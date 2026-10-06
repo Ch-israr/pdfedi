@@ -1,5 +1,17 @@
+# PDFEDI on Render free tier — single Docker image:
+#   Stage 1 builds the static Next.js frontend.
+#   Stage 2 runs FastAPI (API) + serves the exported frontend, one origin.
+#
+# Free-tier notes:
+#   - slim Python deps (backend/requirements-render.txt): no celery/redis/
+#     boto3/psycopg/alembic/sentry — unused with the Render configuration
+#     (inline worker, local storage, Turso, redis disabled). Smaller image,
+#     faster builds and cold starts, less RAM.
+#   - single uvicorn worker (default): correct for 512 MB RAM.
+
 # ---- Stage 1: build the Next.js frontend (static export -> /build/out) ----
 FROM node:20-slim AS web
+ENV NEXT_TELEMETRY_DISABLED=1
 WORKDIR /build
 COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
@@ -17,7 +29,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FRONTEND_DIR=/srv/static
 WORKDIR /srv
-COPY netlify/functions/requirements.txt ./requirements.txt
+COPY backend/requirements-render.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend ./backend
 COPY --from=web /build/out ./static

@@ -1,0 +1,33 @@
+# PDFEDI backend — slim runtime dependencies for Render free tier (Docker).
+# Python 3.12+. Drops everything not imported at runtime with the
+# Render configuration (inline worker, local storage, Turso/SQLite,
+# redis disabled): celery, redis, boto3, psycopg, alembic, sentry-sdk,
+# email-validator, pikepdf, img2pdf and all dev/test packages.
+# Versions pinned to match the full requirements.txt.
+
+# --- API ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-multipart==0.0.20
+
+# --- Database (SQLite + Turso via the pure-Python tursohttp dialect) ---
+sqlalchemy==2.0.36
+greenlet==3.1.1
+
+# --- Auth / security ---
+argon2-cffi==23.1.0
+pyjwt==2.10.1
+cryptography==44.0.0
+email-validator==2.2.0
+
+# --- PDF processing ---
+# NOTE: PyMuPDF (fitz) is BANNED — AGPL-3.0, see ARCHITECTURE.md Decision 2.
+pypdf==5.1.0
+pypdfium2==4.30.0
+pillow==11.0.0
+reportlab==4.2.5
+
+# --- Observability ---
+structlog==24.4.0
