@@ -52,23 +52,14 @@ def create_app() -> FastAPI:
             engine = get_engine()
             Base.metadata.create_all(engine, checkfirst=True)
 
-            # Idempotent schema repair: files.internal_storage_key was
-            # briefly UNIQUE, which breaks the deliberate SHA-256 dedup
-            # (multiple rows share one storage key; deletion is ref-counted).
-            # SQLite and Turso/libsql both support DROP/CREATE INDEX IF EXISTS.
+            # Idempotent schema repairs (SQLite/Turso). Each repair detects the
+            # legacy schema first and is a no-op when already correct.
             try:
-                from sqlalchemy import text
+                from app.db.repairs import repair_files_storage_key_unique
 
-                with engine.begin() as conn:
-                    conn.execute(text("DROP INDEX IF EXISTS uq_files_internal_storage_key"))
-                    conn.execute(
-                        text(
-                            "CREATE INDEX IF NOT EXISTS ix_files_internal_storage_key "
-                            "ON files (internal_storage_key)"
-                        )
-                    )
+                repair_files_storage_key_unique(engine)
             except Exception as e:
-                log.warning("index_repair_failed", error=str(e)[:200])
+                log.warning("schema_repair_failed", error=str(e)[:200])
 
             db = _session_factory()()
             try:
