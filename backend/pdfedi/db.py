@@ -7,11 +7,15 @@ stateless — connections are just host+token), default pool for SQLite.
 from __future__ import annotations
 
 from sqlalchemy import create_engine
+from sqlalchemy.dialects import registry as dialect_registry
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import NullPool
 
+from . import turso as turso_dialect  # noqa: F401  (module must be importable)
 from .config import get_settings
-from . import turso as turso_dialect  # noqa: F401  (registers the dialect)
+
+# Register the custom Turso HTTP dialect (pure Python, no native extensions).
+dialect_registry.register("tursohttp", "pdfedi.turso", "Dialect_tursohttp")
 
 
 def build_database_url() -> str:

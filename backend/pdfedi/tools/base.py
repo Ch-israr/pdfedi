@@ -51,7 +51,7 @@ class ToolSpec:
     min_files: int = 1
     max_files: int = 1
     options: list[ToolOption] = field(default_factory=list)
-    output_kind: str = "pdf"  # "pdf" | "images" | "text"
+    output_kind: str = "pdf"  # "pdf" | "images" | "text" | "zip"
     output_ext: str = "pdf"
     output_mime: str = "application/pdf"
 
