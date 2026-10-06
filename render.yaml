@@ -1,6 +1,5 @@
-# Render Blueprint for the combined PDFEDI deployment:
-# one Docker web service running FastAPI (API) + the statically exported
-# Next.js frontend from a single origin.
+# Render Blueprint for PDFEDI v2: one Docker web service running
+# FastAPI (API) + the statically exported Next.js frontend, single origin.
 services:
   - type: web
     name: pdfedi
@@ -9,6 +8,8 @@ services:
     plan: free
     healthCheckPath: /api/v1/health/live
     envVars:
+      - key: ENV
+        value: production
       - key: DB_PROVIDER
         value: turso
       - key: TURSO_DATABASE_URL
@@ -18,4 +19,6 @@ services:
       - key: TURSO_AUTH_TOKEN
         sync: false
       - key: ADMIN_PASSWORD_HASH
+        sync: false
+      - key: JWT_SECRET_KEY
         sync: false

@@ -1,39 +1,45 @@
-# PDFEDI Web
+# PDFEDI v2 — Free Online PDF Tools
 
-Responsive website for the PDFEDI platform — Next.js 14, TypeScript, Tailwind CSS.
+Single-service deployment: FastAPI backend + statically exported Next.js
+frontend in one Docker image (Render free tier).
 
-## Backend
+## Layout
 
-The app is a pure API client. It talks to the live backend:
+- `backend/` — FastAPI API (`pdfedi/` package, `main.py` entry)
+- `web/` — Next.js frontend (static export)
+- `Dockerfile` — combined image: builds `web/`, serves API + static files
+- `render.yaml` — Render Blueprint
 
+## API
+
+Base: `/api/v1`
+
+- `GET /api/v1/health/live`, `GET /api/v1/health/ready`
+- `GET /api/v1/tools`, `GET /api/v1/tools/{key}`
+- `POST /api/v1/uploads` (multipart, 4 MB max)
+- `GET /api/v1/files/{id}`, `DELETE /api/v1/files/{id}`
+- `POST /api/v1/jobs` `{tool_key, file_ids, config}` — runs inline
+- `GET /api/v1/jobs/{id}`, `POST /api/v1/jobs/{id}/cancel`, `POST /api/v1/jobs/{id}/retry`
+- `GET /api/v1/downloads/{file_id}` (4 MB max)
+- `GET /api/v1/quota/{tool}`
+- Admin: `POST /api/v1/admin/login`, `GET /api/v1/admin/dashboard`, `/admin/files`, `/admin/jobs`, `/admin/change-password`
+
+## Configuration (env vars)
+
+`DB_PROVIDER` (sqlite|turso), `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN`,
+`JWT_SECRET_KEY`, `ADMIN_USERNAME`, `ADMIN_PASSWORD_HASH` (argon2; legacy
+SHA-256 accepted once and auto-upgraded), `STORAGE_DIR`, `MAX_UPLOAD_MB`,
+`MAX_DOWNLOAD_MB`, `QUOTA_PER_HOUR`, `ENV`, `FRONTEND_DIR`.
+
+## Database
+
+SQLite locally, Turso hosted. Enums and timestamps are stored as plain
+strings — no ORM enum mapping, so no serialization bugs. Versioned SQL
+migrations run at startup (`pdfedi/migrate.py`).
+
+## Local dev
+
+```sh
+cd backend && pip install -r requirements-render.txt
+ENV=development FRONTEND_DIR=../web/out uvicorn main:app --reload --app-dir .
 ```
-NEXT_PUBLIC_API_URL=https://pdfedi-backend-5y28wv3x3-chisrar647-3507.vercel.app/api/v1
-```
-
-No mocks, no dummy auth, no localhost fallbacks in production builds.
-
-## Develop
-
-```bash
-npm install
-cp .env.example .env.local   # optional — defaults are baked into next.config.mjs
-npm run dev
-```
-
-## Build & deploy
-
-```bash
-npm run build
-```
-
-Deploys to Vercel as a standard Next.js project (auto-detected framework). Set
-`NEXT_PUBLIC_API_URL` in the Vercel project environment variables for
-production/preview.
-
-## Structure
-
-- `app/` — App Router pages (landing, auth, dashboard, tools/[key], files, pricing, admin, account)
-- `components/` — Navbar, Footer, FileDropzone, RequireAuth
-- `lib/api.ts` — typed API client with token refresh
-- `lib/tools.tsx` — per-tool metadata and params forms
-- `context/AuthContext.tsx` — auth state

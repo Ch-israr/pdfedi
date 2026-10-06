@@ -1,0 +1,248 @@
+"""Job lifecycle and upload ingestion.
+
+Uploads are validated synchronously (PDF parses, page count extracted).
+Jobs run inline in the request — correct for Render's free tier where there
+is no worker tier. Quota is consumed only by successful jobs.
+"""
+from __future__ import annotations
+
+import hashlib
+import io
+import json
+import logging
+import uuid
+
+from pypdf import PdfReader
+from sqlalchemy.orm import Session
+
+from .config import get_settings
+from .models import File, FileKind, FileStatus, Job, JobStatus, enum_value
+from . import quotas
+from .storage import delete_file_record, get_object_path, put_object, storage_key_for
+from .timeutil import utcnow_iso
+from .tools import get_tool
+from .tools.base import ToolContext, ToolError, ToolInput
+
+log = logging.getLogger("pdfedi.jobs")
+
+PDF_MIME = "application/pdf"
+IMAGE_MIMES = {"image/png", "image/jpeg", "image/webp"}
+
+
+class UploadError(Exception):
+    def __init__(self, message: str, *, status_code: int = 422):
+        super().__init__(message)
+        self.status_code = status_code
+
+
+def _extension_for(filename: str, mime: str) -> str:
+    if "." in filename:
+        return filename.rsplit(".", 1)[-1].lower()[:10]
+    return {"application/pdf": "pdf", "image/png": "png", "image/jpeg": "jpg"}.get(mime, "bin")
+
+
+def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
+    """Validate and persist an uploaded file. Raises UploadError on problems."""
+    settings = get_settings()
+    if len(data) > settings.max_upload_bytes:
+        raise UploadError(
+            f"File exceeds the {settings.max_upload_mb} MB upload limit.",
+            status_code=413,
+        )
+    if not data:
+        raise UploadError("Empty file.", status_code=422)
+
+    kind = (mime or "").lower()
+    is_pdf = kind == PDF_MIME or filename.lower().endswith(".pdf")
+    is_image = kind in IMAGE_MIMES or filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+
+    page_count: int | None = None
+    if is_pdf:
+        if not data.startswith(b"%PDF-"):
+            raise UploadError("Not a valid PDF file.", status_code=422)
+        try:
+            reader = PdfReader(io.BytesIO(data))
+            if reader.is_encrypted:
+                raise UploadError("Encrypted PDFs are not supported as input.", status_code=422)
+            page_count = len(reader.pages)
+        except UploadError:
+            raise
+        except Exception as e:
+            raise UploadError(f"Could not parse PDF: {e}", status_code=422) from e
+        mime = PDF_MIME
+    elif not is_image:
+        raise UploadError("Unsupported file type. Upload a PDF or an image.", status_code=422)
+
+    sha256 = hashlib.sha256(data).hexdigest()
+    key = storage_key_for(sha256, _extension_for(filename, mime))
+    put_object(key, data)
+
+    record = File(
+        id=uuid.uuid4().hex,
+        sha256=sha256,
+        filename=filename[:255],
+        size_bytes=len(data),
+        mime=mime,
+        storage_key=key,
+        kind=enum_value(FileKind.INPUT),
+        status=enum_value(FileStatus.VALIDATED),
+        page_count=page_count,
+        created_at=utcnow_iso(),
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
+def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, client_ip: str) -> Job:
+    tool = get_tool(tool_key)
+    if tool is None:
+        raise UploadError(f"Unknown tool: {tool_key}", status_code=404)
+    spec = tool.SPEC
+
+    if not isinstance(file_ids, list) or not (spec.min_files <= len(file_ids) <= spec.max_files):
+        raise UploadError(
+            f"{spec.name} needs {spec.min_files}–{spec.max_files} file(s).",
+            status_code=422,
+        )
+
+    files = []
+    for fid in file_ids:
+        f = db.query(File).filter(File.id == fid).first()
+        if f is None or f.status != FileStatus.VALIDATED.value:
+            raise UploadError("One or more input files are not ready.", status_code=422)
+        if "pdf" in spec.input_kinds and f.mime != PDF_MIME:
+            raise UploadError(f"{spec.name} needs PDF input.", status_code=422)
+        if "image" in spec.input_kinds and f.mime not in IMAGE_MIMES:
+            raise UploadError(f"{spec.name} needs image input.", status_code=422)
+        files.append(f)
+
+    allowed, used, limit = quotas.check_quota(db, client_ip, tool_key)
+    if not allowed:
+        raise UploadError(
+            f"Hourly limit reached for {spec.name} ({used}/{limit}). Try again later.",
+            status_code=429,
+        )
+
+    job = Job(
+        id=uuid.uuid4().hex,
+        tool=tool_key,
+        status=enum_value(JobStatus.QUEUED),
+        file_ids=json.dumps([f.id for f in files]),
+        options=json.dumps(options or {}),
+        created_at=utcnow_iso(),
+        updated_at=utcnow_iso(),
+    )
+    db.add(job)
+    db.commit()
+    db.refresh(job)
+    return job
+
+
+def run_job(db: Session, job_id: str, client_ip: str) -> Job:
+    """Execute a job inline. Never raises — failures are recorded on the job."""
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None:
+        raise UploadError("Job not found.", status_code=404)
+    if job.status not in (JobStatus.QUEUED.value, JobStatus.FAILED.value):
+        return job
+
+    tool = get_tool(job.tool)
+    job.status = enum_value(JobStatus.RUNNING)
+    job.updated_at = utcnow_iso()
+    db.commit()
+
+    ctx = ToolContext([])
+    try:
+        file_ids = json.loads(job.file_ids)
+        options = json.loads(job.options)
+        inputs = []
+        for fid in file_ids:
+            f = db.query(File).filter(File.id == fid).first()
+            if f is None:
+                raise ToolError("An input file is missing.")
+            inputs.append(ToolInput(
+                file_id=f.id, filename=f.filename, path=get_object_path(f.storage_key),
+                size=f.size_bytes, sha256=f.sha256, page_count=f.page_count,
+            ))
+        ctx = ToolContext(inputs)
+        output_path = tool.run(ctx, options if isinstance(options, dict) else {})
+        data = output_path.read_bytes()
+
+        settings = get_settings()
+        if len(data) > settings.max_download_bytes:
+            raise ToolError(f"Output exceeds the {settings.max_download_mb} MB download limit.")
+
+        spec = tool.SPEC
+        sha256 = hashlib.sha256(data).hexdigest()
+        key = storage_key_for(sha256, spec.output_ext)
+        put_object(key, data)
+        out = File(
+            id=uuid.uuid4().hex,
+            sha256=sha256,
+            filename=f"{job.tool}_output.{spec.output_ext}",
+            size_bytes=len(data),
+            mime=spec.output_mime,
+            storage_key=key,
+            kind=enum_value(FileKind.OUTPUT),
+            status=enum_value(FileStatus.VALIDATED),
+            created_at=utcnow_iso(),
+        )
+        db.add(out)
+        db.flush()
+        job.output_file_id = out.id
+        job.status = enum_value(JobStatus.SUCCEEDED)
+        job.error = None
+        quotas.record_success(db, client_ip, job.tool)
+    except ToolError as e:
+        job.status = enum_value(JobStatus.FAILED)
+        job.error = str(e)
+        log.info("job %s failed (user error): %s", job.id, e)
+    except Exception as e:  # noqa: BLE001 — recorded, never leaked raw
+        job.status = enum_value(JobStatus.FAILED)
+        job.error = "Processing failed. Please try again."
+        log.exception("job %s failed (internal)", job.id)
+    finally:
+        job.updated_at = utcnow_iso()
+        db.commit()
+        ctx.cleanup()
+    db.refresh(job)
+    return job
+
+
+def cancel_job(db: Session, job_id: str) -> Job:
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None:
+        raise UploadError("Job not found.", status_code=404)
+    if job.status in (JobStatus.QUEUED.value, JobStatus.RUNNING.value):
+        job.status = enum_value(JobStatus.CANCELLED)
+        job.updated_at = utcnow_iso()
+        db.commit()
+        db.refresh(job)
+    return job
+
+
+def retry_job(db: Session, job_id: str, client_ip: str) -> Job:
+    job = db.query(Job).filter(Job.id == job_id).first()
+    if job is None:
+        raise UploadError("Job not found.", status_code=404)
+    if job.status not in (JobStatus.FAILED.value, JobStatus.CANCELLED.value):
+        raise UploadError("Only failed or cancelled jobs can be retried.", status_code=409)
+    allowed, used, limit = quotas.check_quota(db, client_ip, job.tool)
+    if not allowed:
+        raise UploadError(
+            f"Hourly limit reached ({used}/{limit}). Try again later.", status_code=429
+        )
+    job.status = enum_value(JobStatus.QUEUED)
+    job.error = None
+    job.updated_at = utcnow_iso()
+    db.commit()
+    return run_job(db, job.id, client_ip)
+
+
+def delete_file(db: Session, file_id: str) -> None:
+    f = db.query(File).filter(File.id == file_id).first()
+    if f is None:
+        raise UploadError("File not found.", status_code=404)
+    delete_file_record(db, f)
