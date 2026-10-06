@@ -1,0 +1,52 @@
+# PDFEDI backend — pinned runtime dependencies
+# Python 3.12+
+
+# --- API ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic==2.10.4
+pydantic-settings==2.7.0
+python-multipart==0.0.20
+
+# --- Database ---
+sqlalchemy==2.0.36
+alembic==1.14.0
+psycopg==3.2.3
+greenlet==3.1.1
+
+# --- Auth / security ---
+argon2-cffi==23.1.0
+pyjwt==2.10.1
+cryptography==44.0.0
+email-validator==2.2.0
+
+# --- Redis / queue ---
+redis==5.2.1
+celery[redis]==5.4.0
+
+# --- PDF processing ---
+# NOTE: PyMuPDF (fitz) is BANNED — AGPL-3.0, see ARCHITECTURE.md Decision 2.
+# Use pypdf (BSD) + pypdfium2 (Apache-2.0) + reportlab (BSD) + pikepdf (MPL-2.0).
+pypdf==5.1.0
+pypdfium2==4.30.0
+pillow==11.0.0
+reportlab==4.2.5
+pikepdf==10.12.0
+img2pdf==0.6.1
+# OCR: ocrmypdf + tesseract system binary (deploy separately)
+# ocrmypdf removed: unsatisfiable deps on Vercel; OCR tool degrades gracefully
+
+# --- Storage ---
+boto3==1.35.90
+
+# --- Observability ---
+structlog==24.4.0
+sentry-sdk[fastapi]==2.19.0
+
+# --- Dev / test ---
+pytest==8.3.4
+pytest-asyncio==0.25.0
+httpx==0.28.1
+pytest-cov==6.0.0
+ruff==0.8.4
+mypy==1.13.0
