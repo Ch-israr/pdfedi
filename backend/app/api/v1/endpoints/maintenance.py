@@ -80,7 +80,7 @@ def cleanup_expired_data(db: Session = Depends(get_db)):
         old_jobs = db.query(ProcessingJob).filter(
             and_(
                 ProcessingJob.created_at < cutoff,
-                ProcessingJob.status.in_([JobStatus.COMPLETED, JobStatus.FAILED, JobStatus.CANCELLED])
+                ProcessingJob.status.in_([JobStatus.SUCCEEDED, JobStatus.FAILED, JobStatus.CANCELLED])
             )
         ).all()
         

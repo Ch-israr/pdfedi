@@ -120,13 +120,13 @@ def list_jobs(
 
 @jobs_router.get("/{job_id}")
 def get_job(job_id: uuid.UUID, db: Session = Depends(get_db)):
-    job = job_service.get_job_for_user(db, user=user, job_id=job_id)
+    job = job_service.get_job_for_user(db, job_id=job_id)
     return job_service.job_to_public_dict(job)
 
 
 @jobs_router.post("/{job_id}/cancel")
 def cancel_job(job_id: uuid.UUID, db: Session = Depends(get_db)):
-    job = job_service.get_job_for_user(db, user=user, job_id=job_id)
+    job = job_service.get_job_for_user(db, job_id=job_id)
     if job.status not in (JobStatus.QUEUED,):
         from app.core.errors import AppException
 
@@ -136,25 +136,27 @@ def cancel_job(job_id: uuid.UUID, db: Session = Depends(get_db)):
 
 
 @jobs_router.post("/{job_id}/retry", dependencies=[Depends(rate_limit("job_create"))])
-def retry_job(job_id: uuid.UUID, db: Session = Depends(get_db)):
-    job = job_service.get_job_for_user(db, user=user, job_id=job_id)
+def retry_job(job_id: uuid.UUID, request: Request, db: Session = Depends(get_db)):
+    from app.core.quotas import quota_manager
+
+    job = job_service.get_job_for_user(db, job_id=job_id)
     if job.status != JobStatus.FAILED:
         raise JobNotFound("Only failed jobs can be retried.")
     if job.retry_count >= 2:
         from app.core.errors import AppException
 
         raise AppException("Retry limit reached for this job.")
-    plan = subscription_service.check_tool_entitled(db, user, job.tool_key)
-    subscription_service.check_job_quota(db, user, plan)
-    job.retry_count += 1
-    job.status = JobStatus.QUEUED
-    job.error_code = None
-    job.internal_error_reference = None
-    db.commit()
-    plan_limits = {
-        "max_pages": plan.max_pages_per_pdf,
-        "max_upload_mb": plan.max_upload_mb,
-    }
-    job_service.get_worker().submit(db, job, user_plan_limits=plan_limits)
-    db.refresh(job)
-    return job_service.job_to_public_dict(job)
+    # Same abuse protection as job creation (no subscriptions in this architecture).
+    client_ip = quota_manager.get_client_ip(request)
+    quota_manager.check_and_record(client_ip)
+    try:
+        job.retry_count += 1
+        job.status = JobStatus.QUEUED
+        job.error_code = None
+        job.internal_error_reference = None
+        db.commit()
+        job_service.get_worker().submit(db, job)
+        db.refresh(job)
+        return job_service.job_to_public_dict(job)
+    finally:
+        quota_manager.release(client_ip)

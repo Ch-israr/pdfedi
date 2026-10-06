@@ -162,7 +162,7 @@ def store_upload(
         key = existing.internal_storage_key
         log.info("file_dedup_hit", user_id=str(owner_id), sha256=file_hash[:12])
     else:
-        key = new_storage_key(prefix=f"{storage_class}/{owner_id}", suffix=f".{ext}")
+        key = new_storage_key(prefix=f"{getattr(storage_class, 'value', storage_class)}/{owner_id}", suffix=f".{ext}")
         storage.put(key, data, content_type=f"application/{ext}" if ext == "pdf" else f"image/{ext}")
 
     now = datetime.now(timezone.utc)
@@ -193,7 +193,7 @@ def store_upload(
     return f
 
 
-def get_user_file(db: Session, *, user: User, file_id: uuid.UUID) -> File:
+def get_user_file(db: Session, *, owner_id: uuid.UUID, file_id: uuid.UUID) -> File:
     """Ownership-enforced fetch. Raises NotFound (not Forbidden) to avoid
     leaking existence of other users' files."""
     from app.core.errors import NotFound
@@ -204,8 +204,8 @@ def get_user_file(db: Session, *, user: User, file_id: uuid.UUID) -> File:
     return f
 
 
-def delete_file(db: Session, *, user: User, file_id: uuid.UUID) -> None:
-    f = get_user_file(db, user=user, file_id=file_id)
+def delete_file(db: Session, *, owner_id: uuid.UUID, file_id: uuid.UUID) -> None:
+    f = get_user_file(db, owner_id=owner_id, file_id=file_id)
     # Dedup-aware: only delete storage bytes if no other live file references the key.
     # (store_upload reuses storage keys on SHA-256 match; blind delete would break siblings.)
     from sqlalchemy import func, select

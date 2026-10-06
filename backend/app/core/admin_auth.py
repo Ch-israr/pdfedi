@@ -56,14 +56,14 @@ def create_admin_token(admin_id: str) -> str:
         "jti": str(uuid.uuid4()),
     }
     # Use a separate secret for admin tokens
-    secret = getattr(settings, 'admin_jwt_secret', settings.jwt_secret_key)
+    secret = settings.admin_jwt_secret or settings.jwt_secret_key
     return jwt.encode(payload, secret, algorithm="HS256")
 
 
 def verify_admin_token(token: str) -> dict | None:
     """Verify admin JWT, return payload or None."""
     settings = get_settings()
-    secret = getattr(settings, 'admin_jwt_secret', settings.jwt_secret_key)
+    secret = settings.admin_jwt_secret or settings.jwt_secret_key
     try:
         payload = jwt.decode(token, secret, algorithms=["HS256"])
         if payload.get("type") != "admin":

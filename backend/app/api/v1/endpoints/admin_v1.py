@@ -97,7 +97,7 @@ def dashboard(
     completed_jobs = db.scalar(
         select(func.count()).select_from(ProcessingJob).where(
             ProcessingJob.created_at >= since,
-            ProcessingJob.status == JobStatus.COMPLETED,
+            ProcessingJob.status == JobStatus.SUCCEEDED,
         )
     ) or 0
 

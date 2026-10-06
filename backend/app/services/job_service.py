@@ -49,9 +49,12 @@ class WorkerBackend(ABC):
         """Attempt cancellation. Returns True if cancelled."""
 
 
-def get_job_for_user(db: Session, *, user: User, job_id: uuid.UUID) -> ProcessingJob:
+def get_job_for_user(db: Session, *, job_id: uuid.UUID) -> ProcessingJob:
+    """Fetch a job owned by the anonymous public user (no auth in this architecture)."""
+    from app.core.anonymous import ANONYMOUS_USER_ID
+
     job = db.get(ProcessingJob, job_id)
-    if not job or job.owner_user_id != owner_id:
+    if not job or job.owner_user_id != ANONYMOUS_USER_ID:
         raise JobNotFound()
     return job
 

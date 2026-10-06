@@ -22,7 +22,7 @@ class File(UUIDMixin, TimestampMixin, SoftDeleteMixin, Base):
     owner_user_id: Mapped[uuid.UUID] = mapped_column(GUID(), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     original_filename: Mapped[str] = mapped_column(String(512), nullable=False)
     safe_display_name: Mapped[str] = mapped_column(String(512), nullable=False)
-    internal_storage_key: Mapped[str] = mapped_column(String(1024), unique=True, nullable=False)
+    internal_storage_key: Mapped[str] = mapped_column(String(1024), index=True, nullable=False)
     detected_content_type: Mapped[str] = mapped_column(String(128), nullable=False)
     size_bytes: Mapped[int] = mapped_column(BigInteger, nullable=False)
     sha256: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
