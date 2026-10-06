@@ -181,6 +181,13 @@ class TursoHttpCursor:
 
     def _to_turso_arg(self, v: Any) -> dict:
         """Convert Python value to Turso arg format."""
+        import enum as enum_module
+
+        # Unwrap enums to their raw values FIRST: str(enum_member) renders as
+        # "ClassName.MEMBER" on Python 3.11+, which would corrupt every
+        # enum-mapped String column (status checks compare against .value).
+        if isinstance(v, enum_module.Enum):
+            return self._to_turso_arg(v.value)
         if v is None:
             return {"type": "null"}
         if isinstance(v, bool):

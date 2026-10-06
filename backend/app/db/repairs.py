@@ -16,6 +16,61 @@ from app.core.logging import get_logger
 log = get_logger("pdfedi.db.repairs")
 
 
+def repair_legacy_enum_strings(engine: Engine) -> int:
+    """Normalize legacy "ClassName.MEMBER" strings in enum-mapped columns.
+
+    The Turso HTTP dialect used to serialize str-enums via str(member),
+    which on Python 3.11+ renders "ClassName.MEMBER" instead of the raw
+    value. Rows written before the dialect fix carry the long form, which
+    breaks value comparisons (e.g. upload_status checks). Rewrites each
+    legacy literal to its enum value. Returns the number of rows updated.
+    """
+    from app.db.models.enums import (
+        AccountStatus,
+        FileUploadStatus,
+        JobStatus,
+        PlanCategory,
+        StorageClass,
+        SubscriptionStatus,
+    )
+
+    targets = [
+        ("files", "upload_status", FileUploadStatus),
+        ("files", "storage_class", StorageClass),
+        ("processing_jobs", "status", JobStatus),
+        ("subscription_plans", "category", PlanCategory),
+        ("subscriptions", "status", SubscriptionStatus),
+        ("users", "account_status", AccountStatus),
+    ]
+    total = 0
+    with engine.begin() as conn:
+        tables = {
+            r[0]
+            for r in conn.execute(
+                text("SELECT name FROM sqlite_master WHERE type='table'")
+            ).fetchall()
+        }
+        for table, column, enum_cls in targets:
+            if table not in tables:
+                continue
+            cols = {
+                r[1]
+                for r in conn.execute(text(f"PRAGMA table_info({table})")).fetchall()
+            }
+            if column not in cols:
+                continue
+            for member in enum_cls:
+                legacy = f"{enum_cls.__name__}.{member.name}"
+                res = conn.execute(
+                    text(f"UPDATE {table} SET {column} = :val WHERE {column} = :legacy"),
+                    {"val": member.value, "legacy": legacy},
+                )
+                total += res.rowcount or 0
+    if total:
+        log.warning("repair_legacy_enum_strings_done", rows=total)
+    return total
+
+
 def repair_files_storage_key_unique(engine: Engine) -> bool:
     """Drop the legacy UNIQUE on files.internal_storage_key.
 

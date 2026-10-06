@@ -55,9 +55,13 @@ def create_app() -> FastAPI:
             # Idempotent schema repairs (SQLite/Turso). Each repair detects the
             # legacy schema first and is a no-op when already correct.
             try:
-                from app.db.repairs import repair_files_storage_key_unique
+                from app.db.repairs import (
+                    repair_files_storage_key_unique,
+                    repair_legacy_enum_strings,
+                )
 
                 repair_files_storage_key_unique(engine)
+                repair_legacy_enum_strings(engine)
             except Exception as e:
                 log.warning("schema_repair_failed", error=str(e)[:200])
 
