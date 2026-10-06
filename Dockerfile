@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY app ./app
 COPY components ./components
+COPY context ./context
 COPY lib ./lib
 COPY public ./public
 COPY next.config.mjs tsconfig.json tailwind.config.ts postcss.config.mjs next-env.d.ts ./
