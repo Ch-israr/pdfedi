@@ -1,9 +1,14 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ToolRunner } from "./ToolRunner";
-import { getToolMeta } from "@/lib/tools";
+import { getToolMeta, TOOLS } from "@/lib/tools";
 
 type Props = { params: { key: string } };
+
+// Static export: pre-render one page per tool.
+export function generateStaticParams() {
+  return TOOLS.map((t) => ({ key: t.key }));
+}
 
 // Per-tool SEO metadata (spec §43). Public tool pages are indexable;
 // the runner itself is a client component.

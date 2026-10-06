@@ -5,6 +5,7 @@ API-first: the web app, future Android and iOS apps are all clients of
 """
 from __future__ import annotations
 
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -141,9 +142,41 @@ def create_app() -> FastAPI:
     # --- Routes ---
     app.include_router(v1_router, prefix=settings.api_v1_prefix)
 
+    # --- Frontend (combined deployment) ---
+    # When FRONTEND_DIR points at a Next.js static export, serve it from the
+    # same origin: exact files directly, extensionless routes via their
+    # .html file, everything else falls back to index.html. API routes are
+    # registered above, so they always win over this catch-all.
+    _frontend_dir = os.environ.get("FRONTEND_DIR", "")
+
     @app.get("/", include_in_schema=False)
     def root():
+        if _frontend_dir:
+            _index = os.path.join(_frontend_dir, "index.html")
+            if os.path.isfile(_index):
+                from fastapi.responses import FileResponse
+
+                return FileResponse(_index)
         return {"service": settings.app_name, "version": settings.app_version, "api": settings.api_v1_prefix}
+
+    if _frontend_dir and os.path.isdir(_frontend_dir):
+
+        @app.get("/{full_path:path}", include_in_schema=False)
+        async def serve_frontend(full_path: str):
+            # Never swallow API 404s — keep the JSON error envelope.
+            if full_path == "api" or full_path.startswith("api/"):
+                raise StarletteHTTPException(status_code=404, detail="Not found")
+            from fastapi.responses import FileResponse
+
+            candidates = [
+                os.path.join(_frontend_dir, full_path),
+                os.path.join(_frontend_dir, full_path + ".html"),
+                os.path.join(_frontend_dir, "index.html"),
+            ]
+            for _candidate in candidates:
+                if os.path.isfile(_candidate):
+                    return FileResponse(_candidate)
+            raise StarletteHTTPException(status_code=404, detail="Not found")
 
     return app
 

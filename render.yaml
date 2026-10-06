@@ -1,0 +1,21 @@
+# Render Blueprint for the combined PDFEDI deployment:
+# one Docker web service running FastAPI (API) + the statically exported
+# Next.js frontend from a single origin.
+services:
+  - type: web
+    name: pdfedi
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    healthCheckPath: /api/v1/health/live
+    envVars:
+      - key: DB_PROVIDER
+        value: turso
+      - key: TURSO_DATABASE_URL
+        value: libsql://museapp-ch-israr.aws-ap-south-1.turso.io
+      - key: ADMIN_USERNAME
+        value: admin@pdfedi.com
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: ADMIN_PASSWORD_HASH
+        sync: false
