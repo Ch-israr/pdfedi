@@ -82,7 +82,7 @@ def create_app() -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=settings.cors_allow_origins,
-        allow_origin_regex=r"https://pdfedi-[a-z0-9-]+\.vercel\.app",
+        allow_origin_regex=r"https://pdfedi-[a-z0-9-]+\.vercel\.app|https://[a-z0-9-]+\.netlify\.app",
         allow_credentials=settings.cors_allow_credentials,
         allow_methods=["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
         allow_headers=["Authorization", "Content-Type", "X-Request-ID", "X-Idempotency-Key"],
@@ -165,9 +165,9 @@ def _ensure_roles(db) -> None:
         "admin.jobs.read", "admin.jobs.write", "admin.files.read", "admin.settings.read",
         "admin.settings.write", "admin.analytics.read", "admin.audit.read",
     ]
-    for name, desc in perm_defs:
-        if not db.scalar(select(Permission).where(Permission.name == name)):
-            db.add(Permission(name=name, description=desc))
+    for perm_name in perm_defs:
+        if not db.scalar(select(Permission).where(Permission.name == perm_name)):
+            db.add(Permission(name=perm_name, description=perm_name))
     db.flush()
     grants = {
         "super_admin": perm_defs,
