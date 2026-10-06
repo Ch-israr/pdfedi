@@ -10,7 +10,7 @@ from pathlib import Path
 
 import structlog
 from fastapi import FastAPI
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from pdfedi.api import admin as admin_api
@@ -58,6 +58,9 @@ def create_app() -> FastAPI:
 
         @app.get("/{path:path}")
         def serve_frontend(path: str):
+            # Unknown API routes are real 404s (JSON), not the SPA fallback.
+            if path == "api" or path.startswith("api/"):
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
             # API routes are matched before this catch-all.
             candidate = frontend / path
             if path and candidate.is_file():
