@@ -20,6 +20,7 @@ from pathlib import Path
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, Response
+from fastapi.staticfiles import StaticFiles
 
 import asyncio
 
@@ -37,6 +38,9 @@ _MAX_CONCURRENT_RUNS = 2
 _run_semaphore = asyncio.Semaphore(_MAX_CONCURRENT_RUNS)
 
 app = FastAPI(title="PDFEDI Testing Sandbox", docs_url=None, redoc_url=None)
+
+# Serve editor JS modules (sandbox editor is a static client-side app)
+app.mount("/editor", StaticFiles(directory=str(HERE / "editor")), name="editor-static")
 
 
 def _load_tools() -> dict[str, ToolSpec]:
@@ -71,6 +75,12 @@ def _get_tool(key: str) -> tuple[ToolSpec, object]:
 @app.get("/", response_class=HTMLResponse)
 def index():
     return (WEB_DIR / "index.html").read_text()
+
+
+@app.get("/editor", response_class=HTMLResponse)
+def editor():
+    """Experimental browser-first PDF editor (sandbox only)."""
+    return (WEB_DIR / "editor.html").read_text()
 
 
 @app.get("/api/health")
