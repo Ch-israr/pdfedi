@@ -192,6 +192,90 @@ def _ocr_words_via_api(pdf_bytes: bytes, language: str) -> list[list[dict]]:
 
 
 # ---------------------------------------------------------------------------
+# Native text extraction (digital PDFs): no OCR, no rendering.
+# ---------------------------------------------------------------------------
+
+def _font_flags(fontname: str) -> tuple[bool, bool]:
+    """Detect bold/italic from PDF font name."""
+    fn = (fontname or "").lower()
+    bold = "bold" in fn or "black" in fn or "heavy" in fn
+    italic = "italic" in fn or "oblique" in fn or "slanted" in fn
+    return bold, italic
+
+
+def _is_digital_page(plumber_page, min_chars: int = 50) -> bool:
+    """True if the page has substantial native text (digital, not scanned)."""
+    try:
+        text = plumber_page.extract_text() or ""
+        return len(text.strip()) >= min_chars
+    except Exception:
+        return False
+
+
+def _chars_to_word(chars: list[dict]) -> dict | None:
+    """Merge chars into a word dict with font info."""
+    if not chars:
+        return None
+    text = "".join(c.get("text", "") for c in chars)
+    if not text.strip():
+        return None
+    x0 = min(c["x0"] for c in chars)
+    x1 = max(c.get("x1", c["x0"] + 5) for c in chars)
+    top = min(c["top"] for c in chars)
+    bottom = max(c.get("bottom", c["top"] + 10) for c in chars)
+    fonts: dict[str, int] = {}
+    sizes: dict[float, int] = {}
+    for c in chars:
+        fonts[c.get("fontname", "")] = fonts.get(c.get("fontname", ""), 0) + 1
+        sz = round(float(c.get("size", 10)), 1)
+        sizes[sz] = sizes.get(sz, 0) + 1
+    fontname = max(fonts, key=fonts.get)
+    size = max(sizes, key=sizes.get)
+    bold, italic = _font_flags(fontname)
+    return {
+        "text": text,
+        "x0": x0, "top": top,
+        "width": x1 - x0, "height": bottom - top,
+        "fontname": fontname, "size": size,
+        "bold": bold, "italic": italic,
+    }
+
+
+def _extract_native_words(plumber_page) -> list[dict]:
+    """Extract positioned words with font info from a digital PDF page.
+
+    Groups pdfplumber chars into words, preserving fontname/size for
+    bold/italic/size reconstruction. No OCR, no rendering — 100% accurate
+    text, minimal memory.
+    """
+    chars = [c for c in plumber_page.chars if (c.get("text") or "").strip()]
+    if not chars:
+        return []
+    chars.sort(key=lambda c: (round(c["top"], 1), c["x0"]))
+    words: list[dict] = []
+    current: list[dict] = []
+    for ch in chars:
+        if current:
+            prev = current[-1]
+            prev_x1 = prev.get("x1", prev["x0"] + prev.get("adv", 5))
+            gap = ch["x0"] - prev_x1
+            prev_h = prev.get("height", 10)
+            same_line = abs(ch["top"] - prev["top"]) < prev_h * 0.5
+            # Space width is typically ~0.25-0.3x font size.
+            if not same_line or gap > prev_h * 0.25:
+                w = _chars_to_word(current)
+                if w:
+                    words.append(w)
+                current = []
+        current.append(ch)
+    if current:
+        w = _chars_to_word(current)
+        if w:
+            words.append(w)
+    return words
+
+
+# ---------------------------------------------------------------------------
 # Layout analysis: words -> lines -> columns -> blocks
 # ---------------------------------------------------------------------------
 
@@ -402,26 +486,103 @@ def _detect_table(lines: list[list[dict]]) -> list[dict] | None:
     return None
 
 
+def _detect_list_marker(text: str) -> tuple[str | None, str, str]:
+    """Detect bullet/numbered list markers at the start of a paragraph.
+
+    Returns (kind, marker, clean_text) where kind is 'bullet', 'number',
+    or None.
+    """
+    import re
+    t = text.lstrip()
+    # Bullets: • - * · ◦ ▪ – —, or (cid:NNN) placeholder for unmapped glyphs.
+    m = re.match(r"^(\(cid:\d+\)|[•\-\*\·\◦\▪\–\—])\s+(.*)$", t, re.DOTALL)
+    if m:
+        return "bullet", m.group(1) + " ", m.group(2)
+    # Numbered: 1. 1) (1) a. A. i. I. etc.
+    m = re.match(r"^(\(?[0-9a-zA-Z]{1,4}[.\)])\s+(.*)$", t, re.DOTALL)
+    if m:
+        marker = m.group(1)
+        # Avoid false positives like "8.5" (decimal) or single letters mid-text.
+        # Require the marker to be a plausible list label.
+        label = marker.strip("().")
+        if re.fullmatch(r"[0-9]{1,3}|[a-zA-Z]|i{1,3}|iv|v|vi{1,3}|ix|x", label,
+                         re.IGNORECASE):
+            return "number", m.group(1) + " ", m.group(2)
+    return None, "", text
+
+
+def _majority_text(texts: list[str], n_pages: int) -> str | None:
+    """Find text repeated on most pages (header/footer candidate)."""
+    import re
+    norm: dict[str, tuple[str, int]] = {}
+    for t in texts:
+        key = re.sub(r"\s+", " ", t.strip().lower())
+        if not key or len(key) > 200:
+            continue
+        if key in norm:
+            orig, cnt = norm[key]
+            norm[key] = (orig, cnt + 1)
+        else:
+            norm[key] = (t.strip(), 1)
+    for orig, cnt in norm.values():
+        if cnt >= 2 and cnt >= n_pages * 0.5 and n_pages >= 2:
+            return orig
+    return None
+
+
+def _estimate_margins(words: list[dict], page_w_pt: float, page_h_pt: float,
+                      coords_in_points: bool) -> dict[str, float]:
+    """Estimate page margins (in points) from the content bounding box."""
+    scale = 1.0 if coords_in_points else 72.0 / _OCR_DPI
+    try:
+        min_x0 = min(w["x0"] for w in words) * scale
+        max_x1 = max(w["x0"] + w["width"] for w in words) * scale
+        min_top = min(w["top"] for w in words) * scale
+        max_bot = max(w["top"] + w["height"] for w in words) * scale
+    except (ValueError, KeyError):
+        return {"left": 72.0, "right": 72.0, "top": 72.0, "bottom": 72.0}
+
+    def clamp(v: float) -> float:
+        return min(max(v, 18.0), 144.0)  # 0.25" .. 2"
+
+    return {
+        "left": clamp(min_x0),
+        "right": clamp(page_w_pt - max_x1),
+        "top": clamp(min_top),
+        "bottom": clamp(page_h_pt - max_bot),
+    }
+
+
 def _is_heading(text: str, avg_h: float, median_h: float) -> bool:
-    """Heading heuristic: short text that is all-caps or notably large."""
+    """Heading heuristic: short text that is all-caps or notably large.
+
+    The size ratio uses 1.5x (not 1.35x) because OCR height measurements
+    are noisy — a 37% difference can be measurement error, not a real
+    font size change.
+    """
     words = text.split()
     if not words or len(words) > 10 or len(text) > 100:
         return False
     if text.isupper() and len(words) <= 8:
         return True
-    if median_h > 0 and avg_h > median_h * 1.35:
+    if median_h > 0 and avg_h > median_h * 1.5 and len(words) <= 8:
         return True
     return False
 
 
-def _analyze_page(words: list[dict], page_w: float, page_h: float) -> list[dict]:
+def _analyze_page(words: list[dict], page_w: float, page_h: float,
+                  coords_in_points: bool = False) -> list[dict]:
     """Full layout analysis for one page. Returns ordered blocks.
 
+    If coords_in_points is True, word coordinates are already in PDF points
+    (from pdfplumber); otherwise they are in image pixels at _OCR_DPI.
+
     Block types:
-      {'type': 'heading', 'text': str, 'size_pt': float}
+      {'type': 'heading', 'text': str, 'size_pt': float, 'runs': [...]}
       {'type': 'paragraph', 'text': str, 'size_pt': float, 'align': str,
-       'indent': bool}
+       'indent': bool, 'runs': [...]}
       {'type': 'table', 'rows': [{'cells': [str]}]}
+    Runs preserve per-word bold/italic when font info is available.
     """
     if not words:
         return []
@@ -451,7 +612,19 @@ def _analyze_page(words: list[dict], page_w: float, page_h: float) -> list[dict]
         def flush():
             if not current:
                 return
-            text = " ".join(_line_text(l) for l in current)
+            # Build runs preserving per-word font info (bold/italic/size).
+            runs: list[dict] = []
+            for line in current:
+                for w in line:
+                    runs.append({
+                        "text": w["text"] + " ",
+                        "bold": w.get("bold", False),
+                        "italic": w.get("italic", False),
+                        "size": w.get("size"),  # PDF points, None if from OCR
+                    })
+            if runs:
+                runs[-1]["text"] = runs[-1]["text"].rstrip()
+            text = "".join(r["text"] for r in runs)
             hs = [w["height"] for l in current for w in l]
             avg_h = sum(hs) / len(hs) if hs else median_h
             # Alignment: compare line x0 spread.
@@ -461,21 +634,61 @@ def _analyze_page(words: list[dict], page_w: float, page_h: float) -> list[dict]
             if max(x0s) - min(x0s) > 30 and max(x1s) - min(x1s) < 20:
                 align = "right"
             elif max(x0s) - min(x0s) < 20 and max(x1s) - min(x1s) < 20:
-                # Both edges aligned — could be justified or centered block.
                 pass
             indent = min(x0s) > page_w * 0.08
-            # Approximate font size in points (at 200 DPI).
-            size_pt = round(avg_h * 72 / 200, 1)
-            if _is_heading(text, avg_h, median_h):
-                col_blocks.append({"type": "heading", "text": text, "size_pt": size_pt})
+            # Font size: prefer native PDF size if available, else from height.
+            native_sizes = [w.get("size") for l in current for w in l
+                            if w.get("size")]
+            if native_sizes:
+                size_pt = round(sum(native_sizes) / len(native_sizes), 1)
             else:
+                # Approximate from height (OCR path, pixels at _OCR_DPI).
+                size_pt = round(avg_h * 72 / _OCR_DPI, 1)
+            # Heading detection: use native size if available.
+            is_head = _is_heading(text, avg_h, median_h)
+            if native_sizes:
+                med_size = sorted(native_sizes)[len(native_sizes) // 2]
+                # If text is notably larger than body, it's a heading.
+                body_size = 11  # typical
+                if med_size > body_size * 1.3 and len(text.split()) <= 10:
+                    is_head = True
+            if is_head:
                 col_blocks.append({
-                    "type": "paragraph", "text": text, "size_pt": size_pt,
-                    "align": align, "indent": indent,
+                    "type": "heading", "text": text, "size_pt": size_pt,
+                    "runs": runs, "zone": current_zone,
                 })
+                return
+            # List detection: bullet or numbered markers.
+            list_kind, marker, clean = _detect_list_marker(text)
+            if list_kind and clean.strip():
+                list_runs = [dict(r) for r in runs]
+                # Strip the marker from the first run's text.
+                try:
+                    first = list_runs[0]["text"]
+                    idx = first.find(marker.strip())
+                    if idx >= 0:
+                        list_runs[0]["text"] = first[idx + len(marker.strip()):].lstrip()
+                    else:
+                        # Fallback: strip leading marker chars.
+                        list_runs[0]["text"] = first.lstrip("•-*·◦▪–—0123456789.)( ").lstrip()
+                except Exception:
+                    pass
+                col_blocks.append({
+                    "type": "list_item", "text": clean, "size_pt": size_pt,
+                    "runs": list_runs, "list_kind": list_kind,
+                    "zone": current_zone,
+                })
+                return
+            col_blocks.append({
+                "type": "paragraph", "text": text, "size_pt": size_pt,
+                "align": align, "indent": indent, "runs": runs,
+                "zone": current_zone,
+            })
 
         i = 0
         prev_line_text = ""
+        prev_line_is_edge = False
+        current_zone: str | None = None  # "top", "bottom", or None
         while i < len(col_lines):
             # Try table detection starting at this line.
             tbl = _detect_table(col_lines[i:i + 8])
@@ -485,11 +698,20 @@ def _analyze_page(words: list[dict], page_w: float, page_h: float) -> list[dict]
                 i += len(tbl)
                 prev_bottom = None
                 prev_line_text = ""
+                prev_line_is_edge = False
+                current_zone = None
                 continue
             line = col_lines[i]
             top = min(w["top"] for w in line)
             bottom = max(w["top"] + w["height"] for w in line)
             line_x0 = min(w["x0"] for w in line)
+            # Edge zone (probable header/footer): top 10% / bottom 8%.
+            # Edge lines always stand alone — never merged with body or
+            # with each other, so repeated headers/footers stay detectable.
+            is_top_edge = top < page_h * 0.10
+            is_bottom_edge = bottom > page_h * 0.92
+            line_is_edge = is_top_edge or is_bottom_edge
+            line_zone = "top" if is_top_edge else ("bottom" if is_bottom_edge else None)
             new_para = False
             if prev_bottom is not None and current:
                 gap = top - prev_bottom
@@ -506,12 +728,23 @@ def _analyze_page(words: list[dict], page_w: float, page_h: float) -> list[dict]
                     # is not tiny, it's a new paragraph.
                     if gap > avg_h * 0.4:
                         new_para = True
+            # Boundary involving the edge zone: edge lines never merge.
+            if current and (line_is_edge or prev_line_is_edge):
+                new_para = True
+            # A line starting with a list marker begins a new list item.
+            if current and not line_is_edge:
+                _lk, _lm, _ = _detect_list_marker(_line_text(line))
+                if _lm:
+                    new_para = True
             if new_para:
                 flush()
                 current = []
             current.append(line)
+            if len(current) == 1:
+                current_zone = line_zone
             prev_bottom = bottom
             prev_line_text = _line_text(line)
+            prev_line_is_edge = line_is_edge
             i += 1
         flush()
         blocks.extend(col_blocks)
@@ -598,7 +831,10 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if not pdf_bytes.lstrip().startswith(b"%PDF-"):
         raise ToolError("Input is not a valid PDF file.", code="invalid_input")
 
-    # --- Step 1+2: OCR pipeline (required), memory-safe page-by-page ---
+    # --- Hybrid extraction: native text for digital pages, OCR for scanned ---
+    # Per-page decision: if pdfplumber finds substantial native text, use it
+    # directly (100% accurate, font info preserved, no rendering, minimal RAM).
+    # Otherwise, render + OCR (memory-safe: spill to temp file first).
     try:
         import pypdfium2 as pdfium
         import pytesseract  # noqa: F401
@@ -606,91 +842,405 @@ def run(ctx: ToolContext, options: dict) -> Path:
     except ImportError:
         local_ok = False
 
+    import pdfplumber
+
     tmpdir = Path(tempfile.mkdtemp(prefix="pdfedi-p2w-"))
     doc = Document()
     style = doc.styles["Normal"]
     style.font.size = Pt(11)
 
-    try:
-        if local_ok:
-            import pypdfium2 as pdfium
-            pdf = pdfium.PdfDocument(io.BytesIO(pdf_bytes))
-            try:
-                n_pages = len(pdf)
-                for i in range(n_pages):
-                    # Render -> temp file -> release BEFORE OCR.
-                    page = pdf[i]
-                    pil_image = page.render(scale=_OCR_DPI / 72).to_pil()
-                    img_w, img_h = pil_image.size
-                    page_w_pt = img_w * 72 / _OCR_DPI
-                    page_h_pt = img_h * 72 / _OCR_DPI
-                    img_file = tmpdir / f"page_{i}.png"
-                    pil_image.save(str(img_file), optimize=True)
-                    del pil_image
-                    gc.collect()
+    # Per-page edge blocks for header/footer detection (tiny memory: text only).
+    page_edges: list[tuple[str, str]] = []  # (first_block_text, last_block_text)
+    page_emitted: list[list[tuple[dict, object | None]]] = []
 
-                    words = _ocr_words_local(str(img_file), language)
-                    blocks = _analyze_page(words, img_w, img_h)
-                    images = _extract_images(pdf_bytes, i, page_w_pt, page_h_pt, tmpdir)
-
-                    _emit_page(doc, blocks, images, i == 0, Pt, WD_ALIGN_PARAGRAPH)
-
-                    # Per-page cleanup: temp image gone, memory released.
-                    try:
-                        img_file.unlink()
-                    except OSError:
-                        pass
-                    del words, blocks, images
-                    gc.collect()
-            finally:
-                pdf.close()
+    def _new_page_section(page_w_pt: float, page_h_pt: float,
+                          margins: dict[str, float], is_first: bool):
+        """Create (or reuse) a section for this PDF page with its size."""
+        from docx.shared import Inches
+        from docx.enum.section import WD_SECTION
+        if is_first:
+            section = doc.sections[0]
         else:
-            # Fallback: production OCR API (read-only use).
-            words_per_page = _ocr_words_via_api(pdf_bytes, language)
-            # Page dimensions unknown here; use A4-ish default for layout.
-            for i, words in enumerate(words_per_page):
-                blocks = _analyze_page(words, 1654, 2339)  # A4 @200dpi
-                _emit_page(doc, blocks, [], i == 0, Pt, WD_ALIGN_PARAGRAPH)
-                del words, blocks
-                gc.collect()
+            section = doc.add_section(WD_SECTION.NEW_PAGE)
+        section.page_width = Pt(page_w_pt)
+        section.page_height = Pt(page_h_pt)
+        section.left_margin = Pt(margins["left"])
+        section.right_margin = Pt(margins["right"])
+        section.top_margin = Pt(margins["top"])
+        section.bottom_margin = Pt(margins["bottom"])
+        return section
+
+    try:
+        # Open with pdfplumber once for digital-page detection.
+        with pdfplumber.open(io.BytesIO(pdf_bytes)) as plumber_pdf:
+            n_pages = len(plumber_pdf.pages)
+            # Also open with pypdfium2 for rendering scanned pages.
+            pdfium_pdf = None
+            if local_ok:
+                import pypdfium2 as pdfium_mod
+                pdfium_pdf = pdfium_mod.PdfDocument(io.BytesIO(pdf_bytes))
+            # If no local OCR, check if ALL pages are digital; otherwise use API.
+            if not local_ok:
+                all_digital = all(
+                    _is_digital_page(plumber_pdf.pages[i]) for i in range(n_pages))
+                if not all_digital:
+                    # Fallback: production OCR API (read-only use) for scanned pages.
+                    if pdfium_pdf is not None:
+                        pdfium_pdf.close()
+                    words_per_page = _ocr_words_via_api(pdf_bytes, language)
+                    for i, words in enumerate(words_per_page):
+                        margins = _estimate_margins(words, 595.0, 842.0, True)
+                        _new_page_section(595.0, 842.0, margins, i == 0)
+                        blocks = _analyze_page(words, 1654, 2339)  # A4 @200dpi
+                        emitted = _emit_page(doc, blocks, [], Pt, WD_ALIGN_PARAGRAPH)
+                        page_emitted.append(emitted)
+                        _record_edges(blocks, page_edges)
+                        del words, blocks
+                        gc.collect()
+                    _apply_headers_footers(doc, page_edges, page_emitted, n_pages)
+                    return _save_doc(doc, ctx)
+            try:
+                for i in range(n_pages):
+                    plumber_page = plumber_pdf.pages[i]
+                    page_w_pt = float(plumber_page.width)
+                    page_h_pt = float(plumber_page.height)
+
+                    if _is_digital_page(plumber_page):
+                        # DIGITAL: native extraction with font info.
+                        words = _extract_native_words(plumber_page)
+                        margins = _estimate_margins(words, page_w_pt, page_h_pt,
+                                                    True)
+                        _new_page_section(page_w_pt, page_h_pt, margins, i == 0)
+                        blocks = _analyze_page(words, page_w_pt, page_h_pt,
+                                               coords_in_points=True)
+                        images = _extract_images(pdf_bytes, i, page_w_pt,
+                                                 page_h_pt, tmpdir)
+                        emitted = _emit_page(doc, blocks, images, Pt,
+                                             WD_ALIGN_PARAGRAPH)
+                        page_emitted.append(emitted)
+                        _record_edges(blocks, page_edges)
+                        del words, blocks, images
+                    elif local_ok and pdfium_pdf is not None:
+                        # SCANNED: render -> temp file -> release BEFORE OCR.
+                        page = pdfium_pdf[i]
+                        pil_image = page.render(scale=_OCR_DPI / 72).to_pil()
+                        img_w, img_h = pil_image.size
+                        img_file = tmpdir / f"page_{i}.png"
+                        pil_image.save(str(img_file), optimize=True)
+                        del pil_image
+                        gc.collect()
+
+                        words = _ocr_words_local(str(img_file), language)
+                        page_w_pt = img_w * 72 / _OCR_DPI
+                        page_h_pt = img_h * 72 / _OCR_DPI
+                        margins = _estimate_margins(words, page_w_pt, page_h_pt,
+                                                    False)
+                        _new_page_section(page_w_pt, page_h_pt, margins, i == 0)
+                        blocks = _analyze_page(words, img_w, img_h)
+                        images = _extract_images(pdf_bytes, i, page_w_pt,
+                                                 page_h_pt, tmpdir)
+                        emitted = _emit_page(doc, blocks, images, Pt,
+                                             WD_ALIGN_PARAGRAPH)
+                        page_emitted.append(emitted)
+                        _record_edges(blocks, page_edges)
+                        try:
+                            img_file.unlink()
+                        except OSError:
+                            pass
+                        del words, blocks, images
+                        gc.collect()
+                    else:
+                        raise ToolError(
+                            "Page appears scanned but no OCR engine is available.",
+                            code="ocr_unavailable")
+            finally:
+                if pdfium_pdf is not None:
+                    pdfium_pdf.close()
+            _apply_headers_footers(doc, page_edges, page_emitted, n_pages)
     finally:
         shutil.rmtree(tmpdir, ignore_errors=True)
 
+    return _save_doc(doc, ctx)
+
+
+def _record_edges(blocks: list[dict],
+                  page_edges: list[tuple[str, str]]) -> None:
+    """Record header/footer candidates: first top-zone and last bottom-zone
+    text blocks. Only edge-zone blocks qualify, so repeated body content
+    is never mistaken for a header/footer."""
+    top_texts = [b.get("text", "") for b in blocks
+                 if b.get("zone") == "top"
+                 and b.get("type") in ("heading", "paragraph", "list_item")
+                 and b.get("text", "").strip()]
+    bot_texts = [b.get("text", "") for b in blocks
+                 if b.get("zone") == "bottom"
+                 and b.get("type") in ("heading", "paragraph", "list_item")
+                 and b.get("text", "").strip()]
+    page_edges.append((
+        top_texts[0] if top_texts else "",
+        bot_texts[-1] if bot_texts else "",
+    ))
+
+
+def _detect_page_number_footer(lasts: list[str], n_pages: int
+                               ) -> tuple[str, str, str, bool] | None:
+    """Detect page-number footers like 'Page 1 of 3' or '5'.
+
+    Returns (prefix, middle, suffix, has_total) if most last-lines share the
+    same digit-normalized shape, else None. Numbers become PAGE/NUMPAGES
+    fields in Word.
+    """
+    import re
+    shapes: dict[str, int] = {}
+    parts: dict[str, tuple[str, str, str, bool]] = {}
+    for t in lasts:
+        s = t.strip()
+        if not s or len(s) > 40:
+            continue
+        nums = list(re.finditer(r"\d+", s))
+        if not nums:
+            continue
+        if len(nums) == 1:
+            prefix = s[:nums[0].start()]
+            suffix = s[nums[0].end():]
+            shape = f"{prefix}#{suffix}"
+            parts[shape] = (prefix, "", suffix, False)
+        else:
+            # First number = page, second = total.
+            prefix = s[:nums[0].start()]
+            middle = s[nums[0].end():nums[1].start()]
+            suffix = s[nums[1].end():]
+            shape = f"{prefix}#{middle}#{suffix}"
+            parts[shape] = (prefix, middle, suffix, True)
+        shapes[shape] = shapes.get(shape, 0) + 1
+    for shape, cnt in shapes.items():
+        if cnt >= 2 and cnt >= n_pages * 0.5:
+            prefix, middle, suffix, has_total = parts[shape]
+            if len(prefix) + len(middle) + len(suffix) <= 20:
+                return prefix, middle, suffix, has_total
+    return None
+
+
+def _add_page_field(paragraph, instr: str, placeholder: str = "1"):
+    """Insert a Word field (PAGE / NUMPAGES) into a paragraph."""
+    from docx.oxml import OxmlElement
+    from docx.oxml.ns import qn
+
+    def _run():
+        return paragraph.add_run()._r
+
+    r = _run()
+    fc1 = OxmlElement("w:fldChar")
+    fc1.set(qn("w:fldCharType"), "begin")
+    r.append(fc1)
+    r = _run()
+    it = OxmlElement("w:instrText")
+    it.set(qn("xml:space"), "preserve")
+    it.text = f" {instr} "
+    r.append(it)
+    r = _run()
+    fc2 = OxmlElement("w:fldChar")
+    fc2.set(qn("w:fldCharType"), "separate")
+    r.append(fc2)
+    paragraph.add_run(placeholder)
+    r = _run()
+    fc3 = OxmlElement("w:fldChar")
+    fc3.set(qn("w:fldCharType"), "end")
+    r.append(fc3)
+
+
+def _apply_headers_footers(doc, page_edges: list[tuple[str, str]],
+                           page_emitted: list[list[tuple[dict, object | None]]],
+                           n_pages: int) -> None:
+    """Detect repeated top/bottom text and move it into Word header/footer.
+
+    Page-number footers ('Page 1 of 3') become live PAGE/NUMPAGES fields.
+    """
+    import re
+    if n_pages < 2:
+        return
+    firsts = [f for f, _ in page_edges if f]
+    lasts = [l for _, l in page_edges if l]
+    header_text = _majority_text(firsts, n_pages)
+    footer_text = _majority_text(lasts, n_pages)
+    # Page-number pattern takes precedence for the footer.
+    pgnum = _detect_page_number_footer(lasts, n_pages)
+    if pgnum:
+        footer_text = None  # handled via fields below
+    if header_text and footer_text:
+        # Same text top and bottom is likely a page number or artifact;
+        # keep it as footer only.
+        hn = re.sub(r"\s+", " ", header_text.strip().lower())
+        fn = re.sub(r"\s+", " ", footer_text.strip().lower())
+        if hn == fn:
+            header_text = None
+
+    def _matches(text: str, target: str | None) -> bool:
+        if not target:
+            return False
+        a = re.sub(r"\s+", " ", text.strip().lower())
+        b = re.sub(r"\s+", " ", target.strip().lower())
+        return a == b
+
+    def _matches_pgnum(text: str) -> bool:
+        if not pgnum:
+            return False
+        prefix, middle, suffix, _ = pgnum
+        s = text.strip()
+        # Rebuild the digit-normalized shape and compare.
+        nums = list(re.finditer(r"\d+", s))
+        if not nums:
+            return False
+        if len(nums) == 1:
+            shape = f"{s[:nums[0].start()]}#{s[nums[0].end():]}"
+            want = f"{prefix}#{suffix}"
+        else:
+            shape = (f"{s[:nums[0].start()]}#"
+                     f"{s[nums[0].end():nums[1].start()]}#"
+                     f"{s[nums[1].end():]}")
+            want = f"{prefix}#{middle}#{suffix}"
+        return shape == want
+
+    # Remove matching body paragraphs (zone + text match, not position).
+    for emitted in page_emitted:
+        for b, e in emitted:
+            if e is None:
+                continue
+            zone = b.get("zone")
+            text = b.get("text", "")
+            if zone == "top" and _matches(text, header_text):
+                try:
+                    e._element.getparent().remove(e._element)
+                except Exception:
+                    pass
+            elif zone == "bottom" and (
+                    _matches(text, footer_text) or _matches_pgnum(text)):
+                try:
+                    e._element.getparent().remove(e._element)
+                except Exception:
+                    pass
+
+    # Write into section header/footer (linked across sections).
+    try:
+        sec0 = doc.sections[0]
+        if header_text:
+            sec0.header.paragraphs[0].text = header_text
+            for sec in doc.sections[1:]:
+                try:
+                    sec.header.is_linked_to_previous = True
+                except Exception:
+                    pass
+        if pgnum:
+            prefix, middle, suffix, has_total = pgnum
+            fp = sec0.footer.paragraphs[0]
+            fp.text = ""
+            if prefix:
+                fp.add_run(prefix)
+            _add_page_field(fp, "PAGE")
+            if has_total:
+                if middle:
+                    fp.add_run(middle)
+                _add_page_field(fp, "NUMPAGES")
+            if suffix:
+                fp.add_run(suffix)
+            for sec in doc.sections[1:]:
+                try:
+                    sec.footer.is_linked_to_previous = True
+                except Exception:
+                    pass
+        elif footer_text:
+            sec0.footer.paragraphs[0].text = footer_text
+            for sec in doc.sections[1:]:
+                try:
+                    sec.footer.is_linked_to_previous = True
+                except Exception:
+                    pass
+    except Exception:
+        pass
+
+
+def _save_doc(doc, ctx: ToolContext) -> Path:
+    """Save the DOCX and return the path."""
     out_path = ctx.new_output_path("converted").with_suffix(".docx")
     doc.save(str(out_path))
     return out_path
 
 
-def _emit_page(doc, blocks: list[dict], images: list[dict], is_first: bool,
-               Pt, WD_ALIGN_PARAGRAPH) -> None:
-    """Write one PDF page's blocks into the DOCX document."""
+def _emit_page(doc, blocks: list[dict], images: list[dict],
+               Pt, WD_ALIGN_PARAGRAPH) -> list[tuple[dict, object | None]]:
+    """Write one PDF page's blocks into the DOCX document.
+
+    Returns a list of (block, paragraph_element_or_None) for header/footer
+    post-processing. Pagination is handled by per-page sections in run().
+    """
     from docx.shared import Inches
 
-    if not is_first:
-        doc.add_page_break()
+    def _apply_runs(paragraph, runs: list[dict], default_size: float):
+        """Add runs with bold/italic/size preserved."""
+        # Merge consecutive runs with identical formatting.
+        merged: list[dict] = []
+        for r in runs:
+            if merged and merged[-1]["bold"] == r["bold"] \
+                    and merged[-1]["italic"] == r["italic"] \
+                    and merged[-1].get("size") == r.get("size"):
+                merged[-1]["text"] += r["text"]
+            else:
+                merged.append(dict(r))
+        for r in merged:
+            run = paragraph.add_run(r["text"])
+            if r.get("bold"):
+                run.bold = True
+            if r.get("italic"):
+                run.italic = True
+            sz = r.get("size") or default_size
+            if abs(sz - 11) > 1.0:
+                run.font.size = Pt(min(max(sz, 8), 28))
+
+    emitted: list[tuple[dict, object | None]] = []
     for b in blocks:
         btype = b["type"]
+        runs = b.get("runs", [])
         if btype == "heading":
-            h = doc.add_heading(b["text"], level=1)
-            # Scale heading size relative to detected size.
+            h = doc.add_heading(level=1)
+            if runs:
+                _apply_runs(h, runs, b.get("size_pt", 16))
+            else:
+                h.add_run(b["text"])
             try:
                 for run in h.runs:
-                    run.font.size = Pt(min(max(b.get("size_pt", 16), 12), 24))
+                    if not run.font.size:
+                        run.font.size = Pt(min(max(b.get("size_pt", 16), 12), 24))
             except Exception:
                 pass
-        elif btype == "paragraph":
-            p = doc.add_paragraph(b["text"])
+            emitted.append((b, h))
+        elif btype == "list_item":
+            style_name = "List Bullet" if b.get("list_kind") == "bullet" \
+                else "List Number"
             try:
-                size = b.get("size_pt", 11)
-                if abs(size - 11) > 1.5:
-                    for run in p.runs:
-                        run.font.size = Pt(min(max(size, 8), 18))
+                p = doc.add_paragraph(style=style_name)
+            except Exception:
+                p = doc.add_paragraph()
+            if runs:
+                _apply_runs(p, runs, b.get("size_pt", 11))
+            else:
+                p.add_run(b["text"])
+            emitted.append((b, p))
+        elif btype == "paragraph":
+            p = doc.add_paragraph()
+            if runs:
+                _apply_runs(p, runs, b.get("size_pt", 11))
+            else:
+                p.add_run(b["text"])
+            try:
                 if b.get("align") == "right":
                     p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+                elif b.get("align") == "center":
+                    p.alignment = WD_ALIGN_PARAGRAPH.CENTER
                 if b.get("indent"):
                     p.paragraph_format.left_indent = Inches(0.4)
             except Exception:
                 pass
+            emitted.append((b, p))
         elif btype == "table":
             rows = b["rows"]
             if not rows:
@@ -702,6 +1252,7 @@ def _emit_page(doc, blocks: list[dict], images: list[dict], is_first: bool,
                 for ci in range(ncols):
                     cell_text = row["cells"][ci] if ci < len(row["cells"]) else ""
                     table.rows[ri].cells[ci].text = cell_text
+            emitted.append((b, None))
     # Embedded images after the page's text blocks.
     for im in images:
         try:
@@ -709,3 +1260,4 @@ def _emit_page(doc, blocks: list[dict], images: list[dict], is_first: bool,
                 im["path"], width=Pt(im["width_pt"]))
         except Exception:
             pass
+    return emitted
