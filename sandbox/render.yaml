@@ -1,0 +1,14 @@
+# Optional: deploy the sandbox as a service completely separate from production.
+# Apply only when asked — e.g. `render blueprint launch -f sandbox/render.yaml`.
+# The sandbox has no database; uploads live in temp dirs and are deleted
+# after each run.
+services:
+  - type: web
+    name: pdfedi-sandbox
+    runtime: docker
+    dockerfilePath: ./sandbox/Dockerfile
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHONUNBUFFERED
+        value: "1"

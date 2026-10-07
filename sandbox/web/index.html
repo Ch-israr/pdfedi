@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PDFEDI Testing Sandbox</title>
+<style>
+  body { font-family: system-ui, sans-serif; max-width: 640px; margin: 0 auto; padding: 24px 16px; color: #1e293b; background: #f8fafc; }
+  .banner { background: #fef3c7; border: 1px solid #f59e0b; border-radius: 12px; padding: 12px 16px; margin-bottom: 20px; font-size: 14px; }
+  .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  label { display: block; font-size: 13px; font-weight: 600; margin: 12px 0 4px; }
+  input[type=text], input[type=number], select { width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; }
+  button { background: #4f46e5; color: #fff; border: 0; border-radius: 10px; padding: 12px 20px; font-size: 15px; font-weight: 600; cursor: pointer; width: 100%; margin-top: 16px; }
+  button:disabled { opacity: .5; cursor: default; }
+  .error { background: #fef2f2; border: 1px solid #fca5a5; color: #b91c1c; border-radius: 10px; padding: 12px; margin-top: 12px; font-size: 14px; }
+  .ok { background: #f0fdf4; border: 1px solid #86efac; color: #15803d; border-radius: 10px; padding: 12px; margin-top: 12px; font-size: 14px; }
+  .help { font-size: 12px; color: #64748b; margin-top: 2px; }
+  #spinner { display: none; text-align: center; margin-top: 16px; }
+</style>
+</head>
+<body>
+  <div class="banner"><strong>⚠️ Testing Sandbox</strong> — experimental tools only. Nothing here touches production.</div>
+  <h1>PDFEDI Sandbox</h1>
+
+  <div class="card">
+    <label for="tool">Experimental tool</label>
+    <select id="tool"></select>
+    <p class="help" id="toolDesc"></p>
+  </div>
+
+  <div class="card">
+    <label for="files">Input files</label>
+    <input type="file" id="files" multiple>
+    <div id="opts"></div>
+    <button id="run" onclick="runTool()">Run test</button>
+    <div id="spinner">Running…</div>
+    <div id="result"></div>
+  </div>
+
+<script>
+let specs = {};
+async function load() {
+  const res = await fetch('/api/tools');
+  specs = Object.fromEntries((await res.json()).map(s => [s.key, s]));
+  const sel = document.getElementById('tool');
+  sel.innerHTML = '';
+  for (const s of Object.values(specs)) {
+    const o = document.createElement('option');
+    o.value = s.key; o.textContent = s.name;
+    sel.appendChild(o);
+  }
+  sel.onchange = renderOpts;
+  renderOpts();
+  if (!Object.keys(specs).length) {
+    document.getElementById('result').innerHTML =
+      '<div class="error">No experimental tools registered. See sandbox/tools/__init__.py.</div>';
+  }
+}
+function renderOpts() {
+  const s = specs[document.getElementById('tool').value];
+  document.getElementById('toolDesc').textContent = s ? s.description : '';
+  const box = document.getElementById('opts');
+  box.innerHTML = '';
+  if (!s) return;
+  for (const o of s.options) {
+    const l = document.createElement('label');
+    l.textContent = o.label + (o.required ? ' *' : '');
+    box.appendChild(l);
+    let el;
+    if (o.kind === 'boolean') { el = document.createElement('input'); el.type = 'checkbox'; el.checked = !!o.default; }
+    else if (o.kind === 'select') { el = document.createElement('select'); for (const c of (o.choices || [])) { const op = document.createElement('option'); op.value = c; op.textContent = c; el.appendChild(op); } el.value = o.default ?? ''; }
+    else if (o.kind === 'number') { el = document.createElement('input'); el.type = 'number'; el.value = o.default ?? ''; }
+    else { el = document.createElement('input'); el.type = 'text'; el.value = o.default ?? ''; el.placeholder = o.default ?? ''; }
+    el.id = 'opt_' + o.name; el.dataset.kind = o.kind;
+    box.appendChild(el);
+    if (o.help) { const h = document.createElement('p'); h.className = 'help'; h.textContent = o.help; box.appendChild(h); }
+  }
+}
+async function runTool() {
+  const key = document.getElementById('tool').value;
+  const s = specs[key];
+  const files = document.getElementById('files').files;
+  const out = document.getElementById('result');
+  out.innerHTML = '';
+  if (!files.length) { out.innerHTML = '<div class="error">Choose at least one file.</div>'; return; }
+  const opts = {};
+  for (const o of s.options) {
+    const el = document.getElementById('opt_' + o.name);
+    opts[o.name] = o.kind === 'boolean' ? el.checked : o.kind === 'number' ? Number(el.value) : el.value;
+  }
+  const fd = new FormData();
+  for (const f of files) fd.append('files', f);
+  fd.append('options', JSON.stringify(opts));
+  document.getElementById('spinner').style.display = 'block';
+  document.getElementById('run').disabled = true;
+  try {
+    const res = await fetch('/api/run/' + key, { method: 'POST', body: fd });
+    if (!res.ok) {
+      const j = await res.json().catch(() => ({}));
+      throw new Error(j.detail || ('HTTP ' + res.status));
+    }
+    const blob = await res.blob();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = key + '_output.' + s.output_ext;
+    a.textContent = 'Download result';
+    out.innerHTML = '<div class="ok">Success.</div>';
+    out.appendChild(a);
+  } catch (e) {
+    out.innerHTML = '<div class="error">' + e.message + '</div>';
+  } finally {
+    document.getElementById('spinner').style.display = 'none';
+    document.getElementById('run').disabled = false;
+  }
+}
+load();
+</script>
+</body>
+</html>
