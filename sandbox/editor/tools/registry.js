@@ -228,7 +228,12 @@ registerTool({
       x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
       width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
     };
-    if (sr.width < 5 || sr.height < 5) return;
+    // For lines/arrows, only the length matters (they're 1D)
+    const isLine = this.shape === 'line' || this.shape === 'arrow';
+    const minDim = isLine
+      ? Math.hypot(sr.width, sr.height)
+      : Math.min(sr.width, sr.height);
+    if (minDim < 5) return;
 
     const pr = ctx.screenRectToPdf(sr, pageIndex);
     const op = { op: 'add_highlight', page: pageIndex, ...pr, color: '#ffff00' };
@@ -568,7 +573,12 @@ registerTool({
       x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
       width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
     };
-    if (sr.width < 5 || sr.height < 5) return;
+    // For lines/arrows, only the length matters (they're 1D)
+    const isLineShape = this.shape === 'line' || this.shape === 'arrow';
+    const minDimShape = isLineShape
+      ? Math.hypot(sr.width, sr.height)
+      : Math.min(sr.width, sr.height);
+    if (minDimShape < 5) return;
 
     const pr = ctx.screenRectToPdf(sr, pageIndex);
     const op = {

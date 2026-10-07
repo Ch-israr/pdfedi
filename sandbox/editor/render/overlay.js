@@ -297,8 +297,26 @@ export class OverlayManager {
   removeOp(pageIndex, opId) {
     const layer = this.getLayer(pageIndex);
     if (!layer) return;
-    layer.find(`[opId="${opId}"]`).forEach(n => n.destroy());
-    layer.draw(); // immediate redraw (not batch) to avoid stale ghosts
+    // Find by attribute — also check nested children of groups
+    const toRemove = [];
+    layer.find(node => {
+      if (node.getAttr('opId') === opId) {
+        // Only collect top-level matches (not children of a matched group)
+        toRemove.push(node);
+        return true;
+      }
+      return false;
+    });
+    // Dedupe: if a group matched, don't also destroy its children separately
+    const seen = new Set();
+    toRemove.forEach(n => {
+      if (seen.has(n)) return;
+      // Mark all descendants as seen
+      n.find(() => true).forEach(d => seen.add(d));
+      seen.add(n);
+      n.destroy();
+    });
+    layer.draw();
   }
 
   /** Clear all editor objects from a page (keeps the stage). */
