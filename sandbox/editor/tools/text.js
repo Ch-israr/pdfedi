@@ -159,9 +159,24 @@ registerTool({
       },
       undo: () => {
         const last = ctx.manifest.operations[ctx.manifest.operations.length - 1];
-        ctx.removeManifestOp(last.id);
-        ctx.overlay.removeOp(pageIndex, last.id);
+        if (last) {
+          ctx.removeManifestOp(last.id);
+          ctx.overlay.removeOp(pageIndex, last.id);
+          // Aggressive cleanup: find any node with this ID across all layers
+          const layer = ctx.overlay.getLayer(pageIndex);
+          if (layer) {
+            layer.find(n => n.getAttr('opId') === last.id).forEach(n => {
+              try { n.destroy(); } catch (e) {}
+            });
+            layer.batchDraw();
+          }
+        }
+        // Also destroy the captured node reference if it exists
+        if (nodeRef && !nodeRef.isDestroyed()) {
+          try { nodeRef.destroy(); } catch (e) {}
+        }
         ctx.clearSelection();
+        ctx.updateStatus();
       },
     });
   },

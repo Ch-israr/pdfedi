@@ -290,6 +290,10 @@
             d.node.x(d.startNodeX + dx);
             d.node.y(d.startNodeY + dy);
             d.node.getLayer()?.batchDraw();
+            // Update op in real-time so it's always correct (even if history fails)
+            const s = state.overlay.scale;
+            d.op.x = d.startOpX + (dx / s);
+            d.op.y = d.startOpY + (-dy / s);
           }
         }
       });
