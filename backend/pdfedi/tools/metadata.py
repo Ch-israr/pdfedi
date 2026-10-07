@@ -36,6 +36,7 @@ SPEC = ToolSpec(
     output_kind="text",
     output_ext="json",
     output_mime="application/json",
+    category="edit",
 )
 
 

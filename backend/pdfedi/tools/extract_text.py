@@ -38,6 +38,7 @@ SPEC = ToolSpec(
     output_ext="txt",
     output_mime="text/plain",
     activity="converting",
+    category="convert",
 )
 
 

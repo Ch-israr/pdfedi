@@ -27,6 +27,7 @@ SPEC = ToolSpec(
     output_ext="pdf",
     output_mime="application/pdf",
     activity="converting",
+    category="convert",
 )
 
 

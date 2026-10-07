@@ -57,6 +57,9 @@ class ToolSpec:
     # UI progress verb while a job is running. One of:
     # "processing" | "converting" | "optimizing".
     activity: str = "processing"
+    # Tool directory category. One of:
+    # "organize" | "convert" | "edit" | "optimize" | "security".
+    category: str = "organize"
 
 
 @dataclass

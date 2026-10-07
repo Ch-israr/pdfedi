@@ -21,6 +21,7 @@ from . import (
     rotate_pages,
     split,
     thumbnails,
+    unlock_pdf,
     watermark,
 )
 from .base import ToolSpec
@@ -28,8 +29,8 @@ from .base import ToolSpec
 _MODULES = [
     compress, merge, split, rotate_pages, delete_pages, reorder_pages,
     extract_text, pdf_to_images, images_to_pdf, thumbnails, metadata,
-    edit_metadata, password_protect, watermark, page_numbers, redact,
-    flatten, ocr,
+    edit_metadata, password_protect, unlock_pdf, watermark, page_numbers,
+    redact, flatten, ocr,
 ]
 
 TOOLS: dict[str, Any] = {}

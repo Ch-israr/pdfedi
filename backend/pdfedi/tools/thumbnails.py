@@ -61,6 +61,7 @@ SPEC = ToolSpec(
     output_kind="images",
     output_ext="png",
     output_mime="image/png",
+    category="convert",
 )
 
 

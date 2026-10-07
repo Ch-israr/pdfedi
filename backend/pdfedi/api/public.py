@@ -86,6 +86,7 @@ def list_tools():
             "output_kind": s.output_kind,
             "output_ext": s.output_ext,
             "activity": s.activity,
+            "category": s.category,
         }
         for s in list_specs()
     ]
@@ -108,7 +109,7 @@ def tool_detail(tool_key: str):
             for o in s.options
         ],
         "output_kind": s.output_kind, "output_ext": s.output_ext,
-        "activity": s.activity,
+        "activity": s.activity, "category": s.category,
     }
 
 

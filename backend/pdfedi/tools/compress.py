@@ -54,6 +54,7 @@ SPEC = ToolSpec(
     output_ext="pdf",
     output_mime="application/pdf",
     activity="optimizing",
+    category="optimize",
 )
 
 # quality -> (max image dimension in px or None, JPEG quality)

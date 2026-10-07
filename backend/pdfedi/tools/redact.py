@@ -52,6 +52,7 @@ SPEC = ToolSpec(
     output_kind="pdf",
     output_ext="pdf",
     output_mime="application/pdf",
+    category="security",
 )
 
 

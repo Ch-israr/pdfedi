@@ -61,6 +61,7 @@ SPEC = ToolSpec(
     output_ext="zip",
     output_mime="application/zip",
     activity="converting",
+    category="convert",
 )
 
 

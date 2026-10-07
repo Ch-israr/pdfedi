@@ -54,6 +54,7 @@ SPEC = ToolSpec(
     output_kind="zip",
     output_ext="zip",
     output_mime="application/zip",
+    category="organize",
 )
 
 _RANGE_TOKEN_RE = re.compile(r"^\s*(\d+)\s*(?:-\s*(\d+)\s*)?$")

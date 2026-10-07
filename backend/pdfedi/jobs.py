@@ -13,6 +13,7 @@ import json
 import logging
 import threading
 import uuid
+from pathlib import Path
 
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
@@ -66,10 +67,11 @@ def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
         try:
             reader = PdfReader(io.BytesIO(data))
             if reader.is_encrypted:
-                raise UploadError("Encrypted PDFs are not supported as input.", status_code=422)
-            page_count = len(reader.pages)
-        except UploadError:
-            raise
+                # Allowed through: the Unlock PDF tool decrypts it.
+                # page_count is unknown until the password is supplied.
+                page_count = None
+            else:
+                page_count = len(reader.pages)
         except Exception as e:
             raise UploadError(f"Could not parse PDF: {e}", status_code=422) from e
         mime = PDF_MIME
@@ -119,6 +121,11 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
             raise UploadError(f"{spec.name} needs PDF input.", status_code=422)
         if "image" in spec.input_kinds and f.mime not in IMAGE_MIMES:
             raise UploadError(f"{spec.name} needs image input.", status_code=422)
+        if spec.key != "unlock_pdf" and _stored_pdf_is_encrypted(f):
+            raise UploadError(
+                "This PDF is password protected. Use Unlock PDF first.",
+                status_code=422,
+            )
         files.append(f)
 
     allowed, used, limit = quotas.check_quota(db, client_ip, tool_key)
@@ -141,6 +148,17 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
     db.commit()
     db.refresh(job)
     return job
+
+
+def _stored_pdf_is_encrypted(f: File) -> bool:
+    """Check whether a stored PDF is encrypted (cheap header/trailer parse)."""
+    if f.mime != PDF_MIME:
+        return False
+    try:
+        data = Path(get_object_path(f.storage_key)).read_bytes()
+        return PdfReader(io.BytesIO(data)).is_encrypted
+    except Exception:  # noqa: BLE001 — treat unreadable as not encrypted
+        return False
 
 
 def _run_in_thread(job_id: str, client_ip: str) -> None:
