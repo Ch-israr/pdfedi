@@ -193,6 +193,9 @@ function deleteBtn(cb) {
 // ---------- per-type toolbars ----------
 
 function buildTextControls(bar, node, op, cb) {
+  // Group 0: Move
+  bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(groupSep());
   // Group 1: B I
   bar.appendChild(btn('<b>B</b>', 'Bold (Ctrl+B)', b => cb.onStyle({ bold: !op.bold }), { active: op.bold }));
   bar.appendChild(btn('<i>I</i>', 'Italic (Ctrl+I)', b => cb.onStyle({ italic: !op.italic }), { active: op.italic }));
@@ -216,6 +219,8 @@ function buildTextControls(bar, node, op, cb) {
 }
 
 function buildShapeControls(bar, node, op, cb) {
+  bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(groupSep());
   bar.appendChild(colorBtn({ color: op.stroke }, { onStyle: s => cb.onStyle({ stroke: s.color }) }));
   bar.appendChild(btn('◉', 'Toggle fill', () => cb.onStyle({ fill: op.fill ? null : (op.stroke || '#2f6bff') }), { active: !!op.fill }));
   const sizes = [1, 2, 4, 6, 8];
@@ -236,6 +241,8 @@ function buildShapeControls(bar, node, op, cb) {
 }
 
 function buildImageControls(bar, node, op, cb) {
+  bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(groupSep());
   bar.appendChild(btn('🔄', 'Replace image', () => cb.onReplace()));
   bar.appendChild(btn('↻', 'Rotate 90°', () => cb.onRotate()));
   bar.appendChild(groupSep());
@@ -252,5 +259,7 @@ function buildLinkControls(bar, node, op, cb) {
 }
 
 function buildGenericControls(bar, node, op, cb) {
+  bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(groupSep());
   bar.appendChild(deleteBtn(cb));
 }

@@ -401,7 +401,19 @@
           });
         },
         onDuplicate: () => duplicateObject(node, op),
-        onDelete: () => deleteObject(node, op),
+        onDelete: () => {
+          // Look up fresh references by ID (closure may be stale)
+          const opId = node.getAttr('opId');
+          const freshOp = state.manifest.operations.find(o => o.id === opId);
+          const freshNode = state.overlay.findNodeByOpId(opId);
+          if (freshOp && freshNode) {
+            deleteObject(freshNode, freshOp);
+          } else if (freshOp) {
+            // Node missing but op exists — remove op directly
+            deleteObjectById(opId);
+          }
+        },
+        onMoveMode: () => enterMoveMode(node, op),
         onRepeatAll: () => repeatOnAllPages(op),
         onRotate: () => { node.rotate(90); node.getLayer()?.batchDraw(); },
         onReplace: () => replaceImage(node, op),
@@ -441,10 +453,10 @@
         },
       });
     }
-    function deleteObject(node, op) {
-      // Snapshot the op for undo (preserves ID via restoreOp)
+    function deleteObjectById(opId) {
+      const op = state.manifest.operations.find(o => o.id === opId);
+      if (!op) return;
       const snapshot = JSON.parse(JSON.stringify(op));
-      const opId = op.id;
       const pageIndex = op.page;
       state.history.execute({
         op: { op: 'delete_object', targetId: opId },
@@ -461,10 +473,55 @@
           } catch (err) {
             console.error('Undo delete failed:', err);
           }
-          // Force counter refresh — read actual manifest length
           updateStatus();
         },
       });
+    }
+    // Move mode: explicit grab-to-move with visual feedback
+    let moveModeActive = false;
+    function enterMoveMode(node, op) {
+      if (moveModeActive) return;
+      moveModeActive = true;
+      const stage = node.getStage();
+      stage.container().style.cursor = 'grab';
+      // Hide the context bar during move for unobstructed dragging
+      hideContextBar();
+      const exitMove = () => {
+        moveModeActive = false;
+        stage.container().style.cursor = '';
+        stage.off('click.moveMode');
+        // Re-show toolbar
+        if (state.selected === node) {
+          const freshOp = state.manifest.operations.find(o => o.id === node.getAttr('opId'));
+          if (freshOp) showContextBar(node, freshOp, makeContextCallbacks(node, freshOp));
+        }
+      };
+      // Exit on click outside the node or double-click
+      stage.on('click.moveMode', e => {
+        if (e.target === stage || e.target.getAttr('opId') !== node.getAttr('opId')) {
+          exitMove();
+        }
+      });
+      node.on('dblclick.moveMode', () => exitMove());
+      // Change to grabbing cursor while dragging
+      node.on('dragstart.moveMode', () => {
+        stage.container().style.cursor = 'grabbing';
+      });
+      node.on('dragend.moveMode', () => {
+        stage.container().style.cursor = 'grab';
+        // Stay in move mode until user clicks away
+      });
+      // Store exit function for cleanup
+      node.setAttr('_exitMove', exitMove);
+    }
+    function exitMoveModeIfActive() {
+      if (moveModeActive && state.selected) {
+        const exit = state.selected.getAttr('_exitMove');
+        if (exit) exit();
+      }
+    }
+    function deleteObject(node, op) {
+      deleteObjectById(op.id);
     }
     function repeatOnAllPages(op) {
       // Clone this object onto every page (except its own)
@@ -514,8 +571,13 @@
       inp.click();
     }
     function clearSelection() {
+      exitMoveModeIfActive();
       transformer?.destroy();
       transformer = null;
+      // Clean up move mode listeners
+      if (state.selected) {
+        state.selected.off('.moveMode');
+      }
       state.selected = null;
       hideContextBar();
     }
@@ -742,6 +804,12 @@
         e.preventDefault();
         state.history?.redo();
         updateStatus(); // ensure counter refreshes
+        return;
+      }
+      // Ctrl+F → search
+      if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
+        e.preventDefault();
+        document.getElementById('searchBtn')?.click();
         return;
       }
       // Delete / Backspace removes the selected object (not while typing in a textarea/input)

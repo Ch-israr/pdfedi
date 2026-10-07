@@ -55,9 +55,14 @@ function makeEditable(textNode, stage, onCommit) {
   ta.addEventListener('keydown', e => {
     e.stopPropagation();
     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); finish(false); }
-    if (e.key === 'Escape') finish(true);
+    if (e.key === 'Escape') { e.preventDefault(); finish(true); } // cancel, don't commit
   });
-  ta.addEventListener('blur', () => finish(false));
+  ta.addEventListener('blur', () => {
+    // Only commit on blur if there's actual text; otherwise cancel
+    // (prevents accidental commits when clicking toolbar)
+    if (ta.value.trim()) finish(false);
+    else finish(true);
+  });
 }
 
 registerTool({
