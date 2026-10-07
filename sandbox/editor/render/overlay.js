@@ -202,6 +202,38 @@ export class OverlayManager {
         }));
         break;
       }
+      case 'add_form_field': {
+        const r = pdfRectToScreen(op, heightPt, s);
+        const fieldColor = '#eef4ff';
+        if (op.fieldType === 'checkbox') {
+          node = new Konva.Group({ ...common, x: r.x, y: r.y });
+          node.add(new Konva.Rect({
+            width: Math.min(r.width, 24 * s), height: Math.min(r.height, 24 * s),
+            fill: fieldColor, stroke: '#2f6bff', strokeWidth: 2,
+          }));
+          if (op.value) {
+            node.add(new Konva.Text({
+              text: '✓', fontSize: 18 * s, fill: '#2f6bff',
+              x: 3 * s, y: 0,
+            }));
+          }
+        } else {
+          node = new Konva.Group({ ...common, x: r.x, y: r.y });
+          node.add(new Konva.Rect({
+            width: r.width, height: r.height,
+            fill: fieldColor, stroke: '#2f6bff', strokeWidth: 1.5,
+            cornerRadius: 4,
+          }));
+          const label = op.fieldType === 'dropdown' ? `▾ ${op.name || 'Select…'}` :
+                        op.fieldType === 'radio' ? `○ ${op.name || ''}` :
+                        op.value || op.name || 'Text field';
+          node.add(new Konva.Text({
+            text: label, fontSize: 11 * s, fill: '#64748b',
+            x: 6 * s, y: 6 * s, width: r.width - 12 * s,
+          }));
+        }
+        break;
+      }
       case 'whiteout': {
         const r = pdfRectToScreen(op, heightPt, s);
         node = new Konva.Rect({

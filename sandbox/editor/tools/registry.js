@@ -314,7 +314,92 @@ registerTool({
   },
 });
 
-// ---- Shapes tool (rect / ellipse / line / arrow) ----
+// ---- Form field tool ----
+const FIELD_TYPES = [
+  { id: 'text', label: 'Text field' },
+  { id: 'multiline', label: 'Multiline text' },
+  { id: 'checkbox', label: 'Checkbox' },
+  { id: 'radio', label: 'Radio group' },
+  { id: 'dropdown', label: 'Dropdown' },
+];
+registerTool({
+  id: 'formfield',
+  name: 'Form field',
+  icon: '📝',
+  cursor: 'crosshair',
+  onActivate() {
+    const choice = prompt(
+      'Field type:\n' + FIELD_TYPES.map((f, i) => `${i+1}. ${f.label}`).join('\n'),
+      '1'
+    );
+    const idx = Math.max(0, Math.min(FIELD_TYPES.length - 1, (parseInt(choice) || 1) - 1));
+    this._fieldType = FIELD_TYPES[idx].id;
+    this._fieldLabel = FIELD_TYPES[idx].label;
+  },
+  onDeactivate(ctx) { this._start = null; this._preview = null; },
+  onPointerDown(ctx, evt) {
+    const stage = evt.target.getStage();
+    if (!stage) return;
+    const pageIndex = ctx.getPageIndex(stage);
+    if (pageIndex < 0) return;
+    const pos = stage.getPointerPosition();
+    this._start = { pageIndex, x: pos.x, y: pos.y };
+  },
+  onPointerMove(ctx, evt) {
+    if (!this._start) return;
+    const stage = evt.target.getStage();
+    const pos = stage.getPointerPosition();
+    const layer = ctx.overlay.getLayer(this._start.pageIndex);
+    this._preview?.destroy();
+    this._preview = new Konva.Rect({
+      x: Math.min(this._start.x, pos.x), y: Math.min(this._start.y, pos.y),
+      width: Math.abs(pos.x - this._start.x), height: Math.abs(pos.y - this._start.y),
+      fill: '#eef4ff', stroke: '#2f6bff', strokeWidth: 1.5, cornerRadius: 4,
+    });
+    layer.add(this._preview);
+    layer.batchDraw();
+  },
+  onPointerUp(ctx, evt) {
+    if (!this._start) return;
+    const stage = evt.target.getStage();
+    const pos = stage.getPointerPosition();
+    const { pageIndex, x: x1, y: y1 } = this._start;
+    this._preview?.destroy();
+    this._preview = null;
+    this._start = null;
+
+    const sr = {
+      x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
+      width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
+    };
+    if (sr.width < 20 || sr.height < 16) return;
+
+    const name = prompt('Field name:', this._fieldLabel || 'Field');
+    if (name === null) return;
+
+    const pr = ctx.screenRectToPdf(sr, pageIndex);
+    const op = {
+      op: 'add_form_field', page: pageIndex, ...pr,
+      fieldType: this._fieldType || 'text',
+      name: name || 'Field',
+    };
+    ctx.history.execute({
+      op,
+      do: () => {
+        const withId = ctx.appendManifestOp(op);
+        const node = ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
+        if (node) ctx.selectObject(node);
+      },
+      undo: () => {
+        const last = ctx.manifest.operations[ctx.manifest.operations.length - 1];
+        ctx.removeManifestOp(last.id);
+        ctx.overlay.removeOp(pageIndex, last.id);
+        ctx.clearSelection();
+      },
+    });
+    ctx.setTool('select');
+  },
+});
 registerTool({
   id: 'shapes',
   name: 'Shapes',

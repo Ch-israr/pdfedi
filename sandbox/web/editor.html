@@ -123,6 +123,7 @@
     <div class="sep"></div>
     <button class="tool-btn" data-tool="link" title="Add link">🔗 Link</button>
     <button class="tool-btn" data-tool="stamp" title="Add stamp">🏷️ Stamp</button>
+    <button class="tool-btn" data-tool="formfield" title="Add form field">📝 Field</button>
     <div class="sep"></div>
     <button class="tool-btn" data-tool="whiteout" title="Whiteout (visual cover)">⬜ Whiteout</button>
     <button class="tool-btn" data-tool="redact" title="Redact (permanent)">⬛ Redact</button>
@@ -157,6 +158,8 @@
     import { getTool } from './editor/tools/registry.js';
     import './editor/tools/text.js'; // registers improved text tool (overrides)
     import { openSignatureModal } from './editor/ui/signature-modal.js';
+    import { showContextBar, hideContextBar, refreshContextBar } from './editor/ui/context-bar.js';
+    import { styleTextNode } from './editor/tools/text.js';
     import { finalizeInBrowser } from './editor/finalize/browser.js';
     import { applyRedaction, verifyRedaction } from './editor/finalize/redact.js';
     import { verifyOutput, expectedPageCount } from './editor/finalize/verify.js';
@@ -321,11 +324,74 @@
       transformer.nodes([node]);
       layer.batchDraw();
       showProps(node);
+      // Contextual floating toolbar
+      const opId = node.getAttr('opId');
+      const op = state.manifest.operations.find(o => o.id === opId);
+      if (op) {
+        node.setAttr('_objType', op.op);
+        showContextBar(node, op, makeContextCallbacks(node, op));
+      }
+    }
+    function makeContextCallbacks(node, op) {
+      return {
+        onStyle: (style) => {
+          Object.assign(op, style);
+          if (op.op === 'add_text') styleTextNode(node, op, style);
+          else if (op.op === 'add_shape') {
+            if (style.stroke) node.stroke(style.stroke);
+            if ('fill' in style) node.fill(style.fill);
+            if (style.thickness) node.strokeWidth(style.thickness);
+            node.getLayer()?.batchDraw();
+          }
+          showContextBar(node, op, makeContextCallbacks(node, op));
+          showProps(node);
+        },
+        onDuplicate: () => duplicateObject(node, op),
+        onDelete: () => deleteObject(node, op),
+        onRotate: () => { node.rotate(90); node.getLayer()?.batchDraw(); },
+        onReplace: () => replaceImage(node, op),
+      };
+    }
+    function duplicateObject(node, op) {
+      const clone = JSON.parse(JSON.stringify(op));
+      delete clone.id;
+      clone.x = (clone.x || 0) + 20;
+      const withId = appendOp(state.manifest, clone);
+      const newNode = state.overlay.renderOp(withId.page, withId, state.assets);
+      if (newNode) selectObject(newNode);
+      updateStatus();
+    }
+    function deleteObject(node, op) {
+      removeOp(state.manifest, op.id);
+      state.overlay.removeOp(op.page, op.id);
+      clearSelection();
+      updateStatus();
+    }
+    function replaceImage(node, op) {
+      const inp = document.createElement('input');
+      inp.type = 'file'; inp.accept = 'image/*';
+      inp.onchange = () => {
+        const f = inp.files[0];
+        if (!f) return;
+        const url = URL.createObjectURL(f);
+        const img = new Image();
+        img.onload = () => {
+          const assetId = `img_${Date.now()}`;
+          state.assets[assetId] = { mime: f.type, blob: f, image: img };
+          op.assetId = assetId;
+          if (node.className === 'Image') node.image(img);
+          node.getLayer()?.batchDraw();
+          updateStatus();
+        };
+        img.src = url;
+      };
+      inp.click();
     }
     function clearSelection() {
       transformer?.destroy();
       transformer = null;
       state.selected = null;
+      hideContextBar();
       document.getElementById('propsContent').innerHTML =
         '<p style="font-size:13px;color:#94a3b8">Select an object to edit its properties.</p>';
     }

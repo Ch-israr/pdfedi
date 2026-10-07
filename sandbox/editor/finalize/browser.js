@@ -197,6 +197,38 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
         });
         break;
       }
+      case 'add_form_field': {
+        // Real AcroForm field via pdf-lib
+        const form = pdfDoc.getForm();
+        const fname = op.name || `field_${op.id || Date.now()}`;
+        const fw = op.w || 150, fh = op.h || 24;
+        if (op.fieldType === 'text' || op.fieldType === 'multiline') {
+          const tf = form.createTextField(fname);
+          tf.setText(op.value || '');
+          if (op.fieldType === 'multiline') tf.enableMultiline();
+          tf.addToPage(page, { x: op.x, y: op.y, width: fw, height: fh });
+        } else if (op.fieldType === 'checkbox') {
+          const cb = form.createCheckBox(fname);
+          if (op.value) cb.check(); else cb.uncheck();
+          cb.addToPage(page, { x: op.x, y: op.y, width: Math.min(fw, 24), height: Math.min(fh, 24) });
+        } else if (op.fieldType === 'radio') {
+          const rg = form.createRadioGroup(fname);
+          const opts = op.options || ['Option 1'];
+          opts.forEach((o, i) => {
+            rg.addOptionToPage(o, page, {
+              x: op.x, y: op.y - i * (fh + 6),
+              width: Math.min(fw, 20), height: Math.min(fh, 20),
+            });
+          });
+          if (op.value) rg.select(op.value);
+        } else if (op.fieldType === 'dropdown') {
+          const dd = form.createDropdown(fname);
+          dd.setOptions(op.options || ['Option 1', 'Option 2']);
+          dd.select(op.value || (op.options || [])[0] || 'Option 1');
+          dd.addToPage(page, { x: op.x, y: op.y, width: fw, height: fh });
+        }
+        break;
+      }
       case 'whiteout': {
         page.drawRectangle({
           x: op.x, y: op.y, width: op.w, height: op.h,
