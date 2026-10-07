@@ -19,12 +19,15 @@
 export const OP_TYPES = [
   'add_text',
   'add_image',
-  'add_shape',      // rect, ellipse, line
+  'add_shape',      // rect, ellipse, line, arrow
   'draw',           // freehand path
   'add_highlight',
   'add_underline',
   'add_strikeout',
   'add_signature',
+  'add_link',       // URL link annotation
+  'add_stamp',      // preset text stamp
+  'add_form_field', // AcroForm field
   'whiteout',       // visual cover (NOT redaction)
   'redact_rects',   // true redaction (destructive)
   'move_page',
@@ -46,7 +49,8 @@ export function validateOp(op) {
   if (!OP_TYPES.includes(op.op)) return `unknown op type: ${op.op}`;
 
   const needPage = ['add_text','add_image','add_shape','draw','add_highlight',
-    'add_underline','add_strikeout','add_signature','whiteout','redact_rects'];
+    'add_underline','add_strikeout','add_signature','add_link','add_stamp',
+    'add_form_field','whiteout','redact_rects'];
   if (needPage.includes(op.op)) {
     if (!Number.isInteger(op.page) || op.page < 0)
       return `${op.op}: page must be a non-negative integer`;

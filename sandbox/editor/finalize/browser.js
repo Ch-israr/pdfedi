@@ -20,8 +20,12 @@
 const FONT_MAP = {
   Helvetica: 'Helvetica',
   'Helvetica-Bold': 'HelveticaBold',
+  'Helvetica-Oblique': 'HelveticaOblique',
+  'Helvetica-BoldOblique': 'HelveticaBoldOblique',
   Times: 'TimesRoman',
+  'Times-Bold': 'TimesRomanBold',
   Courier: 'Courier',
+  'Courier-Bold': 'CourierBold',
 };
 
 function hexToRgb(hex, PDFLib) {
@@ -81,7 +85,13 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
 
     switch (op.op) {
       case 'add_text': {
-        const font = await getFont(op.font || 'Helvetica');
+        // Bold/italic map to Helvetica-Bold / Helvetica-Oblique variants
+        let fontName = op.font || 'Helvetica';
+        if (op.bold && op.italic) fontName = 'Helvetica-BoldOblique';
+        else if (op.bold) fontName = 'Helvetica-Bold';
+        else if (op.italic) fontName = 'Helvetica-Oblique';
+        // Fallback: pdf-lib StandardFonts has these variants
+        const font = await getFont(fontName);
         page.drawText(op.text, {
           x: op.x,
           y: op.y,
@@ -104,12 +114,27 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
             borderColor: color, borderWidth: th, color: fill,
             opacity: op.opacity ?? 1,
           });
-        } else if (op.shape === 'line') {
+        } else if (op.shape === 'line' || op.shape === 'arrow') {
           page.drawLine({
             start: { x: op.x, y: op.y },
             end: { x: op.x + op.w, y: op.y },
             thickness: th, color, opacity: op.opacity ?? 1,
           });
+          if (op.shape === 'arrow') {
+            // Arrowhead: two short lines at 30° from the tip
+            const len = Math.hypot(op.w, 0) || 1;
+            const ahLen = Math.min(14, len * 0.25);
+            const angle = Math.atan2(0, op.w); // horizontal in our model
+            const tipX = op.x + op.w, tipY = op.y;
+            for (const da of [Math.PI - 0.5, Math.PI + 0.5]) {
+              const a = angle + da;
+              page.drawLine({
+                start: { x: tipX, y: tipY },
+                end: { x: tipX + ahLen * Math.cos(a), y: tipY + ahLen * Math.sin(a) },
+                thickness: th, color, opacity: op.opacity ?? 1,
+              });
+            }
+          }
         } else {
           page.drawRectangle({
             x: op.x, y: op.y, width: op.w, height: op.h,
@@ -128,6 +153,47 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
           borderColor: op.color ? hexToRgb(op.color, window.PDFLib) : rgb(0,0,0),
           borderWidth: op.thickness || 2,
           opacity: op.opacity ?? 1,
+        });
+        break;
+      }
+      case 'add_link': {
+        // Link annotation (URL or internal page)
+        const { PDFName, PDFString, PDFNumber } = window.PDFLib;
+        const ctx = pdfDoc.context;
+        const linkAnnot = ctx.obj({
+          Type: PDFName.of('Annot'),
+          Subtype: PDFName.of('Link'),
+          Rect: ctx.obj([op.x, op.y, op.x + (op.w || 100), op.y + (op.h || 20)]),
+          Border: ctx.obj([PDFNumber.of(0), PDFNumber.of(0), PDFNumber.of(0)]),
+          A: ctx.obj({
+            Type: PDFName.of('Action'),
+            S: PDFName.of('URI'),
+            URI: PDFString.of(op.url || ''),
+          }),
+        });
+        const linkRef = ctx.register(linkAnnot);
+        const existing = page.node.Annots();
+        if (existing) existing.push(linkRef);
+        else page.node.set(PDFName.of('Annots'), ctx.obj([linkRef]));
+        break;
+      }
+      case 'add_stamp': {
+        // Stamp: bordered text label burned into the page
+        const stampColor = op.color ? hexToRgb(op.color, window.PDFLib) : rgb(0.86, 0.15, 0.15);
+        const label = op.text || 'APPROVED';
+        const fs = 22;
+        const pad = 10;
+        const tw = label.length * fs * 0.6;
+        const bw = tw + pad * 2, bh = fs + pad * 2;
+        page.drawRectangle({
+          x: op.x, y: op.y, width: bw, height: bh,
+          borderColor: stampColor, borderWidth: 3,
+          color: rgb(1, 1, 1), opacity: 0.9,
+        });
+        const sfont = await getFont('Helvetica-Bold');
+        page.drawText(label, {
+          x: op.x + pad, y: op.y + pad,
+          size: fs, font: sfont, color: stampColor,
         });
         break;
       }

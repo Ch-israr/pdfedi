@@ -16,15 +16,15 @@
   .btn { border: 1px solid #cbd5e1; background: #fff; border-radius: 8px; padding: 7px 12px; font-size: 13px; font-weight: 600; cursor: pointer; }
   .btn:hover:not(:disabled) { background: #f8fafc; }
   .btn:disabled { opacity: .4; cursor: default; }
-  .btn.primary { background: #4f46e5; color: #fff; border-color: #4f46e5; }
-  .btn.primary:hover { background: #4338ca; }
+  .btn.primary { background: #2f6bff; color: #fff; border-color: #2f6bff; }
+  .btn.primary:hover { background: #2456d6; }
   .zoom-ctl { display: flex; align-items: center; gap: 6px; font-size: 13px; }
 
   /* Toolbar */
   .toolbar { display: flex; align-items: center; gap: 4px; background: #fff; border-bottom: 1px solid #e2e8f0; padding: 6px 12px; overflow-x: auto; }
   .tool-btn { border: 1px solid transparent; background: none; border-radius: 8px; padding: 8px 10px; font-size: 14px; cursor: pointer; white-space: nowrap; }
   .tool-btn:hover { background: #f1f5f9; }
-  .tool-btn.active { background: #eef2ff; border-color: #4f46e5; color: #4f46e5; }
+  .tool-btn.active { background: #eef4ff; border-color: #2f6bff; color: #2f6bff; }
   .toolbar .sep { width: 1px; height: 24px; background: #e2e8f0; margin: 0 6px; flex-shrink: 0; }
 
   /* Main layout */
@@ -33,7 +33,7 @@
   /* Left: page panel */
   .page-panel { width: 180px; background: #fff; border-right: 1px solid #e2e8f0; overflow-y: auto; padding: 10px; flex-shrink: 0; }
   .page-thumb { border: 2px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; cursor: pointer; position: relative; background: #fff; }
-  .page-thumb.selected { border-color: #4f46e5; }
+  .page-thumb.selected { border-color: #2f6bff; }
   .page-thumb canvas { width: 100%; display: block; border-radius: 6px; }
   .page-thumb .pnum { font-size: 11px; text-align: center; padding: 4px; color: #64748b; }
   .page-thumb .pactions { display: none; position: absolute; top: 4px; right: 4px; gap: 4px; }
@@ -60,7 +60,7 @@
   .upload-card h2 { margin: 0 0 8px; }
   .upload-card p { color: #64748b; font-size: 14px; }
   .dropzone { border: 2px dashed #cbd5e1; border-radius: 12px; padding: 36px 20px; margin-top: 16px; cursor: pointer; }
-  .dropzone:hover { border-color: #4f46e5; background: #f8fafc; }
+  .dropzone:hover { border-color: #2f6bff; background: #f8fafc; }
 
   .hidden { display: none !important; }
   .status-bar { background: #fff; border-top: 1px solid #e2e8f0; padding: 6px 16px; font-size: 12px; color: #64748b; display: flex; gap: 16px; }
@@ -119,6 +119,10 @@
     <button class="tool-btn" data-tool="shapes" data-shape="rect" title="Rectangle">⬛ Rect</button>
     <button class="tool-btn" data-tool="shapes" data-shape="ellipse" title="Ellipse">⭕ Ellipse</button>
     <button class="tool-btn" data-tool="shapes" data-shape="line" title="Line">📏 Line</button>
+    <button class="tool-btn" data-tool="shapes" data-shape="arrow" title="Arrow">➡️ Arrow</button>
+    <div class="sep"></div>
+    <button class="tool-btn" data-tool="link" title="Add link">🔗 Link</button>
+    <button class="tool-btn" data-tool="stamp" title="Add stamp">🏷️ Stamp</button>
     <div class="sep"></div>
     <button class="tool-btn" data-tool="whiteout" title="Whiteout (visual cover)">⬜ Whiteout</button>
     <button class="tool-btn" data-tool="redact" title="Redact (permanent)">⬛ Redact</button>
@@ -151,6 +155,8 @@
     import { History } from './editor/core/history.js';
     import { screenRectToPdf } from './editor/core/coordinates.js';
     import { getTool } from './editor/tools/registry.js';
+    import './editor/tools/text.js'; // registers improved text tool (overrides)
+    import { openSignatureModal } from './editor/ui/signature-modal.js';
     import { finalizeInBrowser } from './editor/finalize/browser.js';
     import { applyRedaction, verifyRedaction } from './editor/finalize/redact.js';
     import { verifyOutput, expectedPageCount } from './editor/finalize/verify.js';
@@ -297,6 +303,8 @@
         removeManifestOp: (id) => { removeOp(state.manifest, id); updateStatus(); },
         selectObject: (node) => selectObject(node),
         clearSelection: () => clearSelection(),
+        setTool: (id, shape) => setTool(id, shape),
+        updateStatus: () => updateStatus(),
       };
     }
 
@@ -416,24 +424,15 @@
     }
 
     function pickSignature() {
-      // Simple: prompt for typed signature rendered to canvas
-      const name = prompt('Type your name for signature:', '');
-      if (!name) { setTool('select'); return; }
-      const c = document.createElement('canvas');
-      c.width = 400; c.height = 120;
-      const g = c.getContext('2d');
-      g.font = 'italic 64px "Brush Script MT", cursive';
-      g.fillStyle = '#1e3a8a';
-      g.fillText(name, 20, 80);
-      c.toBlob(async blob => {
-        const url = URL.createObjectURL(blob);
+      openSignatureModal((sig) => {
         const img = new Image();
         img.onload = () => {
           const assetId = `sig_${Date.now()}`;
+          const blob = sig.blob;
           state.assets[assetId] = { mime: 'image/png', blob, image: img };
           const pageIndex = state.pageOrder[0];
           const dims = state.pageDims[pageIndex];
-          const w = 180, h = 54;
+          const w = 180, h = w * (img.height / img.width);
           const op = {
             op: 'add_signature', page: pageIndex,
             x: (dims.widthPt - w) / 2, y: 72, w, h, assetId,
@@ -447,16 +446,16 @@
               updateStatus();
             },
             undo: () => {
-              const withId = state.manifest.operations[state.manifest.operations.length-1];
-              removeOp(state.manifest, withId.id);
-              state.overlay.removeOp(pageIndex, withId.id);
+              const last = state.manifest.operations[state.manifest.operations.length - 1];
+              removeOp(state.manifest, last.id);
+              state.overlay.removeOp(pageIndex, last.id);
               clearSelection(); updateStatus();
             },
           });
           setTool('select');
         };
-        img.src = url;
-      }, 'image/png');
+        img.src = sig.dataUrl;
+      });
     }
 
     // ---------- Page panel ----------

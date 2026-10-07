@@ -97,15 +97,19 @@ export class OverlayManager {
     switch (op.op) {
       case 'add_text': {
         const [sx, sy] = pdfToScreenPoint(op.x, op.y, heightPt, s);
+        const fontStyle = [op.bold ? 'bold' : '', op.italic ? 'italic' : ''].filter(Boolean).join(' ') || 'normal';
         node = new Konva.Text({
           ...common,
           x: sx, y: sy - (op.size || 12) * s, // Konva text y is top
           text: op.text,
           fontSize: (op.size || 12) * s,
           fontFamily: op.font || 'Helvetica',
+          fontStyle,
+          align: op.align || 'left',
           fill: op.color || '#000000',
           opacity: op.opacity ?? 1,
         });
+        node.setAttr('_scale', s);
         break;
       }
       case 'add_shape': {
@@ -120,15 +124,18 @@ export class OverlayManager {
             strokeWidth: (op.thickness || 2) * s,
             opacity: op.opacity ?? 1,
           });
-        } else if (op.shape === 'line') {
+        } else if (op.shape === 'line' || op.shape === 'arrow') {
           const [x1, y1] = pdfToScreenPoint(op.x, op.y, heightPt, s);
           const [x2, y2] = pdfToScreenPoint(op.x + op.w, op.y, heightPt, s);
-          node = new Konva.Line({
+          node = new Konva.Arrow({
             ...common,
             points: [x1, y1, x2, y2],
             stroke: op.stroke || '#000000',
             strokeWidth: (op.thickness || 2) * s,
             opacity: op.opacity ?? 1,
+            pointerLength: op.shape === 'arrow' ? 12 * s : 0,
+            pointerWidth: op.shape === 'arrow' ? 10 * s : 0,
+            fill: op.stroke || '#000000',
           });
         } else { // rect
           node = new Konva.Rect({
@@ -162,6 +169,37 @@ export class OverlayManager {
             opacity: op.opacity ?? 0.8,
           });
         }
+        break;
+      }
+      case 'add_link': {
+        // Preview: dashed blue outline (invisible in final PDF — it's an annotation)
+        const r = pdfRectToScreen(op, heightPt, s);
+        node = new Konva.Rect({
+          ...common, draggable: false,
+          x: r.x, y: r.y, width: r.width, height: r.height,
+          stroke: '#2f6bff', strokeWidth: 1.5,
+          dash: [6, 4], fill: 'rgba(47,107,255,0.06)',
+        });
+        break;
+      }
+      case 'add_stamp': {
+        const r = pdfRectToScreen(op, heightPt, s);
+        node = new Konva.Label({ ...common, x: r.x, y: r.y });
+        node.add(new Konva.Tag({
+          fill: 'rgba(255,255,255,0.85)',
+          stroke: op.color || '#dc2626',
+          strokeWidth: 3 * s,
+          cornerRadius: 6 * s,
+          opacity: op.opacity ?? 0.9,
+        }));
+        node.add(new Konva.Text({
+          text: op.text || 'APPROVED',
+          fontSize: 22 * s,
+          fontStyle: 'bold',
+          fill: op.color || '#dc2626',
+          padding: 10 * s,
+          align: 'center',
+        }));
         break;
       }
       case 'whiteout': {

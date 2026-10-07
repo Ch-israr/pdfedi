@@ -247,13 +247,140 @@ registerTool({
   },
 });
 
-// ---- Shapes tool (rect / ellipse / line) ----
+// ---- Link tool ----
+registerTool({
+  id: 'link',
+  name: 'Link',
+  icon: '🔗',
+  cursor: 'crosshair',
+  onActivate() {},
+  onDeactivate(ctx) { this._start = null; this._preview = null; },
+  onPointerDown(ctx, evt) {
+    const stage = evt.target.getStage();
+    if (!stage) return;
+    const pageIndex = ctx.getPageIndex(stage);
+    if (pageIndex < 0) return;
+    const pos = stage.getPointerPosition();
+    this._start = { pageIndex, x: pos.x, y: pos.y };
+  },
+  onPointerMove(ctx, evt) {
+    if (!this._start) return;
+    const stage = evt.target.getStage();
+    const pos = stage.getPointerPosition();
+    const layer = ctx.overlay.getLayer(this._start.pageIndex);
+    this._preview?.destroy();
+    this._preview = new Konva.Rect({
+      x: Math.min(this._start.x, pos.x), y: Math.min(this._start.y, pos.y),
+      width: Math.abs(pos.x - this._start.x), height: Math.abs(pos.y - this._start.y),
+      stroke: '#2f6bff', strokeWidth: 1.5, dash: [6, 4],
+      fill: 'rgba(47,107,255,0.06)',
+    });
+    layer.add(this._preview);
+    layer.batchDraw();
+  },
+  onPointerUp(ctx, evt) {
+    if (!this._start) return;
+    const stage = evt.target.getStage();
+    const pos = stage.getPointerPosition();
+    const { pageIndex, x: x1, y: y1 } = this._start;
+    this._preview?.destroy();
+    this._preview = null;
+    this._start = null;
+
+    const sr = {
+      x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
+      width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
+    };
+    if (sr.width < 10 || sr.height < 10) return;
+
+    const url = prompt('Link URL (https://…):', 'https://');
+    if (!url || url === 'https://') return;
+
+    const pr = ctx.screenRectToPdf(sr, pageIndex);
+    const op = { op: 'add_link', page: pageIndex, ...pr, url };
+    ctx.history.execute({
+      op,
+      do: () => {
+        const withId = ctx.appendManifestOp(op);
+        ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
+      },
+      undo: () => {
+        const last = ctx.manifest.operations[ctx.manifest.operations.length - 1];
+        ctx.removeManifestOp(last.id);
+        ctx.overlay.removeOp(pageIndex, last.id);
+      },
+    });
+    ctx.setTool('select');
+  },
+});
+
+// ---- Shapes tool (rect / ellipse / line / arrow) ----
 registerTool({
   id: 'shapes',
   name: 'Shapes',
   icon: '⬛',
   cursor: 'crosshair',
-  shape: 'rect', // rect | ellipse | line — set by UI
+  shape: 'rect', // rect | ellipse | line | arrow — set by UI
+
+// ---- Stamp tool ----
+const STAMPS = [
+  { text: 'APPROVED', color: '#16a34a' },
+  { text: 'CONFIDENTIAL', color: '#dc2626' },
+  { text: 'DRAFT', color: '#d97706' },
+  { text: 'REVIEWED', color: '#2f6bff' },
+  { text: 'REJECTED', color: '#991b1b' },
+];
+registerTool({
+  id: 'stamp',
+  name: 'Stamp',
+  icon: '🏷️',
+  cursor: 'crosshair',
+  stampIndex: 0,
+  onActivate(ctx) {
+    // Cycle through presets or let user pick
+    const choice = prompt(
+      'Stamp text (or pick):\n' + STAMPS.map((s, i) => `${i+1}. ${s.text}`).join('\n'),
+      STAMPS[this.stampIndex].text
+    );
+    if (choice) {
+      const found = STAMPS.findIndex(s => s.text.toLowerCase() === choice.toLowerCase());
+      this._text = choice.toUpperCase();
+      this._color = found >= 0 ? STAMPS[found].color : '#dc2626';
+    }
+  },
+  onDeactivate() {},
+  onPointerDown(ctx, evt) {
+    if (evt.evt) evt.evt.preventDefault();
+    const stage = evt.target.getStage();
+    if (!stage || evt.target !== stage) return;
+    const pos = stage.getPointerPosition();
+    const pageIndex = ctx.getPageIndex(stage);
+    if (pageIndex < 0) return;
+
+    const [px, py] = ctx.screenToPdf(pos.x, pos.y, pageIndex);
+    const op = {
+      op: 'add_stamp', page: pageIndex,
+      x: px, y: py, w: 120, h: 36,
+      text: this._text || 'APPROVED',
+      color: this._color || '#dc2626',
+    };
+    ctx.history.execute({
+      op,
+      do: () => {
+        const withId = ctx.appendManifestOp(op);
+        const node = ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
+        if (node) ctx.selectObject(node);
+      },
+      undo: () => {
+        const last = ctx.manifest.operations[ctx.manifest.operations.length - 1];
+        ctx.removeManifestOp(last.id);
+        ctx.overlay.removeOp(pageIndex, last.id);
+        ctx.clearSelection();
+      },
+    });
+    ctx.setTool('select');
+  },
+});
   onActivate() {},
   onDeactivate(ctx) { this._start = null; this._preview = null; },
   onPointerDown(ctx, evt) {
