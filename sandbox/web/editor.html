@@ -402,16 +402,12 @@
         },
         onDuplicate: () => duplicateObject(node, op),
         onDelete: () => {
-          // Look up fresh references by ID (closure may be stale)
-          const opId = node.getAttr('opId');
-          const freshOp = state.manifest.operations.find(o => o.id === opId);
-          const freshNode = state.overlay.findNodeByOpId(opId);
-          if (freshOp && freshNode) {
-            deleteObject(freshNode, freshOp);
-          } else if (freshOp) {
-            // Node missing but op exists — remove op directly
-            deleteObjectById(opId);
-          }
+          // Use global selection (not closure node which may be stale)
+          const selNode = state.selected;
+          if (!selNode) return;
+          const opId = selNode.getAttr('opId');
+          if (!opId) return;
+          deleteObjectById(opId);
         },
         onMoveMode: () => enterMoveMode(node, op),
         onRepeatAll: () => repeatOnAllPages(op),
