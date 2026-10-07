@@ -90,7 +90,12 @@ export class History {
   redo() {
     const cmd = this.redoStack.pop();
     if (!cmd) return false;
-    cmd.do();
+    // Prefer cmd.redo() if defined, else fallback to cmd.do()
+    if (typeof cmd.redo === 'function') {
+      cmd.redo();
+    } else {
+      cmd.do();
+    }
     this.undoStack.push(cmd);
     this._emit();
     return true;
