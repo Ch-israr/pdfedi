@@ -44,6 +44,10 @@ registerTool({
   onActivate() {},
   onDeactivate() {},
   onPointerDown(ctx, evt) {
+    // Prevent the browser's default mousedown focus behavior, which would
+    // instantly blur the textarea we're about to create.
+    if (evt.evt) evt.evt.preventDefault();
+
     const stage = evt.target.getStage();
     if (!stage) return;
     const pos = stage.getPointerPosition();
