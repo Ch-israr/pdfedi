@@ -129,8 +129,9 @@ registerTool({
         const node = ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
         if (node) {
           nodeRef = node;
-          ctx.selectObject(node);
-          // Immediately enter edit mode
+          // Do NOT select yet — enter edit mode first.
+          // Selection (and draggability) happens after editing completes,
+          // then we immediately deselect so the object stays fixed.
           makeEditable(node, stage, (newText) => {
             withId.text = newText;
             // If user left it empty, remove the object
@@ -138,6 +139,14 @@ registerTool({
               ctx.removeManifestOp(withId.id);
               ctx.overlay.removeOp(pageIndex, withId.id);
               ctx.clearSelection();
+            } else {
+              // Placement complete: ensure node is at final position,
+              // NOT draggable, NOT selected — detached from mouse.
+              // User switches to Select tool to move it.
+              node.draggable(false);
+              ctx.clearSelection();
+              // Switch back to select tool for natural next action
+              ctx.setTool('select');
             }
             ctx.updateStatus();
           });
