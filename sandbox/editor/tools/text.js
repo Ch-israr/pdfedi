@@ -86,11 +86,31 @@ registerTool({
       return;
     }
 
-    // Empty canvas click → create new text object
+    // Empty canvas click — but first check if we clicked NEAR an existing text
+    // object (within 10px). If so, select it instead of creating new.
+    // This prevents accidental new objects when trying to grab existing text.
     const pos = stage.getPointerPosition();
     const pageIndex = ctx.getPageIndex(stage);
     if (pageIndex < 0) return;
 
+    const layer = ctx.overlay.getLayer(pageIndex);
+    if (layer) {
+      const nearby = layer.find(node => {
+        if (node.getAttr('opId') && node.className === 'Text') {
+          const box = node.getClientRect();
+          const pad = 10;
+          return pos.x >= box.x - pad && pos.x <= box.x + box.width + pad &&
+                 pos.y >= box.y - pad && pos.y <= box.y + box.height + pad;
+        }
+        return false;
+      });
+      if (nearby.length > 0) {
+        ctx.selectObject(nearby[0]);
+        return;
+      }
+    }
+
+    // Truly empty canvas → create new text object
     const [px, py] = ctx.screenToPdf(pos.x, pos.y, pageIndex);
     const op = {
       op: 'add_text', page: pageIndex,

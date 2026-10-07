@@ -144,7 +144,7 @@
   <script type="module">
     import { PdfRenderer } from './editor/render/pdfjs-loader.js';
     import { OverlayManager } from './editor/render/overlay.js';
-    import { createManifest, appendOp, removeOp } from './editor/core/manifest.js';
+    import { createManifest, appendOp, removeOp, restoreOp } from './editor/core/manifest.js';
     import { History } from './editor/core/history.js';
     import { screenRectToPdf } from './editor/core/coordinates.js';
     import { getTool } from './editor/tools/registry.js';
@@ -433,7 +433,7 @@
       });
     }
     function deleteObject(node, op) {
-      // Snapshot the op for undo
+      // Snapshot the op for undo (preserves ID via restoreOp)
       const snapshot = JSON.parse(JSON.stringify(op));
       state.history.execute({
         op: { op: 'delete_object', targetId: op.id },
@@ -444,9 +444,8 @@
           updateStatus();
         },
         undo: () => {
-          const withId = appendOp(state.manifest, snapshot);
-          // Re-render (appendOp assigns new id; that's fine — identity is by content)
-          state.overlay.renderOp(withId.page, withId, state.assets);
+          const restored = restoreOp(state.manifest, snapshot);
+          state.overlay.renderOp(restored.page, restored, state.assets);
           updateStatus();
         },
       });
@@ -729,6 +728,30 @@
           const opId = node.getAttr('opId');
           const op = state.manifest.operations.find(o => o.id === opId);
           if (op) deleteObject(node, op);
+        }
+        return;
+      }
+      // Arrow keys nudge the selected object (1px, or 10px with Shift)
+      if (e.key.startsWith('Arrow') && state.selected && !e.ctrlKey && !e.metaKey) {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+        e.preventDefault();
+        const step = e.shiftKey ? 10 : 1;
+        const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
+        const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
+        const node = state.selected;
+        const opId = node.getAttr('opId');
+        const op = state.manifest.operations.find(o => o.id === opId);
+        if (op && (dx || dy)) {
+          const s = state.overlay.scale;
+          const dPdfX = dx / s;
+          const dPdfY = -dy / s;
+          const beforeX = op.x, beforeY = op.y;
+          state.history.execute({
+            op: { op: 'nudge_object', targetId: op.id },
+            do: () => { op.x = beforeX + dPdfX; op.y = beforeY + dPdfY; syncNodeToOp(node, op); },
+            undo: () => { op.x = beforeX; op.y = beforeY; syncNodeToOp(node, op); },
+          });
         }
       }
     });

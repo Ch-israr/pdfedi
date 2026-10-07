@@ -123,6 +123,20 @@ export function appendOp(manifest, op) {
 }
 
 /**
+ * Restore an operation with its original ID (for undo of delete).
+ * Preserves object identity so formatting history stays connected.
+ */
+export function restoreOp(manifest, opWithId) {
+  const err = validateOp(opWithId);
+  if (err) throw new Error(`Invalid operation: ${err}`);
+  // Remove any existing op with this ID first (shouldn't happen, but safe)
+  const existing = manifest.operations.findIndex(o => o.id === opWithId.id);
+  if (existing >= 0) manifest.operations.splice(existing, 1);
+  manifest.operations.push({ ...opWithId });
+  return opWithId;
+}
+
+/**
  * Remove an operation by id (used by undo).
  */
 export function removeOp(manifest, opId) {
