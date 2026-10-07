@@ -18,14 +18,22 @@
  */
 
 const FONT_MAP = {
+  Arial: 'Helvetica',  // Arial → Helvetica (metrically compatible, PDF standard)
+  'Arial-Bold': 'HelveticaBold',
+  'Arial-Oblique': 'HelveticaOblique',
+  'Arial-BoldOblique': 'HelveticaBoldOblique',
   Helvetica: 'Helvetica',
   'Helvetica-Bold': 'HelveticaBold',
   'Helvetica-Oblique': 'HelveticaOblique',
   'Helvetica-BoldOblique': 'HelveticaBoldOblique',
+  'Times New Roman': 'TimesRoman',
   Times: 'TimesRoman',
   'Times-Bold': 'TimesRomanBold',
+  'Courier New': 'Courier',
   Courier: 'Courier',
   'Courier-Bold': 'CourierBold',
+  Georgia: 'TimesRoman',  // closest standard match
+  Verdana: 'Helvetica',   // closest standard match
 };
 
 function hexToRgb(hex, PDFLib) {
@@ -86,12 +94,12 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
     switch (op.op) {
       case 'add_text': {
         if (!op.text || !op.text.trim()) break; // skip empty (user cancelled)
-        // Bold/italic map to Helvetica-Bold / Helvetica-Oblique variants
-        let fontName = op.font || 'Helvetica';
-        if (op.bold && op.italic) fontName = 'Helvetica-BoldOblique';
-        else if (op.bold) fontName = 'Helvetica-Bold';
-        else if (op.italic) fontName = 'Helvetica-Oblique';
-        // Fallback: pdf-lib StandardFonts has these variants
+        // Bold/italic map to font variants (Arial→Helvetica via FONT_MAP)
+        const base = op.font || 'Arial';
+        let fontName = base;
+        if (op.bold && op.italic) fontName = base + '-BoldOblique';
+        else if (op.bold) fontName = base + '-Bold';
+        else if (op.italic) fontName = base + '-Oblique';
         const font = await getFont(fontName);
         page.drawText(op.text, {
           x: op.x,

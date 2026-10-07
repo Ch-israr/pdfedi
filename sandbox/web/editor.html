@@ -47,11 +47,7 @@
   .konva-overlay { position: absolute; top: 0; left: 0; }
 
   /* Right: properties panel */
-  .props-panel { width: 240px; background: #fff; border-left: 1px solid #e2e8f0; overflow-y: auto; padding: 14px; flex-shrink: 0; }
-  .props-panel h3 { font-size: 13px; margin: 0 0 10px; text-transform: uppercase; letter-spacing: .05em; color: #64748b; }
-  .prop-row { margin-bottom: 10px; }
-  .prop-row label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 4px; }
-  .prop-row input, .prop-row select { width: 100%; padding: 7px; border: 1px solid #cbd5e1; border-radius: 7px; font-size: 13px; }
+  /* (properties panel removed — contextual floating toolbar is used instead) */
   .prop-row input[type=color] { height: 36px; padding: 2px; }
 
   /* Upload overlay */
@@ -133,10 +129,6 @@
   <div class="editor-main">
     <div class="page-panel" id="pagePanel"></div>
     <div class="workspace" id="workspace"></div>
-    <div class="props-panel" id="propsPanel">
-      <h3>Properties</h3>
-      <div id="propsContent"><p style="font-size:13px;color:#94a3b8">Select an object to edit its properties.</p></div>
-    </div>
   </div>
 
   <div class="status-bar">
@@ -171,7 +163,7 @@
       manifest: null, history: null,
       assets: {}, activeTool: 'select',
       zoom: 1.0, selected: null,
-      textDefaults: { font: 'Helvetica', size: 12, color: '#000000' },
+      textDefaults: { font: 'Arial', size: 12, color: '#000000' },
       drawDefaults: { color: '#000000', thickness: 2 },
       pageOrder: [], // working page order (indices into original)
     };
@@ -322,29 +314,82 @@
       });
       layer.add(transformer);
       transformer.nodes([node]);
+      node.draggable(true);
       layer.batchDraw();
-      showProps(node);
-      // Contextual floating toolbar
+      // Contextual floating toolbar (replaces the old side properties panel)
       const opId = node.getAttr('opId');
       const op = state.manifest.operations.find(o => o.id === opId);
       if (op) {
         node.setAttr('_objType', op.op);
         showContextBar(node, op, makeContextCallbacks(node, op));
+        attachDragHistory(node, op);
       }
+    }
+    // Single undo entry per drag (not per mousemove)
+    function attachDragHistory(node, op) {
+      let startX, startY, startOpX, startOpY;
+      node.off('dragstart.pdfedi dragend.pdfedi');
+      node.on('dragstart.pdfedi', () => {
+        startX = node.x(); startY = node.y();
+        startOpX = op.x; startOpY = op.y;
+      });
+      node.on('dragend.pdfedi', () => {
+        const dx = node.x() - startX;
+        const dy = node.y() - startY;
+        if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return; // no-op
+        // Convert screen delta to PDF points
+        const pageIndex = op.page;
+        const s = state.overlay.scale;
+        const dPdfX = dx / s;
+        const dPdfY = -dy / s; // screen y down → PDF y up
+        const endOpX = startOpX + dPdfX;
+        const endOpY = startOpY + dPdfY;
+        // Reset node to start, then apply via history for clean undo
+        node.x(startX); node.y(startY);
+        state.history.execute({
+          op: { op: 'move_object', targetId: op.id },
+          do: () => {
+            op.x = endOpX; op.y = endOpY;
+            syncNodeToOp(node, op);
+          },
+          undo: () => {
+            op.x = startOpX; op.y = startOpY;
+            syncNodeToOp(node, op);
+          },
+        });
+        refreshContextBar();
+      });
+    }
+    function syncNodeToOp(node, op) {
+      // Re-render the node from the op (simplest reliable sync)
+      const pageIndex = op.page;
+      state.overlay.removeOp(pageIndex, op.id);
+      const newNode = state.overlay.renderOp(pageIndex, op, state.assets);
+      if (newNode) selectObject(newNode);
     }
     function makeContextCallbacks(node, op) {
       return {
         onStyle: (style) => {
-          Object.assign(op, style);
-          if (op.op === 'add_text') styleTextNode(node, op, style);
-          else if (op.op === 'add_shape') {
-            if (style.stroke) node.stroke(style.stroke);
-            if ('fill' in style) node.fill(style.fill);
-            if (style.thickness) node.strokeWidth(style.thickness);
-            node.getLayer()?.batchDraw();
+          // Capture before/after for undoable style change
+          const before = {};
+          const after = {};
+          for (const k of Object.keys(style)) {
+            before[k] = op[k];
+            after[k] = style[k];
           }
-          showContextBar(node, op, makeContextCallbacks(node, op));
-          showProps(node);
+          state.history.execute({
+            op: { op: 'style_object', targetId: op.id, style: { ...after } },
+            do: () => {
+              Object.assign(op, after);
+              applyStyleToNode(node, op, after);
+              showContextBar(node, op, makeContextCallbacks(node, op));
+            },
+            undo: () => {
+              Object.assign(op, before);
+              applyStyleToNode(node, op, before);
+              showContextBar(node, op, makeContextCallbacks(node, op));
+            },
+          });
         },
         onDuplicate: () => duplicateObject(node, op),
         onDelete: () => deleteObject(node, op),
@@ -353,20 +398,58 @@
         onReplace: () => replaceImage(node, op),
       };
     }
+    function applyStyleToNode(node, op, style) {
+      if (op.op === 'add_text') styleTextNode(node, op, style);
+      else if (op.op === 'add_shape') {
+        if (style.stroke !== undefined) node.stroke(style.stroke);
+        if (style.fill !== undefined) node.fill(style.fill);
+        if (style.thickness !== undefined) node.strokeWidth(style.thickness);
+        node.getLayer()?.batchDraw();
+      }
+      // Link URL is op-only, no visual change needed
+    }
     function duplicateObject(node, op) {
       const clone = JSON.parse(JSON.stringify(op));
       delete clone.id;
       clone.x = (clone.x || 0) + 20;
-      const withId = appendOp(state.manifest, clone);
-      const newNode = state.overlay.renderOp(withId.page, withId, state.assets);
-      if (newNode) selectObject(newNode);
-      updateStatus();
+      let newId = null;
+      state.history.execute({
+        op: { op: 'duplicate_object', targetId: op.id },
+        do: () => {
+          const withId = appendOp(state.manifest, clone);
+          newId = withId.id;
+          const newNode = state.overlay.renderOp(withId.page, withId, state.assets);
+          if (newNode) selectObject(newNode);
+          updateStatus();
+        },
+        undo: () => {
+          if (newId) {
+            removeOp(state.manifest, newId);
+            state.overlay.removeOp(clone.page, newId);
+            clearSelection();
+            updateStatus();
+          }
+        },
+      });
     }
     function deleteObject(node, op) {
-      removeOp(state.manifest, op.id);
-      state.overlay.removeOp(op.page, op.id);
-      clearSelection();
-      updateStatus();
+      // Snapshot the op for undo
+      const snapshot = JSON.parse(JSON.stringify(op));
+      state.history.execute({
+        op: { op: 'delete_object', targetId: op.id },
+        do: () => {
+          removeOp(state.manifest, op.id);
+          state.overlay.removeOp(op.page, op.id);
+          clearSelection();
+          updateStatus();
+        },
+        undo: () => {
+          const withId = appendOp(state.manifest, snapshot);
+          // Re-render (appendOp assigns new id; that's fine — identity is by content)
+          state.overlay.renderOp(withId.page, withId, state.assets);
+          updateStatus();
+        },
+      });
     }
     function repeatOnAllPages(op) {
       // Clone this object onto every page (except its own)
@@ -420,31 +503,6 @@
       transformer = null;
       state.selected = null;
       hideContextBar();
-      document.getElementById('propsContent').innerHTML =
-        '<p style="font-size:13px;color:#94a3b8">Select an object to edit its properties.</p>';
-    }
-    function showProps(node) {
-      const c = document.getElementById('propsContent');
-      const opId = node.getAttr('opId');
-      c.innerHTML = `<p style="font-size:13px">Object: <code>${opId || 'unknown'}</code></p>
-        <div class="prop-row"><label>Opacity</label>
-        <input type="range" min="10" max="100" value="${Math.round((node.opacity()||1)*100)}" id="propOpacity"></div>
-        <button class="btn" id="propDelete" style="width:100%">Delete object</button>`;
-      document.getElementById('propOpacity').oninput = e => {
-        node.opacity(e.target.value / 100);
-        node.getLayer().batchDraw();
-      };
-      document.getElementById('propDelete').onclick = () => {
-        // Find and remove the manifest op
-        const op = state.manifest.operations.find(o => o.id === opId);
-        if (op) {
-          state.history.execute({
-            op: { op: 'delete_object', targetId: opId },
-            do: () => { removeOp(state.manifest, opId); state.overlay.removeOp(op.page, opId); clearSelection(); updateStatus(); },
-            undo: () => { appendOp(state.manifest, op); state.overlay.renderOp(op.page, op, state.assets); updateStatus(); },
-          });
-        }
-      };
     }
 
     // ---------- Toolbar ----------
@@ -659,8 +717,20 @@
     document.getElementById('undoBtn').onclick = () => state.history?.undo();
     document.getElementById('redoBtn').onclick = () => state.history?.redo();
     document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); state.history?.undo(); }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); state.history?.redo(); }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); state.history?.undo(); return; }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); state.history?.redo(); return; }
+      // Delete / Backspace removes the selected object (not while typing in a textarea/input)
+      if ((e.key === 'Delete' || e.key === 'Backspace') && !e.ctrlKey && !e.metaKey) {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+        if (state.selected) {
+          e.preventDefault();
+          const node = state.selected;
+          const opId = node.getAttr('opId');
+          const op = state.manifest.operations.find(o => o.id === opId);
+          if (op) deleteObject(node, op);
+        }
+      }
     });
     function updateHistoryUI() {
       document.getElementById('undoBtn').disabled = !state.history?.canUndo;

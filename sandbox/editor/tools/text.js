@@ -69,7 +69,24 @@ registerTool({
   onPointerDown(ctx, evt) {
     if (evt.evt) evt.evt.preventDefault();
     const stage = evt.target.getStage();
-    if (!stage || evt.target !== stage) return; // only on empty canvas
+    if (!stage) return;
+
+    // Clicked on an existing object? Select it (don't create new).
+    // This is the critical move-vs-create distinction.
+    if (evt.target !== stage) {
+      const clickedOpId = evt.target.getAttr('opId') ||
+        evt.target.findAncestor('[opId]', true)?.getAttr('opId');
+      if (clickedOpId) {
+        const node = ctx.overlay.findNodeByOpId?.(clickedOpId) ||
+          evt.target.findAncestor('[opId]', true) || evt.target;
+        ctx.selectObject(node);
+        return;
+      }
+      // Clicked on something without an opId (e.g. page background rect) — ignore
+      return;
+    }
+
+    // Empty canvas click → create new text object
     const pos = stage.getPointerPosition();
     const pageIndex = ctx.getPageIndex(stage);
     if (pageIndex < 0) return;

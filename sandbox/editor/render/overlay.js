@@ -293,6 +293,15 @@ export class OverlayManager {
     return node;
   }
 
+  /** Find the Konva node for an op id (top-level match). */
+  findNodeByOpId(opId) {
+    for (const [, layer] of this.layers) {
+      const found = layer.find(node => node.getAttr('opId') === opId);
+      if (found.length) return found[0];
+    }
+    return null;
+  }
+
   /** Remove all nodes for an operation id. */
   removeOp(pageIndex, opId) {
     const layer = this.getLayer(pageIndex);

@@ -1,162 +1,256 @@
 /**
- * Contextual floating toolbar — per-object-type controls.
+ * Contextual floating toolbar — professional, focused, per object type.
  *
- * Per spec §8: when an object is selected, show only the controls
- * relevant to that object type, positioned near the object.
- * Does not appear in the exported PDF.
- *
- * PDFEDI design: brand #2f6bff, rounded, subtle shadow.
+ * Design principles:
+ * - Only show controls that work and are relevant
+ * - Clear icons + tooltips on everything
+ * - Clean visual grouping
+ * - Compact — never larger than needed
+ * - Positioned near the object, viewport-safe, zoom-aware
  */
 
 let bar = null;
 let currentNode = null;
+let currentOp = null;
 let callbacks = {};
 
 export function showContextBar(node, op, cb) {
   hideContextBar();
-  if (!node) return;
+  if (!node || !op) return;
   currentNode = node;
+  currentOp = op;
   callbacks = cb;
 
   bar = document.createElement('div');
   bar.id = 'ctx-bar';
   bar.style.cssText = `
-    position:absolute;z-index:30;display:flex;gap:4px;align-items:center;
+    position:absolute;z-index:30;display:flex;gap:2px;align-items:center;
     background:#fff;border:1px solid #e2e8f0;border-radius:12px;
-    box-shadow:0 8px 24px rgba(15,23,42,.14);padding:6px 8px;
-    font-family:system-ui,sans-serif;font-size:12px;`;
+    box-shadow:0 8px 24px rgba(15,23,42,.16);padding:6px;
+    font-family:system-ui,-apple-system,sans-serif;`;
 
-  const type = node.getAttr('_objType') || op?.op || 'unknown';
-  const controls = controlsFor(type, op);
-  controls.forEach(c => bar.appendChild(c));
+  const builders = {
+    add_text: buildTextControls,
+    add_shape: buildShapeControls,
+    add_image: buildImageControls,
+    add_signature: buildImageControls,
+    add_link: buildLinkControls,
+  };
+  const build = builders[op.op] || buildGenericControls;
+  build(bar, node, op, cb);
 
   const container = node.getStage().container();
   if (getComputedStyle(container).position === 'static') container.style.position = 'relative';
   container.appendChild(bar);
-  positionBar(node);
+  positionBar();
 }
 
 export function hideContextBar() {
   bar?.remove();
   bar = null;
   currentNode = null;
+  currentOp = null;
 }
 
 export function refreshContextBar() {
-  if (bar && currentNode) positionBar(currentNode);
+  if (bar && currentNode) positionBar();
 }
 
-function positionBar(node) {
-  if (!bar) return;
-  const box = node.getClientRect();
-  const stage = node.getStage();
-  const scale = stage.scaleX();
-  const barW = bar.offsetWidth || 200;
+function positionBar() {
+  if (!bar || !currentNode) return;
+  const box = currentNode.getClientRect({ relativeTo: currentNode.getStage() });
+  const stage = currentNode.getStage();
+  const stageW = stage.width();
+  const stageH = stage.height();
+
+  // Measure bar (needs to be in DOM)
+  const barW = bar.offsetWidth || 280;
+  const barH = bar.offsetHeight || 44;
+
+  // Prefer above the object, centered
   let x = box.x + box.width / 2 - barW / 2;
-  let y = box.y - 48;
-  x = Math.max(8, Math.min(x, stage.width() - barW - 8));
-  if (y < 8) y = box.y + box.height + 8;
-  bar.style.left = `${x / scale}px`;
-  bar.style.top = `${y / scale}px`;
+  let y = box.y - barH - 10;
+
+  // If no room above, go below
+  if (y < 4) y = box.y + box.height + 10;
+  // Clamp horizontally
+  x = Math.max(4, Math.min(x, stageW - barW - 4));
+  // Clamp vertically (shouldn't happen, but safe)
+  y = Math.max(4, Math.min(y, stageH - barH - 4));
+
+  bar.style.left = `${x}px`;
+  bar.style.top = `${y}px`;
 }
 
-// --- control builders ---
+// ---------- building blocks ----------
 
-function btn(label, title, onClick, active) {
+function btn(label, tooltip, onClick, opts = {}) {
   const b = document.createElement('button');
-  b.textContent = label;
-  b.title = title;
+  b.innerHTML = label;
+  b.title = tooltip;
+  b.setAttribute('aria-label', tooltip);
+  const active = opts.active;
   b.style.cssText = `
-    border:1px solid ${active ? '#2f6bff' : '#e2e8f0'};border-radius:8px;
-    background:${active ? '#eef4ff' : '#fff'};color:${active ? '#2f6bff' : '#334155'};
-    padding:6px 8px;font-size:12px;font-weight:600;cursor:pointer;min-width:28px;`;
+    border:0;border-radius:8px;min-width:32px;height:32px;
+    background:${active ? '#eef4ff' : 'transparent'};
+    color:${active ? '#2f6bff' : '#334155'};
+    font-size:${opts.fontSize || '15px'};font-weight:${opts.bold ? '700' : '400'};
+    font-style:${opts.italic ? 'italic' : 'normal'};
+    cursor:pointer;display:flex;align-items:center;justify-content:center;
+    padding:0 6px;transition:background .12s;`;
+  b.onmouseenter = () => { if (!active) b.style.background = '#f1f5f9'; };
+  b.onmouseleave = () => { b.style.background = active ? '#eef4ff' : 'transparent'; };
   b.onclick = (e) => { e.stopPropagation(); onClick(b); };
   return b;
 }
 
-function colorInput(value, onChange) {
-  const c = document.createElement('input');
-  c.type = 'color'; c.value = value || '#000000';
-  c.title = 'Color';
-  c.style.cssText = 'width:30px;height:28px;border:1px solid #e2e8f0;border-radius:8px;padding:2px;cursor:pointer;';
-  c.oninput = () => onChange(c.value);
-  c.onclick = (e) => e.stopPropagation();
-  return c;
-}
-
-function select(options, value, onChange) {
-  const s = document.createElement('select');
-  s.style.cssText = 'border:1px solid #e2e8f0;border-radius:8px;padding:5px 6px;font-size:12px;cursor:pointer;';
-  options.forEach(o => {
-    const opt = document.createElement('option');
-    opt.value = o.v; opt.textContent = o.l;
-    if (o.v == value) opt.selected = true;
-    s.appendChild(opt);
-  });
-  s.onchange = () => onChange(s.value);
-  s.onclick = (e) => e.stopPropagation();
-  return s;
-}
-
-function sep() {
+function groupSep() {
   const d = document.createElement('div');
-  d.style.cssText = 'width:1px;height:22px;background:#e2e8f0;margin:0 2px;';
+  d.style.cssText = 'width:1px;height:24px;background:#e2e8f0;margin:0 4px;flex-shrink:0;';
   return d;
 }
 
-// --- per-type control sets ---
+function fontSelect(op, cb) {
+  const fonts = [
+    { v: 'Arial', l: 'Arial' },
+    { v: 'Helvetica', l: 'Helvetica' },
+    { v: 'Times New Roman', l: 'Times' },
+    { v: 'Courier New', l: 'Courier' },
+    { v: 'Georgia', l: 'Georgia' },
+    { v: 'Verdana', l: 'Verdana' },
+  ];
+  const s = document.createElement('select');
+  s.title = 'Font family';
+  s.style.cssText = `border:0;border-radius:8px;height:32px;font-size:13px;cursor:pointer;
+    background:transparent;color:#334155;max-width:110px;padding:0 4px;`;
+  s.onmouseenter = () => s.style.background = '#f1f5f9';
+  s.onmouseleave = () => s.style.background = 'transparent';
+  fonts.forEach(f => {
+    const o = document.createElement('option');
+    o.value = f.v; o.textContent = f.l;
+    o.style.fontFamily = f.v;
+    if ((op.font || 'Arial') === f.v) o.selected = true;
+    s.appendChild(o);
+  });
+  s.onchange = () => cb.onStyle({ font: s.value });
+  s.onclick = e => e.stopPropagation();
+  return s;
+}
 
-function controlsFor(type, op) {
-  const out = [];
-  const cb = callbacks;
-
-  // Common: duplicate, delete, repeat on all pages
-  const commonEnd = () => {
-    out.push(sep());
-    out.push(btn('⧉', 'Duplicate', () => cb.onDuplicate?.()));
-    out.push(btn('📄', 'Repeat on all pages', () => cb.onRepeatAll?.()));
-    out.push(btn('🗑', 'Delete', () => cb.onDelete?.()));
-  };
-
-  if (op?.op === 'add_text' || type === 'add_text') {
-    out.push(btn('B', 'Bold', (b) => cb.onStyle?.({ bold: !op.bold }, b), op.bold));
-    out.push(btn('I', 'Italic', (b) => cb.onStyle?.({ italic: !op.italic }, b), op.italic));
-    out.push(select(
-      [8,10,12,14,18,24,32,48].map(s => ({ v: s, l: s + 'pt' })),
-      op.size || 12, v => cb.onStyle?.({ size: +v })
-    ));
-    out.push(colorInput(op.color, v => cb.onStyle?.({ color: v })));
-    out.push(btn('≡', 'Align: left/center/right', () => {
-      const order = ['left', 'center', 'right'];
-      const next = order[(order.indexOf(op.align || 'left') + 1) % 3];
-      cb.onStyle?.({ align: next });
-    }));
-    commonEnd();
-  } else if (type === 'add_shape' || op?.op === 'add_shape') {
-    out.push(colorInput(op.stroke, v => cb.onStyle?.({ stroke: v })));
-    out.push(btn('▦', 'Fill color', () => {
-      const cur = op.fill ? null : (op.stroke || '#2f6bff');
-      cb.onStyle?.({ fill: cur });
-    }, !!op.fill));
-    out.push(select(
-      [1,2,3,4,6,8].map(t => ({ v: t, l: t + 'px' })),
-      op.thickness || 2, v => cb.onStyle?.({ thickness: +v })
-    ));
-    commonEnd();
-  } else if (op?.op === 'add_image' || op?.op === 'add_signature') {
-    out.push(btn('🔄', 'Replace', () => cb.onReplace?.()));
-    out.push(btn('↻', 'Rotate 90°', () => cb.onRotate?.()));
-    commonEnd();
-  } else if (op?.op === 'add_link') {
-    out.push(btn('✎', 'Edit URL', () => {
-      const url = prompt('Link URL:', op.url || 'https://');
-      if (url) cb.onStyle?.({ url });
-    }));
-    commonEnd();
-  } else {
-    // Generic: delete + duplicate
-    commonEnd();
+function sizeSelect(op, cb) {
+  const sizes = [8, 10, 12, 14, 18, 24, 32, 48, 64];
+  const s = document.createElement('select');
+  s.title = 'Font size';
+  s.style.cssText = `border:0;border-radius:8px;height:32px;font-size:13px;cursor:pointer;
+    background:transparent;color:#334155;padding:0 4px;`;
+  s.onmouseenter = () => s.style.background = '#f1f5f9';
+  s.onmouseleave = () => s.style.background = 'transparent';
+  sizes.forEach(sz => {
+    const o = document.createElement('option');
+    o.value = sz; o.textContent = sz;
+    if ((op.size || 12) === sz) o.selected = true;
+    s.appendChild(o);
+  });
+  // Allow custom size not in list
+  if (!sizes.includes(op.size || 12)) {
+    const o = document.createElement('option');
+    o.value = op.size; o.textContent = op.size; o.selected = true;
+    s.appendChild(o);
   }
+  s.onchange = () => cb.onStyle({ size: parseInt(s.value) });
+  s.onclick = e => e.stopPropagation();
+  return s;
+}
 
-  return out;
+function colorBtn(op, cb) {
+  const wrap = document.createElement('button');
+  wrap.title = 'Text color';
+  wrap.setAttribute('aria-label', 'Text color');
+  wrap.style.cssText = `border:0;border-radius:8px;width:32px;height:32px;cursor:pointer;
+    background:transparent;display:flex;align-items:center;justify-content:center;`;
+  wrap.onmouseenter = () => wrap.style.background = '#f1f5f9';
+  wrap.onmouseleave = () => wrap.style.background = 'transparent';
+  // Show an "A" with color underline
+  wrap.innerHTML = `<span style="font-size:16px;font-weight:700;color:${op.color || '#000'};border-bottom:3px solid ${op.color || '#000'};line-height:1;">A</span>`;
+  const inp = document.createElement('input');
+  inp.type = 'color';
+  inp.value = op.color || '#000000';
+  inp.style.cssText = 'position:absolute;opacity:0;width:0;height:0;pointer-events:none;';
+  wrap.appendChild(inp);
+  wrap.onclick = (e) => { e.stopPropagation(); inp.click(); };
+  inp.oninput = () => {
+    cb.onStyle({ color: inp.value });
+    wrap.querySelector('span').style.color = inp.value;
+    wrap.querySelector('span').style.borderBottomColor = inp.value;
+  };
+  return wrap;
+}
+
+function deleteBtn(cb) {
+  return btn('🗑️', 'Delete object (Del)', () => cb.onDelete(), { fontSize: '15px' });
+}
+
+// ---------- per-type toolbars ----------
+
+function buildTextControls(bar, node, op, cb) {
+  // Group 1: B I
+  bar.appendChild(btn('<b>B</b>', 'Bold (Ctrl+B)', b => cb.onStyle({ bold: !op.bold }), { active: op.bold }));
+  bar.appendChild(btn('<i>I</i>', 'Italic (Ctrl+I)', b => cb.onStyle({ italic: !op.italic }), { active: op.italic }));
+  bar.appendChild(groupSep());
+  // Group 2: font + size
+  bar.appendChild(fontSelect(op, cb));
+  bar.appendChild(sizeSelect(op, cb));
+  bar.appendChild(groupSep());
+  // Group 3: color + align
+  bar.appendChild(colorBtn(op, cb));
+  const alignIcons = { left: '⇤', center: '⇔', right: '⇥' };
+  const alignLabels = { left: 'Align left', center: 'Align center', right: 'Align right' };
+  const cur = op.align || 'left';
+  bar.appendChild(btn(alignIcons[cur], alignLabels[cur] + ' (click to cycle)', () => {
+    const order = ['left', 'center', 'right'];
+    cb.onStyle({ align: order[(order.indexOf(cur) + 1) % 3] });
+  }));
+  bar.appendChild(groupSep());
+  // Group 4: delete
+  bar.appendChild(deleteBtn(cb));
+}
+
+function buildShapeControls(bar, node, op, cb) {
+  bar.appendChild(colorBtn({ color: op.stroke }, { onStyle: s => cb.onStyle({ stroke: s.color }) }));
+  bar.appendChild(btn('◉', 'Toggle fill', () => cb.onStyle({ fill: op.fill ? null : (op.stroke || '#2f6bff') }), { active: !!op.fill }));
+  const sizes = [1, 2, 4, 6, 8];
+  const s = document.createElement('select');
+  s.title = 'Line width';
+  s.style.cssText = 'border:0;border-radius:8px;height:32px;font-size:13px;background:transparent;cursor:pointer;';
+  sizes.forEach(w => {
+    const o = document.createElement('option');
+    o.value = w; o.textContent = w + 'px';
+    if ((op.thickness || 2) === w) o.selected = true;
+    s.appendChild(o);
+  });
+  s.onchange = () => cb.onStyle({ thickness: parseInt(s.value) });
+  s.onclick = e => e.stopPropagation();
+  bar.appendChild(s);
+  bar.appendChild(groupSep());
+  bar.appendChild(deleteBtn(cb));
+}
+
+function buildImageControls(bar, node, op, cb) {
+  bar.appendChild(btn('🔄', 'Replace image', () => cb.onReplace()));
+  bar.appendChild(btn('↻', 'Rotate 90°', () => cb.onRotate()));
+  bar.appendChild(groupSep());
+  bar.appendChild(deleteBtn(cb));
+}
+
+function buildLinkControls(bar, node, op, cb) {
+  bar.appendChild(btn('✎', 'Edit link URL', () => {
+    const url = window.prompt('Link URL:', op.url || 'https://');
+    if (url && url !== 'https://') cb.onStyle({ url });
+  }));
+  bar.appendChild(groupSep());
+  bar.appendChild(deleteBtn(cb));
+}
+
+function buildGenericControls(bar, node, op, cb) {
+  bar.appendChild(deleteBtn(cb));
 }
