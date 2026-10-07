@@ -4,4 +4,6 @@
 # The sandbox image also installs ../backend/requirements-render.txt for the
 # shared tool framework and common PDF libraries.
 
-# (empty — add experimental packages below as needed)
+python-docx
+pdfplumber
+pytesseract

@@ -128,11 +128,17 @@ async def run_tool(
             if not data:
                 raise HTTPException(status_code=400, detail=f"File {i + 1} is empty.")
             digest = hashlib.sha256(data).hexdigest()
-            # Light kind check: pdf tools expect a PDF magic header.
-            if "pdf" in spec.input_kinds and "image" not in spec.input_kinds:
+            # Light kind check per declared input kind.
+            if "pdf" in spec.input_kinds and "image" not in spec.input_kinds \
+                    and "document" not in spec.input_kinds:
                 if not data.lstrip().startswith(b"%PDF-"):
                     raise HTTPException(
                         status_code=422, detail=f"File {i + 1} is not a valid PDF."
+                    )
+            if "document" in spec.input_kinds:
+                if not data.startswith(b"PK\x03\x04"):
+                    raise HTTPException(
+                        status_code=422, detail=f"File {i + 1} is not a valid .docx file."
                     )
             p = tmpdir / f"input_{i}_{uuid.uuid4().hex[:8]}"
             p.write_bytes(data)

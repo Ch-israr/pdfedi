@@ -7,5 +7,6 @@ sandbox/tools/ (without .py) and <key> matches the tool's SPEC.key.
 from __future__ import annotations
 
 SANDBOX_TOOLS: dict[str, str] = {
-    # "my_experiment": "my_experiment",
+    "pdf_to_word": "pdf_to_word",
+    "word_to_pdf": "word_to_pdf",
 }

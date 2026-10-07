@@ -5,6 +5,15 @@ FROM python:3.12-slim
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
+# Native dependencies for experimental tools:
+#  - tesseract-ocr: local OCR path in pdf_to_word
+#  - libreoffice-writer: word_to_pdf conversion
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        tesseract-ocr-eng \
+        libreoffice-writer \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /srv/sandbox
 
 # Shared tool framework + common PDF libraries (same versions as production).
