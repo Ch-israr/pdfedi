@@ -268,6 +268,15 @@
         if (e.target === stage) { clearSelection(); return; }
         selectObject(e.target);
       });
+      stage.on('dblclick', e => {
+        const tool = getTool(state.activeTool);
+        if (tool?.onDblClick && e.target !== stage) {
+          // Find the node with opId (might be clicked on child)
+          const node = e.target.getAttr('opId') ? e.target :
+            e.target.findAncestor('[opId]', true);
+          if (node) tool.onDblClick(editorCtx(), e, node);
+        }
+      });
     }
 
     // ---------- Editor context for tools ----------
