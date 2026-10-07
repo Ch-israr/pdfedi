@@ -27,7 +27,11 @@ from pdfedi.tools.base import (
 
 _LANGUAGE_RE = re.compile(r"^[A-Za-z]{2,3}(?:\+[A-Za-z]{2,3})*$")
 _OCR_UNAVAILABLE = "OCR is not available on this server."
-_DPI = 300
+# 200 DPI keeps OCR accurate on clean documents while staying viable on
+# weak CPUs (300 DPI proved impractically slow on throttled hardware).
+_DPI = 200
+# Per-page recognition timeout (seconds): fail gracefully, never hang forever.
+_PAGE_TIMEOUT = 600
 _MIN_CONFIDENCE = 30
 
 
@@ -113,7 +117,8 @@ def run(ctx: ToolContext, options: dict) -> Path:
             # Invisible text layer (transparent fill = selectable but unseen).
             try:
                 words = pytesseract.image_to_data(
-                    pil_image, lang=language, output_type=pytesseract.Output.DICT
+                    pil_image, lang=language, output_type=pytesseract.Output.DICT,
+                    timeout=_PAGE_TIMEOUT,
                 )
             except Exception as e:
                 raise ToolError(f"OCR failed on page {i + 1}: {e}", code="ocr_failed") from e
