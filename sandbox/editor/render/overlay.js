@@ -228,7 +228,7 @@ export class OverlayManager {
     const layer = this.getLayer(pageIndex);
     if (!layer) return;
     layer.find(`[opId="${opId}"]`).forEach(n => n.destroy());
-    layer.batchDraw();
+    layer.draw(); // immediate redraw (not batch) to avoid stale ghosts
   }
 
   /** Clear all editor objects from a page (keeps the stage). */
