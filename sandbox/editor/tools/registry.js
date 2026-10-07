@@ -406,6 +406,83 @@ registerTool({
   icon: '⬛',
   cursor: 'crosshair',
   shape: 'rect', // rect | ellipse | line | arrow — set by UI
+  onActivate() {},
+  onDeactivate(ctx) { this._start = null; this._preview = null; },
+  onPointerDown(ctx, evt) {
+    const stage = evt.target.getStage();
+    if (!stage) return;
+    const pageIndex = ctx.getPageIndex(stage);
+    if (pageIndex < 0) return;
+    const pos = stage.getPointerPosition();
+    this._start = { pageIndex, x: pos.x, y: pos.y };
+  },
+  onPointerMove(ctx, evt) {
+    if (!this._start) return;
+    const stage = evt.target.getStage();
+    const pos = stage.getPointerPosition();
+    const layer = ctx.overlay.getLayer(this._start.pageIndex);
+    this._preview?.destroy();
+    const s = ctx.overlay.scale;
+    const shape = this.shape;
+    if (shape === 'ellipse') {
+      this._preview = new Konva.Ellipse({
+        x: (this._start.x + pos.x) / 2, y: (this._start.y + pos.y) / 2,
+        radiusX: Math.abs(pos.x - this._start.x) / 2,
+        radiusY: Math.abs(pos.y - this._start.y) / 2,
+        stroke: '#000000', strokeWidth: 2 * s, fill: null,
+      });
+    } else if (shape === 'line' || shape === 'arrow') {
+      this._preview = new Konva.Arrow({
+        points: [this._start.x, this._start.y, pos.x, pos.y],
+        stroke: '#000000', strokeWidth: 2 * s,
+        pointerLength: shape === 'arrow' ? 12 * s : 0,
+        pointerWidth: shape === 'arrow' ? 10 * s : 0,
+        fill: '#000000',
+      });
+    } else {
+      this._preview = new Konva.Rect({
+        x: Math.min(this._start.x, pos.x), y: Math.min(this._start.y, pos.y),
+        width: Math.abs(pos.x - this._start.x), height: Math.abs(pos.y - this._start.y),
+        stroke: '#000000', strokeWidth: 2 * s, fill: null,
+      });
+    }
+    layer.add(this._preview);
+    layer.batchDraw();
+  },
+  onPointerUp(ctx, evt) {
+    if (!this._start) return;
+    const stage = evt.target.getStage();
+    const pos = stage.getPointerPosition();
+    const { pageIndex, x: x1, y: y1 } = this._start;
+    this._preview?.destroy();
+    this._preview = null;
+    this._start = null;
+
+    const sr = {
+      x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
+      width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
+    };
+    if (sr.width < 5 || sr.height < 5) return;
+
+    const pr = ctx.screenRectToPdf(sr, pageIndex);
+    const op = {
+      op: 'add_shape', page: pageIndex, ...pr,
+      shape: this.shape, stroke: '#000000', thickness: 2,
+    };
+    ctx.history.execute({
+      op,
+      do: () => {
+        const withId = ctx.appendManifestOp(op);
+        ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
+        this._lastOpId = withId.id;
+      },
+      undo: () => {
+        ctx.removeManifestOp(this._lastOpId);
+        ctx.overlay.removeOp(pageIndex, this._lastOpId);
+      },
+    });
+  },
+});
 
 // ---- Stamp tool ----
 const STAMPS = [
@@ -464,79 +541,5 @@ registerTool({
       },
     });
     ctx.setTool('select');
-  },
-});
-  onActivate() {},
-  onDeactivate(ctx) { this._start = null; this._preview = null; },
-  onPointerDown(ctx, evt) {
-    const stage = evt.target.getStage();
-    if (!stage) return;
-    const pageIndex = ctx.getPageIndex(stage);
-    if (pageIndex < 0) return;
-    const pos = stage.getPointerPosition();
-    this._start = { pageIndex, x: pos.x, y: pos.y };
-  },
-  onPointerMove(ctx, evt) {
-    if (!this._start) return;
-    const stage = evt.target.getStage();
-    const pos = stage.getPointerPosition();
-    const layer = ctx.overlay.getLayer(this._start.pageIndex);
-    this._preview?.destroy();
-    const s = ctx.overlay.scale;
-    const shape = this.shape;
-    if (shape === 'ellipse') {
-      this._preview = new Konva.Ellipse({
-        x: (this._start.x + pos.x) / 2, y: (this._start.y + pos.y) / 2,
-        radiusX: Math.abs(pos.x - this._start.x) / 2,
-        radiusY: Math.abs(pos.y - this._start.y) / 2,
-        stroke: '#000000', strokeWidth: 2 * s, fill: null,
-      });
-    } else if (shape === 'line') {
-      this._preview = new Konva.Line({
-        points: [this._start.x, this._start.y, pos.x, pos.y],
-        stroke: '#000000', strokeWidth: 2 * s,
-      });
-    } else {
-      this._preview = new Konva.Rect({
-        x: Math.min(this._start.x, pos.x), y: Math.min(this._start.y, pos.y),
-        width: Math.abs(pos.x - this._start.x), height: Math.abs(pos.y - this._start.y),
-        stroke: '#000000', strokeWidth: 2 * s, fill: null,
-      });
-    }
-    layer.add(this._preview);
-    layer.batchDraw();
-  },
-  onPointerUp(ctx, evt) {
-    if (!this._start) return;
-    const stage = evt.target.getStage();
-    const pos = stage.getPointerPosition();
-    const { pageIndex, x: x1, y: y1 } = this._start;
-    this._preview?.destroy();
-    this._preview = null;
-    this._start = null;
-
-    const sr = {
-      x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
-      width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
-    };
-    if (sr.width < 5 || sr.height < 5) return;
-
-    const pr = ctx.screenRectToPdf(sr, pageIndex);
-    const op = {
-      op: 'add_shape', page: pageIndex, ...pr,
-      shape: this.shape, stroke: '#000000', thickness: 2,
-    };
-    ctx.history.execute({
-      op,
-      do: () => {
-        const withId = ctx.appendManifestOp(op);
-        ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
-        this._lastOpId = withId.id;
-      },
-      undo: () => {
-        ctx.removeManifestOp(this._lastOpId);
-        ctx.overlay.removeOp(pageIndex, this._lastOpId);
-      },
-    });
   },
 });
