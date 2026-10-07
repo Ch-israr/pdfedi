@@ -134,7 +134,7 @@
   <div class="status-bar">
     <span id="statusPages">No document</span>
     <span id="statusOps">0 edits</span>
-    <span id="statusMem"></span>
+    <span id="statusMem" title="Browser memory usage"></span>
   </div>
 
   <!-- Libraries (lazy: only loaded on this page) -->
@@ -266,7 +266,20 @@
       stage.on('click', e => {
         if (state.activeTool !== 'select') return;
         if (e.target === stage) { clearSelection(); return; }
-        selectObject(e.target);
+        // Find the node with opId (might be a child or transformer handle)
+        let node = e.target;
+        if (!node.getAttr('opId')) {
+          node = node.findAncestor('[opId]', true) || node;
+        }
+        // If clicked on transformer, find its attached node
+        if (node.className === 'Transformer') {
+          const attached = node.nodes?.()[0];
+          if (attached) node = attached;
+          else return;
+        }
+        if (node.getAttr('opId')) {
+          selectObject(node);
+        }
       });
       stage.on('dblclick', e => {
         const tool = getTool(state.activeTool);
@@ -347,25 +360,44 @@
         const dy = node.y() - startY;
         if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return; // no-op
         // Convert screen delta to PDF points
-        const pageIndex = op.page;
         const s = state.overlay.scale;
         const dPdfX = dx / s;
         const dPdfY = -dy / s; // screen y down → PDF y up
         const endOpX = startOpX + dPdfX;
         const endOpY = startOpY + dPdfY;
-        // Reset node to start, then apply via history for clean undo
-        node.x(startX); node.y(startY);
-        state.history.execute({
-          op: { op: 'move_object', targetId: op.id },
-          do: () => {
-            op.x = endOpX; op.y = endOpY;
-            syncNodeToOp(node, op);
-          },
-          undo: () => {
-            op.x = startOpX; op.y = startOpY;
-            syncNodeToOp(node, op);
-          },
-        });
+        // Node is already at the new position (Konva moved it).
+        // Just record the op change for undo — don't destroy/recreate.
+        const endX = node.x(), endY = node.y();
+        try {
+          state.history.execute({
+            op: { op: 'move_object', targetId: op.id },
+            do: () => {
+              op.x = endOpX; op.y = endOpY;
+              // Node already at endX/endY, ensure it stays
+              const n = state.overlay.findNodeByOpId(op.id) || node;
+              if (n && !n.isDestroyed()) {
+                n.x(endX); n.y(endY);
+                n.getLayer()?.batchDraw();
+              }
+            },
+            undo: () => {
+              op.x = startOpX; op.y = startOpY;
+              const n = state.overlay.findNodeByOpId(op.id);
+              if (n && !n.isDestroyed()) {
+                n.x(startX); n.y(startY);
+                n.getLayer()?.batchDraw();
+                // Re-select to restore transformer
+                if (state.selected === node || state.selected?.getAttr('opId') === op.id) {
+                  selectObject(n);
+                }
+              }
+            },
+          });
+        } catch (e) {
+          console.warn('Drag history failed:', e);
+          // At least update the op so export is correct
+          op.x = endOpX; op.y = endOpY;
+        }
         refreshContextBar();
       });
     }
@@ -850,11 +882,36 @@
           const dPdfX = dx / s;
           const dPdfY = -dy / s;
           const beforeX = op.x, beforeY = op.y;
-          state.history.execute({
-            op: { op: 'nudge_object', targetId: op.id },
-            do: () => { op.x = beforeX + dPdfX; op.y = beforeY + dPdfY; syncNodeToOp(node, op); },
-            undo: () => { op.x = beforeX; op.y = beforeY; syncNodeToOp(node, op); },
-          });
+          const afterX = beforeX + dPdfX, afterY = beforeY + dPdfY;
+          // Move node directly (don't destroy/recreate)
+          node.x(node.x() + dx);
+          node.y(node.y() + dy);
+          node.getLayer()?.batchDraw();
+          try {
+            state.history.execute({
+              op: { op: 'nudge_object', targetId: op.id },
+              do: () => {
+                op.x = afterX; op.y = afterY;
+                const n = state.overlay.findNodeByOpId(op.id);
+                if (n && !n.isDestroyed()) {
+                  // Node already moved, just ensure position
+                  n.getLayer()?.batchDraw();
+                }
+              },
+              undo: () => {
+                op.x = beforeX; op.y = beforeY;
+                const n = state.overlay.findNodeByOpId(op.id);
+                if (n && !n.isDestroyed()) {
+                  n.x(n.x() - dx); n.y(n.y() - dy);
+                  n.getLayer()?.batchDraw();
+                }
+              },
+            });
+          } catch (e) {
+            console.warn('Nudge history failed:', e);
+            op.x = afterX; op.y = afterY;
+          }
+          refreshContextBar();
         }
       }
     });
@@ -990,7 +1047,7 @@
         `${state.manifest?.operations.length || 0} edits`;
       if (performance.memory) {
         const mb = Math.round(performance.memory.usedJSHeapSize / 1048576);
-        document.getElementById('statusMem').textContent = `${mb} MB`;
+        document.getElementById('statusMem').textContent = `Mem: ${mb} MB`;
       }
     }
     setInterval(updateStatus, 5000);
