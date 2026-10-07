@@ -13,6 +13,12 @@ RUN npm run build
 
 # ---- Stage 2: Python runtime ----
 FROM python:3.12-slim
+# tesseract-ocr powers the OCR tool (pytesseract). Keep the layer small:
+# no recommended extras, apt lists removed.
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        tesseract-ocr \
+        tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/*
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     FRONTEND_DIR=/srv/static \

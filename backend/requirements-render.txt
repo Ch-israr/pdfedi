@@ -23,5 +23,9 @@ pypdfium2==4.30.0
 pillow==11.0.0
 reportlab==4.2.5
 
+# --- OCR ---
+# NOTE: also requires the tesseract-ocr system package (see Dockerfile).
+pytesseract==0.3.13
+
 # --- Observability ---
 structlog==24.4.0
