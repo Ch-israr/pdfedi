@@ -1,11 +1,12 @@
 """OCR a scanned PDF into a searchable PDF.
 
 Pipeline (no ocrmypdf needed):
-  1. Render each page to an image with pypdfium2 (200 DPI).
-  2. Recognize words with Tesseract (via pytesseract).
-  3. Rebuild the PDF with reportlab: the scanned image as background plus
-     an invisible (fully transparent) text layer, so the output looks
-     identical but is searchable and selectable.
+  1. Check each page for native text with pypdf (cheap, no rendering).
+     Pages that already have a text layer are copied as-is — no re-OCR.
+  2. Render only text-less pages to images with pypdfium2 (200 DPI).
+  3. Recognize words with Tesseract (via pytesseract).
+  4. Rebuild: pypdf interleaves original text pages with reportlab-built
+     OCR pages (scanned image as background + invisible text layer).
 
 Degrades gracefully: if pytesseract or the ``tesseract`` system binary is
 unavailable, raises ToolError with code "ocr_unavailable".
@@ -44,6 +45,19 @@ _TESSERACT_CONFIG = "--oem 0"
 # Per-page recognition timeout (seconds): fail gracefully, never hang forever.
 _PAGE_TIMEOUT = 600
 _MIN_CONFIDENCE = 30
+# Minimum native-text chars for a page to skip OCR. Below this, the page
+# is treated as scanned (safe: we OCR rather than risk missing text).
+_NATIVE_TEXT_MIN_CHARS = 50
+
+
+def _page_needs_ocr(reader_page) -> bool:
+    """True if the page lacks a usable native text layer (i.e. it's a scan)."""
+    try:
+        text = reader_page.extract_text() or ""
+        return len(text.strip()) < _NATIVE_TEXT_MIN_CHARS
+    except Exception:
+        # If text extraction fails, assume it needs OCR (safe default).
+        return True
 
 
 SPEC = ToolSpec(
@@ -105,6 +119,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
     import pypdfium2 as pdfium
     from reportlab.lib.utils import ImageReader
     from reportlab.pdfgen.canvas import Canvas
+    from pypdf import PdfReader, PdfWriter
 
     try:
         pdf = pdfium.PdfDocument(io.BytesIO(data))
@@ -114,13 +129,39 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if n_pages == 0:
         raise ToolError("The PDF has no pages.", code="invalid_input")
 
+    # --- Optimization: skip OCR for pages that already have native text ---
+    # pypdf text extraction is cheap (no rendering). Pages with a real text
+    # layer are copied as-is; only scanned pages go through Tesseract.
+    try:
+        reader = PdfReader(io.BytesIO(data))
+        needs_ocr = [_page_needs_ocr(p) for p in reader.pages]
+    except Exception:
+        # If pypdf can't parse, fall back to OCR-ing everything.
+        needs_ocr = [True] * n_pages
+    n_ocr = sum(needs_ocr)
+    log.info("ocr page plan", extra={"total": n_pages, "ocr_pages": n_ocr,
+                                     "skipped": n_pages - n_ocr})
+
     out_path = ctx.new_output_path("ocr").with_suffix(".pdf")
+
+    if n_ocr == 0:
+        # All pages already searchable: copy through (dedup via sha256 in
+        # jobs.py handles the identical-output case).
+        log.info("ocr skipped entirely: all pages have native text")
+        out_path.write_bytes(data)
+        return out_path
+
+    # Build OCR'd pages with reportlab (only for pages that need it).
     c = Canvas(str(out_path))
     # Rendered page images go to temp files on disk, never held in memory
     # during OCR. Peak Python-side memory per page is ~one small buffer.
     tmpdir = Path(tempfile.mkdtemp(prefix="pdfedi-ocr-"))
+    ocr_page_indices: list[int] = []
     try:
         for i in range(n_pages):
+            if not needs_ocr[i]:
+                continue
+            ocr_page_indices.append(i)
             t0 = time.perf_counter()
             page = pdf[i]
             pil_image = page.render(scale=_DPI / 72).to_pil()
@@ -193,4 +234,30 @@ def run(ctx: ToolContext, options: dict) -> Path:
         pdf.close()
         shutil.rmtree(tmpdir, ignore_errors=True)
 
-    return out_path
+    if n_ocr == n_pages:
+        # Every page was OCR'd: the reportlab output is already complete.
+        return out_path
+
+    # Mixed: interleave original text pages with OCR'd pages via pypdf.
+    try:
+        ocr_reader = PdfReader(str(out_path))
+        writer = PdfWriter()
+        ocr_idx = 0
+        for i, page in enumerate(reader.pages):
+            if needs_ocr[i]:
+                writer.add_page(ocr_reader.pages[ocr_idx])
+                ocr_idx += 1
+            else:
+                writer.add_page(page)
+        # Write to a new file, then replace.
+        final_path = ctx.new_output_path("ocr").with_suffix(".pdf")
+        with open(final_path, "wb") as f:
+            writer.write(f)
+        out_path.unlink(missing_ok=True)
+        return final_path
+    except Exception as e:
+        # If interleaving fails, fall back to the OCR-only output
+        # (all scanned pages are in there; text pages would be missing,
+        # so this is a last resort — log loudly).
+        log.error("ocr interleave failed, returning OCR-only PDF: %s", e)
+        return out_path

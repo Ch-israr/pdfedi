@@ -13,7 +13,6 @@ import json
 import logging
 import threading
 import uuid
-from pathlib import Path
 
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
@@ -31,6 +30,24 @@ log = logging.getLogger("pdfedi.jobs")
 
 PDF_MIME = "application/pdf"
 IMAGE_MIMES = {"image/png", "image/jpeg", "image/webp"}
+
+# Concurrency guard: limits simultaneous job executions to protect
+# memory-constrained hosts. The semaphore is created lazily from settings
+# so tests can override MAX_CONCURRENT_JOBS via environment.
+_job_semaphore: threading.Semaphore | None = None
+_job_semaphore_lock = threading.Lock()
+
+
+def _get_job_semaphore() -> threading.Semaphore:
+    """Return the process-wide job concurrency semaphore (configurable)."""
+    global _job_semaphore
+    if _job_semaphore is None:
+        with _job_semaphore_lock:
+            if _job_semaphore is None:
+                limit = max(1, get_settings().max_concurrent_jobs)
+                _job_semaphore = threading.Semaphore(limit)
+                log.info("job concurrency limit: %d", limit)
+    return _job_semaphore
 
 
 class UploadError(Exception):
@@ -151,12 +168,17 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
 
 
 def _stored_pdf_is_encrypted(f: File) -> bool:
-    """Check whether a stored PDF is encrypted (cheap header/trailer parse)."""
+    """Check whether a stored PDF is encrypted.
+
+    Uses the file path directly instead of loading the whole file into
+    RAM: PdfReader only parses the header/trailer for is_encrypted.
+    """
     if f.mime != PDF_MIME:
         return False
     try:
-        data = Path(get_object_path(f.storage_key)).read_bytes()
-        return PdfReader(io.BytesIO(data)).is_encrypted
+        # PdfReader accepts a path; it does NOT slurp the whole file for
+        # a simple is_encrypted check (reads header + trailer only).
+        return PdfReader(get_object_path(f.storage_key)).is_encrypted
     except Exception:  # noqa: BLE001 — treat unreadable as not encrypted
         return False
 
@@ -164,9 +186,15 @@ def _stored_pdf_is_encrypted(f: File) -> bool:
 def _run_in_thread(job_id: str, client_ip: str) -> None:
     """Worker entry point: own DB session, never leaks exceptions.
 
+    Acquires the concurrency semaphore first: if too many jobs are already
+    running, this worker waits here (job stays QUEUED) until a slot frees.
     If the worker dies unexpectedly, the job is marked failed instead of
     being left stuck in "running" forever.
     """
+    sem = _get_job_semaphore()
+    # Wait for a slot. No timeout: queued jobs wait their turn; the
+    # frontend polls and shows "Queued" meanwhile.
+    sem.acquire()
     db = SessionLocal()
     try:
         run_job(db, job_id, client_ip)
@@ -184,6 +212,7 @@ def _run_in_thread(job_id: str, client_ip: str) -> None:
             log.exception("could not mark crashed job %s as failed", job_id)
     finally:
         db.close()
+        sem.release()
 
 
 def enqueue_job(job_id: str, client_ip: str) -> None:

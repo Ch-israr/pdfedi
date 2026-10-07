@@ -44,6 +44,10 @@ class Settings(BaseSettings):
     max_upload_mb: int = 50
     max_download_mb: int = 50
     quota_per_hour: int = 5
+    # Max simultaneous job executions. Prevents OOM on memory-constrained
+    # hosts when multiple heavy jobs (e.g. OCR) are submitted at once.
+    # Jobs beyond the limit wait in QUEUED status until a slot frees up.
+    max_concurrent_jobs: int = 2
 
     frontend_dir: str = "./static"
 
