@@ -296,6 +296,13 @@
       stage.on('pointerup', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerUp) tool.onPointerUp(editorCtx(), e);
+        commitDrag();
+      });
+      // Fallback: document-level mouseup in case stage doesn't fire
+      document.addEventListener('mouseup', () => {
+        if (state._drag) commitDrag();
+      });
+      function commitDrag() {
         // Custom drag end - commit to history
         if (state._drag) {
           const d = state._drag;
@@ -303,10 +310,17 @@
           if (d.moved && state.activeTool === 'select') {
             const node = d.node;
             const op = d.op;
-            const endX = node.x(), endY = node.y();
+            // Verify node still exists and op still in manifest
+            if (!op || !state.manifest.operations.find(o => o.id === op.id)) {
+              console.warn('Drag commit: op no longer in manifest');
+              return;
+            }
+            const endX = node.isDestroyed() ? d.startNodeX : node.x();
+            const endY = node.isDestroyed() ? d.startNodeY : node.y();
             const s = state.overlay.scale;
             const dx = endX - d.startNodeX;
             const dy = endY - d.startNodeY;
+            if (Math.abs(dx) < 1 && Math.abs(dy) < 1) return; // no-op
             const dPdfX = dx / s;
             const dPdfY = -dy / s;
             const endOpX = d.startOpX + dPdfX;
@@ -330,14 +344,16 @@
                   }
                 },
               });
+              updateStatus();
             } catch (err) {
               console.warn('Drag commit failed:', err);
               op.x = endOpX; op.y = endOpY;
+              updateStatus();
             }
             refreshContextBar();
           }
         }
-      });
+      }
       // Selection
       stage.on('click', e => {
         if (state.activeTool !== 'select') return;
@@ -945,15 +961,23 @@
         return;
       }
       // Arrow keys nudge the selected object (1px, or 10px with Shift)
-      if (e.key.startsWith('Arrow') && state.selected && !e.ctrlKey && !e.metaKey) {
+      if ((e.key.startsWith('Arrow') || ['Left','Right','Up','Down'].includes(e.key)) && state.selected && !e.ctrlKey && !e.metaKey) {
         const tag = document.activeElement?.tagName;
         if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
         e.preventDefault();
+        // Normalize key name
+        let key = e.key;
+        if (key === 'Left') key = 'ArrowLeft';
+        if (key === 'Right') key = 'ArrowRight';
+        if (key === 'Up') key = 'ArrowUp';
+        if (key === 'Down') key = 'ArrowDown';
         const step = e.shiftKey ? 10 : 1;
-        const dx = e.key === 'ArrowLeft' ? -step : e.key === 'ArrowRight' ? step : 0;
-        const dy = e.key === 'ArrowUp' ? -step : e.key === 'ArrowDown' ? step : 0;
-        const node = state.selected;
-        const opId = node.getAttr('opId');
+        const dx = key === 'ArrowLeft' ? -step : key === 'ArrowRight' ? step : 0;
+        const dy = key === 'ArrowUp' ? -step : key === 'ArrowDown' ? step : 0;
+        // Fresh lookup - don't rely on stale closure
+        const selNode = state.selected;
+        if (!selNode || selNode.isDestroyed()) return;
+        const opId = selNode.getAttr('opId');
         const op = state.manifest.operations.find(o => o.id === opId);
         if (op && (dx || dy)) {
           const s = state.overlay.scale;
@@ -961,20 +985,17 @@
           const dPdfY = -dy / s;
           const beforeX = op.x, beforeY = op.y;
           const afterX = beforeX + dPdfX, afterY = beforeY + dPdfY;
-          // Move node directly (don't destroy/recreate)
-          node.x(node.x() + dx);
-          node.y(node.y() + dy);
-          node.getLayer()?.batchDraw();
+          // Move node directly
+          try {
+            selNode.x(selNode.x() + dx);
+            selNode.y(selNode.y() + dy);
+            selNode.getLayer()?.batchDraw();
+          } catch (err) { console.warn('Nudge move failed:', err); }
           try {
             state.history.execute({
               op: { op: 'nudge_object', targetId: op.id },
               do: () => {
                 op.x = afterX; op.y = afterY;
-                const n = state.overlay.findNodeByOpId(op.id);
-                if (n && !n.isDestroyed()) {
-                  // Node already moved, just ensure position
-                  n.getLayer()?.batchDraw();
-                }
               },
               undo: () => {
                 op.x = beforeX; op.y = beforeY;
@@ -985,12 +1006,14 @@
                 }
               },
             });
-          } catch (e) {
-            console.warn('Nudge history failed:', e);
+          } catch (err) {
+            console.warn('Nudge history failed:', err);
             op.x = afterX; op.y = afterY;
           }
           refreshContextBar();
+          updateStatus();
         }
+        return;
       }
     });
     function updateHistoryUI() {
