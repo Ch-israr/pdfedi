@@ -899,15 +899,13 @@
           const dims = state.pageDims[page];
           for (const m of items) {
             // Whiteout the old text, add new text at same position
-            // m.transform gives PDF.js coordinates; convert to PDF points
-            const [x, y] = m.transform.slice(4);
-            const fontH = Math.abs(m.transform[3]) || 12;
-            // PDF.js y is from top in default viewport; our pages are rendered unscaled
-            // Approximate: use the item's position directly
-            const scale = state.zoom || 1;
-            const pdfX = x / scale;
-            const pdfY = dims.heightPt - (y / scale) - fontH;
-            const pdfW = (m.width || q.length * fontH * 0.5) / scale;
+            // getPageText() returns {str, x, y} in PDF.js coordinates (y from top)
+            const x = m.x || 0;
+            const y = m.y || 0;
+            const fontH = 12; // estimated, getPageText doesn't return height
+            const pdfX = x;
+            const pdfY = dims.heightPt - y - fontH;
+            const pdfW = q.length * fontH * 0.5;
             const whiteoutOp = { op: 'whiteout', page, x: pdfX - 2, y: pdfY - 2, w: pdfW + 4, h: fontH + 4 };
             const textOp = {
               op: 'add_text', page, x: pdfX, y: pdfY,
