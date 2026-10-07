@@ -475,16 +475,10 @@
           try {
             const restored = restoreOp(state.manifest, snapshot);
             const node = state.overlay.renderOp(restored.page, restored, state.assets);
-            if (!node) {
-              console.error('Undo delete: renderOp returned null for', restored);
-            }
             state.overlay.getLayer(restored.page)?.batchDraw();
-            // Re-select the restored object for visual confirmation
-            if (node) {
-              selectObject(node);
-            }
+            if (node) selectObject(node);
           } catch (err) {
-            console.error('Undo delete failed:', err, snapshot);
+            console.error('Undo delete failed:', err);
           }
           updateStatus();
         },
