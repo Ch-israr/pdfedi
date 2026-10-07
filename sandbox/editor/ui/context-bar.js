@@ -102,10 +102,8 @@ function btn(label, tooltip, onClick, opts = {}) {
     padding:0 6px;transition:background .12s;`;
   b.onmouseenter = () => { if (!active) b.style.background = '#f1f5f9'; };
   b.onmouseleave = () => { b.style.background = active ? '#eef4ff' : 'transparent'; };
-  // Use mousedown (not click) to fire before any blur/focus changes
-  // Don't preventDefault here — it would block the click event
-  b.onmousedown = (e) => { e.stopPropagation(); };
-  b.onclick = (e) => { e.stopPropagation(); e.preventDefault(); onClick(b); };
+  // Simple click handler — no preventDefault/stopPropagation which can block events
+  b.addEventListener('click', () => { try { onClick(b); } catch (err) { console.error('Toolbar button error:', err); } });
   return b;
 }
 
