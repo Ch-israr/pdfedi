@@ -103,7 +103,8 @@ function btn(label, tooltip, onClick, opts = {}) {
   b.onmouseenter = () => { if (!active) b.style.background = '#f1f5f9'; };
   b.onmouseleave = () => { b.style.background = active ? '#eef4ff' : 'transparent'; };
   // Use mousedown (not click) to fire before any blur/focus changes
-  b.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
+  // Don't preventDefault here — it would block the click event
+  b.onmousedown = (e) => { e.stopPropagation(); };
   b.onclick = (e) => { e.stopPropagation(); e.preventDefault(); onClick(b); };
   return b;
 }

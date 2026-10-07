@@ -462,10 +462,14 @@
         op: { op: 'delete_object', targetId: opId },
         do: () => {
           removeOp(state.manifest, opId);
+          // Remove visual node(s) — try multiple approaches to avoid ghosts
           state.overlay.removeOp(pageIndex, opId);
-          // Force layer redraw to ensure visual removal
+          // Fallback: find any remaining node with this opId and destroy it
           const layer = state.overlay.getLayer(pageIndex);
-          layer?.batchDraw();
+          if (layer) {
+            layer.find(n => n.getAttr('opId') === opId).forEach(n => n.destroy());
+            layer.batchDraw();
+          }
           clearSelection();
           updateStatus();
         },
