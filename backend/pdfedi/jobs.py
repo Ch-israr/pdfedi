@@ -117,6 +117,38 @@ def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
     return record
 
 
+def _find_duplicate_job(db: Session, tool_key: str, file_ids: list[str],
+                         options: dict) -> Job | None:
+    """Find a recent identical job that's still queued or running.
+
+    Matches on exact tool + file IDs + options within a short window.
+    Prevents duplicate work from double-submits/retries. Returns None
+    if no duplicate exists.
+    """
+    from datetime import datetime, timedelta, timezone
+    try:
+        cutoff = (datetime.now(timezone.utc) - timedelta(minutes=10)).isoformat()
+    except Exception:
+        return None
+    try:
+        return (
+            db.query(Job)
+            .filter(
+                Job.tool == tool_key,
+                Job.file_ids == json.dumps(file_ids),
+                Job.options == json.dumps(options),
+                Job.status.in_([enum_value(JobStatus.QUEUED),
+                                enum_value(JobStatus.RUNNING)]),
+                Job.created_at >= cutoff,
+            )
+            .order_by(Job.created_at.desc())
+            .first()
+        )
+    except Exception:
+        # Never break job creation on an idempotency lookup failure.
+        return None
+
+
 def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, client_ip: str) -> Job:
     tool = get_tool(tool_key)
     if tool is None:
@@ -151,6 +183,16 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
             f"Hourly limit reached for {spec.name} ({used}/{limit}). Try again later.",
             status_code=429,
         )
+
+    # Idempotency: if an identical job (same tool/files/options) is already
+    # queued or running from the last few minutes, return it instead of
+    # starting duplicate work (e.g. user double-clicked "convert").
+    # Quota was already checked above, so this can't bypass limits.
+    duplicate = _find_duplicate_job(
+        db, tool_key, [f.id for f in files], options or {})
+    if duplicate is not None:
+        log.info("idempotent job reuse: %s -> %s", tool_key, duplicate.id)
+        return duplicate
 
     job = Job(
         id=uuid.uuid4().hex,

@@ -120,31 +120,46 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
     pdf = pdfium.PdfDocument(data)
     try:
-        thumbs: list[Image.Image] = []
+        # Pass 1 (cheap): compute each thumbnail's dimensions from page size
+        # without rendering. This gives us max_h for the sheet layout while
+        # holding zero PIL images in RAM.
+        dims: list[tuple[float, int]] = []  # (scale, thumb_height_px)
         max_h = 0
         for page_no in pages:
             page = pdf[page_no - 1]
             try:
-                src_width_pt = page.get_size()[0]
-                scale = thumb_width / src_width_pt if src_width_pt > 0 else 1.0
+                src_w_pt, src_h_pt = page.get_size()
+                scale = thumb_width / src_w_pt if src_w_pt > 0 else 1.0
+                # Rendered height in pixels at this scale.
+                thumb_h = max(1, int(src_h_pt * scale))
+            finally:
+                page.close()
+            dims.append((scale, thumb_h))
+            max_h = max(max_h, thumb_h)
+
+        rows = (len(pages) + columns - 1) // columns
+        sheet_w = columns * thumb_width + (columns + 1) * _GAP
+        sheet_h = rows * max_h + (rows + 1) * _GAP
+        sheet = Image.new("RGB", (sheet_w, sheet_h), "white")
+
+        # Pass 2: render one thumbnail at a time, paste, release immediately.
+        # Peak PIL memory is now a single thumbnail instead of up to 50.
+        for idx, page_no in enumerate(pages):
+            scale, _ = dims[idx]
+            page = pdf[page_no - 1]
+            try:
                 thumb = page.render(scale=scale).to_pil()
             finally:
                 page.close()
-            thumbs.append(thumb)
-            max_h = max(max_h, thumb.height)
+            try:
+                r, c = divmod(idx, columns)
+                x = _GAP + c * (thumb_width + _GAP)
+                y = _GAP + r * (max_h + _GAP)
+                sheet.paste(thumb, (x, y))
+            finally:
+                thumb.close()
     finally:
         pdf.close()
-
-    rows = (len(thumbs) + columns - 1) // columns
-    sheet_w = columns * thumb_width + (columns + 1) * _GAP
-    sheet_h = rows * max_h + (rows + 1) * _GAP
-    sheet = Image.new("RGB", (sheet_w, sheet_h), "white")
-    for idx, thumb in enumerate(thumbs):
-        r, c = divmod(idx, columns)
-        x = _GAP + c * (thumb_width + _GAP)
-        y = _GAP + r * (max_h + _GAP)
-        sheet.paste(thumb, (x, y))
-        thumb.close()
 
     out = Path(str(ctx.new_output_path("thumbnails")) + ".png")
     sheet.save(out, format="PNG")
