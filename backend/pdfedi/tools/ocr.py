@@ -27,9 +27,12 @@ from pdfedi.tools.base import (
 
 _LANGUAGE_RE = re.compile(r"^[A-Za-z]{2,3}(?:\+[A-Za-z]{2,3})*$")
 _OCR_UNAVAILABLE = "OCR is not available on this server."
-# 200 DPI keeps OCR accurate on clean documents while staying viable on
-# weak CPUs (300 DPI proved impractically slow on throttled hardware).
-_DPI = 200
+# 300 DPI render. Tesseract runs with the legacy engine (--oem 0): on weak
+# CPUs the LSTM engine is impractically slow for full pages, while the legacy
+# engine stays fast and accurate on clean documents.
+_DPI = 300
+# Tesseract config: legacy OCR engine, fully automatic page segmentation.
+_TESSERACT_CONFIG = "--oem 0"
 # Per-page recognition timeout (seconds): fail gracefully, never hang forever.
 _PAGE_TIMEOUT = 600
 _MIN_CONFIDENCE = 30
@@ -118,7 +121,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
             try:
                 words = pytesseract.image_to_data(
                     pil_image, lang=language, output_type=pytesseract.Output.DICT,
-                    timeout=_PAGE_TIMEOUT,
+                    config=_TESSERACT_CONFIG, timeout=_PAGE_TIMEOUT,
                 )
             except Exception as e:
                 raise ToolError(f"OCR failed on page {i + 1}: {e}", code="ocr_failed") from e
