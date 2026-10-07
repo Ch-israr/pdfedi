@@ -3,7 +3,8 @@
 FROM python:3.12-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
-    PYTHONUNBUFFERED=1
+    PYTHONUNBUFFERED=1 \
+    PYTHONPATH=/srv/sandbox
 
 # Native dependencies for experimental tools:
 #  - tesseract-ocr: local OCR path in pdf_to_word
