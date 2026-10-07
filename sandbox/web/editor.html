@@ -457,19 +457,19 @@
       state.history.execute({
         op: { op: 'delete_object', targetId: opId },
         do: () => {
-          // Clear selection FIRST (destroys transformer, hides toolbar)
-          // before removing the node, to avoid ghost references
-          clearSelection();
-          removeOp(state.manifest, opId);
-          // Remove visual node(s)
-          state.overlay.removeOp(pageIndex, opId);
-          const layer = state.overlay.getLayer(pageIndex);
-          if (layer) {
-            // Fallback: destroy any remaining nodes with this opId
-            layer.find(n => n.getAttr('opId') === opId).forEach(n => n.destroy());
-            layer.batchDraw();
+          try {
+            // Clear selection FIRST (destroys transformer, hides toolbar)
+            clearSelection();
+            removeOp(state.manifest, opId);
+            state.overlay.removeOp(pageIndex, opId);
+            const layer = state.overlay.getLayer(pageIndex);
+            if (layer) {
+              layer.find(n => n.getAttr('opId') === opId).forEach(n => n.destroy());
+              layer.batchDraw();
+            }
+          } finally {
+            updateStatus(); // Always update counter
           }
-          updateStatus();
         },
         undo: () => {
           try {
@@ -479,8 +479,9 @@
             if (node) selectObject(node);
           } catch (err) {
             console.error('Undo delete failed:', err);
+          } finally {
+            updateStatus(); // Always update counter
           }
-          updateStatus();
         },
       });
     }
