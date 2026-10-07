@@ -66,8 +66,10 @@ export function validateOp(op) {
   }
 
   if (op.op === 'add_text') {
-    if (typeof op.text !== 'string' || op.text.length === 0)
-      return 'add_text: text must be a non-empty string';
+    if (typeof op.text !== 'string')
+      return 'add_text: text must be a string';
+    // Empty text allowed during editing (user types after placement).
+    // Finalize skips empty text ops.
     if (typeof op.x !== 'number' || typeof op.y !== 'number')
       return 'add_text: x/y must be numbers';
     if (op.size !== undefined && (typeof op.size !== 'number' || op.size <= 0))

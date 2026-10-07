@@ -85,6 +85,7 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
 
     switch (op.op) {
       case 'add_text': {
+        if (!op.text || !op.text.trim()) break; // skip empty (user cancelled)
         // Bold/italic map to Helvetica-Bold / Helvetica-Oblique variants
         let fontName = op.font || 'Helvetica';
         if (op.bold && op.italic) fontName = 'Helvetica-BoldOblique';

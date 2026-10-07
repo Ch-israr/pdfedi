@@ -96,6 +96,12 @@ registerTool({
           // Immediately enter edit mode
           makeEditable(node, stage, (newText) => {
             withId.text = newText;
+            // If user left it empty, remove the object
+            if (!newText.trim()) {
+              ctx.removeManifestOp(withId.id);
+              ctx.overlay.removeOp(pageIndex, withId.id);
+              ctx.clearSelection();
+            }
             ctx.updateStatus();
           });
         }

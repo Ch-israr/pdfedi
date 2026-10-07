@@ -247,6 +247,43 @@ registerTool({
   },
 });
 
+/** Inline stamp picker (no prompt()). */
+function showStampPicker(onPick) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;`;
+  const modal = document.createElement('div');
+  modal.style.cssText = `background:#fff;border-radius:16px;padding:24px;width:340px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:system-ui,sans-serif;`;
+  modal.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:16px;font-weight:700">Choose stamp</h3>
+    <div style="display:grid;gap:8px;margin-bottom:14px" id="stBtns"></div>
+    <input id="stCustom" placeholder="Or type custom text…"
+      style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;box-sizing:border-box;margin-bottom:14px">
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="stCancel" style="background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="stUse" style="background:#2f6bff;color:#fff;border:0;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Use custom</button>
+    </div>`;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const btnWrap = modal.querySelector('#stBtns');
+  STAMPS.forEach(s => {
+    const b = document.createElement('button');
+    b.innerHTML = `<span style="font-weight:700;color:${s.color}">${s.text}</span>`;
+    b.style.cssText = `text-align:left;padding:10px 12px;border-radius:9px;cursor:pointer;
+      border:2px solid ${s.color};background:#fff;font-size:14px;`;
+    b.onclick = () => { overlay.remove(); onPick(s.text, s.color); };
+    btnWrap.appendChild(b);
+  });
+  modal.querySelector('#stUse').onclick = () => {
+    const t = modal.querySelector('#stCustom').value.trim().toUpperCase();
+    if (t) { overlay.remove(); onPick(t, '#dc2626'); }
+  };
+  modal.querySelector('#stCancel').onclick = () => overlay.remove();
+  overlay.onclick = e => { if (e.target === overlay) overlay.remove(); };
+}
+
 // ---- Link tool ----
 registerTool({
   id: 'link',
@@ -293,26 +330,56 @@ registerTool({
     };
     if (sr.width < 10 || sr.height < 10) return;
 
-    const url = prompt('Link URL (https://…):', 'https://');
-    if (!url || url === 'https://') return;
-
-    const pr = ctx.screenRectToPdf(sr, pageIndex);
-    const op = { op: 'add_link', page: pageIndex, ...pr, url };
-    ctx.history.execute({
-      op,
-      do: () => {
-        const withId = ctx.appendManifestOp(op);
-        ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
-      },
-      undo: () => {
-        const last = ctx.manifest.operations[ctx.manifest.operations.length - 1];
-        ctx.removeManifestOp(last.id);
-        ctx.overlay.removeOp(pageIndex, last.id);
-      },
+    showLinkDialog((url) => {
+      if (!url) return;
+      const pr = ctx.screenRectToPdf(sr, pageIndex);
+      const op = { op: 'add_link', page: pageIndex, ...pr, url };
+      ctx.history.execute({
+        op,
+        do: () => {
+          const withId = ctx.appendManifestOp(op);
+          ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
+        },
+        undo: () => {
+          const last = ctx.manifest.operations[ctx.manifest.operations.length - 1];
+          ctx.removeManifestOp(last.id);
+          ctx.overlay.removeOp(pageIndex, last.id);
+        },
+      });
+      ctx.setTool('select');
     });
-    ctx.setTool('select');
   },
 });
+
+/** Inline link URL dialog (no prompt()). */
+function showLinkDialog(onPick) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;`;
+  const modal = document.createElement('div');
+  modal.style.cssText = `background:#fff;border-radius:16px;padding:24px;width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:system-ui,sans-serif;`;
+  modal.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:16px;font-weight:700">Add link</h3>
+    <input id="lkUrl" placeholder="https://example.com" value="https://"
+      style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;box-sizing:border-box;margin-bottom:14px">
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="lkCancel" style="background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="lkAdd" style="background:#2f6bff;color:#fff;border:0;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Add link</button>
+    </div>`;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  const inp = modal.querySelector('#lkUrl');
+  inp.focus(); inp.select();
+  const done = (val) => { overlay.remove(); onPick(val); };
+  modal.querySelector('#lkAdd').onclick = () => {
+    const v = inp.value.trim();
+    if (v && v !== 'https://') done(v);
+  };
+  modal.querySelector('#lkCancel').onclick = () => done(null);
+  overlay.onclick = e => { if (e.target === overlay) done(null); };
+  inp.onkeydown = e => { if (e.key === 'Enter') modal.querySelector('#lkAdd').click(); };
+}
 
 // ---- Form field tool ----
 const FIELD_TYPES = [
@@ -322,19 +389,61 @@ const FIELD_TYPES = [
   { id: 'radio', label: 'Radio group' },
   { id: 'dropdown', label: 'Dropdown' },
 ];
+
+/** Inline field-type picker modal (no prompt()). */
+function showFieldTypePicker(onPick, toolRef) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;`;
+  const modal = document.createElement('div');
+  modal.style.cssText = `background:#fff;border-radius:16px;padding:24px;width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:system-ui,sans-serif;`;
+  modal.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:16px;font-weight:700">Add form field</h3>
+    <div style="display:grid;gap:8px;margin-bottom:14px" id="fftBtns"></div>
+    <input id="fftName" placeholder="Field name (e.g. Full Name)"
+      style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;box-sizing:border-box;margin-bottom:14px">
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="fftCancel" style="background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Cancel</button>
+    </div>`;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+
+  const btnWrap = modal.querySelector('#fftBtns');
+  FIELD_TYPES.forEach((f, i) => {
+    const b = document.createElement('button');
+    b.textContent = f.label;
+    b.style.cssText = `text-align:left;padding:10px 12px;border-radius:9px;cursor:pointer;font-size:14px;
+      border:1px solid ${i === 0 ? '#2f6bff' : '#e2e8f0'};
+      background:${i === 0 ? '#eef4ff' : '#fff'};
+      color:${i === 0 ? '#2f6bff' : '#334155'};font-weight:${i === 0 ? '700' : '400'};`;
+    b.onclick = () => {
+      const name = modal.querySelector('#fftName').value.trim() || f.label;
+      overlay.remove();
+      onPick(f.id, name);
+    };
+    btnWrap.appendChild(b);
+  });
+  modal.querySelector('#fftCancel').onclick = () => { overlay.remove(); onPick(null); };
+  overlay.onclick = e => { if (e.target === overlay) { overlay.remove(); onPick(null); } };
+}
 registerTool({
   id: 'formfield',
   name: 'Form field',
   icon: '📝',
   cursor: 'crosshair',
   onActivate() {
-    const choice = prompt(
-      'Field type:\n' + FIELD_TYPES.map((f, i) => `${i+1}. ${f.label}`).join('\n'),
-      '1'
-    );
-    const idx = Math.max(0, Math.min(FIELD_TYPES.length - 1, (parseInt(choice) || 1) - 1));
-    this._fieldType = FIELD_TYPES[idx].id;
-    this._fieldLabel = FIELD_TYPES[idx].label;
+    // Show an inline field-type picker instead of prompt()
+    showFieldTypePicker((fieldType, fieldName) => {
+      if (fieldType) {
+        this._fieldType = fieldType;
+        this._fieldLabel = fieldName || fieldType;
+        this._pendingName = fieldName;
+      } else {
+        // User cancelled — switch back to select
+        setTimeout(() => this._ctx?.setTool?.('select'), 0);
+      }
+    }, this);
   },
   onDeactivate(ctx) { this._start = null; this._preview = null; },
   onPointerDown(ctx, evt) {
@@ -374,14 +483,11 @@ registerTool({
     };
     if (sr.width < 20 || sr.height < 16) return;
 
-    const name = prompt('Field name:', this._fieldLabel || 'Field');
-    if (name === null) return;
-
     const pr = ctx.screenRectToPdf(sr, pageIndex);
     const op = {
       op: 'add_form_field', page: pageIndex, ...pr,
       fieldType: this._fieldType || 'text',
-      name: name || 'Field',
+      name: this._pendingName || this._fieldLabel || 'Field',
     };
     ctx.history.execute({
       op,
@@ -498,17 +604,13 @@ registerTool({
   icon: '🏷️',
   cursor: 'crosshair',
   stampIndex: 0,
-  onActivate(ctx) {
-    // Cycle through presets or let user pick
-    const choice = prompt(
-      'Stamp text (or pick):\n' + STAMPS.map((s, i) => `${i+1}. ${s.text}`).join('\n'),
-      STAMPS[this.stampIndex].text
-    );
-    if (choice) {
-      const found = STAMPS.findIndex(s => s.text.toLowerCase() === choice.toLowerCase());
-      this._text = choice.toUpperCase();
-      this._color = found >= 0 ? STAMPS[found].color : '#dc2626';
-    }
+  onActivate() {
+    showStampPicker((text, color) => {
+      if (text) {
+        this._text = text;
+        this._color = color;
+      }
+    });
   },
   onDeactivate() {},
   onPointerDown(ctx, evt) {
