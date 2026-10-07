@@ -54,6 +54,9 @@ class ToolSpec:
     output_kind: str = "pdf"  # "pdf" | "images" | "text" | "zip"
     output_ext: str = "pdf"
     output_mime: str = "application/pdf"
+    # UI progress verb while a job is running. One of:
+    # "processing" | "converting" | "optimizing".
+    activity: str = "processing"
 
 
 @dataclass

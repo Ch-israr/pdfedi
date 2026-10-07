@@ -23,6 +23,7 @@ export interface ToolSpec {
   options: ToolOption[];
   output_kind: string;
   output_ext: string;
+  activity: "processing" | "converting" | "optimizing";
 }
 
 export interface UploadedFile {
@@ -79,6 +80,10 @@ export const api = {
       body: JSON.stringify({ tool_key, file_ids, config }),
     }),
   job: (id: string): Promise<Job> => req(`/jobs/${id}`),
+  cancelJob: (id: string): Promise<Job> =>
+    req(`/jobs/${id}/cancel`, { method: "POST" }),
+  retryJob: (id: string): Promise<Job> =>
+    req(`/jobs/${id}/retry`, { method: "POST" }),
   quota: (tool: string): Promise<{ used: number; limit: number; remaining: number }> =>
     req(`/quota/${tool}`),
   downloadUrl: (fileId: string) => `${BASE}/downloads/${fileId}`,

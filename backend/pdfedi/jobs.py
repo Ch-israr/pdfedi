@@ -1,8 +1,9 @@
 """Job lifecycle and upload ingestion.
 
 Uploads are validated synchronously (PDF parses, page count extracted).
-Jobs run inline in the request — correct for Render's free tier where there
-is no worker tier. Quota is consumed only by successful jobs.
+Jobs run in background threads — the API returns immediately with status
+`queued` and clients poll GET /api/v1/jobs/{id} for real progress states:
+queued → running → succeeded | failed (or cancelled).
 """
 from __future__ import annotations
 
@@ -10,12 +11,14 @@ import hashlib
 import io
 import json
 import logging
+import threading
 import uuid
 
 from pypdf import PdfReader
 from sqlalchemy.orm import Session
 
 from .config import get_settings
+from .db import SessionLocal
 from .models import File, FileKind, FileStatus, Job, JobStatus, enum_value
 from . import quotas
 from .storage import delete_file_record, get_object_path, put_object, storage_key_for
@@ -140,11 +143,33 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
     return job
 
 
+def _run_in_thread(job_id: str, client_ip: str) -> None:
+    """Worker entry point: own DB session, never leaks exceptions."""
+    db = SessionLocal()
+    try:
+        run_job(db, job_id, client_ip)
+    except Exception:  # noqa: BLE001 — run_job already records failures
+        log.exception("background worker crashed for job %s", job_id)
+    finally:
+        db.close()
+
+
+def enqueue_job(job_id: str, client_ip: str) -> None:
+    """Start background execution of a queued job. Returns immediately."""
+    thread = threading.Thread(
+        target=_run_in_thread, args=(job_id, client_ip), daemon=True,
+        name=f"pdfedi-job-{job_id[:8]}",
+    )
+    thread.start()
+
+
 def run_job(db: Session, job_id: str, client_ip: str) -> Job:
-    """Execute a job inline. Never raises — failures are recorded on the job."""
+    """Execute a job. Never raises — failures are recorded on the job."""
     job = db.query(Job).filter(Job.id == job_id).first()
     if job is None:
         raise UploadError("Job not found.", status_code=404)
+    if job.status == JobStatus.CANCELLED.value:
+        return job  # cancelled while queued — leave it
     if job.status not in (JobStatus.QUEUED.value, JobStatus.FAILED.value):
         return job
 
@@ -215,7 +240,9 @@ def cancel_job(db: Session, job_id: str) -> Job:
     job = db.query(Job).filter(Job.id == job_id).first()
     if job is None:
         raise UploadError("Job not found.", status_code=404)
-    if job.status in (JobStatus.QUEUED.value, JobStatus.RUNNING.value):
+    if job.status == JobStatus.RUNNING.value:
+        raise UploadError("Job is already running and cannot be cancelled.", status_code=409)
+    if job.status == JobStatus.QUEUED.value:
         job.status = enum_value(JobStatus.CANCELLED)
         job.updated_at = utcnow_iso()
         db.commit()
@@ -224,6 +251,7 @@ def cancel_job(db: Session, job_id: str) -> Job:
 
 
 def retry_job(db: Session, job_id: str, client_ip: str) -> Job:
+    """Reset a failed/cancelled job to queued and re-enqueue it."""
     job = db.query(Job).filter(Job.id == job_id).first()
     if job is None:
         raise UploadError("Job not found.", status_code=404)
@@ -238,7 +266,9 @@ def retry_job(db: Session, job_id: str, client_ip: str) -> Job:
     job.error = None
     job.updated_at = utcnow_iso()
     db.commit()
-    return run_job(db, job.id, client_ip)
+    db.refresh(job)
+    enqueue_job(job.id, client_ip)
+    return job
 
 
 def delete_file(db: Session, file_id: str) -> None:

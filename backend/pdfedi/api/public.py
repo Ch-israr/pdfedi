@@ -85,6 +85,7 @@ def list_tools():
             ],
             "output_kind": s.output_kind,
             "output_ext": s.output_ext,
+            "activity": s.activity,
         }
         for s in list_specs()
     ]
@@ -107,6 +108,7 @@ def tool_detail(tool_key: str):
             for o in s.options
         ],
         "output_kind": s.output_kind, "output_ext": s.output_ext,
+        "activity": s.activity,
     }
 
 
@@ -153,15 +155,20 @@ class JobCreate(BaseModel):
     config: dict = {}
 
 
-@router.post("/jobs")
+@router.post("/jobs", status_code=202)
 def create_job(payload: JobCreate, request: Request, db: Session = Depends(get_db)):
+    """Create a job and start it in the background.
+
+    Returns 202 immediately with status `queued`. Poll GET /jobs/{id} for
+    real progress: queued → running → succeeded | failed.
+    """
     ip = _client_ip(request)
     try:
         job = jobs.create_job(db, payload.tool_key, payload.file_ids, payload.config or {}, ip)
     except jobs.UploadError as e:
         raise _as_http_error(e)
-    # Inline execution on the free tier (no worker tier).
-    job = jobs.run_job(db, job.id, ip)
+    jobs.enqueue_job(job.id, ip)
+    db.refresh(job)
     return job_to_dict(job)
 
 
@@ -182,7 +189,7 @@ def cancel_job(job_id: str, db: Session = Depends(get_db)):
     return job_to_dict(j)
 
 
-@router.post("/jobs/{job_id}/retry")
+@router.post("/jobs/{job_id}/retry", status_code=202)
 def retry_job(job_id: str, request: Request, db: Session = Depends(get_db)):
     try:
         j = jobs.retry_job(db, job_id, _client_ip(request))
