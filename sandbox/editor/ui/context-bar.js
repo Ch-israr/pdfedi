@@ -89,6 +89,8 @@ function btn(label, tooltip, onClick, opts = {}) {
   b.innerHTML = label;
   b.title = tooltip;
   b.setAttribute('aria-label', tooltip);
+  // Prevent button from stealing focus (which can blur the canvas)
+  b.setAttribute('tabindex', '-1');
   const active = opts.active;
   b.style.cssText = `
     border:0;border-radius:8px;min-width:32px;height:32px;
@@ -100,7 +102,9 @@ function btn(label, tooltip, onClick, opts = {}) {
     padding:0 6px;transition:background .12s;`;
   b.onmouseenter = () => { if (!active) b.style.background = '#f1f5f9'; };
   b.onmouseleave = () => { b.style.background = active ? '#eef4ff' : 'transparent'; };
-  b.onclick = (e) => { e.stopPropagation(); onClick(b); };
+  // Use mousedown (not click) to fire before any blur/focus changes
+  b.onmousedown = (e) => { e.preventDefault(); e.stopPropagation(); };
+  b.onclick = (e) => { e.stopPropagation(); e.preventDefault(); onClick(b); };
   return b;
 }
 
