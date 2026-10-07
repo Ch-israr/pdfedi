@@ -144,12 +144,26 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
 
 
 def _run_in_thread(job_id: str, client_ip: str) -> None:
-    """Worker entry point: own DB session, never leaks exceptions."""
+    """Worker entry point: own DB session, never leaks exceptions.
+
+    If the worker dies unexpectedly, the job is marked failed instead of
+    being left stuck in "running" forever.
+    """
     db = SessionLocal()
     try:
         run_job(db, job_id, client_ip)
     except Exception:  # noqa: BLE001 — run_job already records failures
         log.exception("background worker crashed for job %s", job_id)
+        try:
+            db.rollback()
+            job = db.query(Job).filter(Job.id == job_id).first()
+            if job is not None and job.status == JobStatus.RUNNING.value:
+                job.status = enum_value(JobStatus.FAILED)
+                job.error = "Processing was interrupted unexpectedly. Please try again."
+                job.updated_at = utcnow_iso()
+                db.commit()
+        except Exception:  # noqa: BLE001 — best effort only
+            log.exception("could not mark crashed job %s as failed", job_id)
     finally:
         db.close()
 
