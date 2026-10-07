@@ -1,7 +1,7 @@
 """OCR a scanned PDF into a searchable PDF.
 
 Pipeline (no ocrmypdf needed):
-  1. Render each page to an image with pypdfium2 (300 DPI).
+  1. Render each page to an image with pypdfium2 (200 DPI).
   2. Recognize words with Tesseract (via pytesseract).
   3. Rebuild the PDF with reportlab: the scanned image as background plus
      an invisible (fully transparent) text layer, so the output looks
@@ -12,10 +12,12 @@ unavailable, raises ToolError with code "ocr_unavailable".
 """
 from __future__ import annotations
 
+import gc
 import io
 import logging
 import re
 import shutil
+import tempfile
 import time
 from pathlib import Path
 
@@ -31,10 +33,12 @@ from pdfedi.tools.base import (
 
 _LANGUAGE_RE = re.compile(r"^[A-Za-z]{2,3}(?:\+[A-Za-z]{2,3})*$")
 _OCR_UNAVAILABLE = "OCR is not available on this server."
-# 300 DPI render. Tesseract runs with the legacy engine (--oem 0): on weak
-# CPUs the LSTM engine is impractically slow for full pages, while the legacy
-# engine stays fast and accurate on clean documents.
-_DPI = 300
+# 200 DPI render: Tesseract is accurate at 200+ DPI and this uses 2.25x less
+# memory than 300 DPI. Critical on memory-constrained hosts (Render free tier
+# = 512MB): the old code held the full-res PIL image in memory *while*
+# Tesseract (a subprocess) allocated its own copy, pushing RSS over the limit
+# and getting the container OOM-killed mid-job.
+_DPI = 200
 # Tesseract config: legacy OCR engine, fully automatic page segmentation.
 _TESSERACT_CONFIG = "--oem 0"
 # Per-page recognition timeout (seconds): fail gracefully, never hang forever.
@@ -112,6 +116,9 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
     out_path = ctx.new_output_path("ocr").with_suffix(".pdf")
     c = Canvas(str(out_path))
+    # Rendered page images go to temp files on disk, never held in memory
+    # during OCR. Peak Python-side memory per page is ~one small buffer.
+    tmpdir = Path(tempfile.mkdtemp(prefix="pdfedi-ocr-"))
     try:
         for i in range(n_pages):
             t0 = time.perf_counter()
@@ -121,14 +128,25 @@ def run(ctx: ToolContext, options: dict) -> Path:
             img_w, img_h = pil_image.size
             page_w_pt = img_w * 72 / _DPI
             page_h_pt = img_h * 72 / _DPI
+
+            # Spill the image to disk, then release it BEFORE tesseract runs.
+            # pytesseract accepts a file path; the tesseract subprocess reads
+            # the file itself, so Python holds no image copy during OCR.
+            img_file = tmpdir / f"page_{i}.png"
+            pil_image.save(str(img_file), optimize=True)
+            del pil_image
+            gc.collect()
+
             c.setPageSize((page_w_pt, page_h_pt))
-            c.drawImage(ImageReader(pil_image), 0, 0, width=page_w_pt, height=page_h_pt)
+            c.drawImage(ImageReader(str(img_file)), 0, 0,
+                        width=page_w_pt, height=page_h_pt)
 
             # Invisible text layer (transparent fill = selectable but unseen).
             t1 = time.perf_counter()
             try:
                 words = pytesseract.image_to_data(
-                    pil_image, lang=language, output_type=pytesseract.Output.DICT,
+                    str(img_file), lang=language,
+                    output_type=pytesseract.Output.DICT,
                     config=_TESSERACT_CONFIG, timeout=_PAGE_TIMEOUT,
                 )
             except Exception as e:
@@ -164,8 +182,15 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 c.drawString(x_pt, y_pt, text)
             c.restoreState()
             c.showPage()
+            # Free the page image file as soon as the page is done.
+            try:
+                img_file.unlink()
+            except OSError:
+                pass
+            gc.collect()
     finally:
         c.save()
         pdf.close()
+        shutil.rmtree(tmpdir, ignore_errors=True)
 
     return out_path

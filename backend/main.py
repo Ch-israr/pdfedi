@@ -48,6 +48,26 @@ async def lifespan(app: FastAPI):
         log.info("migrations_applied", versions=applied)
     with SessionLocal() as db:
         ensure_admin_seed(db)
+        # Recover jobs orphaned by a container kill (e.g. OOM): their worker
+        # died with the old process, so without this they stay "running"
+        # forever. Mark them failed so users get a clear, retryable state.
+        from pdfedi.models import Job, JobStatus, enum_value
+        from pdfedi.timeutil import utcnow_iso
+        orphaned = (
+            db.query(Job)
+            .filter(Job.status.in_([JobStatus.RUNNING.value, JobStatus.QUEUED.value]))
+            .all()
+        )
+        for job in orphaned:
+            job.status = enum_value(JobStatus.FAILED)
+            job.error = (
+                "The server restarted while this job was processing. "
+                "Please try again."
+            )
+            job.updated_at = utcnow_iso()
+        if orphaned:
+            db.commit()
+            log.info("recovered_orphaned_jobs", count=len(orphaned))
     log.info("startup_complete", db_provider=settings.db_provider)
     yield
 
