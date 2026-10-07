@@ -208,8 +208,15 @@ class TursoHttpCursor:
             values = params.values() if isinstance(params, dict) else params
             stmt: dict[str, Any] = {"sql": sql, "args": [to_turso_arg(v) for v in values]}
             requests.append({"type": "execute", "stmt": stmt})
+        # Sum affected rows across the batch: SQLAlchemy's ORM bulk handling
+        # expects the TOTAL rowcount for executemany, and raises StaleDataError
+        # if only the last statement's count is reported.
+        total = 0
         for data in self.connection._post(requests):
             self._apply_result(data)
+            if self.rowcount and self.rowcount > 0:
+                total += self.rowcount
+        self.rowcount = total
         return self
 
     def fetchone(self) -> tuple | None:
