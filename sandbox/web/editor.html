@@ -253,14 +253,90 @@
       stage.on('pointerdown', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerDown) tool.onPointerDown(editorCtx(), e);
+        // Custom drag for selected objects (more reliable than Konva draggable with Transformer)
+        if (state.activeTool === 'select' && state.selected && e.target !== stage) {
+          let node = e.target;
+          if (!node.getAttr('opId')) {
+            node = node.findAncestor('[opId]', true);
+          }
+          if (node && node.getAttr('opId') === state.selected.getAttr('opId')) {
+            // Start custom drag
+            const opId = node.getAttr('opId');
+            const op = state.manifest.operations.find(o => o.id === opId);
+            if (op) {
+              const pos = stage.getPointerPosition();
+              state._drag = {
+                opId, op, node: state.selected,
+                startPointerX: pos.x, startPointerY: pos.y,
+                startNodeX: state.selected.x(), startNodeY: state.selected.y(),
+                startOpX: op.x, startOpY: op.y,
+                moved: false,
+              };
+            }
+          }
+        }
       });
       stage.on('pointermove', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerMove) tool.onPointerMove(editorCtx(), e);
+        // Custom drag move
+        if (state._drag && state.activeTool === 'select') {
+          const d = state._drag;
+          const pos = stage.getPointerPosition();
+          const dx = pos.x - d.startPointerX;
+          const dy = pos.y - d.startPointerY;
+          if (Math.abs(dx) > 2 || Math.abs(dy) > 2) d.moved = true;
+          if (d.moved) {
+            d.node.x(d.startNodeX + dx);
+            d.node.y(d.startNodeY + dy);
+            d.node.getLayer()?.batchDraw();
+          }
+        }
       });
       stage.on('pointerup', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerUp) tool.onPointerUp(editorCtx(), e);
+        // Custom drag end - commit to history
+        if (state._drag) {
+          const d = state._drag;
+          state._drag = null;
+          if (d.moved && state.activeTool === 'select') {
+            const node = d.node;
+            const op = d.op;
+            const endX = node.x(), endY = node.y();
+            const s = state.overlay.scale;
+            const dx = endX - d.startNodeX;
+            const dy = endY - d.startNodeY;
+            const dPdfX = dx / s;
+            const dPdfY = -dy / s;
+            const endOpX = d.startOpX + dPdfX;
+            const endOpY = d.startOpY + dPdfY;
+            const startOpX = d.startOpX, startOpY = d.startOpY;
+            const startNodeX = d.startNodeX, startNodeY = d.startNodeY;
+            try {
+              state.history.execute({
+                op: { op: 'move_object', targetId: op.id },
+                do: () => {
+                  op.x = endOpX; op.y = endOpY;
+                  const n = state.overlay.findNodeByOpId(op.id);
+                  if (n && !n.isDestroyed()) { n.x(endX); n.y(endY); n.getLayer()?.batchDraw(); }
+                },
+                undo: () => {
+                  op.x = startOpX; op.y = startOpY;
+                  const n = state.overlay.findNodeByOpId(op.id);
+                  if (n && !n.isDestroyed()) {
+                    n.x(startNodeX); n.y(startNodeY); n.getLayer()?.batchDraw();
+                    if (state.selected?.getAttr('opId') === op.id) selectObject(n);
+                  }
+                },
+              });
+            } catch (err) {
+              console.warn('Drag commit failed:', err);
+              op.x = endOpX; op.y = endOpY;
+            }
+            refreshContextBar();
+          }
+        }
       });
       // Selection
       stage.on('click', e => {
@@ -336,7 +412,8 @@
       });
       layer.add(transformer);
       transformer.nodes([node]);
-      node.draggable(true);
+      // Use custom stage-level drag (more reliable than Konva draggable with Transformer)
+      node.draggable(false);
       layer.batchDraw();
       // Contextual floating toolbar (replaces the old side properties panel)
       const opId = node.getAttr('opId');
@@ -344,7 +421,8 @@
       if (op) {
         node.setAttr('_objType', op.op);
         showContextBar(node, op, makeContextCallbacks(node, op));
-        attachDragHistory(node, op);
+        // Note: drag is handled by custom stage-level handlers (see pointerdown/move/up above)
+        // attachDragHistory is deprecated - kept for reference but not called
       }
     }
     // Single undo entry per drag (not per mousemove)
