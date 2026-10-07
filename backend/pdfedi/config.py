@@ -35,6 +35,10 @@ class Settings(BaseSettings):
 
     admin_username: str = "admin@pdfedi.com"
     admin_password_hash: str = ""
+    # One-time admin password set/reset: put the PLAINTEXT password here,
+    # deploy, log in, then REMOVE the variable. It is hashed with argon2
+    # on startup and never stored in plaintext.
+    admin_password: str = ""
 
     storage_dir: str = "./storage"
     max_upload_mb: int = 4

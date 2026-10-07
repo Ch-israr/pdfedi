@@ -101,18 +101,46 @@ def change_password(
 
 
 def ensure_admin_seed(db: Session) -> None:
-    """Create the admin user on first boot when ADMIN_PASSWORD_HASH is set."""
+    """Create the admin user on first boot; handle password resets.
+
+    If ADMIN_PASSWORD (plaintext) is set, it takes precedence: the admin
+    user's password is (re)set to its argon2 hash. This is the supported
+    recovery path when the password is lost — set the var, deploy, log
+    in, then REMOVE the var. A warning is logged while it is set.
+    """
+    import logging
+
+    log = logging.getLogger("pdfedi.admin")
     settings = get_settings()
+    username = settings.admin_username
+
+    if settings.admin_password:
+        user = db.query(AdminUser).filter(AdminUser.username == username).first()
+        new_hash = hash_password(settings.admin_password)
+        if user is None:
+            user = AdminUser(
+                id=uuid.uuid4().hex,
+                username=username,
+                password_hash=new_hash,
+                created_at=utcnow_iso(),
+            )
+            db.add(user)
+        else:
+            user.password_hash = new_hash
+        db.commit()
+        log.warning("admin password was (re)set from ADMIN_PASSWORD env var — remove the var")
+        return
+
     if not settings.admin_password_hash:
         return
-    existing = db.query(AdminUser).filter(AdminUser.username == settings.admin_username).first()
+    existing = db.query(AdminUser).filter(AdminUser.username == username).first()
     if existing is not None:
         return
     # Accept argon2 hashes; also accept legacy SHA-256 hex during migration
     # (the user will change the password after first login).
     db.add(AdminUser(
         id=uuid.uuid4().hex,
-        username=settings.admin_username,
+        username=username,
         password_hash=settings.admin_password_hash,
         created_at=utcnow_iso(),
     ))
