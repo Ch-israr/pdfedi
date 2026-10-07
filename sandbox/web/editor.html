@@ -298,10 +298,6 @@
         if (tool?.onPointerUp) tool.onPointerUp(editorCtx(), e);
         commitDrag();
       });
-      // Fallback: document-level mouseup in case stage doesn't fire
-      document.addEventListener('mouseup', () => {
-        if (state._drag) commitDrag();
-      });
       function commitDrag() {
         // Custom drag end - commit to history
         if (state._drag) {
