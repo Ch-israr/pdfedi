@@ -240,7 +240,6 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <h1 className="text-3xl font-extrabold tracking-tight">{spec.name}</h1>
       <p className="mt-2 text-slate-600">{spec.description}</p>
       {quota && (
         <p className="mt-2 text-xs text-slate-500">
