@@ -13,9 +13,13 @@ unavailable, raises ToolError with code "ocr_unavailable".
 from __future__ import annotations
 
 import io
+import logging
 import re
 import shutil
+import time
 from pathlib import Path
+
+log = logging.getLogger(__name__)
 
 from pdfedi.tools.base import (
     ToolContext,
@@ -109,8 +113,10 @@ def run(ctx: ToolContext, options: dict) -> Path:
     c = Canvas(str(out_path))
     try:
         for i in range(n_pages):
+            t0 = time.perf_counter()
             page = pdf[i]
             pil_image = page.render(scale=_DPI / 72).to_pil()
+            t_render = time.perf_counter() - t0
             img_w, img_h = pil_image.size
             page_w_pt = img_w * 72 / _DPI
             page_h_pt = img_h * 72 / _DPI
@@ -118,6 +124,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
             c.drawImage(ImageReader(pil_image), 0, 0, width=page_w_pt, height=page_h_pt)
 
             # Invisible text layer (transparent fill = selectable but unseen).
+            t1 = time.perf_counter()
             try:
                 words = pytesseract.image_to_data(
                     pil_image, lang=language, output_type=pytesseract.Output.DICT,
@@ -125,6 +132,12 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 )
             except Exception as e:
                 raise ToolError(f"OCR failed on page {i + 1}: {e}", code="ocr_failed") from e
+            t_ocr = time.perf_counter() - t1
+            log.info(
+                "ocr page timing",
+                extra={"page": i + 1, "render_s": round(t_render, 1),
+                       "ocr_s": round(t_ocr, 1), "px": f"{img_w}x{img_h}"},
+            )
             c.saveState()
             c.setFillAlpha(0)
             texts = words.get("text", [])
