@@ -713,11 +713,21 @@
     }
 
     // ---------- Header controls ----------
-    document.getElementById('undoBtn').onclick = () => state.history?.undo();
-    document.getElementById('redoBtn').onclick = () => state.history?.redo();
+    document.getElementById('undoBtn').onclick = () => { state.history?.undo(); updateStatus(); };
+    document.getElementById('redoBtn').onclick = () => { state.history?.redo(); updateStatus(); };
     document.addEventListener('keydown', e => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) { e.preventDefault(); state.history?.undo(); return; }
-      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) { e.preventDefault(); state.history?.redo(); return; }
+      if ((e.ctrlKey || e.metaKey) && e.key === 'z' && !e.shiftKey) {
+        e.preventDefault();
+        state.history?.undo();
+        updateStatus(); // ensure counter refreshes
+        return;
+      }
+      if ((e.ctrlKey || e.metaKey) && (e.key === 'y' || (e.key === 'z' && e.shiftKey))) {
+        e.preventDefault();
+        state.history?.redo();
+        updateStatus(); // ensure counter refreshes
+        return;
+      }
       // Delete / Backspace removes the selected object (not while typing in a textarea/input)
       if ((e.key === 'Delete' || e.key === 'Backspace') && !e.ctrlKey && !e.metaKey) {
         const tag = document.activeElement?.tagName;
