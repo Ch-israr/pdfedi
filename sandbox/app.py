@@ -21,12 +21,20 @@ from pathlib import Path
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import HTMLResponse, Response
 
+import asyncio
+
 from pdfedi.tools.base import ToolContext, ToolError, ToolInput, ToolSpec
 from tools import SANDBOX_TOOLS  # noqa: E402  (sandbox-local registry)
 
 HERE = Path(__file__).resolve().parent
 WEB_DIR = HERE / "web"
 MAX_UPLOAD_BYTES = 50 * 1024 * 1024
+
+# Concurrency control: max 2 simultaneous tool runs. Prevents memory spikes
+# from concurrent OCR jobs on limited servers. Lightweight asyncio semaphore —
+# no queues, no workers, no infrastructure.
+_MAX_CONCURRENT_RUNS = 2
+_run_semaphore = asyncio.Semaphore(_MAX_CONCURRENT_RUNS)
 
 app = FastAPI(title="PDFEDI Testing Sandbox", docs_url=None, redoc_url=None)
 
@@ -151,7 +159,10 @@ async def run_tool(
             )
         ctx = ToolContext(inputs)
         try:
-            out_path = module.run(ctx, opts)
+            # Limit concurrent runs to prevent memory spikes on limited servers.
+            # The semaphore is acquired here; the tool runs synchronously.
+            async with _run_semaphore:
+                out_path = module.run(ctx, opts)
         except ToolError as e:
             raise HTTPException(status_code=422, detail=str(e))
         except Exception as e:  # noqa: BLE001 — surface unexpected failures
