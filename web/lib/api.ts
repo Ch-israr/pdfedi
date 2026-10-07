@@ -86,6 +86,8 @@ export const api = {
     req(`/jobs/${id}/retry`, { method: "POST" }),
   quota: (tool: string): Promise<{ used: number; limit: number; remaining: number }> =>
     req(`/quota/${tool}`),
+  limits: (): Promise<{ max_upload_mb: number; max_download_mb: number }> =>
+    req("/limits"),
   downloadUrl: (fileId: string) => `${BASE}/downloads/${fileId}`,
 
   adminLogin: (username: string, password: string): Promise<{ token: string; username: string }> =>

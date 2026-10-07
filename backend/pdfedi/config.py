@@ -8,8 +8,8 @@ Environment variables (same names as the Render dashboard already uses):
   ADMIN_USERNAME         admin login username     (default: admin@pdfedi.com)
   ADMIN_PASSWORD_HASH    argon2 hash; seeded on first boot if set
   STORAGE_DIR            local file storage dir   (default: ./storage)
-  MAX_UPLOAD_MB          upload limit             (default: 4)
-  MAX_DOWNLOAD_MB        download limit           (default: 4)
+  MAX_UPLOAD_MB          upload limit             (default: 50)
+  MAX_DOWNLOAD_MB        download limit           (default: 50)
   QUOTA_PER_HOUR         successful actions per tool per IP per hour (default: 5)
   ENV                    development | production (default: development)
   FRONTEND_DIR           static frontend dir      (default: ./static)
@@ -41,8 +41,8 @@ class Settings(BaseSettings):
     admin_password: str = ""
 
     storage_dir: str = "./storage"
-    max_upload_mb: int = 4
-    max_download_mb: int = 4
+    max_upload_mb: int = 50
+    max_download_mb: int = 50
     quota_per_hour: int = 5
 
     frontend_dir: str = "./static"

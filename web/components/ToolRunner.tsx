@@ -29,6 +29,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   const [quota, setQuota] = useState<{ used: number; limit: number; remaining: number } | null>(null);
+  const [limits, setLimits] = useState<{ max_upload_mb: number; max_download_mb: number } | null>(null);
   const [downloadPct, setDownloadPct] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -36,6 +37,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
   useEffect(() => {
     api.tool(toolKey).then(setSpec).catch((e) => setError(String(e.message || e)));
     api.quota(toolKey).then(setQuota).catch(() => {});
+    api.limits().then(setLimits).catch(() => {});
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
@@ -110,6 +112,16 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
     const chosen = Array.from(list).slice(0, spec.max_files);
     if (files.length + chosen.length > spec.max_files) {
       setError(`This tool accepts at most ${spec.max_files} file(s).`);
+      return;
+    }
+    // Client-side size check against the server's real limit — instant,
+    // clear feedback instead of waiting for the upload to be rejected.
+    const maxBytes = (limits?.max_upload_mb ?? 50) * 1024 * 1024;
+    const tooBig = chosen.find((f) => f.size > maxBytes);
+    if (tooBig) {
+      setError(
+        `"${tooBig.name}" exceeds the ${limits?.max_upload_mb ?? 50} MB upload limit.`
+      );
       return;
     }
     if (files.length + chosen.length < spec.min_files && chosen.length === 0) return;
@@ -306,7 +318,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
               : `Choose ${spec.input_kinds.includes("image") ? "image" : "PDF"} file(s)`}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            Up to {spec.max_files} file(s), 4&nbsp;MB each. No sign-up needed.
+            Up to {spec.max_files} file(s), {limits?.max_upload_mb ?? 50}&nbsp;MB each. No sign-up needed.
           </p>
         </div>
       )}

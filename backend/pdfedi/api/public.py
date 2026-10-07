@@ -224,3 +224,13 @@ def quota_info(tool_key: str, request: Request, db: Session = Depends(get_db)):
 
     allowed, used, limit = quota_mod.check_quota(db, _client_ip(request), tool_key)
     return {"tool": tool_key, "used": used, "limit": limit, "remaining": max(0, limit - used)}
+
+
+@router.get("/limits")
+def limits():
+    """File-size limits, so the frontend validates against real config."""
+    settings = get_settings()
+    return {
+        "max_upload_mb": settings.max_upload_mb,
+        "max_download_mb": settings.max_download_mb,
+    }
