@@ -29,6 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && test "$(stat -c%s "$TESSDATA_DIR/eng.traineddata")" -gt 10000000
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
+    PYTHONUNBUFFERED=1 \
     FRONTEND_DIR=/srv/static \
     STORAGE_DIR=/srv/storage \
     ENV=production

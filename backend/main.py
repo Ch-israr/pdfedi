@@ -5,8 +5,17 @@ Next.js frontend served from FRONTEND_DIR (one origin, no CORS needed).
 """
 from __future__ import annotations
 
+import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
+
+# stdlib logging (used by jobs.py, tools/ocr.py, ...) has no configuration
+# by default, which silently drops everything below WARNING. Configure it
+# so worker activity actually reaches the Render log stream.
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 
 import structlog
 from fastapi import FastAPI
