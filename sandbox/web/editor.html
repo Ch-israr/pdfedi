@@ -458,18 +458,20 @@
         op: { op: 'delete_object', targetId: opId },
         do: () => {
           try {
-            // Clear selection FIRST (destroys transformer, hides toolbar)
             clearSelection();
+          } catch (e) { console.warn('clearSelection in delete:', e); }
+          try {
             removeOp(state.manifest, opId);
+          } catch (e) { console.warn('removeOp in delete:', e); }
+          try {
             state.overlay.removeOp(pageIndex, opId);
             const layer = state.overlay.getLayer(pageIndex);
             if (layer) {
               layer.find(n => n.getAttr('opId') === opId).forEach(n => n.destroy());
               layer.batchDraw();
             }
-          } finally {
-            updateStatus(); // Always update counter
-          }
+          } catch (e) { console.warn('visual remove in delete:', e); }
+          updateStatus();
         },
         undo: () => {
           try {
@@ -479,9 +481,8 @@
             if (node) selectObject(node);
           } catch (err) {
             console.error('Undo delete failed:', err);
-          } finally {
-            updateStatus(); // Always update counter
           }
+          updateStatus();
         },
       });
     }
