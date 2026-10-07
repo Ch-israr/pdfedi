@@ -348,6 +348,7 @@
         },
         onDuplicate: () => duplicateObject(node, op),
         onDelete: () => deleteObject(node, op),
+        onRepeatAll: () => repeatOnAllPages(op),
         onRotate: () => { node.rotate(90); node.getLayer()?.batchDraw(); },
         onReplace: () => replaceImage(node, op),
       };
@@ -366,6 +367,33 @@
       state.overlay.removeOp(op.page, op.id);
       clearSelection();
       updateStatus();
+    }
+    function repeatOnAllPages(op) {
+      // Clone this object onto every page (except its own)
+      const createdIds = [];
+      state.history.execute({
+        op: { op: 'repeat_all', page: op.page },
+        do: () => {
+          state.pageOrder.forEach(origIdx => {
+            if (origIdx === op.page) return;
+            const clone = JSON.parse(JSON.stringify(op));
+            delete clone.id;
+            clone.page = origIdx;
+            const withId = appendOp(state.manifest, clone);
+            createdIds.push({ id: withId.id, page: withId.page });
+            state.overlay.renderOp(withId.page, withId, state.assets);
+          });
+          updateStatus();
+        },
+        undo: () => {
+          createdIds.forEach(({ id, page }) => {
+            removeOp(state.manifest, id);
+            state.overlay.removeOp(page, id);
+          });
+          createdIds.length = 0;
+          updateStatus();
+        },
+      });
     }
     function replaceImage(node, op) {
       const inp = document.createElement('input');
@@ -557,6 +585,26 @@
           document.querySelector(`.page-wrap[data-page-index="${origIdx}"]`)
             ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         };
+        // Drag to reorder — changes final PDF page order (state.pageOrder)
+        div.draggable = true;
+        div.ondragstart = e => {
+          e.dataTransfer.setData('text/plain', String(displayIdx));
+          div.style.opacity = '0.4';
+        };
+        div.ondragend = () => { div.style.opacity = '1'; };
+        div.ondragover = e => { e.preventDefault(); div.style.borderColor = '#2f6bff'; };
+        div.ondragleave = () => { div.style.borderColor = ''; };
+        div.ondrop = e => {
+          e.preventDefault();
+          div.style.borderColor = '';
+          const from = parseInt(e.dataTransfer.getData('text/plain'));
+          const to = displayIdx;
+          if (from === to || isNaN(from)) return;
+          const [moved] = state.pageOrder.splice(from, 1);
+          state.pageOrder.splice(to, 0, moved);
+          buildPagePanel();
+          updateStatus();
+        };
         actions.onclick = e => {
           const act = e.target.dataset.act;
           if (act) pageAction(act, origIdx, displayIdx);
@@ -633,17 +681,58 @@
       buildWorkspace();
     }
 
-    // Search
+    // Search + Find & Replace
     document.getElementById('searchBtn').onclick = async () => {
       const q = prompt('Search text in PDF:');
       if (!q) return;
       let total = 0;
+      const matchesByPage = [];
       for (let i = 0; i < state.renderer.pageCount; i++) {
         const items = await state.renderer.getPageText(i);
         const matches = items.filter(t => t.str.toLowerCase().includes(q.toLowerCase()));
         total += matches.length;
+        if (matches.length) matchesByPage.push({ page: i, items: matches });
       }
-      alert(`Found ${total} match(es) for "${q}" across ${state.renderer.pageCount} pages.`);
+      const replace = total > 0 &&
+        confirm(`Found ${total} match(es) for "${q}" across ${state.renderer.pageCount} pages.\n\nClick OK to replace all with new text (adds whiteout + new text), Cancel to just view.`);
+      if (replace) {
+        const newText = prompt(`Replace "${q}" with:`, q);
+        if (newText === null || newText === q) return;
+        let replaced = 0;
+        for (const { page, items } of matchesByPage) {
+          const dims = state.pageDims[page];
+          for (const m of items) {
+            // Whiteout the old text, add new text at same position
+            // m.transform gives PDF.js coordinates; convert to PDF points
+            const [x, y] = m.transform.slice(4);
+            const fontH = Math.abs(m.transform[3]) || 12;
+            // PDF.js y is from top in default viewport; our pages are rendered unscaled
+            // Approximate: use the item's position directly
+            const scale = state.zoom || 1;
+            const pdfX = x / scale;
+            const pdfY = dims.heightPt - (y / scale) - fontH;
+            const pdfW = (m.width || q.length * fontH * 0.5) / scale;
+            const whiteoutOp = { op: 'whiteout', page, x: pdfX - 2, y: pdfY - 2, w: pdfW + 4, h: fontH + 4 };
+            const textOp = {
+              op: 'add_text', page, x: pdfX, y: pdfY,
+              text: m.str.split(new RegExp(`(${q})`, 'i')).map((part, i) =>
+                part.toLowerCase() === q.toLowerCase() ? newText : part).join(''),
+              font: 'Helvetica', size: fontH, color: '#000000',
+            };
+            const w1 = appendOp(state.manifest, whiteoutOp);
+            const t1 = appendOp(state.manifest, textOp);
+            state.overlay.renderOp(page, w1, state.assets);
+            state.overlay.renderOp(page, t1, state.assets);
+            replaced++;
+          }
+        }
+        updateStatus();
+        alert(`Replaced ${replaced} occurrence(s).`);
+      } else if (total > 0) {
+        alert(`Found ${total} match(es) for "${q}".`);
+      } else {
+        alert(`No matches for "${q}".`);
+      }
     };
 
     // ---------- Download ----------

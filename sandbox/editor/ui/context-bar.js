@@ -110,10 +110,11 @@ function controlsFor(type, op) {
   const out = [];
   const cb = callbacks;
 
-  // Common: duplicate, delete
+  // Common: duplicate, delete, repeat on all pages
   const commonEnd = () => {
     out.push(sep());
     out.push(btn('⧉', 'Duplicate', () => cb.onDuplicate?.()));
+    out.push(btn('📄', 'Repeat on all pages', () => cb.onRepeatAll?.()));
     out.push(btn('🗑', 'Delete', () => cb.onDelete?.()));
   };
 
