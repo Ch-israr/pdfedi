@@ -435,17 +435,24 @@
     function deleteObject(node, op) {
       // Snapshot the op for undo (preserves ID via restoreOp)
       const snapshot = JSON.parse(JSON.stringify(op));
+      const opId = op.id;
+      const pageIndex = op.page;
       state.history.execute({
-        op: { op: 'delete_object', targetId: op.id },
+        op: { op: 'delete_object', targetId: opId },
         do: () => {
-          removeOp(state.manifest, op.id);
-          state.overlay.removeOp(op.page, op.id);
+          removeOp(state.manifest, opId);
+          state.overlay.removeOp(pageIndex, opId);
           clearSelection();
           updateStatus();
         },
         undo: () => {
-          const restored = restoreOp(state.manifest, snapshot);
-          state.overlay.renderOp(restored.page, restored, state.assets);
+          try {
+            const restored = restoreOp(state.manifest, snapshot);
+            state.overlay.renderOp(restored.page, restored, state.assets);
+          } catch (err) {
+            console.error('Undo delete failed:', err);
+          }
+          // Force counter refresh — read actual manifest length
           updateStatus();
         },
       });
