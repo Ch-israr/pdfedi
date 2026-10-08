@@ -272,6 +272,14 @@
       };
     }
 
+    // Tiny drag-state indicator (temporary, remove after fix)
+    const dragDbg = document.createElement('div');
+    dragDbg.id = 'dragDbg';
+    dragDbg.style.cssText = 'position:fixed;left:8px;bottom:8px;z-index:9999;background:#000;color:#0f0;font:11px monospace;padding:4px 8px;border-radius:4px;pointer-events:none;';
+    dragDbg.textContent = 'drag: idle';
+    document.body.appendChild(dragDbg);
+    function dragDbgUpdate(s) { dragDbg.textContent = 'drag: ' + s; }
+
     function wireStageEvents(pageIndex) {
       const entry = state.overlay.stages.get(pageIndex);
       if (!entry) return;
@@ -309,6 +317,7 @@
                 moved: false,
               };
               stage.container().style.cursor = 'grabbing';
+              dragDbgUpdate('armed ' + opId.slice(0, 8));
             }
           }
         }
@@ -328,10 +337,12 @@
         if (state._drag && state.activeTool === 'select') {
           const d = state._drag;
           const pos = stage.getPointerPosition();
+          if (!pos) { dragDbgUpdate('move: null pos'); return; }
           const dx = pos.x - d.startPointerX;
           const dy = pos.y - d.startPointerY;
           if (Math.abs(dx) > 2 || Math.abs(dy) > 2) d.moved = true;
           if (d.moved) {
+            dragDbgUpdate('moving dx=' + Math.round(dx));
             d.node.x(d.startNodeX + dx);
             d.node.y(d.startNodeY + dy);
             d.node.getLayer()?.batchDraw();
