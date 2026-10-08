@@ -230,35 +230,6 @@
       return null;
     }
 
-    /**
-     * Geometric hit-test: find the topmost opId-carrying node whose bounding
-     * box contains the stage-relative point. Does not depend on Konva's hit
-     * graph, which has proven unreliable for text nodes in this app.
-     */
-    function findNodeAtPos(stage, pageIndex, pos) {
-      const layer = state.overlay.getLayer(pageIndex);
-      if (!layer || !pos) return null;
-      const kids = layer.children;
-      for (let i = kids.length - 1; i >= 0; i--) {
-        const n = kids[i];
-        if (!n || n.className === 'Transformer') continue;
-        const opId = n.getAttr && n.getAttr('opId');
-        if (!opId) continue;
-        try {
-          const stageRect = stage.container().getBoundingClientRect();
-          const absX = stageRect.left + pos.x;
-          const absY = stageRect.top + pos.y;
-          const r = n.getClientRect();
-          const pad = 8;
-          if (absX >= r.x - pad && absX <= r.x + r.width + pad &&
-              absY >= r.y - pad && absY <= r.y + r.height + pad) {
-            return n;
-          }
-        } catch { continue; }
-      }
-      return null;
-    }
-
     function buildWorkspace() {
       const ws = document.getElementById('workspace');
       ws.innerHTML = '';
@@ -311,13 +282,8 @@
         // Free drag & drop: grab ANY object on the first press — select and
         // start tracking in one gesture. Custom stage-level drag (more reliable
         // than Konva draggable with Transformer). No snapping, no forced axis.
-        // Note: Konva has no isDestroyed() method — never call it. A node that
-        // was just hit-tested is alive by definition.
-        // Picking uses geometric hit-test (findNodeAtPos) because Konva's
-        // e.target hit graph is unreliable for text nodes in this app.
-        if (state.activeTool === 'select' && !state._drag) {
-          const pos = stage.getPointerPosition();
-          const node = pos ? findNodeAtPos(stage, pageIndex, pos) : null;
+        if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
+          const node = findOpNode(e.target, stage);
           if (node) {
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
               selectObject(node);
@@ -343,10 +309,8 @@
         const tool = getTool(state.activeTool);
         if (tool?.onPointerMove) tool.onPointerMove(editorCtx(), e);
         // Hover affordance in select mode: grab cursor over any object
-        // (geometric picking — Konva e.target hit-testing is unreliable here)
         if (state.activeTool === 'select' && !state._drag) {
-          const hpos = stage.getPointerPosition();
-          const hov = hpos ? findNodeAtPos(stage, pageIndex, hpos) : null;
+          const hov = e.target !== stage ? findOpNode(e.target, stage) : null;
           const want = moveModeActive ? 'grab' : (hov ? 'grab' : 'default');
           if (stage.container().style.cursor !== want) {
             stage.container().style.cursor = want;
@@ -446,27 +410,8 @@
       // Selection
       stage.on('click', e => {
         if (state.activeTool !== 'select') return;
-        // Geometric picking (Konva e.target hit-testing is unreliable here).
-        // Transformer handles: keep the current selection, don't clear.
-        const cpos = stage.getPointerPosition();
-        if (cpos) {
-          const hovNode = findNodeAtPos(stage, pageIndex, cpos);
-          // If the pointer is over the transformer itself, ignore the click
-          // (it was on a handle, not on empty space).
-          const t = e.target;
-          const onTransformer = t && (t.className === 'Transformer' ||
-            (t.getParent && t.getParent()?.className === 'Transformer'));
-          if (!hovNode && !onTransformer) { clearSelection(); return; }
-          if (onTransformer && !hovNode) return;
-          const node = hovNode || (onTransformer ?
-            (t.className === 'Transformer' ? t : t.getParent()).nodes?.()[0] : null);
-          if (!node) return;
-          if (state.selected && state.selected.getAttr('opId') === node.getAttr('opId')) return;
-          selectObject(node);
-          return;
-        }
         if (e.target === stage) { clearSelection(); return; }
-        // Fallback: e.target-based picking
+        // If clicked on transformer, find its attached node
         let target = e.target;
         if (target.className === 'Transformer' ||
             (target.getParent && target.getParent()?.className === 'Transformer')) {
@@ -475,16 +420,18 @@
           if (attached) target = attached;
           else return;
         }
+        // Find the node with opId (might be a child, e.g. stamp text or field part)
         const node = findOpNode(target, stage);
         if (!node) return;
+        // Already selected → keep selection (avoids transformer flicker and
+        // preserves move-mode across drags)
         if (state.selected && state.selected.getAttr('opId') === node.getAttr('opId')) return;
         selectObject(node);
       });
       stage.on('dblclick', e => {
-        // Geometric picking (Konva e.target hit-testing is unreliable here)
-        const dpos = stage.getPointerPosition();
-        const node = dpos ? findNodeAtPos(stage, pageIndex, dpos) :
-          (e.target === stage ? null : findOpNode(e.target, stage));
+        if (e.target === stage) return;
+        // Find the node with opId (might be clicked on a child)
+        const node = findOpNode(e.target, stage);
         if (!node) return;
         // If it's a text object, enter edit mode regardless of active tool
         const opId = node.getAttr('opId');
