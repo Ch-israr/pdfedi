@@ -430,6 +430,67 @@
       transformer.nodes([node]);
       // Use custom stage-level drag (more reliable than Konva draggable with Transformer)
       node.draggable(false);
+      // Sync Transformer resize/rotate back to the manifest op (with undo)
+      transformer.on('transformend', () => {
+        const opId = node.getAttr('opId');
+        const op = state.manifest.operations.find(o => o.id === opId);
+        if (!op || node.isDestroyed()) return;
+        const s = state.overlay.scale;
+        const dims = state.pageDims[op.page];
+        const pageH = dims ? dims.heightPt : 0;
+        // Capture new state in screen coords
+        const newX = node.x(), newY = node.y();
+        const newRot = node.rotation();
+        const newScaleX = node.scaleX(), newScaleY = node.scaleY();
+        // Convert screen position to PDF coords
+        const newPdfX = newX / s;
+        const newPdfY = pageH - (newY / s);
+        const before = { x: op.x, y: op.y, rotation: op.rotation || 0,
+          w: op.w, h: op.h, fontSize: op.fontSize };
+        const applyTransform = () => {
+          op.x = newPdfX;
+          op.y = newPdfY;
+          op.rotation = newRot;
+          // Bake scale into dimensions
+          if (op.op === 'add_text' && op.fontSize) {
+            op.fontSize = Math.max(6, op.fontSize * newScaleX);
+          }
+          if (op.w !== undefined) op.w = op.w * newScaleX;
+          if (op.h !== undefined) op.h = op.h * newScaleY;
+          try {
+            const pageIndex = op.page;
+            state.overlay.removeOp(pageIndex, op.id);
+            state.overlay.renderOp(pageIndex, op);
+            const fresh = state.overlay.findNodeByOpId(op.id);
+            if (fresh && !fresh.isDestroyed()) selectObject(fresh);
+          } catch (e) { console.warn('Transform re-render failed:', e); }
+          updateStatus();
+        };
+        const revertTransform = () => {
+          op.x = before.x; op.y = before.y; op.rotation = before.rotation;
+          if (before.w !== undefined) op.w = before.w;
+          if (before.h !== undefined) op.h = before.h;
+          if (before.fontSize !== undefined) op.fontSize = before.fontSize;
+          try {
+            const pageIndex = op.page;
+            state.overlay.removeOp(pageIndex, op.id);
+            state.overlay.renderOp(pageIndex, op);
+            const fresh = state.overlay.findNodeByOpId(op.id);
+            if (fresh && !fresh.isDestroyed()) selectObject(fresh);
+          } catch (e) { console.warn('Transform revert failed:', e); }
+          updateStatus();
+        };
+        try {
+          state.history.execute({
+            op: { op: 'transform_object', targetId: op.id },
+            do: applyTransform,
+            undo: revertTransform,
+          });
+        } catch (e) {
+          console.warn('Transform history failed:', e);
+          applyTransform();
+        }
+      });
       layer.batchDraw();
       // Contextual floating toolbar (replaces the old side properties panel)
       const opId = node.getAttr('opId');
