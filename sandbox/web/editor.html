@@ -613,6 +613,15 @@
         onRepeatAll: () => repeatOnAllPages(op),
         onRotate: () => { node.rotate(90); node.getLayer()?.batchDraw(); },
         onReplace: () => replaceImage(node, op),
+        onEditText: () => {
+          // Enter text edit mode (for text objects)
+          if (op.op === 'add_text') {
+            const textTool = getTool('text');
+            if (textTool?.onDblClick) {
+              textTool.onDblClick(editorCtx(), null, node);
+            }
+          }
+        },
       };
     }
     function applyStyleToNode(node, op, style) {
@@ -678,9 +687,21 @@
             }
             layer.batchDraw();
           }
-          // Force a full stage redraw
-          const stageEntry = [...state.overlay.stages.values()].find(s => s.pageIndex === pageIndex);
-          if (stageEntry?.stage) stageEntry.stage.batchDraw();
+          // Force FULL stage redraw to clear any cached pixels (ghost fix)
+          const stageEntry = [...state.overlay.stages.values()].find(s => {
+            try { return s.stage.findOne(`[opId="${opId}"]`) || s.pageIndex === pageIndex; }
+            catch (e) { return false; }
+          });
+          // Simpler: redraw all stages
+          for (const [, entry] of state.overlay.stages) {
+            try {
+              entry.stage.getLayers().forEach(l => {
+                try { l.batchDraw(); } catch (e) {}
+              });
+              // Force a synchronous draw
+              try { entry.stage.draw(); } catch (e) {}
+            } catch (e) {}
+          }
         } catch (e) { console.warn('visual remove in delete:', e); }
         updateStatus();
       };
@@ -1048,6 +1069,23 @@
           if (op) deleteObject(node, op);
         }
         return;
+      }
+      // Enter enters text edit mode for selected text object
+      if (e.key === 'Enter' && state.selected && !e.ctrlKey && !e.metaKey) {
+        const tag = document.activeElement?.tagName;
+        if (tag === 'TEXTAREA' || tag === 'INPUT' || tag === 'SELECT') return;
+        const node = state.selected;
+        if (node.isDestroyed()) return;
+        const opId = node.getAttr('opId');
+        const op = state.manifest.operations.find(o => o.id === opId);
+        if (op && op.op === 'add_text') {
+          e.preventDefault();
+          const textTool = getTool('text');
+          if (textTool?.onDblClick) {
+            textTool.onDblClick(editorCtx(), e, node);
+          }
+          return;
+        }
       }
       // Arrow keys nudge the selected object (1px, or 10px with Shift)
       if ((e.key.startsWith('Arrow') || ['Left','Right','Up','Down'].includes(e.key)) && state.selected && !e.ctrlKey && !e.metaKey) {

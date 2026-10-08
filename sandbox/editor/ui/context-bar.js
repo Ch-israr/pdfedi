@@ -196,8 +196,9 @@ function deleteBtn(cb) {
 // ---------- per-type toolbars ----------
 
 function buildTextControls(bar, node, op, cb) {
-  // Group 0: Move
+  // Group 0: Move + Edit
   bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(btn('✎', 'Edit text', () => cb.onEditText()));
   bar.appendChild(groupSep());
   // Group 1: B I
   bar.appendChild(btn('<b>B</b>', 'Bold (Ctrl+B)', b => cb.onStyle({ bold: !op.bold }), { active: op.bold }));
