@@ -374,12 +374,25 @@
         }
       });
       stage.on('dblclick', e => {
+        if (e.target === stage) return;
+        // Find the node with opId (might be clicked on child)
+        const node = e.target.getAttr('opId') ? e.target :
+          e.target.findAncestor('[opId]', true);
+        if (!node) return;
+        // If it's a text object, enter edit mode regardless of active tool
+        const opId = node.getAttr('opId');
+        const op = state.manifest.operations.find(o => o.id === opId);
+        if (op && op.op === 'add_text') {
+          const textTool = getTool('text');
+          if (textTool?.onDblClick) {
+            textTool.onDblClick(editorCtx(), e, node);
+            return;
+          }
+        }
+        // Otherwise, delegate to active tool
         const tool = getTool(state.activeTool);
-        if (tool?.onDblClick && e.target !== stage) {
-          // Find the node with opId (might be clicked on child)
-          const node = e.target.getAttr('opId') ? e.target :
-            e.target.findAncestor('[opId]', true);
-          if (node) tool.onDblClick(editorCtx(), e, node);
+        if (tool?.onDblClick) {
+          tool.onDblClick(editorCtx(), e, node);
         }
       });
     }
@@ -641,25 +654,40 @@
       if (!op) return;
       const snapshot = JSON.parse(JSON.stringify(op));
       const pageIndex = op.page;
+      const doDelete = () => {
+        try {
+          clearSelection();
+        } catch (e) { console.warn('clearSelection in delete:', e); }
+        try {
+          removeOp(state.manifest, opId);
+        } catch (e) { console.warn('removeOp in delete:', e); }
+        try {
+          // Aggressive visual removal: try multiple methods
+          state.overlay.removeOp(pageIndex, opId);
+          const layer = state.overlay.getLayer(pageIndex);
+          if (layer) {
+            // Find by opId attribute
+            const found = layer.find(n => n.getAttr('opId') === opId);
+            found.forEach(n => {
+              try { n.destroy(); } catch (e) {}
+            });
+            // Also check transformer
+            if (transformer) {
+              try { transformer.destroy(); } catch (e) {}
+              transformer = null;
+            }
+            layer.batchDraw();
+          }
+          // Force a full stage redraw
+          const stageEntry = [...state.overlay.stages.values()].find(s => s.pageIndex === pageIndex);
+          if (stageEntry?.stage) stageEntry.stage.batchDraw();
+        } catch (e) { console.warn('visual remove in delete:', e); }
+        updateStatus();
+      };
       state.history.execute({
         op: { op: 'delete_object', targetId: opId },
-        do: () => {
-          try {
-            clearSelection();
-          } catch (e) { console.warn('clearSelection in delete:', e); }
-          try {
-            removeOp(state.manifest, opId);
-          } catch (e) { console.warn('removeOp in delete:', e); }
-          try {
-            state.overlay.removeOp(pageIndex, opId);
-            const layer = state.overlay.getLayer(pageIndex);
-            if (layer) {
-              layer.find(n => n.getAttr('opId') === opId).forEach(n => n.destroy());
-              layer.batchDraw();
-            }
-          } catch (e) { console.warn('visual remove in delete:', e); }
-          updateStatus();
-        },
+        do: doDelete,
+        redo: doDelete, // Explicit redo (not just fallback to do)
         undo: () => {
           try {
             const restored = restoreOp(state.manifest, snapshot);
