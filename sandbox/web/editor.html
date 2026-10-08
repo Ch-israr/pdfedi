@@ -283,7 +283,15 @@
         // start tracking in one gesture. Custom stage-level drag (more reliable
         // than Konva draggable with Transformer). No snapping, no forced axis.
         if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
-          const node = findOpNode(e.target, stage);
+          // If pressed on the transformer (or its handle), use its attached node
+          let target = e.target;
+          if (target.className === 'Transformer' ||
+              (target.getParent && target.getParent()?.className === 'Transformer')) {
+            const tr = target.className === 'Transformer' ? target : target.getParent();
+            const attached = tr.nodes?.()[0];
+            if (attached) target = attached;
+          }
+          const node = findOpNode(target, stage);
           if (node) {
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
               selectObject(node);
