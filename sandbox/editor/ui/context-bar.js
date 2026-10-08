@@ -35,6 +35,8 @@ export function showContextBar(node, op, cb) {
     add_image: buildImageControls,
     add_signature: buildImageControls,
     add_link: buildLinkControls,
+    add_form_field: buildFieldControls,
+    add_stamp: buildStampControls,
   };
   const build = builders[op.op] || buildGenericControls;
   build(bar, node, op, cb);
@@ -266,4 +268,110 @@ function buildGenericControls(bar, node, op, cb) {
   bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
   bar.appendChild(groupSep());
   bar.appendChild(deleteBtn(cb));
+}
+
+function buildFieldControls(bar, node, op, cb) {
+  bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(btn('✎', 'Edit field name/value', () => cb.onEditField()));
+  bar.appendChild(groupSep());
+  bar.appendChild(deleteBtn(cb));
+}
+
+function buildStampControls(bar, node, op, cb) {
+  bar.appendChild(btn('✥', 'Move object (drag)', () => cb.onMoveMode(), { fontSize: '16px' }));
+  bar.appendChild(btn('✎', 'Edit stamp text', () => cb.onEditStamp()));
+  bar.appendChild(groupSep());
+  bar.appendChild(deleteBtn(cb));
+}
+
+/** Escape for safe injection into dialog HTML. */
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
+
+/**
+ * Inline dialog to edit a form field's name and value.
+ * Checkbox fields get a toggle; all other types get a text input.
+ * Commits through cb.onStyle so the change is undoable.
+ */
+export function openFieldEditor(op, cb) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;`;
+  const modal = document.createElement('div');
+  modal.style.cssText = `background:#fff;border-radius:16px;padding:24px;width:360px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:system-ui,sans-serif;`;
+  const isCheckbox = op.fieldType === 'checkbox';
+  modal.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:16px;font-weight:700">Edit form field</h3>
+    <label style="display:block;font-size:12px;color:#64748b;margin-bottom:4px">Field name</label>
+    <input id="ffName" value="${escapeHtml(op.name)}"
+      style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;box-sizing:border-box;margin-bottom:12px">
+    <label style="display:block;font-size:12px;color:#64748b;margin-bottom:4px">Value</label>
+    ${isCheckbox
+      ? `<label style="display:flex;align-items:center;gap:8px;font-size:14px;margin-bottom:12px;cursor:pointer">
+           <input type="checkbox" id="ffValue" ${op.value ? 'checked' : ''} style="width:18px;height:18px"> Checked
+         </label>`
+      : `<input id="ffValue" value="${escapeHtml(op.value)}"
+           style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;box-sizing:border-box;margin-bottom:12px">`}
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="ffCancel" style="background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="ffSave" style="background:#2f6bff;color:#fff;border:0;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Save</button>
+    </div>`;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  const nameInp = modal.querySelector('#ffName');
+  const valInp = modal.querySelector('#ffValue');
+  const close = () => overlay.remove();
+  modal.querySelector('#ffCancel').onclick = close;
+  overlay.onclick = e => { if (e.target === overlay) close(); };
+  modal.querySelector('#ffSave').onclick = () => {
+    const style = { name: nameInp.value.trim() };
+    style.value = isCheckbox ? valInp.checked : valInp.value;
+    close();
+    cb.onStyle(style);
+  };
+  modal.querySelector('#ffSave').onkeydown = e => {
+    if (e.key === 'Enter') modal.querySelector('#ffSave').click();
+  };
+  nameInp.focus();
+  nameInp.select();
+}
+
+/**
+ * Inline dialog to edit a stamp's text.
+ * Commits through cb.onStyle so the change is undoable.
+ */
+export function openStampEditor(op, cb) {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = `position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;`;
+  const modal = document.createElement('div');
+  modal.style.cssText = `background:#fff;border-radius:16px;padding:24px;width:340px;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);font-family:system-ui,sans-serif;`;
+  modal.innerHTML = `
+    <h3 style="margin:0 0 12px;font-size:16px;font-weight:700">Edit stamp</h3>
+    <label style="display:block;font-size:12px;color:#64748b;margin-bottom:4px">Stamp text</label>
+    <input id="stText" value="${escapeHtml(op.text)}"
+      style="width:100%;padding:10px 12px;border:1px solid #cbd5e1;border-radius:9px;font-size:14px;box-sizing:border-box;margin-bottom:14px">
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button id="stCancel" style="background:#fff;border:1px solid #cbd5e1;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Cancel</button>
+      <button id="stSave" style="background:#2f6bff;color:#fff;border:0;border-radius:9px;padding:9px 16px;font-weight:600;cursor:pointer">Save</button>
+    </div>`;
+  overlay.appendChild(modal);
+  document.body.appendChild(overlay);
+  const inp = modal.querySelector('#stText');
+  const close = () => overlay.remove();
+  modal.querySelector('#stCancel').onclick = close;
+  overlay.onclick = e => { if (e.target === overlay) close(); };
+  const save = () => {
+    const t = inp.value.trim();
+    close();
+    if (t) cb.onStyle({ text: t.toUpperCase() });
+  };
+  modal.querySelector('#stSave').onclick = save;
+  inp.onkeydown = e => { if (e.key === 'Enter') save(); };
+  inp.focus();
+  inp.select();
 }

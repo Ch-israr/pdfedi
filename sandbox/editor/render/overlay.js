@@ -125,8 +125,11 @@ export class OverlayManager {
             opacity: op.opacity ?? 1,
           });
         } else if (op.shape === 'line' || op.shape === 'arrow') {
+          // Free-angle: use explicit endpoints when present — never force horizontal
+          const ex = op.x2 !== undefined ? op.x2 : op.x + op.w;
+          const ey = op.y2 !== undefined ? op.y2 : op.y;
           const [x1, y1] = pdfToScreenPoint(op.x, op.y, heightPt, s);
-          const [x2, y2] = pdfToScreenPoint(op.x + op.w, op.y, heightPt, s);
+          const [x2, y2] = pdfToScreenPoint(ex, ey, heightPt, s);
           node = new Konva.Arrow({
             ...common,
             points: [x1, y1, x2, y2],

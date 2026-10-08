@@ -492,22 +492,34 @@ registerTool({
     this._preview = null;
     this._start = null;
 
-    const sr = {
-      x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
-      width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
-    };
-    // For lines/arrows, only the length matters (they're 1D)
     const isLineShape = this.shape === 'line' || this.shape === 'arrow';
-    const minDimShape = isLineShape
-      ? Math.hypot(sr.width, sr.height)
-      : Math.min(sr.width, sr.height);
-    if (minDimShape < 5) return;
+    let op;
+    if (isLineShape) {
+      // Free-angle line/arrow: the user controls the exact start and end
+      // points. Store both endpoints explicitly — never force horizontal,
+      // vertical, straighten, or snap the angle.
+      if (Math.hypot(pos.x - x1, pos.y - y1) < 5) return;
+      const [px1, py1] = ctx.screenToPdf(x1, y1, pageIndex);
+      const [px2, py2] = ctx.screenToPdf(pos.x, pos.y, pageIndex);
+      op = {
+        op: 'add_shape', page: pageIndex,
+        shape: this.shape, x: px1, y: py1, x2: px2, y2: py2,
+        w: Math.abs(px2 - px1), h: Math.abs(py2 - py1), // bounding box (compat)
+        stroke: '#000000', thickness: 2,
+      };
+    } else {
+      const sr = {
+        x: Math.min(x1, pos.x), y: Math.min(y1, pos.y),
+        width: Math.abs(pos.x - x1), height: Math.abs(pos.y - y1),
+      };
+      if (Math.min(sr.width, sr.height) < 5) return;
 
-    const pr = ctx.screenRectToPdf(sr, pageIndex);
-    const op = {
-      op: 'add_shape', page: pageIndex, ...pr,
-      shape: this.shape, stroke: '#000000', thickness: 2,
-    };
+      const pr = ctx.screenRectToPdf(sr, pageIndex);
+      op = {
+        op: 'add_shape', page: pageIndex, ...pr,
+        shape: this.shape, stroke: '#000000', thickness: 2,
+      };
+    }
     let createdOp = null; // the op with ID, captured for undo/redo
     const doCreate = () => {
       if (createdOp) {

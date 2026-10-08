@@ -124,17 +124,22 @@ export async function finalizeInBrowser(originalBytes, manifest, assets, onProgr
             opacity: op.opacity ?? 1,
           });
         } else if (op.shape === 'line' || op.shape === 'arrow') {
+          // Free-angle: use explicit endpoints when present
+          const ex = op.x2 !== undefined ? op.x2 : op.x + op.w;
+          const ey = op.y2 !== undefined ? op.y2 : op.y;
           page.drawLine({
             start: { x: op.x, y: op.y },
-            end: { x: op.x + op.w, y: op.y },
+            end: { x: ex, y: ey },
             thickness: th, color, opacity: op.opacity ?? 1,
           });
           if (op.shape === 'arrow') {
-            // Arrowhead: two short lines at 30° from the tip
-            const len = Math.hypot(op.w, 0) || 1;
+            // Arrowhead: two short lines at ~30° from the tip, following the
+            // line's actual angle (not assumed horizontal)
+            const dx = ex - op.x, dy = ey - op.y;
+            const len = Math.hypot(dx, dy) || 1;
             const ahLen = Math.min(14, len * 0.25);
-            const angle = Math.atan2(0, op.w); // horizontal in our model
-            const tipX = op.x + op.w, tipY = op.y;
+            const angle = Math.atan2(dy, dx);
+            const tipX = ex, tipY = ey;
             for (const da of [Math.PI - 0.5, Math.PI + 0.5]) {
               const a = angle + da;
               page.drawLine({

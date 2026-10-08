@@ -150,7 +150,7 @@
     import { getTool } from './editor/tools/registry.js';
     import './editor/tools/text.js'; // registers improved text tool (overrides)
     import { openSignatureModal } from './editor/ui/signature-modal.js';
-    import { showContextBar, hideContextBar, refreshContextBar } from './editor/ui/context-bar.js';
+    import { showContextBar, hideContextBar, refreshContextBar, openFieldEditor, openStampEditor } from './editor/ui/context-bar.js';
     import { styleTextNode } from './editor/tools/text.js';
     import { finalizeInBrowser } from './editor/finalize/browser.js';
     import { applyRedaction, verifyRedaction } from './editor/finalize/redact.js';
@@ -215,6 +215,21 @@
     }
 
     // ---------- Workspace ----------
+    /**
+     * Walk up from a Konva target to the nearest node carrying an opId.
+     * (Robust replacement for findAncestor('[opId]') — attribute selectors
+     * are not reliable across Konva versions, and this also covers children
+     * of Labels/Groups such as stamp text or field parts.)
+     */
+    function findOpNode(target, stage) {
+      let n = target;
+      while (n && n !== stage) {
+        if (n.getAttr && n.getAttr('opId')) return n;
+        n = (typeof n.getParent === 'function') ? n.getParent() : null;
+      }
+      return null;
+    }
+
     function buildWorkspace() {
       const ws = document.getElementById('workspace');
       ws.innerHTML = '';
@@ -253,25 +268,29 @@
       stage.on('pointerdown', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerDown) tool.onPointerDown(editorCtx(), e);
-        // Custom drag for selected objects (more reliable than Konva draggable with Transformer)
-        if (state.activeTool === 'select' && state.selected && e.target !== stage) {
-          let node = e.target;
-          if (!node.getAttr('opId')) {
-            node = node.findAncestor('[opId]', true);
-          }
-          if (node && node.getAttr('opId') === state.selected.getAttr('opId')) {
-            // Start custom drag
-            const opId = node.getAttr('opId');
+        // Free drag & drop: grab ANY object on the first press — select and
+        // start tracking in one gesture. Custom stage-level drag (more reliable
+        // than Konva draggable with Transformer). No snapping, no forced axis.
+        if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
+          const node = findOpNode(e.target, stage);
+          if (node) {
+            if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
+              selectObject(node);
+            }
+            const selNode = state.selected;
+            const opId = selNode.getAttr('opId');
             const op = state.manifest.operations.find(o => o.id === opId);
-            if (op) {
+            if (op && selNode && !selNode.isDestroyed()) {
               const pos = stage.getPointerPosition();
               state._drag = {
-                opId, op, node: state.selected,
+                opId, op, node: selNode,
                 startPointerX: pos.x, startPointerY: pos.y,
-                startNodeX: state.selected.x(), startNodeY: state.selected.y(),
+                startNodeX: selNode.x(), startNodeY: selNode.y(),
                 startOpX: op.x, startOpY: op.y,
+                startOpX2: op.x2, startOpY2: op.y2,
                 moved: false,
               };
+              stage.container().style.cursor = 'grabbing';
             }
           }
         }
@@ -279,6 +298,14 @@
       stage.on('pointermove', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerMove) tool.onPointerMove(editorCtx(), e);
+        // Hover affordance in select mode: grab cursor over any object
+        if (state.activeTool === 'select' && !state._drag) {
+          const hov = e.target !== stage ? findOpNode(e.target, stage) : null;
+          const want = moveModeActive ? 'grab' : (hov ? 'grab' : 'default');
+          if (stage.container().style.cursor !== want) {
+            stage.container().style.cursor = want;
+          }
+        }
         // Custom drag move
         if (state._drag && state.activeTool === 'select') {
           const d = state._drag;
@@ -294,6 +321,13 @@
             const s = state.overlay.scale;
             d.op.x = d.startOpX + (dx / s);
             d.op.y = d.startOpY + (-dy / s);
+            // Lines/arrows carry explicit endpoints — translate them too
+            if (d.startOpX2 !== undefined) {
+              d.op.x2 = d.startOpX2 + (dx / s);
+              d.op.y2 = d.startOpY2 + (-dy / s);
+            }
+            // Keep the floating toolbar attached to the moving object
+            refreshContextBar();
           }
         }
       });
@@ -301,6 +335,9 @@
         const tool = getTool(state.activeTool);
         if (tool?.onPointerUp) tool.onPointerUp(editorCtx(), e);
         commitDrag();
+        if (state.activeTool === 'select') {
+          stage.container().style.cursor = moveModeActive ? 'grab' : 'default';
+        }
       });
       function commitDrag() {
         // Custom drag end - commit to history
@@ -325,18 +362,24 @@
             const dPdfY = -dy / s;
             const endOpX = d.startOpX + dPdfX;
             const endOpY = d.startOpY + dPdfY;
+            const hasX2 = d.startOpX2 !== undefined;
+            const endOpX2 = hasX2 ? d.startOpX2 + dPdfX : undefined;
+            const endOpY2 = hasX2 ? d.startOpY2 + dPdfY : undefined;
             const startOpX = d.startOpX, startOpY = d.startOpY;
+            const startOpX2 = d.startOpX2, startOpY2 = d.startOpY2;
             const startNodeX = d.startNodeX, startNodeY = d.startNodeY;
             try {
               state.history.execute({
                 op: { op: 'move_object', targetId: op.id },
                 do: () => {
                   op.x = endOpX; op.y = endOpY;
+                  if (hasX2) { op.x2 = endOpX2; op.y2 = endOpY2; }
                   const n = state.overlay.findNodeByOpId(op.id);
                   if (n && !n.isDestroyed()) { n.x(endX); n.y(endY); n.getLayer()?.batchDraw(); }
                 },
                 undo: () => {
                   op.x = startOpX; op.y = startOpY;
+                  if (hasX2) { op.x2 = startOpX2; op.y2 = startOpY2; }
                   const n = state.overlay.findNodeByOpId(op.id);
                   if (n && !n.isDestroyed()) {
                     n.x(startNodeX); n.y(startNodeY); n.getLayer()?.batchDraw();
@@ -358,26 +401,27 @@
       stage.on('click', e => {
         if (state.activeTool !== 'select') return;
         if (e.target === stage) { clearSelection(); return; }
-        // Find the node with opId (might be a child or transformer handle)
-        let node = e.target;
-        if (!node.getAttr('opId')) {
-          node = node.findAncestor('[opId]', true) || node;
-        }
         // If clicked on transformer, find its attached node
-        if (node.className === 'Transformer') {
-          const attached = node.nodes?.()[0];
-          if (attached) node = attached;
+        let target = e.target;
+        if (target.className === 'Transformer' ||
+            (target.getParent && target.getParent()?.className === 'Transformer')) {
+          const tr = target.className === 'Transformer' ? target : target.getParent();
+          const attached = tr.nodes?.()[0];
+          if (attached) target = attached;
           else return;
         }
-        if (node.getAttr('opId')) {
-          selectObject(node);
-        }
+        // Find the node with opId (might be a child, e.g. stamp text or field part)
+        const node = findOpNode(target, stage);
+        if (!node) return;
+        // Already selected → keep selection (avoids transformer flicker and
+        // preserves move-mode across drags)
+        if (state.selected && state.selected.getAttr('opId') === node.getAttr('opId')) return;
+        selectObject(node);
       });
       stage.on('dblclick', e => {
         if (e.target === stage) return;
-        // Find the node with opId (might be clicked on child)
-        const node = e.target.getAttr('opId') ? e.target :
-          e.target.findAncestor('[opId]', true);
+        // Find the node with opId (might be clicked on a child)
+        const node = findOpNode(e.target, stage);
         if (!node) return;
         // If it's a text object, enter edit mode regardless of active tool
         const opId = node.getAttr('opId');
@@ -388,6 +432,12 @@
             textTool.onDblClick(editorCtx(), e, node);
             return;
           }
+        }
+        // Double-click a form field → edit its value directly
+        if (op && op.op === 'add_form_field') {
+          selectObject(node);
+          openFieldEditor(op, makeContextCallbacks(node, op));
+          return;
         }
         // Otherwise, delegate to active tool
         const tool = getTool(state.activeTool);
@@ -436,8 +486,16 @@
       clearSelection();
       state.selected = node;
       const layer = node.getLayer();
+      const opId = node.getAttr('opId');
+      const selOp = state.manifest.operations.find(o => o.id === opId);
+      // Lines/arrows carry their angle in explicit endpoints — transformer
+      // rotation would fight that, so disable it for them (free-angle drawing
+      // already provides any angle).
+      const isLineShape = selOp?.op === 'add_shape' &&
+        (selOp.shape === 'line' || selOp.shape === 'arrow');
       transformer = new Konva.Transformer({
-        rotateEnabled: true, enabledAnchors: ['top-left','top-right','bottom-left','bottom-right'],
+        rotateEnabled: !isLineShape,
+        enabledAnchors: ['top-left','top-right','bottom-left','bottom-right'],
       });
       layer.add(transformer);
       transformer.nodes([node]);
@@ -458,18 +516,32 @@
         // Convert screen position to PDF coords
         const newPdfX = newX / s;
         const newPdfY = pageH - (newY / s);
+        // Lines/arrows carry free-angle endpoints — transform those, not a box
+        const isLineOp = op.op === 'add_shape' &&
+          (op.shape === 'line' || op.shape === 'arrow') && op.x2 !== undefined;
         const before = { x: op.x, y: op.y, rotation: op.rotation || 0,
-          w: op.w, h: op.h, fontSize: op.fontSize };
+          w: op.w, h: op.h, fontSize: op.fontSize, x2: op.x2, y2: op.y2 };
         const applyTransform = () => {
-          op.x = newPdfX;
-          op.y = newPdfY;
-          op.rotation = newRot;
-          // Bake scale into dimensions
-          if (op.op === 'add_text' && op.fontSize) {
-            op.fontSize = Math.max(6, op.fontSize * newScaleX);
+          if (isLineOp) {
+            // Endpoints from the transformed node (points are local; add position+scale)
+            const pts = node.points();
+            const ax1 = newX + pts[0] * newScaleX, ay1 = newY + pts[1] * newScaleY;
+            const ax2 = newX + pts[2] * newScaleX, ay2 = newY + pts[3] * newScaleY;
+            op.x = ax1 / s; op.y = pageH - (ay1 / s);
+            op.x2 = ax2 / s; op.y2 = pageH - (ay2 / s);
+            op.w = Math.abs(op.x2 - op.x); op.h = Math.abs(op.y2 - op.y);
+            op.rotation = 0;
+          } else {
+            op.x = newPdfX;
+            op.y = newPdfY;
+            op.rotation = newRot;
+            // Bake scale into dimensions
+            if (op.op === 'add_text' && op.fontSize) {
+              op.fontSize = Math.max(6, op.fontSize * newScaleX);
+            }
+            if (op.w !== undefined) op.w = op.w * newScaleX;
+            if (op.h !== undefined) op.h = op.h * newScaleY;
           }
-          if (op.w !== undefined) op.w = op.w * newScaleX;
-          if (op.h !== undefined) op.h = op.h * newScaleY;
           try {
             const pageIndex = op.page;
             state.overlay.removeOp(pageIndex, op.id);
@@ -481,6 +553,7 @@
         };
         const revertTransform = () => {
           op.x = before.x; op.y = before.y; op.rotation = before.rotation;
+          if (before.x2 !== undefined) { op.x2 = before.x2; op.y2 = before.y2; }
           if (before.w !== undefined) op.w = before.w;
           if (before.h !== undefined) op.h = before.h;
           if (before.fontSize !== undefined) op.fontSize = before.fontSize;
@@ -506,7 +579,6 @@
       });
       layer.batchDraw();
       // Contextual floating toolbar (replaces the old side properties panel)
-      const opId = node.getAttr('opId');
       const op = state.manifest.operations.find(o => o.id === opId);
       if (op) {
         node.setAttr('_objType', op.op);
@@ -586,20 +658,32 @@
             before[k] = op[k];
             after[k] = style[k];
           }
+          // Form fields and stamps render their value/text into the node,
+          // so re-render the node instead of patching style attributes.
+          const needsRerender = op.op === 'add_form_field' || op.op === 'add_stamp';
+          const refresh = (vals) => {
+            if (needsRerender) {
+              const pageIndex = op.page;
+              state.overlay.removeOp(pageIndex, op.id);
+              const fresh = state.overlay.renderOp(pageIndex, op, state.assets);
+              if (fresh && !fresh.isDestroyed()) selectObject(fresh);
+            } else {
+              const cur = state.selected;
+              const target = (cur && !cur.isDestroyed() && cur.getAttr('opId') === op.id) ? cur : node;
+              if (target && !target.isDestroyed()) {
+                applyStyleToNode(target, op, vals);
+                showContextBar(target, op, makeContextCallbacks(target, op));
+              }
+            }
+          };
           state.history.execute({
             op: { op: 'style_object', targetId: op.id, style: { ...after } },
-            do: () => {
-              Object.assign(op, after);
-              applyStyleToNode(node, op, after);
-              showContextBar(node, op, makeContextCallbacks(node, op));
-            },
-            undo: () => {
-              Object.assign(op, before);
-              applyStyleToNode(node, op, before);
-              showContextBar(node, op, makeContextCallbacks(node, op));
-            },
+            do: () => { Object.assign(op, after); refresh(after); },
+            undo: () => { Object.assign(op, before); refresh(before); },
           });
         },
+        onEditField: () => openFieldEditor(op, makeContextCallbacks(node, op)),
+        onEditStamp: () => openStampEditor(op, makeContextCallbacks(node, op)),
         onDuplicate: () => duplicateObject(node, op),
         onDelete: () => {
           // Use global selection (not closure node which may be stale)
@@ -717,7 +801,10 @@
         },
       });
     }
-    // Move mode: explicit grab-to-move with visual feedback
+    // Move mode: explicit grab-to-move with visual feedback.
+    // Movement itself is handled by the stage-level custom drag (same as normal
+    // select mode); this mode only provides the grab cursor affordance and
+    // exits when the user clicks away.
     let moveModeActive = false;
     function enterMoveMode(node, op) {
       if (moveModeActive) return;
@@ -728,29 +815,22 @@
       hideContextBar();
       const exitMove = () => {
         moveModeActive = false;
-        stage.container().style.cursor = '';
+        stage.container().style.cursor = 'default';
         stage.off('click.moveMode');
-        // Re-show toolbar
-        if (state.selected === node) {
-          const freshOp = state.manifest.operations.find(o => o.id === node.getAttr('opId'));
-          if (freshOp) showContextBar(node, freshOp, makeContextCallbacks(node, freshOp));
+        // Re-show toolbar, attached at the object's (possibly new) position
+        const sel = state.selected;
+        if (sel && !sel.isDestroyed()) {
+          const freshOp = state.manifest.operations.find(o => o.id === sel.getAttr('opId'));
+          if (freshOp) showContextBar(sel, freshOp, makeContextCallbacks(sel, freshOp));
         }
       };
       // Exit on click outside the node or double-click
       stage.on('click.moveMode', e => {
-        if (e.target === stage || e.target.getAttr('opId') !== node.getAttr('opId')) {
+        if (e.target === stage || findOpNode(e.target, stage)?.getAttr('opId') !== node.getAttr('opId')) {
           exitMove();
         }
       });
       node.on('dblclick.moveMode', () => exitMove());
-      // Change to grabbing cursor while dragging
-      node.on('dragstart.moveMode', () => {
-        stage.container().style.cursor = 'grabbing';
-      });
-      node.on('dragend.moveMode', () => {
-        stage.container().style.cursor = 'grab';
-        // Stay in move mode until user clicks away
-      });
       // Store exit function for cleanup
       node.setAttr('_exitMove', exitMove);
     }
@@ -1106,7 +1186,11 @@
           const dPdfX = dx / s;
           const dPdfY = -dy / s;
           const beforeX = op.x, beforeY = op.y;
+          const hasX2 = op.x2 !== undefined;
+          const beforeX2 = op.x2, beforeY2 = op.y2;
           const afterX = beforeX + dPdfX, afterY = beforeY + dPdfY;
+          const afterX2 = hasX2 ? beforeX2 + dPdfX : undefined;
+          const afterY2 = hasX2 ? beforeY2 + dPdfY : undefined;
           // Move node directly
           try {
             selNode.x(selNode.x() + dx);
@@ -1118,9 +1202,11 @@
               op: { op: 'nudge_object', targetId: op.id },
               do: () => {
                 op.x = afterX; op.y = afterY;
+                if (hasX2) { op.x2 = afterX2; op.y2 = afterY2; }
               },
               undo: () => {
                 op.x = beforeX; op.y = beforeY;
+                if (hasX2) { op.x2 = beforeX2; op.y2 = beforeY2; }
                 const n = state.overlay.findNodeByOpId(op.id);
                 if (n && !n.isDestroyed()) {
                   n.x(n.x() - dx); n.y(n.y() - dy);
@@ -1131,6 +1217,7 @@
           } catch (err) {
             console.warn('Nudge history failed:', err);
             op.x = afterX; op.y = afterY;
+            if (hasX2) { op.x2 = afterX2; op.y2 = afterY2; }
           }
           refreshContextBar();
           updateStatus();

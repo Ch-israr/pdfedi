@@ -10,6 +10,16 @@
 
 import { registerTool } from './registry.js';
 
+/** Walk up to the nearest node (or self) carrying an opId. */
+function findOpNode(node) {
+  let n = node;
+  while (n) {
+    if (n.getAttr && n.getAttr('opId')) return n;
+    n = (typeof n.getParent === 'function') ? n.getParent() : null;
+  }
+  return null;
+}
+
 function makeEditable(textNode, stage, onCommit) {
   // Hide the Konva text, show a textarea at the same position
   const absPos = textNode.getAbsolutePosition();
@@ -79,11 +89,10 @@ registerTool({
     // Clicked on an existing object? Select it (don't create new).
     // This is the critical move-vs-create distinction.
     if (evt.target !== stage) {
-      const clickedOpId = evt.target.getAttr('opId') ||
-        evt.target.findAncestor('[opId]', true)?.getAttr('opId');
+      const opNode = findOpNode(evt.target);
+      const clickedOpId = opNode?.getAttr('opId');
       if (clickedOpId) {
-        const node = ctx.overlay.findNodeByOpId?.(clickedOpId) ||
-          evt.target.findAncestor('[opId]', true) || evt.target;
+        const node = ctx.overlay.findNodeByOpId?.(clickedOpId) || opNode;
         ctx.selectObject(node);
         return;
       }
