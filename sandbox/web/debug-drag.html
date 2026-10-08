@@ -39,6 +39,33 @@
 
   let _drag = null;
   const activeTool = 'select';
+  let selected = null;
+  let transformer = null;
+  let bar = null;
+
+  // Replicates the editor's selectObject: Transformer + floating bar div
+  // appended to the stage container DURING pointerdown.
+  function selectObject(node) {
+    if (transformer) transformer.destroy();
+    if (bar) bar.remove();
+    selected = node;
+    transformer = new Konva.Transformer({ rotateEnabled: true });
+    layer.add(transformer);
+    transformer.nodes([node]);
+    layer.batchDraw();
+    bar = document.createElement('div');
+    bar.textContent = 'TOOLBAR';
+    bar.style.cssText = 'position:absolute;z-index:30;background:#fff;border:1px solid #999;' +
+      'padding:6px 10px;font-size:12px;pointer-events:auto;';
+    const container = stage.container();
+    container.style.position = 'relative';
+    container.appendChild(bar);
+    const r = node.getClientRect();
+    const cr = container.getBoundingClientRect();
+    bar.style.left = (r.x - cr.left + r.width / 2 - 40) + 'px';
+    bar.style.top = (r.y - cr.top - 40) + 'px';
+    log('  selectObject done, bar at ' + bar.style.left + ',' + bar.style.top);
+  }
 
   stage.on('pointerdown', e => {
     log('POINTERDOWN target=' + (e.target === stage ? 'STAGE' : e.target.className) +
@@ -47,6 +74,11 @@
       const node = findOpNode(e.target, stage);
       log('  findOpNode -> ' + (node ? node.className + ' opId=' + node.getAttr('opId') : 'null'));
       if (node) {
+        if (!selected || selected.getAttr('opId') !== node.getAttr('opId')) {
+          log('  calling selectObject...');
+          selectObject(node);
+          log('  selectObject returned');
+        }
         const pos = stage.getPointerPosition();
         log('  pointerPos=' + JSON.stringify(pos));
         _drag = { node, sx: pos.x, sy: pos.y, nx: node.x(), ny: node.y(), moved: false };
