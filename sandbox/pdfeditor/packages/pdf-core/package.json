@@ -1,0 +1,33 @@
+{
+  "dependencies": {
+    "@pdfeditor/shared": "workspace:*",
+    "pdf-lib": "^1.17.1",
+    "zod": "^3.24.1"
+  },
+  "description": "Pure, framework-free PDF operation helpers shared by web and api",
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "name": "@pdfeditor/pdf-core",
+  "private": true,
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "clean": "rm -rf dist",
+    "dev": "tsc -p tsconfig.json --watch",
+    "lint": "echo \"no lint configured\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "types": "./dist/index.d.ts",
+  "version": "0.1.0",
+  "type": "module"
+}

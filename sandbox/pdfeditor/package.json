@@ -1,0 +1,21 @@
+{
+  "name": "pdfeditor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Privacy-first web PDF editor — monorepo",
+  "packageManager": "pnpm@10.34.6",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --parallel",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "clean": "turbo run clean && rm -rf node_modules"
+  },
+  "devDependencies": {
+    "turbo": "^2.5.4",
+    "typescript": "^5.7.2"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,1 @@
+{"compilerOptions":{"module":"NodeNext","moduleResolution":"NodeNext","outDir":"dist","rootDir":"src","target":"ES2022"},"extends":"../../tsconfig.base.json","include":["src"],"references":[{"path":"../../packages/shared"},{"path":"../../packages/pdf-core"}]}
