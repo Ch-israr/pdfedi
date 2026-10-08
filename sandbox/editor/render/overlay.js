@@ -132,6 +132,7 @@ export class OverlayManager {
             points: [x1, y1, x2, y2],
             stroke: op.stroke || '#000000',
             strokeWidth: (op.thickness || 2) * s,
+            hitStrokeWidth: 20, // Wide hit area for easy selection
             opacity: op.opacity ?? 1,
             pointerLength: op.shape === 'arrow' ? 12 * s : 0,
             pointerWidth: op.shape === 'arrow' ? 10 * s : 0,
