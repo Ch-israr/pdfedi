@@ -261,6 +261,21 @@
       }
     }
 
+    // TEMPORARY drag debug — remove after fix
+    window.__dragLog = [];
+    function __dlog(...a) {
+      window.__dragLog.push(a.join(' '));
+      let el = document.getElementById('__draglog');
+      if (!el) {
+        el = document.createElement('div');
+        el.id = '__draglog';
+        el.style.cssText = 'position:fixed;right:0;top:0;width:380px;height:100vh;overflow-y:auto;background:#0f172a;color:#a5f3a5;z-index:9999;font:11px monospace;padding:8px;white-space:pre-wrap;';
+        document.body.appendChild(el);
+      }
+      el.textContent = window.__dragLog.join('\n');
+      el.scrollTop = el.scrollHeight;
+    }
+
     function wireStageEvents(pageIndex) {
       const entry = state.overlay.stages.get(pageIndex);
       if (!entry) return;
@@ -268,11 +283,13 @@
       stage.on('pointerdown', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerDown) tool.onPointerDown(editorCtx(), e);
+        __dlog('PDOWN tool=' + state.activeTool + ' target=' + (e.target === stage ? 'STAGE' : e.target.className) + ' _drag=' + !!state._drag);
         // Free drag & drop: grab ANY object on the first press — select and
         // start tracking in one gesture. Custom stage-level drag (more reliable
         // than Konva draggable with Transformer). No snapping, no forced axis.
         if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
           const node = findOpNode(e.target, stage);
+          __dlog('  findOpNode=' + (node ? node.className + '/' + node.getAttr('opId') : 'null'));
           if (node) {
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
               selectObject(node);
@@ -310,6 +327,7 @@
         if (state._drag && state.activeTool === 'select') {
           const d = state._drag;
           const pos = stage.getPointerPosition();
+          __dlog('PMOVE pos=' + JSON.stringify(pos));
           const dx = pos.x - d.startPointerX;
           const dy = pos.y - d.startPointerY;
           if (Math.abs(dx) > 2 || Math.abs(dy) > 2) d.moved = true;
