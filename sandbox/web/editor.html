@@ -283,7 +283,12 @@
       stage.on('pointerdown', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerDown) tool.onPointerDown(editorCtx(), e);
-        __dlog('PDOWN tool=' + state.activeTool + ' target=' + (e.target === stage ? 'STAGE' : e.target.className) + ' _drag=' + !!state._drag);
+        const pp = stage.getPointerPosition();
+        const layer = state.overlay.getLayer(pageIndex);
+        const kids = layer ? layer.children.map(c => c.className + '@' + Math.round(c.x()) + ',' + Math.round(c.y()) + (c.getAttr('opId') ? '#'+c.getAttr('opId').slice(0,6) : '')).join('|') : 'nolayer';
+        let ise = 'n/a';
+        try { const hit = stage.getIntersection(pp); ise = hit ? hit.className + '/' + (hit.getAttr('opId')||'?').slice(0,6) : 'null'; } catch(err) { ise = 'err'; }
+        __dlog('PDOWN tool=' + state.activeTool + ' target=' + (e.target === stage ? 'STAGE' : e.target.className) + ' pos=' + JSON.stringify(pp) + ' intersect=' + ise + ' kids=' + kids);
         // Free drag & drop: grab ANY object on the first press — select and
         // start tracking in one gesture. Custom stage-level drag (more reliable
         // than Konva draggable with Transformer). No snapping, no forced axis.
