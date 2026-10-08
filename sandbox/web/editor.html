@@ -261,36 +261,16 @@
       }
     }
 
-    // TEMPORARY drag debug — remove after fix
-    window.__dragLog = [];
-    function __dlog(...a) {
-      window.__dragLog.push(a.join(' '));
-      let el = document.getElementById('__draglog');
-      if (!el) {
-        el = document.createElement('div');
-        el.id = '__draglog';
-        el.style.cssText = 'position:fixed;right:0;top:0;width:380px;height:100vh;overflow-y:auto;background:#0f172a;color:#a5f3a5;z-index:9999;font:11px monospace;padding:8px;white-space:pre-wrap;';
-        document.body.appendChild(el);
-      }
-      el.textContent = window.__dragLog.join('\n');
-      el.scrollTop = el.scrollHeight;
-    }
-    // Page-load Konva integrity check (no interaction needed)
-    window.addEventListener('load', () => {
-      setTimeout(() => {
+    // Konva has no isDestroyed() method — polyfill it: a node counts as
+    // destroyed once it has been detached from its parent/stage
+    // (Konva's destroy() removes the node from its parent).
+    if (typeof Konva.Node.prototype.isDestroyed !== 'function') {
+      Konva.Node.prototype.isDestroyed = function() {
         try {
-          const t = new Konva.Text({ x: 0, y: 0, text: 'probe' });
-          __dlog('KONVA_PROBE: Text proto.isDestroyed=' + typeof Konva.Text.prototype.isDestroyed +
-            ' node.isDestroyed=' + typeof t.isDestroyed +
-            ' node.x=' + typeof t.x +
-            ' node.getAttr=' + typeof t.getAttr +
-            ' instanceof Text=' + (t instanceof Konva.Text));
-          t.destroy();
-        } catch (err) {
-          __dlog('KONVA_PROBE EXCEPTION: ' + err.message);
-        }
-      }, 2000);
-    });
+          return !this.getParent() && !this.getStage();
+        } catch { return true; }
+      };
+    }
 
     function wireStageEvents(pageIndex) {
       const entry = state.overlay.stages.get(pageIndex);
@@ -299,40 +279,20 @@
       stage.on('pointerdown', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerDown) tool.onPointerDown(editorCtx(), e);
-        const pp = stage.getPointerPosition();
-        const layer = state.overlay.getLayer(pageIndex);
-        const kids = layer ? layer.children.map(c => c.className + '@' + Math.round(c.x()) + ',' + Math.round(c.y()) + (c.getAttr('opId') ? '#'+c.getAttr('opId').slice(0,6) : '')).join('|') : 'nolayer';
-        let ise = 'n/a';
-        try { const hit = stage.getIntersection(pp); ise = hit ? hit.className + '/' + (hit.getAttr('opId')||'?').slice(0,6) : 'null'; } catch(err) { ise = 'err'; }
-        __dlog('PDOWN tool=' + state.activeTool + ' target=' + (e.target === stage ? 'STAGE' : e.target.className) + ' pos=' + JSON.stringify(pp) + ' intersect=' + ise + ' kids=' + kids);
         // Free drag & drop: grab ANY object on the first press — select and
         // start tracking in one gesture. Custom stage-level drag (more reliable
         // than Konva draggable with Transformer). No snapping, no forced axis.
+        // Note: Konva has no isDestroyed() method — never call it. A node that
+        // was just hit-tested is alive by definition.
         if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
           const node = findOpNode(e.target, stage);
-          __dlog('  findOpNode=' + (node ? node.className + '/' + node.getAttr('opId') : 'null'));
-          if (node) {
-            __dlog('  node instanceof Konva.Text=' + (node instanceof Konva.Text) +
-              ' instanceof Konva.Node=' + (node instanceof Konva.Node) +
-              ' ctor=' + (node.constructor && node.constructor.name) +
-              ' Konva.Text.proto.isDestroyed=' + typeof Konva.Text.prototype.isDestroyed);
-          }
-          try {
           if (node) {
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
               selectObject(node);
             }
-            // Use the node from hit-testing directly (not state.selected,
-            // which has proven unreliable here). The node is a real Konva
-            // node from the event system.
             const opId = node.getAttr('opId');
             const op = state.manifest.operations.find(o => o.id === opId);
-            const isRealNode = typeof node.isDestroyed === 'function' &&
-              typeof node.x === 'function' && typeof node.getLayer === 'function';
-            if (!isRealNode) {
-              __dlog('  hit node is not a real Konva node, skipping drag');
-            }
-            if (op && isRealNode && !node.isDestroyed()) {
+            if (op) {
               const pos = stage.getPointerPosition();
               state._drag = {
                 opId, op, node,
@@ -343,25 +303,13 @@
                 moved: false,
               };
               stage.container().style.cursor = 'grabbing';
-              __dlog('  _drag SET ok');
-            } else {
-              __dlog('  _drag NOT set: op=' + !!op + ' isRealNode=' + isRealNode);
             }
-          }
-          } catch (err) {
-            const sn = state.selected;
-            __dlog('  EXCEPTION: ' + (err && err.message));
-            __dlog('  selNode type=' + typeof sn + ' ctor=' + (sn && sn.constructor && sn.constructor.name) +
-              ' hasGetAttr=' + !!(sn && sn.getAttr) + ' hasIsDestroyed=' + !!(sn && sn.isDestroyed) +
-              ' keys=' + (sn ? Object.keys(sn).slice(0,8).join(',') : 'null'));
           }
         }
       });
       stage.on('pointermove', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerMove) tool.onPointerMove(editorCtx(), e);
-        window.__pmCount = (window.__pmCount || 0) + 1;
-        if (state._drag) __dlog('PMOVE _drag=1 tool=' + state.activeTool + ' count=' + window.__pmCount);
         // Hover affordance in select mode: grab cursor over any object
         if (state.activeTool === 'select' && !state._drag) {
           const hov = e.target !== stage ? findOpNode(e.target, stage) : null;
@@ -374,7 +322,6 @@
         if (state._drag && state.activeTool === 'select') {
           const d = state._drag;
           const pos = stage.getPointerPosition();
-          __dlog('PMOVE pos=' + JSON.stringify(pos));
           const dx = pos.x - d.startPointerX;
           const dy = pos.y - d.startPointerY;
           if (Math.abs(dx) > 2 || Math.abs(dy) > 2) d.moved = true;

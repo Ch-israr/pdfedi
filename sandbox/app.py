@@ -83,12 +83,6 @@ def editor():
     return (WEB_DIR / "editor.html").read_text()
 
 
-@app.get("/debug-drag", response_class=HTMLResponse)
-def debug_drag():
-    """TEMPORARY drag-event debug page (sandbox only, removed after fix)."""
-    return (WEB_DIR / "debug-drag.html").read_text()
-
-
 @app.get("/api/health")
 def health():
     return {"status": "ok", "sandbox": True, "tools": sorted(TOOLS)}
