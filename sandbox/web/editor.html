@@ -320,7 +320,11 @@
             }
           }
           } catch (err) {
-            __dlog('  EXCEPTION: ' + (err && err.message) + ' | ' + (err && err.stack ? err.stack.split('\n')[1] : ''));
+            const sn = state.selected;
+            __dlog('  EXCEPTION: ' + (err && err.message));
+            __dlog('  selNode type=' + typeof sn + ' ctor=' + (sn && sn.constructor && sn.constructor.name) +
+              ' hasGetAttr=' + !!(sn && sn.getAttr) + ' hasIsDestroyed=' + !!(sn && sn.isDestroyed) +
+              ' keys=' + (sn ? Object.keys(sn).slice(0,8).join(',') : 'null'));
           }
         }
       });
