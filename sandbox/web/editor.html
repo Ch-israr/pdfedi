@@ -300,15 +300,22 @@
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
               selectObject(node);
             }
-            const selNode = state.selected;
-            const opId = selNode.getAttr('opId');
+            // Use the node from hit-testing directly (not state.selected,
+            // which has proven unreliable here). The node is a real Konva
+            // node from the event system.
+            const opId = node.getAttr('opId');
             const op = state.manifest.operations.find(o => o.id === opId);
-            if (op && selNode && !selNode.isDestroyed()) {
+            const isRealNode = typeof node.isDestroyed === 'function' &&
+              typeof node.x === 'function' && typeof node.getLayer === 'function';
+            if (!isRealNode) {
+              __dlog('  hit node is not a real Konva node, skipping drag');
+            }
+            if (op && isRealNode && !node.isDestroyed()) {
               const pos = stage.getPointerPosition();
               state._drag = {
-                opId, op, node: selNode,
+                opId, op, node,
                 startPointerX: pos.x, startPointerY: pos.y,
-                startNodeX: selNode.x(), startNodeY: selNode.y(),
+                startNodeX: node.x(), startNodeY: node.y(),
                 startOpX: op.x, startOpY: op.y,
                 startOpX2: op.x2, startOpY2: op.y2,
                 moved: false,
@@ -316,7 +323,7 @@
               stage.container().style.cursor = 'grabbing';
               __dlog('  _drag SET ok');
             } else {
-              __dlog('  _drag NOT set: op=' + !!op + ' selNode=' + !!selNode);
+              __dlog('  _drag NOT set: op=' + !!op + ' isRealNode=' + isRealNode);
             }
           }
           } catch (err) {
