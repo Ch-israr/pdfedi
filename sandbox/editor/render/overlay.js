@@ -109,6 +109,14 @@ export class OverlayManager {
           fill: op.color || '#000000',
           opacity: op.opacity ?? 1,
         });
+        // Explicit width + padding for reliable hit-testing (Konva auto-width
+        // text can have an offset hit area). The padding makes small text
+        // easier to click without affecting the visual.
+        try {
+          const tw = node.width();
+          node.width(tw + 8);
+          node.hitStrokeWidth(8);
+        } catch (e) {}
         node.setAttr('_scale', s);
         break;
       }
