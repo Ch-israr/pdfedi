@@ -671,35 +671,30 @@
           removeOp(state.manifest, opId);
         } catch (e) { console.warn('removeOp in delete:', e); }
         try {
-          // Aggressive visual removal: try multiple methods
+          // Aggressive visual removal
           state.overlay.removeOp(pageIndex, opId);
           const layer = state.overlay.getLayer(pageIndex);
           if (layer) {
-            // Find by opId attribute
             const found = layer.find(n => n.getAttr('opId') === opId);
             found.forEach(n => {
               try { n.destroy(); } catch (e) {}
             });
-            // Also check transformer
             if (transformer) {
               try { transformer.destroy(); } catch (e) {}
               transformer = null;
             }
-            layer.batchDraw();
+            // NUCLEAR: clear the canvas completely and redraw
+            try { layer.clear(); } catch (e) {}
+            try { layer.batchDraw(); } catch (e) {}
           }
-          // Force FULL stage redraw to clear any cached pixels (ghost fix)
-          const stageEntry = [...state.overlay.stages.values()].find(s => {
-            try { return s.stage.findOne(`[opId="${opId}"]`) || s.pageIndex === pageIndex; }
-            catch (e) { return false; }
-          });
-          // Simpler: redraw all stages
+          // Redraw all stages to ensure no stale pixels
           for (const [, entry] of state.overlay.stages) {
             try {
-              entry.stage.getLayers().forEach(l => {
+              const st = entry.stage;
+              st.getLayers().forEach(l => {
+                try { l.clear(); } catch (e) {}
                 try { l.batchDraw(); } catch (e) {}
               });
-              // Force a synchronous draw
-              try { entry.stage.draw(); } catch (e) {}
             } catch (e) {}
           }
         } catch (e) { console.warn('visual remove in delete:', e); }
