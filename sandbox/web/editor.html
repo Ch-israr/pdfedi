@@ -295,6 +295,12 @@
         if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
           const node = findOpNode(e.target, stage);
           __dlog('  findOpNode=' + (node ? node.className + '/' + node.getAttr('opId') : 'null'));
+          if (node) {
+            __dlog('  node instanceof Konva.Text=' + (node instanceof Konva.Text) +
+              ' instanceof Konva.Node=' + (node instanceof Konva.Node) +
+              ' ctor=' + (node.constructor && node.constructor.name) +
+              ' Konva.Text.proto.isDestroyed=' + typeof Konva.Text.prototype.isDestroyed);
+          }
           try {
           if (node) {
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
