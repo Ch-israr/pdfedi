@@ -275,6 +275,22 @@
       el.textContent = window.__dragLog.join('\n');
       el.scrollTop = el.scrollHeight;
     }
+    // Page-load Konva integrity check (no interaction needed)
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        try {
+          const t = new Konva.Text({ x: 0, y: 0, text: 'probe' });
+          __dlog('KONVA_PROBE: Text proto.isDestroyed=' + typeof Konva.Text.prototype.isDestroyed +
+            ' node.isDestroyed=' + typeof t.isDestroyed +
+            ' node.x=' + typeof t.x +
+            ' node.getAttr=' + typeof t.getAttr +
+            ' instanceof Text=' + (t instanceof Konva.Text));
+          t.destroy();
+        } catch (err) {
+          __dlog('KONVA_PROBE EXCEPTION: ' + err.message);
+        }
+      }, 2000);
+    });
 
     function wireStageEvents(pageIndex) {
       const entry = state.overlay.stages.get(pageIndex);
