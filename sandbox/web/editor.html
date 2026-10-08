@@ -295,6 +295,7 @@
         if (state.activeTool === 'select' && e.target !== stage && !state._drag) {
           const node = findOpNode(e.target, stage);
           __dlog('  findOpNode=' + (node ? node.className + '/' + node.getAttr('opId') : 'null'));
+          try {
           if (node) {
             if (!state.selected || state.selected.getAttr('opId') !== node.getAttr('opId')) {
               selectObject(node);
@@ -317,6 +318,9 @@
             } else {
               __dlog('  _drag NOT set: op=' + !!op + ' selNode=' + !!selNode);
             }
+          }
+          } catch (err) {
+            __dlog('  EXCEPTION: ' + (err && err.message) + ' | ' + (err && err.stack ? err.stack.split('\n')[1] : ''));
           }
         }
       });
