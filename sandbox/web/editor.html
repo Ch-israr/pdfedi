@@ -313,6 +313,9 @@
                 moved: false,
               };
               stage.container().style.cursor = 'grabbing';
+              __dlog('  _drag SET ok');
+            } else {
+              __dlog('  _drag NOT set: op=' + !!op + ' selNode=' + !!selNode);
             }
           }
         }
@@ -320,6 +323,8 @@
       stage.on('pointermove', e => {
         const tool = getTool(state.activeTool);
         if (tool?.onPointerMove) tool.onPointerMove(editorCtx(), e);
+        window.__pmCount = (window.__pmCount || 0) + 1;
+        if (state._drag) __dlog('PMOVE _drag=1 tool=' + state.activeTool + ' count=' + window.__pmCount);
         // Hover affordance in select mode: grab cursor over any object
         if (state.activeTool === 'select' && !state._drag) {
           const hov = e.target !== stage ? findOpNode(e.target, stage) : null;
