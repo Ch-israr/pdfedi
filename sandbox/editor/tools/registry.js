@@ -508,17 +508,41 @@ registerTool({
       op: 'add_shape', page: pageIndex, ...pr,
       shape: this.shape, stroke: '#000000', thickness: 2,
     };
+    let createdOp = null; // the op with ID, captured for undo/redo
+    const doCreate = () => {
+      if (createdOp) {
+        // Redo: restore the same op with original ID (not a duplicate)
+        const { restoreOp } = ctx; // available via editorCtx?
+        // Fallback: use appendManifestOp but it generates new ID - we need restore
+        // For now, manually push with preserved ID
+        const manifest = ctx.manifest;
+        const existing = manifest.operations.findIndex(o => o.id === createdOp.id);
+        if (existing < 0) manifest.operations.push({ ...createdOp });
+        ctx.overlay.renderOp(pageIndex, createdOp, ctx.assets);
+      } else {
+        // First do: create new
+        createdOp = ctx.appendManifestOp(op);
+        ctx.overlay.renderOp(pageIndex, createdOp, ctx.assets);
+      }
+      ctx.updateStatus();
+    };
+    const undoCreate = () => {
+      if (createdOp) {
+        ctx.removeManifestOp(createdOp.id);
+        ctx.overlay.removeOp(pageIndex, createdOp.id);
+        const layer = ctx.overlay.getLayer(pageIndex);
+        if (layer) {
+          try { layer.clear(); } catch (e) {}
+          try { layer.batchDraw(); } catch (e) {}
+        }
+      }
+      ctx.updateStatus();
+    };
     ctx.history.execute({
       op,
-      do: () => {
-        const withId = ctx.appendManifestOp(op);
-        ctx.overlay.renderOp(pageIndex, withId, ctx.assets);
-        this._lastOpId = withId.id;
-      },
-      undo: () => {
-        ctx.removeManifestOp(this._lastOpId);
-        ctx.overlay.removeOp(pageIndex, this._lastOpId);
-      },
+      do: doCreate,
+      undo: undoCreate,
+      redo: doCreate,
     });
   },
 });
