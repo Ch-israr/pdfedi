@@ -322,7 +322,7 @@ export function ElementOverlay({ page }: { page: Page }) {
         italic: false,
       });
     },
-    [editingText, addElement, page.id],
+    [editingText, addElement, page.id, pendingFormat],
   );
 
   // Start editing an existing text element (double-click)
