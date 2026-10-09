@@ -1,6 +1,6 @@
 # ---- deps ----
 FROM node:20-alpine AS deps
-RUN corepack enable && corepack prepare pnpm@10.9.4 --activate
+RUN corepack enable && corepack prepare pnpm@10.34.6 --activate
 WORKDIR /app
 COPY pnpm-workspace.yaml package.json pnpm-lock.yaml* turbo.json ./
 COPY apps/web/package.json apps/web/
@@ -11,7 +11,7 @@ RUN pnpm install --frozen-lockfile || pnpm install
 
 # ---- build ----
 FROM node:20-alpine AS build
-RUN corepack enable && corepack prepare pnpm@10.9.4 --activate
+RUN corepack enable && corepack prepare pnpm@10.34.6 --activate
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
