@@ -10,12 +10,12 @@ RUN pnpm --filter @pdfeditor/shared build \
 
 # ---- run ----
 FROM node:20-alpine AS run
-WORKDIR /app
+WORKDIR /app/apps/web
 ENV NODE_ENV=production
-COPY --from=build /app/apps/web/.next ./apps/web/.next
-COPY --from=build /app/apps/web/public ./apps/web/public
-COPY --from=build /app/apps/web/package.json ./apps/web/
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=build /app/apps/web/.next ./.next
+COPY --from=build /app/apps/web/public ./public
+COPY --from=build /app/apps/web/package.json ./
+COPY --from=build /app/node_modules /app/node_modules
+COPY --from=build /app/apps/web/node_modules ./node_modules
 EXPOSE 3000
-CMD ["node", "apps/web/node_modules/next/dist/bin/next", "start", "-p", "3000"]
+CMD ["node", "node_modules/next/dist/bin/next", "start", "-p", "3000"]
