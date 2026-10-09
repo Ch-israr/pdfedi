@@ -16,6 +16,7 @@ export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVer
   const deletePage = useEditor((s) => s.deletePage);
   const duplicatePage = useEditor((s) => s.duplicatePage);
   const insertBlankPage = useEditor((s) => s.insertBlankPage);
+  const reorderPage = useEditor((s) => s.reorderPage);
 
   return (
     <aside
@@ -61,6 +62,8 @@ export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVer
                 deletePage(page.id);
               }
             }}
+            onMoveUp={() => reorderPage(page.id, i - 1)}
+            onMoveDown={() => reorderPage(page.id, i + 1)}
           />
         ))}
       </div>
@@ -101,6 +104,8 @@ function Thumbnail({
   onRotate,
   onDuplicate,
   onDelete,
+  onMoveUp,
+  onMoveDown,
 }: {
   pageId: string;
   sourceIndex: number;
@@ -112,6 +117,8 @@ function Thumbnail({
   onRotate: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
+  onMoveUp: () => void;
+  onMoveDown: () => void;
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -153,19 +160,39 @@ function Thumbnail({
       role="button"
       aria-label={`Go to page ${label}${active ? ' (current)' : ''}`}
       aria-current={active}
-      className={`group relative cursor-pointer rounded-xl border-2 bg-white p-1.5 transition-all ${
+      className={`group relative cursor-pointer overflow-hidden rounded-xl border-2 bg-white p-1.5 transition-all ${
         active
           ? 'border-brand-500 shadow-md'
           : 'border-transparent shadow-sm hover:border-slate-300 hover:shadow'
       }`}
     >
-      <canvas ref={canvasRef} className="w-full rounded-md bg-slate-100" />
+      <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-md bg-slate-100">
+        <canvas ref={canvasRef} className="max-h-full max-w-full object-contain" />
+      </div>
       <div
         className={`mt-1.5 text-center text-xs tabular-nums ${
           active ? 'font-semibold text-brand-600' : 'text-slate-500'
         }`}
       >
         {label}
+      </div>
+      <div className="absolute left-1.5 top-1.5 hidden flex-col gap-1 group-hover:flex group-focus-within:flex">
+        <ThumbAction
+          title="Move page up"
+          label="↑"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMoveUp();
+          }}
+        />
+        <ThumbAction
+          title="Move page down"
+          label="↓"
+          onClick={(e) => {
+            e.stopPropagation();
+            onMoveDown();
+          }}
+        />
       </div>
       <div className="absolute right-1.5 top-1.5 hidden gap-1 group-hover:flex group-focus-within:flex">
         <ThumbAction

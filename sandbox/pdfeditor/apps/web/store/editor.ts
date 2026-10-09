@@ -325,12 +325,24 @@ export const useEditor = create<EditorState>()(
     insertBlankPage: (afterPageId) => {
       const state = get();
       if (state.pages.length === 0) return;
-      // Insert after the given page, or after the active page, or at the end
-      const refId = afterPageId ?? state.activePageId;
-      const refIdx = refId ? state.pages.findIndex((p) => p.id === refId) : -1;
-      const insertIdx = refIdx === -1 ? state.pages.length : refIdx + 1;
-      // Use the reference page's dimensions (or first page) for the blank page
-      const refPage = refIdx === -1 ? state.pages[0] : state.pages[refIdx];
+      // Default: append to END of document. If afterPageId is explicitly provided,
+      // insert after that page. Otherwise, always go to the end.
+      let insertIdx: number;
+      let refPage: Page;
+      if (afterPageId) {
+        const refIdx = state.pages.findIndex((p) => p.id === afterPageId);
+        if (refIdx === -1) {
+          insertIdx = state.pages.length;
+          refPage = state.pages[state.pages.length - 1];
+        } else {
+          insertIdx = refIdx + 1;
+          refPage = state.pages[refIdx];
+        }
+      } else {
+        // Default: end of document
+        insertIdx = state.pages.length;
+        refPage = state.pages[state.pages.length - 1];
+      }
       const blank: Page = {
         id: crypto.randomUUID(),
         sourceIndex: 0, // 0 = blank inserted page (no source to copy)

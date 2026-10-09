@@ -94,7 +94,7 @@ export function EditorContent() {
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Thumbnails getDoc={getDoc} docVersion={docVersion} />
-        <main className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 p-4 sm:p-6">
+        <main className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 px-2 py-4 sm:px-4 sm:py-6">
           {pages.map((page) => (
             <PageCanvas key={page.id} page={page} getDoc={getDoc} docVersion={docVersion} />
           ))}

@@ -54,8 +54,15 @@ export async function renderPageToCanvas(
   const pdfPage = await doc.getPage(sourceIndex);
   const viewport = pdfPage.getViewport({ scale });
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  canvas.width = Math.floor(viewport.width * dpr);
-  canvas.height = Math.floor(viewport.height * dpr);
+  const newW = Math.floor(viewport.width * dpr);
+  const newH = Math.floor(viewport.height * dpr);
+  // Only resize if dimensions changed — setting width/height clears the canvas
+  // synchronously, which causes flicker during re-renders. Keep old content
+  // visible until the new render is ready.
+  if (canvas.width !== newW || canvas.height !== newH) {
+    canvas.width = newW;
+    canvas.height = newH;
+  }
   canvas.style.width = `${viewport.width}px`;
   canvas.style.height = `${viewport.height}px`;
   const ctx = canvas.getContext('2d');
