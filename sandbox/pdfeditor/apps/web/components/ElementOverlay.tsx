@@ -184,19 +184,65 @@ function ElementView({
       // Lines/arrows have zero height — only show corner handles to avoid
       // degenerate edge handles
       const isLine = el.shape === 'line' || el.shape === 'arrow';
+      if (isLine) {
+        const w = toScreen(Math.abs(el.width), zoom);
+        const h = toScreen(Math.max(Math.abs(el.height), 2), zoom);
+        const sw = Math.max(1, toScreen(el.strokeWidth, zoom));
+        // Draw as SVG: line from bottom-left to top-right in element space.
+        // Arrowhead is a filled triangle at the end point.
+        const x1 = sw / 2;
+        const y1 = h - sw / 2;
+        const x2 = w - sw / 2;
+        const y2 = sw / 2;
+        // Arrowhead triangle
+        const headLen = Math.max(10, sw * 4);
+        const angle = Math.atan2(y2 - y1, x2 - x1);
+        const a1 = angle + Math.PI - 0.44;
+        const a2 = angle + Math.PI + 0.44;
+        const hx1 = x2 + headLen * Math.cos(a1);
+        const hy1 = y2 + headLen * Math.sin(a1);
+        const hx2 = x2 + headLen * Math.cos(a2);
+        const hy2 = y2 + headLen * Math.sin(a2);
+        return (
+          <div {...common} style={{ ...style, width: w, height: h }}>
+            <svg
+              width={w}
+              height={h}
+              style={{ display: 'block', overflow: 'visible', pointerEvents: 'none' }}
+            >
+              <line
+                x1={x1}
+                y1={y1}
+                x2={x2}
+                y2={y2}
+                stroke={el.stroke}
+                strokeWidth={sw}
+                strokeLinecap="round"
+              />
+              {el.shape === 'arrow' && (
+                <polygon
+                  points={`${x2},${y2} ${hx1},${hy1} ${hx2},${hy2}`}
+                  fill={el.stroke}
+                />
+              )}
+            </svg>
+            {selected && <ResizeHandles el={el} zoom={zoom} cornersOnly />}
+          </div>
+        );
+      }
       return (
         <div
           {...common}
           style={{
             ...style,
             width: toScreen(Math.abs(el.width), zoom),
-            height: toScreen(Math.max(Math.abs(el.height), isLine ? 4 : 1), zoom),
+            height: toScreen(Math.abs(el.height), zoom),
             border: `${Math.max(1, toScreen(el.strokeWidth, zoom))}px solid ${el.stroke}`,
             background: el.fill ?? 'transparent',
             borderRadius: el.shape === 'ellipse' ? '50%' : 0,
           }}
         >
-          {selected && <ResizeHandles el={el} zoom={zoom} cornersOnly={isLine} />}
+          {selected && <ResizeHandles el={el} zoom={zoom} />}
         </div>
       );
     case 'image':

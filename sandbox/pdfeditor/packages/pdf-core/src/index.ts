@@ -200,14 +200,36 @@ export async function drawElement(
         });
       } else {
         // line / arrow
+        const x2 = el.x + el.width;
+        const y2 = el.y + el.height;
         page.drawLine({
           start: { x: el.x, y: el.y },
-          end: { x: el.x + el.width, y: el.y + el.height },
+          end: { x: x2, y: y2 },
           thickness: el.strokeWidth,
           color,
           opacity: 1,
         });
-        // arrowhead omitted in MVP — drawn as plain line
+        if (el.shape === 'arrow') {
+          // Draw arrowhead: two short lines at ±25° from the line direction
+          const angle = Math.atan2(el.height, el.width);
+          const headLen = Math.max(8, el.strokeWidth * 4);
+          const a1 = angle + Math.PI - 0.44; // ~25°
+          const a2 = angle + Math.PI + 0.44;
+          page.drawLine({
+            start: { x: x2, y: y2 },
+            end: { x: x2 + headLen * Math.cos(a1), y: y2 + headLen * Math.sin(a1) },
+            thickness: el.strokeWidth,
+            color,
+            opacity: 1,
+          });
+          page.drawLine({
+            start: { x: x2, y: y2 },
+            end: { x: x2 + headLen * Math.cos(a2), y: y2 + headLen * Math.sin(a2) },
+            thickness: el.strokeWidth,
+            color,
+            opacity: 1,
+          });
+        }
       }
       break;
     }
