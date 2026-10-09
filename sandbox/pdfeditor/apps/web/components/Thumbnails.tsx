@@ -6,7 +6,7 @@ import { renderPageToCanvas } from '@/lib/pdfjs';
 
 /**
  * Left sidebar: page thumbnails with rotate / duplicate / delete actions.
- * Thumbnails render lazily at low scale.
+ * Thumbnails render lazily at low scale. Collapses on small screens.
  */
 export function Thumbnails({ getDoc }: { getDoc: () => never }) {
   const pages = useEditor((s) => s.pages);
@@ -17,31 +17,66 @@ export function Thumbnails({ getDoc }: { getDoc: () => never }) {
   const duplicatePage = useEditor((s) => s.duplicatePage);
 
   return (
-    <aside className="thin-scroll w-44 shrink-0 overflow-y-auto border-r border-slate-200 bg-white p-2">
-      {pages.map((page, i) => (
-        <Thumbnail
-          key={page.id}
-          pageId={page.id}
-          sourceIndex={page.sourceIndex}
-          label={i + 1}
-          active={page.id === activePageId}
-          getDoc={getDoc}
-          onSelect={() => {
-            setActivePage(page.id);
-            document
-              .querySelector(`[data-page-id="${page.id}"]`)
-              ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-          onRotate={() => rotatePage(page.id)}
-          onDuplicate={() => duplicatePage(page.id)}
-          onDelete={() => {
-            if (pages.length > 1 && window.confirm(`Delete page ${i + 1}?`)) {
-              deletePage(page.id);
-            }
-          }}
-        />
-      ))}
+    <aside
+      aria-label="Pages"
+      className="thin-scroll hidden w-40 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-slate-50 p-2 sm:flex md:w-44"
+    >
+      <div className="mb-2 flex items-center justify-between px-1">
+        <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+          Pages
+        </h2>
+        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] tabular-nums text-slate-600">
+          {pages.length}
+        </span>
+      </div>
+      <div className="flex flex-col gap-2">
+        {pages.map((page, i) => (
+          <Thumbnail
+            key={page.id}
+            pageId={page.id}
+            sourceIndex={page.sourceIndex}
+            label={i + 1}
+            active={page.id === activePageId}
+            getDoc={getDoc}
+            onSelect={() => {
+              setActivePage(page.id);
+              document
+                .querySelector(`[data-page-id="${page.id}"]`)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }}
+            onRotate={() => rotatePage(page.id)}
+            onDuplicate={() => duplicatePage(page.id)}
+            onDelete={() => {
+              if (pages.length > 1 && window.confirm(`Delete page ${i + 1}?`)) {
+                deletePage(page.id);
+              }
+            }}
+          />
+        ))}
+      </div>
     </aside>
+  );
+}
+
+function ThumbAction({
+  title,
+  label,
+  onClick,
+}: {
+  title: string;
+  label: string;
+  onClick: (e: React.MouseEvent) => void;
+}) {
+  return (
+    <button
+      type="button"
+      title={title}
+      aria-label={title}
+      onClick={onClick}
+      className="flex h-7 w-7 items-center justify-center rounded-md bg-white/95 text-xs text-slate-600 shadow-sm ring-1 ring-slate-200 transition-colors hover:bg-white hover:text-slate-900"
+    >
+      <span aria-hidden>{label}</span>
+    </button>
   );
 }
 
@@ -94,19 +129,55 @@ function Thumbnail({
     <div
       ref={wrapRef}
       onClick={onSelect}
-      className={`group relative mb-3 cursor-pointer rounded-lg border p-1 ${
-        active ? 'border-brand-500 ring-1 ring-brand-500' : 'border-slate-200 hover:border-slate-300'
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      tabIndex={0}
+      role="button"
+      aria-label={`Go to page ${label}${active ? ' (current)' : ''}`}
+      aria-current={active}
+      className={`group relative cursor-pointer rounded-xl border-2 bg-white p-1.5 transition-all ${
+        active
+          ? 'border-brand-500 shadow-md'
+          : 'border-transparent shadow-sm hover:border-slate-300 hover:shadow'
       }`}
     >
-      <canvas ref={canvasRef} className="w-full rounded bg-white" />
-      <div className="mt-1 text-center text-xs text-slate-500">{label}</div>
-      <div className="absolute right-1 top-1 hidden gap-0.5 group-hover:flex">
-        <button title="Rotate" onClick={(e) => { e.stopPropagation(); onRotate(); }}
-          className="rounded bg-white/90 px-1.5 text-xs shadow">↻</button>
-        <button title="Duplicate" onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
-          className="rounded bg-white/90 px-1.5 text-xs shadow">⧉</button>
-        <button title="Delete" onClick={(e) => { e.stopPropagation(); onDelete(); }}
-          className="rounded bg-white/90 px-1.5 text-xs shadow">✕</button>
+      <canvas ref={canvasRef} className="w-full rounded-md bg-slate-100" />
+      <div
+        className={`mt-1.5 text-center text-xs tabular-nums ${
+          active ? 'font-semibold text-brand-600' : 'text-slate-500'
+        }`}
+      >
+        {label}
+      </div>
+      <div className="absolute right-1.5 top-1.5 hidden gap-1 group-hover:flex group-focus-within:flex">
+        <ThumbAction
+          title="Rotate page 90°"
+          label="↻"
+          onClick={(e) => {
+            e.stopPropagation();
+            onRotate();
+          }}
+        />
+        <ThumbAction
+          title="Duplicate page"
+          label="⧉"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDuplicate();
+          }}
+        />
+        <ThumbAction
+          title="Delete page"
+          label="✕"
+          onClick={(e) => {
+            e.stopPropagation();
+            onDelete();
+          }}
+        />
       </div>
     </div>
   );

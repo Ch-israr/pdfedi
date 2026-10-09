@@ -2,12 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Thin scrollbars for sidebars */
-.thin-scroll::-webkit-scrollbar {
+/*
+ * Editor-scoped styles. All custom rules live under .pdfeditor-root
+ * (or .pdfeditor-dev / .pdfeditor-dropzone / .pdfeditor-toolbar) so they
+ * never leak into the production website's global styles when
+ * EditorContent is mounted inside the production layout.
+ */
+
+/* Thin scrollbars for editor sidebars only */
+.pdfeditor-root .thin-scroll::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
-.thin-scroll::-webkit-scrollbar-thumb {
+.pdfeditor-root .thin-scroll::-webkit-scrollbar-thumb {
   background: #cbd5e1;
   border-radius: 4px;
+}
+.pdfeditor-root .thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Keep the editor's base font stack local to the editor root */
+.pdfeditor-root {
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial,
+    sans-serif;
 }
