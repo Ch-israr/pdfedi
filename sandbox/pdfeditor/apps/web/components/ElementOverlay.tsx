@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState, useCallback } from 'react';
+import { useRef, useState, useCallback, useEffect } from 'react';
 import type { EditorElement, Page } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
 import { calcGuides, type Guide } from '@/lib/smart-guides';
@@ -189,8 +189,43 @@ export function ElementOverlay({ page }: { page: Page }) {
   // Smart guides are temporary — shown only during drag, never stored/exported
   const [guides, setGuides] = useState<Guide[]>([]);
   const onGuides = useCallback((g: Guide[]) => setGuides(g), []);
+  // Inline text editing: {x, y} in PDF points, plus screen position for the textarea
+  const [editingText, setEditingText] = useState<{
+    x: number;
+    y: number;
+    screenX: number;
+    screenY: number;
+  } | null>(null);
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
+
+  const commitText = useCallback(
+    (text: string) => {
+      if (!editingText) return;
+      const { x, y } = editingText;
+      setEditingText(null);
+      if (!text.trim()) return; // empty → discard, don't create element
+      const id = crypto.randomUUID();
+      addElement(
+        {
+          id,
+          pageId: page.id,
+          kind: 'text',
+          x,
+          y: y - 12,
+          rotation: 0,
+          text,
+          fontSize: 14,
+          fontFamily: 'Helvetica',
+          color: '#000000',
+          bold: false,
+          italic: false,
+        },
+        'Add text',
+      );
+    },
+    [editingText, addElement, page.id],
+  );
 
   const onPageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('[data-el-id]')) return;
@@ -202,16 +237,14 @@ export function ElementOverlay({ page }: { page: Page }) {
 
     switch (tool as ToolId) {
       case 'text': {
-        const text = window.prompt('Enter text:', '');
-        if (text === null) return;
-        place(
-          {
-            id, pageId: page.id, kind: 'text', x, y: y - 12, rotation: 0,
-            text: text || '', fontSize: 14, fontFamily: 'Helvetica',
-            color: '#000000', bold: false, italic: false,
-          },
-          'Add text',
-        );
+        // Inline editing: show a textarea at the click position instead of window.prompt
+        const rect2 = e.currentTarget.getBoundingClientRect();
+        setEditingText({
+          x,
+          y,
+          screenX: e.clientX - rect2.left,
+          screenY: e.clientY - rect2.top,
+        });
         break;
       }
       case 'highlight':
@@ -295,6 +328,16 @@ export function ElementOverlay({ page }: { page: Page }) {
       {els.map((el) => (
         <ElementView key={el.id} el={el} page={page} onGuides={onGuides} />
       ))}
+      {/* Inline text editor — appears at click position when text tool is active */}
+      {editingText && (
+        <InlineTextEditor
+          screenX={editingText.screenX}
+          screenY={editingText.screenY}
+          zoom={zoom}
+          onCommit={commitText}
+          onCancel={() => setEditingText(null)}
+        />
+      )}
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>
         g.orientation === 'v' ? (
@@ -325,6 +368,57 @@ export function ElementOverlay({ page }: { page: Page }) {
         ),
       )}
     </div>
+  );
+}
+
+/** Inline text editor: textarea overlay for the text tool (replaces window.prompt). */
+function InlineTextEditor({
+  screenX,
+  screenY,
+  zoom,
+  onCommit,
+  onCancel,
+}: {
+  screenX: number;
+  screenY: number;
+  zoom: number;
+  onCommit: (text: string) => void;
+  onCancel: () => void;
+}) {
+  const [value, setValue] = useState('');
+  const ref = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    ref.current?.focus();
+  }, []);
+
+  return (
+    <textarea
+      ref={ref}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      onClick={(e) => e.stopPropagation()}
+      onBlur={() => onCommit(value)}
+      onKeyDown={(e) => {
+        e.stopPropagation();
+        if (e.key === 'Enter' && !e.shiftKey) {
+          e.preventDefault();
+          onCommit(value);
+        } else if (e.key === 'Escape') {
+          e.preventDefault();
+          onCancel();
+        }
+      }}
+      placeholder="Type text… (Enter to place, Esc to cancel)"
+      aria-label="Text content"
+      className="absolute z-20 min-h-[32px] min-w-[120px] rounded border-2 border-brand-500 bg-white/95 p-1 shadow-lg focus:outline-none"
+      style={{
+        left: screenX,
+        top: screenY - 14 * zoom,
+        fontSize: 14 * zoom,
+        fontFamily: 'Helvetica, sans-serif',
+      }}
+    />
   );
 }
 
