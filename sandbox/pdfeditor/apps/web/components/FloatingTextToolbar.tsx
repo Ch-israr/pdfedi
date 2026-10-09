@@ -29,8 +29,13 @@ export function FloatingTextToolbar({
     <div
       role="toolbar"
       aria-label="Text formatting"
-      className="absolute z-30 flex -translate-x-1/2 -translate-y-full items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1.5 py-1 shadow-xl"
-      style={{ left: screenX, top: Math.max(8, screenY - 8) }}
+      className="absolute z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1.5 py-1 shadow-xl"
+      style={{
+        left: screenX,
+        // Position well above the text (account for text height + clearance)
+        // so the toolbar never covers the text or blocks double-click to edit.
+        top: Math.max(8, screenY - 64),
+      }}
       onPointerDown={stop}
       onPointerMove={stop}
       onPointerUp={stop}
