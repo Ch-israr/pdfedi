@@ -58,12 +58,18 @@ export function EditorContent() {
   const setZoom = useEditor((s) => s.setZoom);
   const prevPageCount = useRef(0);
 
-  // Debounced autosave: save to IndexedDB 2s after last change
+  // Debounced autosave: save to IndexedDB 2s after last change.
+  // Only saves when there are actual edits (historyLog non-empty) —
+  // this prevents a fresh upload from overwriting a recovery snapshot
+  // before the user can click Recover.
   useEffect(() => {
     let timer: ReturnType<typeof setTimeout> | null = null;
     const unsub = useEditor.subscribe((s, prev) => {
-      // Only autosave when document content changes
-      if (s.pages !== prev.pages || s.elements !== prev.elements) {
+      // Only autosave when document content changes AND there are edits
+      if (
+        (s.pages !== prev.pages || s.elements !== prev.elements) &&
+        s.historyLog.length > 0
+      ) {
         if (timer) clearTimeout(timer);
         timer = setTimeout(() => {
           useEditor.getState().autosave();

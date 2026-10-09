@@ -475,6 +475,8 @@ export const useEditor = create<EditorState>()(
       // Debounced in the caller; this performs the actual save
       const s = get();
       if (!s.pdfBytes || s.pages.length === 0) return;
+      // Don't overwrite a recovery snapshot with an unedited document
+      if (s.historyLog.length === 0) return;
       set({ saveStatus: 'saving' });
       import('@/lib/persistence').then(({ saveDocument }) => {
         const pdfBytes = s.pdfBytes!;
