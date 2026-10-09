@@ -24,12 +24,12 @@ import type { EditorElement, Page } from '@pdfeditor/shared';
 /** Rotate a page 90 degrees clockwise. */
 export function rotatePage(page: Page): Page {
   const rotation = (page.rotation + 90) % 360;
-  const swap = rotation === 90 || rotation === 270;
+  // Every 90° rotation swaps width/height (0°↔90°↔180°↔270°↔0°)
   return {
     ...page,
     rotation,
-    width: swap ? page.height : page.width,
-    height: swap ? page.width : page.height,
+    width: page.height,
+    height: page.width,
   };
 }
 
