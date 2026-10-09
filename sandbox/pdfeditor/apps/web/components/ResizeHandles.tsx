@@ -158,7 +158,9 @@ export function ResizeHandles({
   }, []);
 
   const handles = cornersOnly ? HANDLES.filter((h) => h.pos.length === 2) : HANDLES;
-  const size = 10;
+  const size = 12;
+  // Larger invisible hit area for easier grabbing (especially on touch)
+  const hitSize = 20;
 
   return (
     <>
@@ -173,18 +175,29 @@ export function ResizeHandles({
           onDoubleClick={(e) => e.stopPropagation()}
           style={{
             position: 'absolute',
-            left: `calc(${x}% - ${size / 2}px)`,
-            top: `calc(${y}% - ${size / 2}px)`,
-            width: size,
-            height: size,
-            background: '#fff',
-            border: '2px solid #2f6bff',
-            borderRadius: pos.length === 2 ? '50%' : '2px',
+            left: `calc(${x}% - ${hitSize / 2}px)`,
+            top: `calc(${y}% - ${hitSize / 2}px)`,
+            width: hitSize,
+            height: hitSize,
             cursor,
             zIndex: 10,
             touchAction: 'none',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
           }}
-        />
+        >
+          <div
+            style={{
+              width: size,
+              height: size,
+              background: '#fff',
+              border: '2px solid #2f6bff',
+              borderRadius: pos.length === 2 ? '50%' : '2px',
+              pointerEvents: 'none',
+            }}
+          />
+        </div>
       ))}
     </>
   );
