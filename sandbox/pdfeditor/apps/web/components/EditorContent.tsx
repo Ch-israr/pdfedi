@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor } from '@/store/editor';
 import { Dropzone } from '@/components/Dropzone';
 import { Toolbar } from '@/components/Toolbar';
@@ -23,6 +23,8 @@ export function EditorContent() {
 
   // Keep the pdf.js document in a ref (memory only, never in the store).
   // The store holds bytes + metadata; rendering handles live here.
+  // docVersion increments when the doc is ready, triggering PageCanvas re-render.
+  const [docVersion, setDocVersion] = useState(0);
   useEffect(() => {
     if (!pdfBytes) {
       docRef.current = null;
@@ -34,7 +36,10 @@ export function EditorContent() {
         default: m.loadPdfDocument,
       }));
       const loaded = await getDoc(pdfBytes);
-      if (!cancelled) docRef.current = loaded.doc as never;
+      if (!cancelled) {
+        docRef.current = loaded.doc as never;
+        setDocVersion((v) => v + 1);
+      }
     })();
     return () => {
       cancelled = true;
@@ -88,10 +93,10 @@ export function EditorContent() {
     <div className="pdfeditor-root flex h-full min-h-0 flex-col overflow-hidden bg-slate-100">
       <Toolbar />
       <div className="flex min-h-0 flex-1">
-        <Thumbnails getDoc={getDoc} />
+        <Thumbnails getDoc={getDoc} docVersion={docVersion} />
         <main className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 p-4 sm:p-6">
           {pages.map((page) => (
-            <PageCanvas key={page.id} page={page} getDoc={getDoc} />
+            <PageCanvas key={page.id} page={page} getDoc={getDoc} docVersion={docVersion} />
           ))}
         </main>
         <PropertiesPanel />

@@ -10,13 +10,15 @@ interface Props {
   page: Page;
   /** pdf.js document proxy — set once the PDF is loaded */
   getDoc: () => { getPage: (n: number) => Promise<unknown> } | null;
+  /** Increments when doc is ready; triggers re-render */
+  docVersion: number;
 }
 
 /**
  * Renders one PDF page to canvas (lazy via IntersectionObserver) and
  * overlays the editor elements for that page.
  */
-export function PageCanvas({ page, getDoc }: Props) {
+export function PageCanvas({ page, getDoc, docVersion }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const wrapRef = useRef<HTMLDivElement>(null);
   const zoom = useEditor((s) => s.zoom);
@@ -37,6 +39,8 @@ export function PageCanvas({ page, getDoc }: Props) {
 
   useEffect(() => {
     if (!visible) return;
+    // Blank inserted pages have no PDF source — canvas stays white
+    if (page.sourceIndex === 0) return;
     const doc = getDoc() as never;
     const canvas = canvasRef.current;
     if (!doc || !canvas) return;
@@ -55,7 +59,7 @@ export function PageCanvas({ page, getDoc }: Props) {
     return () => {
       cancelled = true;
     };
-  }, [visible, zoom, page.sourceIndex, page.rotation, getDoc]);
+  }, [visible, zoom, page.sourceIndex, page.rotation, getDoc, docVersion]);
 
   const isActive = activePageId === page.id;
 

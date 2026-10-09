@@ -9,6 +9,8 @@ import {
   PDFFont,
   PDFImage,
   PDFPage,
+  PDFString,
+  PDFName,
   rgb,
   degrees,
   StandardFonts,
@@ -79,10 +81,26 @@ async function getFont(
   const cached = ctx.fontCache.get(key);
   if (cached) return cached;
   // Map to the 14 standard PDF fonts (no embedding needed)
-  let name = StandardFonts.Helvetica;
-  if (bold && italic) name = StandardFonts.HelveticaBoldOblique;
-  else if (bold) name = StandardFonts.HelveticaBold;
-  else if (italic) name = StandardFonts.HelveticaOblique;
+  // Arial → Helvetica, Times New Roman → TimesRoman, Courier New → Courier
+  const f = family.toLowerCase();
+  let name: StandardFonts;
+  if (f.includes('times') || f.includes('georgia') || f.includes('serif')) {
+    if (bold && italic) name = StandardFonts.TimesRomanBoldItalic;
+    else if (bold) name = StandardFonts.TimesRomanBold;
+    else if (italic) name = StandardFonts.TimesRomanItalic;
+    else name = StandardFonts.TimesRoman;
+  } else if (f.includes('courier') || f.includes('mono')) {
+    if (bold && italic) name = StandardFonts.CourierBoldOblique;
+    else if (bold) name = StandardFonts.CourierBold;
+    else if (italic) name = StandardFonts.CourierOblique;
+    else name = StandardFonts.Courier;
+  } else {
+    // Arial, Helvetica, Calibri, sans-serif → Helvetica
+    if (bold && italic) name = StandardFonts.HelveticaBoldOblique;
+    else if (bold) name = StandardFonts.HelveticaBold;
+    else if (italic) name = StandardFonts.HelveticaOblique;
+    else name = StandardFonts.Helvetica;
+  }
   const font = await ctx.doc.embedFont(name);
   ctx.fontCache.set(key, font);
   return font;
@@ -124,6 +142,28 @@ export async function drawElement(
         color: hexToRgb(el.color),
         rotate: degrees(el.rotation),
       });
+      // Add hyperlink annotation if link is present
+      if (el.link) {
+        const textWidth = font.widthOfTextAtSize(el.text, el.fontSize);
+        const textHeight = el.fontSize * 1.2;
+        const annot = ctx.doc.context.obj({
+          Type: PDFName.of('Annot'),
+          Subtype: PDFName.of('Link'),
+          Rect: [el.x, el.y, el.x + textWidth, el.y + textHeight],
+          Border: [0, 0, 0],
+          A: {
+            Type: PDFName.of('Action'),
+            S: PDFName.of('URI'),
+            URI: PDFString.of(el.link),
+          },
+        });
+        const annots = page.node.Annots();
+        if (annots) {
+          annots.push(annot);
+        } else {
+          page.node.set(PDFName.of('Annots'), ctx.doc.context.obj([annot]));
+        }
+      }
       break;
     }
     case 'highlight': {
@@ -209,13 +249,20 @@ export async function exportPdf(input: ExportInput): Promise<Uint8Array> {
   const ctx = createDrawContext(out);
 
   for (const page of input.pages) {
-    const [copied] = await out.copyPages(src, [page.sourceIndex - 1]);
-    // Apply rotation recorded in editor state
-    if (page.rotation) {
-      const current = copied.getRotation().angle;
-      copied.setRotation(degrees((current + page.rotation) % 360));
+    let copied;
+    if (page.sourceIndex === 0) {
+      // Blank inserted page: create new instead of copying
+      copied = out.addPage([page.width, page.height]);
+    } else {
+      const [cp] = await out.copyPages(src, [page.sourceIndex - 1]);
+      // Apply rotation recorded in editor state
+      if (page.rotation) {
+        const current = cp.getRotation().angle;
+        cp.setRotation(degrees((current + page.rotation) % 360));
+      }
+      out.addPage(cp);
+      copied = cp;
     }
-    out.addPage(copied);
 
     const els = Object.values(input.elements).filter((e) => e.pageId === page.id);
     for (const el of els) {

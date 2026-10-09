@@ -8,13 +8,14 @@ import { renderPageToCanvas } from '@/lib/pdfjs';
  * Left sidebar: page thumbnails with rotate / duplicate / delete actions.
  * Thumbnails render lazily at low scale. Collapses on small screens.
  */
-export function Thumbnails({ getDoc }: { getDoc: () => never }) {
+export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVersion: number }) {
   const pages = useEditor((s) => s.pages);
   const activePageId = useEditor((s) => s.activePageId);
   const setActivePage = useEditor((s) => s.setActivePage);
   const rotatePage = useEditor((s) => s.rotatePage);
   const deletePage = useEditor((s) => s.deletePage);
   const duplicatePage = useEditor((s) => s.duplicatePage);
+  const insertBlankPage = useEditor((s) => s.insertBlankPage);
 
   return (
     <aside
@@ -29,6 +30,14 @@ export function Thumbnails({ getDoc }: { getDoc: () => never }) {
           {pages.length}
         </span>
       </div>
+      <button
+        type="button"
+        onClick={() => insertBlankPage()}
+        title="Insert blank page after current page"
+        className="mb-2 flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 bg-white px-2 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-brand-400 hover:text-brand-600"
+      >
+        <span aria-hidden>+</span> Blank page
+      </button>
       <div className="flex flex-col gap-2">
         {pages.map((page, i) => (
           <Thumbnail
@@ -38,6 +47,7 @@ export function Thumbnails({ getDoc }: { getDoc: () => never }) {
             label={i + 1}
             active={page.id === activePageId}
             getDoc={getDoc}
+            docVersion={docVersion}
             onSelect={() => {
               setActivePage(page.id);
               document
@@ -86,6 +96,7 @@ function Thumbnail({
   label,
   active,
   getDoc,
+  docVersion,
   onSelect,
   onRotate,
   onDuplicate,
@@ -96,6 +107,7 @@ function Thumbnail({
   label: number;
   active: boolean;
   getDoc: () => never;
+  docVersion: number;
   onSelect: () => void;
   onRotate: () => void;
   onDuplicate: () => void;
@@ -107,6 +119,8 @@ function Thumbnail({
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
+    // Blank inserted pages (sourceIndex 0) have no PDF source — leave canvas blank white
+    if (sourceIndex === 0) return;
     let done = false;
     const obs = new IntersectionObserver(
       (entries) => {
@@ -123,7 +137,7 @@ function Thumbnail({
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [sourceIndex, getDoc]);
+  }, [sourceIndex, getDoc, docVersion]);
 
   return (
     <div

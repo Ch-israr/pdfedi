@@ -74,6 +74,8 @@ export const TextElementSchema = BaseElementSchema.extend({
   bold: z.boolean().default(false),
   italic: z.boolean().default(false),
   width: z.number().positive().optional(),
+  /** Optional hyperlink URL (http/https only, validated in UI) */
+  link: z.string().url().optional(),
 });
 
 export const ImageElementSchema = BaseElementSchema.extend({
@@ -124,8 +126,8 @@ export type EditorElement = z.infer<typeof EditorElementSchema>;
 export const PageSchema = z.object({
   /** UUID — never an array index */
   id: z.string().uuid(),
-  /** Original 1-based page number in the source PDF */
-  sourceIndex: z.number().int().positive(),
+  /** Original 1-based page number in the source PDF; 0 = blank inserted page */
+  sourceIndex: z.number().int().min(0),
   width: z.number().positive(), // PDF points
   height: z.number().positive(), // PDF points
   rotation: z.number().default(0), // 0 | 90 | 180 | 270

@@ -76,6 +76,7 @@ interface EditorState {
   rotatePage: (pageId: string) => void;
   deletePage: (pageId: string) => void;
   duplicatePage: (pageId: string) => void;
+  insertBlankPage: (afterPageId?: string | null) => void;
   reorderPage: (pageId: string, toIndex: number) => void;
   undo: () => void;
   redo: () => void;
@@ -315,6 +316,46 @@ export const useEditor = create<EditorState>()(
               const i = st.pages.findIndex((p) => p.id === pageId);
               st.pages.splice(i + 1, 0, copy);
               for (const e of elCopies) st.elements[e.id] = e;
+            });
+          },
+        });
+      });
+    },
+
+    insertBlankPage: (afterPageId) => {
+      const state = get();
+      if (state.pages.length === 0) return;
+      // Insert after the given page, or after the active page, or at the end
+      const refId = afterPageId ?? state.activePageId;
+      const refIdx = refId ? state.pages.findIndex((p) => p.id === refId) : -1;
+      const insertIdx = refIdx === -1 ? state.pages.length : refIdx + 1;
+      // Use the reference page's dimensions (or first page) for the blank page
+      const refPage = refIdx === -1 ? state.pages[0] : state.pages[refIdx];
+      const blank: Page = {
+        id: crypto.randomUUID(),
+        sourceIndex: 0, // 0 = blank inserted page (no source to copy)
+        width: refPage.width,
+        height: refPage.height,
+        rotation: 0,
+      };
+      set((s) => {
+        s.pages.splice(insertIdx, 0, blank);
+        s.pageCount = s.pages.length;
+        pushHistory(s, {
+          label: 'Insert blank page',
+          undo: () => {
+            useEditor.setState((st) => {
+              st.pages = coreDeletePage(st.pages, blank.id);
+              st.pageCount = st.pages.length;
+            });
+          },
+          redo: () => {
+            useEditor.setState((st) => {
+              const i = afterPageId
+                ? st.pages.findIndex((p) => p.id === afterPageId)
+                : st.pages.length - 1;
+              st.pages.splice(i + 1, 0, blank);
+              st.pageCount = st.pages.length;
             });
           },
         });
