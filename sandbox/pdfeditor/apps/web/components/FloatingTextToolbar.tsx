@@ -21,12 +21,16 @@ export function FloatingTextToolbar({
   el,
   screenX,
   screenY,
+  textHeight,
   zoom,
+  editing,
 }: {
   el: Extract<EditorElement, { kind: 'text' }>;
   screenX: number;
   screenY: number;
+  textHeight: number;
   zoom: number;
+  editing: boolean;
 }) {
   const updateElement = useEditor((s) => s.updateElement);
   const deleteElement = useEditor((s) => s.deleteElement);
@@ -35,14 +39,21 @@ export function FloatingTextToolbar({
   const [copied, setCopied] = useState(false);
 
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  // Prevent toolbar interactions from stealing focus from the text editor
+  const keepFocus = (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
 
   const btn =
     'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-1 text-sm transition-colors hover:bg-slate-100';
 
-  // Zoom-aware gap: scales with zoom so spacing stays consistent.
+  // screenY is the text TOP. Position toolbar above with zoom-aware gap.
+  // If insufficient space above, place below the text bottom.
   const gap = 12 * zoom;
   const toolbarH = 48;
   const placeAbove = screenY - gap - toolbarH > 4;
+  const top = placeAbove ? screenY - gap - toolbarH : screenY + textHeight + gap;
 
   const normalizeUrl = (raw: string): string | null => {
     const t = raw.trim();
@@ -100,10 +111,10 @@ export function FloatingTextToolbar({
       className="absolute z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1.5 py-1 shadow-xl"
       style={{
         left: screenX,
-        top: placeAbove ? screenY - gap - toolbarH : screenY + gap,
+        top,
         maxWidth: 'calc(100vw - 2rem)',
       }}
-      onPointerDown={stop}
+      onPointerDown={keepFocus}
       onPointerMove={stop}
       onPointerUp={stop}
       onClick={stop}

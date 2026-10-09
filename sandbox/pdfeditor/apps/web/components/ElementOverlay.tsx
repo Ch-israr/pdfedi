@@ -405,16 +405,30 @@ export function ElementOverlay({ page }: { page: Page }) {
           onCancel={() => setEditingText(null)}
         />
       )}
-      {/* Floating toolbar for selected text (not while editing) */}
+      {/* Floating toolbar for selected text (shown during selection AND editing) */}
       {(() => {
-        if (!selectedId || (editingText?.mode === 'edit' && editingText.id === selectedId))
-          return null;
+        if (!selectedId) return null;
         const sel = els.find((e) => e.id === selectedId);
         if (!sel || sel.kind !== 'text') return null;
         // Position above the element: use correct PDF→screen conversion
+        // and account for actual text height so toolbar follows font size changes.
         const sx = toScreen(sel.x, zoom);
-        const sy = pdfYToScreenTop(sel.y, page, zoom);
-        return <FloatingTextToolbar el={sel} screenX={sx} screenY={sy} zoom={zoom} />;
+        const baselineY = pdfYToScreenTop(sel.y, page, zoom);
+        // Estimate text height: fontSize * lineHeight * lines * zoom
+        const lineCount = Math.max(1, sel.text.split('\n').length);
+        const textH = sel.fontSize * 1.2 * lineCount * zoom;
+        const textTop = baselineY - textH;
+        const isEditing = editingText?.mode === 'edit' && editingText.id === selectedId;
+        return (
+          <FloatingTextToolbar
+            el={sel}
+            screenX={sx}
+            screenY={textTop}
+            textHeight={textH}
+            zoom={zoom}
+            editing={isEditing}
+          />
+        );
       })()}
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>
