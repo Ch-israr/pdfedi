@@ -28,13 +28,17 @@ export async function loadPdfDocument(bytes: Uint8Array): Promise<LoadedPdf> {
   const pages: Page[] = [];
   for (let i = 1; i <= doc.numPages; i++) {
     const pdfPage = await doc.getPage(i);
+    // Use the page's native rotation for the viewport so width/height reflect
+    // the actual displayed dimensions (handles PDFs with /Rotate metadata).
+    // Store the native rotation in the model so rendering stays consistent.
+    const nativeRotation = pdfPage.rotate ?? 0;
     const viewport = pdfPage.getViewport({ scale: 1 });
     pages.push({
       id: crypto.randomUUID(),
       sourceIndex: i,
       width: viewport.width,
       height: viewport.height,
-      rotation: 0,
+      rotation: nativeRotation,
     });
     pdfPage.cleanup();
   }

@@ -251,14 +251,17 @@ export async function exportPdf(input: ExportInput): Promise<Uint8Array> {
   for (const page of input.pages) {
     let copied;
     if (page.sourceIndex === 0) {
-      // Blank inserted page: create new instead of copying
+      // Blank inserted page: create new instead of copying.
+      // Dimensions are in PDF points and already reflect the reference page's
+      // size and orientation (including any rotation at insertion time).
       copied = out.addPage([page.width, page.height]);
     } else {
       const [cp] = await out.copyPages(src, [page.sourceIndex - 1]);
-      // Apply rotation recorded in editor state
+      // The model's rotation now includes the PDF's native /Rotate plus any
+      // user-applied rotation. Set absolute (don't add) to avoid double-applying
+      // the native rotation that's already on the copied page.
       if (page.rotation) {
-        const current = cp.getRotation().angle;
-        cp.setRotation(degrees((current + page.rotation) % 360));
+        cp.setRotation(degrees(page.rotation % 360));
       }
       out.addPage(cp);
       copied = cp;

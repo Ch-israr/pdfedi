@@ -33,7 +33,7 @@ export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVer
       </div>
       <button
         type="button"
-        onClick={() => insertBlankPage()}
+        onClick={() => insertBlankPage(activePageId)}
         title="Insert blank page after current page"
         className="mb-2 flex items-center justify-center gap-1 rounded-lg border border-dashed border-slate-300 bg-white px-2 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:border-brand-400 hover:text-brand-600"
       >

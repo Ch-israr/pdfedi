@@ -360,12 +360,17 @@ export const useEditor = create<EditorState>()(
     insertBlankPage: (afterPageId) => {
       const state = get();
       if (state.pages.length === 0) return;
-      // Default: append to END of document. If afterPageId is explicitly provided,
-      // insert after that page. Otherwise, always go to the end.
+      // Reference page selection (in priority order):
+      // 1. Explicit afterPageId (if valid)
+      // 2. Currently selected page (activePageId) — for mixed-size PDFs
+      // 3. Last page (fallback)
+      // The new blank page inherits the reference page's actual dimensions
+      // (width/height in PDF points), which already reflect any rotation.
       let insertIdx: number;
       let refPage: Page;
-      if (afterPageId) {
-        const refIdx = state.pages.findIndex((p) => p.id === afterPageId);
+      const effectiveAfterId = afterPageId ?? state.activePageId;
+      if (effectiveAfterId) {
+        const refIdx = state.pages.findIndex((p) => p.id === effectiveAfterId);
         if (refIdx === -1) {
           insertIdx = state.pages.length;
           refPage = state.pages[state.pages.length - 1];
@@ -374,7 +379,7 @@ export const useEditor = create<EditorState>()(
           refPage = state.pages[refIdx];
         }
       } else {
-        // Default: end of document
+        // No selection: append to end, reference last page
         insertIdx = state.pages.length;
         refPage = state.pages[state.pages.length - 1];
       }
