@@ -66,6 +66,8 @@ export function Toolbar() {
   const fileName = useEditor((s) => s.fileName);
   const zoom = useEditor((s) => s.zoom);
   const setZoom = useEditor((s) => s.setZoom);
+  const snapEnabled = useEditor((s) => s.snapEnabled);
+  const setSnapEnabled = useEditor((s) => s.setSnapEnabled);
 
   return (
     <header className="pdfeditor-toolbar flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-4">
@@ -151,6 +153,23 @@ export function Toolbar() {
           +
         </button>
       </div>
+
+      {/* Smart guides / snap toggle */}
+      <button
+        type="button"
+        title={snapEnabled ? 'Snap to guides: on (hold Alt to bypass)' : 'Snap to guides: off'}
+        aria-label="Toggle snap to alignment guides"
+        aria-pressed={snapEnabled}
+        onClick={() => setSnapEnabled(!snapEnabled)}
+        className={`flex h-9 items-center gap-1.5 rounded-lg px-2.5 text-xs font-medium transition-colors ${
+          snapEnabled
+            ? 'bg-brand-50 text-brand-600 ring-1 ring-brand-500'
+            : 'text-slate-500 hover:bg-slate-100'
+        }`}
+      >
+        <span aria-hidden>🧲</span>
+        <span className="hidden xl:inline">Snap</span>
+      </button>
 
       {/* Primary actions */}
       <div className="ml-auto flex items-center gap-2">

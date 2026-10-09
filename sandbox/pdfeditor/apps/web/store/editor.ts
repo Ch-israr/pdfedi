@@ -53,6 +53,9 @@ interface EditorState {
   zoom: number;
   loading: boolean;
   error: string | null;
+  // Smart guides + snapping (user-controlled, never forced)
+  snapEnabled: boolean;
+  snapThreshold: number; // PDF points
 
   // History (command-based)
   past: HistoryCommand[];
@@ -64,6 +67,8 @@ interface EditorState {
   setTool: (tool: ToolId) => void;
   setZoom: (zoom: number) => void;
   setActivePage: (pageId: string) => void;
+  setSnapEnabled: (enabled: boolean) => void;
+  setSnapThreshold: (pt: number) => void;
   addElement: (el: EditorElement, label?: string) => void;
   updateElement: (id: string, patch: Partial<EditorElement>, label?: string) => void;
   deleteElement: (id: string) => void;
@@ -101,6 +106,8 @@ export const useEditor = create<EditorState>()(
     zoom: 1,
     loading: false,
     error: null,
+    snapEnabled: true,
+    snapThreshold: 5,
     past: [],
     future: [],
 
@@ -161,6 +168,8 @@ export const useEditor = create<EditorState>()(
     setZoom: (zoom) =>
       set((s) => { s.zoom = Math.min(3, Math.max(0.25, zoom)); }),
     setActivePage: (pageId) => set((s) => { s.activePageId = pageId; }),
+    setSnapEnabled: (enabled) => set((s) => { s.snapEnabled = enabled; }),
+    setSnapThreshold: (pt) => set((s) => { s.snapThreshold = Math.max(1, Math.min(20, pt)); }),
     select: (id) => set((s) => { s.selectedId = id; }),
 
     addElement: (el, label = 'Add element') => {

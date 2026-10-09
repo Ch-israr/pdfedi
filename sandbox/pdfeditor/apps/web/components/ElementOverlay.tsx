@@ -1,8 +1,9 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useState, useCallback } from 'react';
 import type { EditorElement, Page } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
+import { calcGuides, type Guide } from '@/lib/smart-guides';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -22,11 +23,22 @@ export function screenToPdf(
   };
 }
 
-function ElementView({ el }: { el: EditorElement }) {
+function ElementView({
+  el,
+  page,
+  onGuides,
+}: {
+  el: EditorElement;
+  page: Page;
+  onGuides: (guides: Guide[]) => void;
+}) {
   const zoom = useEditor((s) => s.zoom);
   const selectedId = useEditor((s) => s.selectedId);
   const select = useEditor((s) => s.select);
   const updateElement = useEditor((s) => s.updateElement);
+  const elements = useEditor((s) => s.elements);
+  const snapEnabled = useEditor((s) => s.snapEnabled);
+  const snapThreshold = useEditor((s) => s.snapThreshold);
   const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(
     null,
   );
@@ -53,11 +65,31 @@ function ElementView({ el }: { el: EditorElement }) {
     if (!d) return;
     const dx = (e.clientX - d.startX) / zoom;
     const dy = -(e.clientY - d.startY) / zoom; // screen y down → pdf y up
-    updateElement(el.id, { x: d.origX + dx, y: d.origY + dy } as Partial<EditorElement>, 'Move element');
+    let newX = d.origX + dx;
+    let newY = d.origY + dy;
+
+    // Smart guides: suggest alignment, never force. Alt bypasses snapping.
+    const bypass = e.altKey;
+    const { guides, snappedX, snappedY } = calcGuides(
+      el.id,
+      newX,
+      newY,
+      elements,
+      page,
+      snapThreshold,
+      snapEnabled,
+      bypass,
+    );
+    onGuides(guides);
+    newX = snappedX;
+    newY = snappedY;
+
+    updateElement(el.id, { x: newX, y: newY } as Partial<EditorElement>, 'Move element');
   };
 
   const onPointerUp = () => {
     dragRef.current = null;
+    onGuides([]); // guides are temporary — removed when interaction ends
   };
 
   const style: React.CSSProperties = {
@@ -154,6 +186,9 @@ export function ElementOverlay({ page }: { page: Page }) {
   const zoom = useEditor((s) => s.zoom);
   const addElement = useEditor((s) => s.addElement);
   const select = useEditor((s) => s.select);
+  // Smart guides are temporary — shown only during drag, never stored/exported
+  const [guides, setGuides] = useState<Guide[]>([]);
+  const onGuides = useCallback((g: Guide[]) => setGuides(g), []);
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
 
@@ -258,8 +293,37 @@ export function ElementOverlay({ page }: { page: Page }) {
   return (
     <div className="absolute inset-0" onClick={onPageClick}>
       {els.map((el) => (
-        <ElementView key={el.id} el={el} />
+        <ElementView key={el.id} el={el} page={page} onGuides={onGuides} />
       ))}
+      {/* Smart alignment guides — visual only, never part of the document */}
+      {guides.map((g, i) =>
+        g.orientation === 'v' ? (
+          <div
+            key={i}
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0"
+            style={{
+              left: toScreen(g.pos, zoom),
+              width: 1,
+              background: '#2f6bff',
+              opacity: 0.7,
+            }}
+          />
+        ) : (
+          <div
+            key={i}
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0"
+            style={{
+              // PDF y (bottom-left) → CSS top
+              top: toScreen(page.height - g.pos, zoom),
+              height: 1,
+              background: '#2f6bff',
+              opacity: 0.7,
+            }}
+          />
+        ),
+      )}
     </div>
   );
 }
