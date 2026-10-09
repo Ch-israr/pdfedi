@@ -236,11 +236,15 @@ export const useEditor = create<EditorState>()(
     },
 
     rotatePage: (pageId) => {
+      console.log('[rotatePage] called with', pageId);
       set((s) => {
         const idx = s.pages.findIndex((p) => p.id === pageId);
+        console.log('[rotatePage] found idx', idx, 'pages:', s.pages.length);
         if (idx === -1) return;
         const before = s.pages[idx];
+        console.log('[rotatePage] before', before);
         const after = coreRotatePage(before);
+        console.log('[rotatePage] after', after);
         s.pages[idx] = after;
         pushHistory(s, {
           label: 'Rotate page',
