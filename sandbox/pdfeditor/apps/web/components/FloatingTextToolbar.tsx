@@ -24,6 +24,7 @@ export function FloatingTextToolbar({
   textHeight,
   zoom,
   editing,
+  overrideUpdate,
 }: {
   el: Extract<EditorElement, { kind: 'text' }>;
   screenX: number;
@@ -31,9 +32,16 @@ export function FloatingTextToolbar({
   textHeight: number;
   zoom: number;
   editing: boolean;
+  /** Optional: intercept updates (for new-text mode with pending formatting) */
+  overrideUpdate?: (id: string, patch: Partial<Extract<EditorElement, { kind: 'text' }>>) => void;
 }) {
-  const updateElement = useEditor((s) => s.updateElement);
+  const storeUpdate = useEditor((s) => s.updateElement);
+  const updateElement = overrideUpdate
+    ? (id: string, patch: Partial<Extract<EditorElement, { kind: 'text' }>>, _label?: string) =>
+        overrideUpdate(id, patch)
+    : storeUpdate;
   const deleteElement = useEditor((s) => s.deleteElement);
+  const isNewMode = el.id === '__new__';
   const [showLink, setShowLink] = useState(false);
   const [linkInput, setLinkInput] = useState(el.link ?? '');
   const [copied, setCopied] = useState(false);
@@ -209,41 +217,47 @@ export function FloatingTextToolbar({
         />
       </label>
       <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />
-      {/* Copy */}
-      <button
-        type="button"
-        title={copied ? 'Copied!' : 'Copy text'}
-        aria-label="Copy text"
-        className={`${btn} text-slate-700`}
-        onClick={copyText}
-      >
-        {copied ? '✓' : '⧉'}
-      </button>
-      {/* Link */}
-      <button
-        type="button"
-        title={el.link ? `Edit link: ${el.link}` : 'Add link'}
-        aria-label={el.link ? 'Edit hyperlink' : 'Add hyperlink'}
-        aria-pressed={!!el.link}
-        className={`${btn} ${el.link ? 'bg-brand-50 text-brand-600' : 'text-slate-700'}`}
-        onClick={() => {
-          setLinkInput(el.link ?? '');
-          setShowLink((v) => !v);
-        }}
-      >
-        🔗
-      </button>
-      <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />
-      {/* Delete */}
-      <button
-        type="button"
-        title="Delete text"
-        aria-label="Delete text element"
-        className={`${btn} text-red-600 hover:bg-red-50`}
-        onClick={() => deleteElement(el.id)}
-      >
-        🗑
-      </button>
+      {/* Copy (hidden in new mode) */}
+      {!isNewMode && (
+        <button
+          type="button"
+          title={copied ? 'Copied!' : 'Copy text'}
+          aria-label="Copy text"
+          className={`${btn} text-slate-700`}
+          onClick={copyText}
+        >
+          {copied ? '✓' : '⧉'}
+        </button>
+      )}
+      {/* Link (hidden in new mode) */}
+      {!isNewMode && (
+        <button
+          type="button"
+          title={el.link ? `Edit link: ${el.link}` : 'Add link'}
+          aria-label={el.link ? 'Edit hyperlink' : 'Add hyperlink'}
+          aria-pressed={!!el.link}
+          className={`${btn} ${el.link ? 'bg-brand-50 text-brand-600' : 'text-slate-700'}`}
+          onClick={() => {
+            setLinkInput(el.link ?? '');
+            setShowLink((v) => !v);
+          }}
+        >
+          🔗
+        </button>
+      )}
+      {!isNewMode && <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />}
+      {/* Delete (hidden in new mode) */}
+      {!isNewMode && (
+        <button
+          type="button"
+          title="Delete text"
+          aria-label="Delete text element"
+          className={`${btn} text-red-600 hover:bg-red-50`}
+          onClick={() => deleteElement(el.id)}
+        >
+          🗑
+        </button>
+      )}
 
       {/* Link editor popover */}
       {showLink && (

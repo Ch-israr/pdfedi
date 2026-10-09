@@ -267,6 +267,14 @@ export function ElementOverlay({ page }: { page: Page }) {
     | { mode: 'edit'; id: string; screenX: number; screenY: number; initialText: string }
     | null
   >(null);
+  // Pending formatting for new text (shown in toolbar while typing)
+  const [pendingFormat, setPendingFormat] = useState({
+    fontSize: 14,
+    fontFamily: 'Helvetica',
+    color: '#000000',
+    bold: false,
+    italic: false,
+  });
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
 
@@ -297,14 +305,22 @@ export function ElementOverlay({ page }: { page: Page }) {
           y: y - 12,
           rotation: 0,
           text,
-          fontSize: 14,
-          fontFamily: 'Helvetica',
-          color: '#000000',
-          bold: false,
-          italic: false,
+          fontSize: pendingFormat.fontSize,
+          fontFamily: pendingFormat.fontFamily,
+          color: pendingFormat.color,
+          bold: pendingFormat.bold,
+          italic: pendingFormat.italic,
         },
         'Add text',
       );
+      // Reset pending format for next time
+      setPendingFormat({
+        fontSize: 14,
+        fontFamily: 'Helvetica',
+        color: '#000000',
+        bold: false,
+        italic: false,
+      });
     },
     [editingText, addElement, page.id],
   );
@@ -447,6 +463,36 @@ export function ElementOverlay({ page }: { page: Page }) {
       )}
       {/* Floating toolbar for selected text (shown during selection AND editing) */}
       {(() => {
+        // During new-text mode: show toolbar with pending formatting
+        if (editingText?.mode === 'new') {
+          const syntheticEl = {
+            id: '__new__',
+            kind: 'text' as const,
+            pageId: page.id,
+            x: editingText.x,
+            y: editingText.y,
+            rotation: 0,
+            text: '',
+            ...pendingFormat,
+          };
+          const sx = toScreen(editingText.x, zoom);
+          const baselineY = pdfYToScreenTop(editingText.y, page, zoom);
+          const textH = pendingFormat.fontSize * 1.2 * zoom;
+          const textTop = baselineY - textH;
+          return (
+            <FloatingTextToolbar
+              el={syntheticEl}
+              screenX={sx}
+              screenY={textTop}
+              textHeight={textH}
+              zoom={zoom}
+              editing={true}
+              overrideUpdate={(_id, patch) => {
+                setPendingFormat((f) => ({ ...f, ...patch }));
+              }}
+            />
+          );
+        }
         if (!selectedId) return null;
         const sel = els.find((e) => e.id === selectedId);
         if (!sel) return null;
