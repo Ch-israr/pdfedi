@@ -47,6 +47,7 @@ export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVer
             sourceIndex={page.sourceIndex}
             label={i + 1}
             active={page.id === activePageId}
+            rotation={page.rotation}
             getDoc={getDoc}
             docVersion={docVersion}
             onSelect={() => {
@@ -98,6 +99,7 @@ function Thumbnail({
   sourceIndex,
   label,
   active,
+  rotation,
   getDoc,
   docVersion,
   onSelect,
@@ -111,6 +113,7 @@ function Thumbnail({
   sourceIndex: number;
   label: number;
   active: boolean;
+  rotation: number;
   getDoc: () => never;
   docVersion: number;
   onSelect: () => void;
@@ -136,7 +139,7 @@ function Thumbnail({
         const doc = getDoc();
         const canvas = canvasRef.current;
         if (doc && canvas) {
-          void renderPageToCanvas(doc, sourceIndex, canvas, 0.25).catch(() => {});
+          void renderPageToCanvas(doc, sourceIndex, canvas, 0.25, rotation).catch(() => {});
         }
         obs.disconnect();
       },
@@ -144,7 +147,7 @@ function Thumbnail({
     );
     obs.observe(el);
     return () => obs.disconnect();
-  }, [sourceIndex, getDoc, docVersion]);
+  }, [sourceIndex, rotation, getDoc, docVersion]);
 
   return (
     <div

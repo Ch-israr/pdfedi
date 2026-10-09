@@ -50,9 +50,10 @@ export async function renderPageToCanvas(
   sourceIndex: number,
   canvas: HTMLCanvasElement,
   scale: number,
+  rotation: number = 0,
 ): Promise<void> {
   const pdfPage = await doc.getPage(sourceIndex);
-  const viewport = pdfPage.getViewport({ scale });
+  const viewport = pdfPage.getViewport({ scale, rotation });
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const newW = Math.floor(viewport.width * dpr);
   const newH = Math.floor(viewport.height * dpr);

@@ -47,7 +47,7 @@ export function PageCanvas({ page, getDoc, docVersion }: Props) {
     let cancelled = false;
     void (async () => {
       try {
-        await renderPageToCanvas(doc as never, page.sourceIndex, canvas, zoom);
+        await renderPageToCanvas(doc as never, page.sourceIndex, canvas, zoom, page.rotation);
         if (cancelled) {
           const ctx = canvas.getContext('2d');
           ctx?.clearRect(0, 0, canvas.width, canvas.height);

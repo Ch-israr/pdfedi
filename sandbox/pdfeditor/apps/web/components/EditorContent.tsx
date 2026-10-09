@@ -54,6 +54,22 @@ export function EditorContent() {
   }, [pdfBytes]);
 
   const getDoc = useCallback(() => docRef.current as never, []);
+  const mainRef = useRef<HTMLElement>(null);
+  const setZoom = useEditor((s) => s.setZoom);
+  const prevPageCount = useRef(0);
+
+  // Fit-to-width on document load: set zoom so the first page fills the container
+  useEffect(() => {
+    const currentPages = useEditor.getState().pages;
+    if (currentPages.length > 0 && prevPageCount.current === 0) {
+      const page = currentPages[0];
+      const containerW = mainRef.current ? mainRef.current.clientWidth - 32 : 800;
+      const fitZoom = containerW / page.width;
+      // Clamp between 0.5 and 2.0 for sensible defaults
+      setZoom(Math.max(0.5, Math.min(2.0, fitZoom)));
+    }
+    prevPageCount.current = currentPages.length;
+  });
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -94,7 +110,10 @@ export function EditorContent() {
       <Toolbar />
       <div className="flex min-h-0 flex-1">
         <Thumbnails getDoc={getDoc} docVersion={docVersion} />
-        <main className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 px-2 py-4 sm:px-4 sm:py-6">
+        <main
+          ref={mainRef}
+          className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 px-2 py-4 sm:px-4 sm:py-6"
+        >
           {pages.map((page) => (
             <PageCanvas key={page.id} page={page} getDoc={getDoc} docVersion={docVersion} />
           ))}
