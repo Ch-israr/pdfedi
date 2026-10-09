@@ -504,10 +504,19 @@ export const useEditor = create<EditorState>()(
       if (!doc || !doc.pdfBytes) return false;
       const pages = doc.pages as Page[];
       const elements = doc.elements as Record<string, EditorElement>;
+      const pdfBytes = new Uint8Array(doc.pdfBytes);
+      // Clear first to force PDF.js document reload, then restore
+      set((s) => {
+        s.pdfBytes = null;
+        s.pages = [];
+        s.elements = {};
+      });
+      // Brief pause to let the cleanup run
+      await new Promise((r) => setTimeout(r, 50));
       set((s) => {
         s.fileName = doc.fileName;
         s.fileSize = doc.fileSize;
-        s.pdfBytes = new Uint8Array(doc.pdfBytes!);
+        s.pdfBytes = pdfBytes;
         s.pageCount = pages.length;
         s.pages = pages;
         s.elements = elements;
