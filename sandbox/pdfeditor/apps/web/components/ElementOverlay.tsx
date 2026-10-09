@@ -50,6 +50,7 @@ function ElementView({
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
+    e.preventDefault();
     select(el.id);
     dragRef.current = {
       startX: e.clientX,
@@ -57,7 +58,8 @@ function ElementView({
       origX: el.x,
       origY: el.y,
     };
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    // Use currentTarget (the div with the handler), not target (may be a text node)
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
@@ -103,6 +105,7 @@ function ElementView({
     outlineOffset: 2,
     userSelect: 'none',
     WebkitUserSelect: 'none',
+    touchAction: 'none',
   };
 
   const common = {
