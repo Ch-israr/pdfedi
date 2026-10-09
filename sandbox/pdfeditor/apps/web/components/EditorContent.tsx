@@ -77,6 +77,7 @@ export function EditorContent() {
   }, []);
 
   // Offer recovery on mount if a saved document exists
+  const [recoveryDoc, setRecoveryDoc] = useState<{ fileName: string; savedAt: number } | null>(null);
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -85,21 +86,23 @@ export function EditorContent() {
       const { loadDocument } = await import('@/lib/persistence');
       const doc = await loadDocument();
       if (!cancelled && doc?.fileName) {
-        const ok = window.confirm(
-          `Recover unsaved work on "${doc.fileName}" from ${new Date(doc.savedAt).toLocaleString()}?`,
-        );
-        if (ok && !cancelled) {
-          await useEditor.getState().recoverDocument();
-        } else if (!cancelled) {
-          const { clearDocument } = await import('@/lib/persistence');
-          await clearDocument();
-        }
+        setRecoveryDoc({ fileName: doc.fileName, savedAt: doc.savedAt });
       }
     })();
     return () => {
       cancelled = true;
     };
   }, []);
+
+  const acceptRecovery = async () => {
+    await useEditor.getState().recoverDocument();
+    setRecoveryDoc(null);
+  };
+  const declineRecovery = async () => {
+    const { clearDocument } = await import('@/lib/persistence');
+    await clearDocument();
+    setRecoveryDoc(null);
+  };
 
   // Fit-to-width on document load: set zoom so the first page fills the container
   useEffect(() => {
@@ -151,6 +154,30 @@ export function EditorContent() {
   return (
     <div className="pdfeditor-root flex h-full min-h-0 flex-col overflow-hidden bg-slate-100">
       <Toolbar />
+      {recoveryDoc && (
+        <div className="flex items-center justify-between gap-4 border-b border-amber-200 bg-amber-50 px-4 py-2.5">
+          <p className="text-sm text-amber-900">
+            Found unsaved work on <strong>{recoveryDoc.fileName}</strong> from{' '}
+            {new Date(recoveryDoc.savedAt).toLocaleString()}. Recover it?
+          </p>
+          <div className="flex shrink-0 gap-2">
+            <button
+              type="button"
+              onClick={acceptRecovery}
+              className="rounded-lg bg-amber-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-amber-700"
+            >
+              Recover
+            </button>
+            <button
+              type="button"
+              onClick={declineRecovery}
+              className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm font-medium text-amber-800 hover:bg-amber-100"
+            >
+              Discard
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex min-h-0 flex-1">
         <Thumbnails getDoc={getDoc} docVersion={docVersion} />
         <main
