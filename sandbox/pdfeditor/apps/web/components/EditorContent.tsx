@@ -58,6 +58,49 @@ export function EditorContent() {
   const setZoom = useEditor((s) => s.setZoom);
   const prevPageCount = useRef(0);
 
+  // Debounced autosave: save to IndexedDB 2s after last change
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const unsub = useEditor.subscribe((s, prev) => {
+      // Only autosave when document content changes
+      if (s.pages !== prev.pages || s.elements !== prev.elements) {
+        if (timer) clearTimeout(timer);
+        timer = setTimeout(() => {
+          useEditor.getState().autosave();
+        }, 2000);
+      }
+    });
+    return () => {
+      unsub();
+      if (timer) clearTimeout(timer);
+    };
+  }, []);
+
+  // Offer recovery on mount if a saved document exists
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      // Only offer recovery if no document is currently loaded
+      if (useEditor.getState().pdfBytes) return;
+      const { loadDocument } = await import('@/lib/persistence');
+      const doc = await loadDocument();
+      if (!cancelled && doc?.fileName) {
+        const ok = window.confirm(
+          `Recover unsaved work on "${doc.fileName}" from ${new Date(doc.savedAt).toLocaleString()}?`,
+        );
+        if (ok && !cancelled) {
+          await useEditor.getState().recoverDocument();
+        } else if (!cancelled) {
+          const { clearDocument } = await import('@/lib/persistence');
+          await clearDocument();
+        }
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   // Fit-to-width on document load: set zoom so the first page fills the container
   useEffect(() => {
     const currentPages = useEditor.getState().pages;

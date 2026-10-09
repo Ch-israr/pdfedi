@@ -194,4 +194,26 @@ export interface HistoryCommand {
   label: string;
   undo(): void | Promise<void>;
   redo(): void | Promise<void>;
+  /** Optional metadata for history panel (not used by undo/redo) */
+  meta?: {
+    actionType: string;
+    pageId?: string;
+    objectIds?: string[];
+  };
+}
+
+/** Serializable metadata for a history entry (for history panel, persistence). */
+export interface HistoryRecord {
+  id: string;
+  /** Machine-readable action type, e.g. "add-element", "move-element", "rotate-page" */
+  actionType: string;
+  label: string;
+  timestamp: number;
+  /** 1-based page number at time of action, if applicable */
+  pageNumber?: number;
+  pageId?: string;
+  /** IDs of affected elements, if applicable */
+  objectIds?: string[];
+  /** Index in the past[] array this record corresponds to */
+  commandIndex: number;
 }

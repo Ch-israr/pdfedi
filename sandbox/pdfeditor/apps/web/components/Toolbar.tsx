@@ -1,6 +1,24 @@
 'use client';
 
 import { useEditor, type ToolId } from '@/store/editor';
+import { HistoryPanel } from './HistoryPanel';
+
+function SaveStatus() {
+  const saveStatus = useEditor((s) => s.saveStatus);
+  if (saveStatus === 'idle') return null;
+  const config = {
+    saved: { icon: '✓', text: 'Saved', cls: 'text-green-600' },
+    saving: { icon: '…', text: 'Saving…', cls: 'text-slate-500' },
+    error: { icon: '⚠', text: 'Save failed', cls: 'text-red-600' },
+    idle: { icon: '', text: '', cls: '' },
+  }[saveStatus];
+  return (
+    <span className={`flex items-center gap-1 px-2 text-xs font-medium ${config.cls}`} title="Local autosave status">
+      <span aria-hidden>{config.icon}</span>
+      <span className="hidden xl:inline">{config.text}</span>
+    </span>
+  );
+}
 
 const TOOL_GROUPS: { id: ToolId; label: string; icon: string; shortcut?: string }[][] = [
   // Selection
@@ -170,6 +188,12 @@ export function Toolbar() {
         <span aria-hidden>🧲</span>
         <span className="hidden xl:inline">Snap</span>
       </button>
+
+      {/* History panel */}
+      <HistoryPanel />
+
+      {/* Save status */}
+      <SaveStatus />
 
       {/* Primary actions */}
       <div className="ml-auto flex items-center gap-2">

@@ -20,6 +20,7 @@ import {
 import type {
   EditorElement,
   HistoryCommand,
+  HistoryRecord,
   Page,
 } from '@pdfeditor/shared';
 import { loadPdfDocument } from '@/lib/pdfjs';
@@ -60,6 +61,10 @@ interface EditorState {
   // History (command-based)
   past: HistoryCommand[];
   future: HistoryCommand[];
+  /** Serializable metadata log parallel to past[] (for history panel) */
+  historyLog: HistoryRecord[];
+  /** Local autosave status */
+  saveStatus: 'saved' | 'saving' | 'error' | 'idle';
 
   // Actions
   loadPdf: (file: File) => Promise<void>;
@@ -82,15 +87,36 @@ interface EditorState {
   redo: () => void;
   exportBytes: () => Promise<Uint8Array>;
   download: () => Promise<void>;
+  /** Trigger a debounced local autosave */
+  autosave: () => void;
+  /** Load recovered document from IndexedDB */
+  recoverDocument: () => Promise<boolean>;
 }
 
 function pushHistory(
-  state: { past: HistoryCommand[]; future: HistoryCommand[] },
+  state: { past: HistoryCommand[]; future: HistoryCommand[]; historyLog: HistoryRecord[]; pages: Page[] },
   cmd: HistoryCommand,
 ) {
   state.past.push(cmd);
-  if (state.past.length > 100) state.past.shift();
+  if (state.past.length > 100) {
+    state.past.shift();
+    state.historyLog.shift();
+  }
   state.future = [];
+  // Create serializable metadata record
+  const pageNumber = cmd.meta?.pageId
+    ? state.pages.findIndex((p) => p.id === cmd.meta!.pageId!) + 1 || undefined
+    : undefined;
+  state.historyLog.push({
+    id: crypto.randomUUID(),
+    actionType: cmd.meta?.actionType ?? 'unknown',
+    label: cmd.label,
+    timestamp: Date.now(),
+    pageNumber: pageNumber && pageNumber > 0 ? pageNumber : undefined,
+    pageId: cmd.meta?.pageId,
+    objectIds: cmd.meta?.objectIds,
+    commandIndex: state.past.length - 1,
+  });
 }
 
 export const useEditor = create<EditorState>()(
@@ -111,6 +137,8 @@ export const useEditor = create<EditorState>()(
     snapThreshold: 5,
     past: [],
     future: [],
+    historyLog: [],
+    saveStatus: 'idle',
 
     loadPdf: async (file) => {
       set((s) => {
@@ -137,6 +165,7 @@ export const useEditor = create<EditorState>()(
           s.selectedId = null;
           s.past = [];
           s.future = [];
+          s.historyLog = [];
           s.tool = 'select';
           s.loading = false;
         });
@@ -161,6 +190,7 @@ export const useEditor = create<EditorState>()(
         s.selectedId = null;
         s.past = [];
         s.future = [];
+        s.historyLog = [];
         s.error = null;
       });
     },
@@ -180,6 +210,11 @@ export const useEditor = create<EditorState>()(
         s.selectedId = el.id;
         pushHistory(s, {
           label,
+          meta: {
+            actionType: 'add-element',
+            pageId: el.pageId,
+            objectIds: [el.id],
+          },
           undo: () => {
             useEditor.setState((st) => {
               delete st.elements[snapshot.id];
@@ -434,6 +469,56 @@ export const useEditor = create<EditorState>()(
       a.remove();
       // Privacy: revoke immediately after the download starts
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    },
+
+    autosave: () => {
+      // Debounced in the caller; this performs the actual save
+      const s = get();
+      if (!s.pdfBytes || s.pages.length === 0) return;
+      set({ saveStatus: 'saving' });
+      import('@/lib/persistence').then(({ saveDocument }) => {
+        const pdfBytes = s.pdfBytes!;
+        // Copy bytes for IndexedDB (it needs ArrayBuffer)
+        const buf = pdfBytes.buffer.slice(
+          pdfBytes.byteOffset,
+          pdfBytes.byteOffset + pdfBytes.byteLength,
+        ) as ArrayBuffer;
+        saveDocument({
+          fileName: s.fileName,
+          fileSize: s.fileSize,
+          pdfBytes: buf,
+          pages: s.pages,
+          elements: s.elements,
+          historyLog: s.historyLog,
+        })
+          .then(() => {
+            if (get().pdfBytes) set({ saveStatus: 'saved' });
+          })
+          .catch(() => set({ saveStatus: 'error' }));
+      });
+    },
+
+    recoverDocument: async () => {
+      const { loadDocument } = await import('@/lib/persistence');
+      const doc = await loadDocument();
+      if (!doc || !doc.pdfBytes) return false;
+      const pages = doc.pages as Page[];
+      const elements = doc.elements as Record<string, EditorElement>;
+      set((s) => {
+        s.fileName = doc.fileName;
+        s.fileSize = doc.fileSize;
+        s.pdfBytes = new Uint8Array(doc.pdfBytes!);
+        s.pageCount = pages.length;
+        s.pages = pages;
+        s.elements = elements;
+        s.activePageId = pages[0]?.id ?? null;
+        s.selectedId = null;
+        s.past = [];
+        s.future = [];
+        s.historyLog = (doc.historyLog as HistoryRecord[]) ?? [];
+        s.saveStatus = 'saved';
+      });
+      return true;
     },
   })),
 );
