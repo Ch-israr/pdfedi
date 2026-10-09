@@ -4,6 +4,7 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import type { EditorElement, Page } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
 import { calcGuides, type Guide } from '@/lib/smart-guides';
+import { FloatingTextToolbar } from './FloatingTextToolbar';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -27,10 +28,14 @@ function ElementView({
   el,
   page,
   onGuides,
+  onEditText,
+  isEditing,
 }: {
   el: EditorElement;
   page: Page;
   onGuides: (guides: Guide[]) => void;
+  onEditText: (el: EditorElement, screenX: number, screenY: number) => void;
+  isEditing: boolean;
 }) {
   const zoom = useEditor((s) => s.zoom);
   const selectedId = useEditor((s) => s.selectedId);
@@ -112,7 +117,20 @@ function ElementView({
     onPointerDown,
     onPointerMove,
     onPointerUp,
-    onDoubleClick: (e: React.MouseEvent) => e.stopPropagation(),
+    onDoubleClick: (e: React.MouseEvent) => {
+      e.stopPropagation();
+      // Double-click on text enters editing mode (distinct from single-click select)
+      if (el.kind === 'text' && !isEditing) {
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const overlay = (e.currentTarget as HTMLElement).closest('.element-overlay-root');
+        const orect = overlay?.getBoundingClientRect();
+        onEditText(
+          el,
+          rect.left - (orect?.left ?? 0),
+          rect.bottom - (orect?.top ?? 0),
+        );
+      }
+    },
     style,
     'data-el-id': el.id,
   };
@@ -191,24 +209,35 @@ export function ElementOverlay({ page }: { page: Page }) {
   const zoom = useEditor((s) => s.zoom);
   const addElement = useEditor((s) => s.addElement);
   const select = useEditor((s) => s.select);
+  const selectedId = useEditor((s) => s.selectedId);
   // Smart guides are temporary — shown only during drag, never stored/exported
   const [guides, setGuides] = useState<Guide[]>([]);
   const onGuides = useCallback((g: Guide[]) => setGuides(g), []);
-  // Inline text editing: {x, y} in PDF points, plus screen position for the textarea
-  const [editingText, setEditingText] = useState<{
-    x: number;
-    y: number;
-    screenX: number;
-    screenY: number;
-  } | null>(null);
+  // Inline text editing: new text or editing existing text element
+  const [editingText, setEditingText] = useState<
+    | { mode: 'new'; x: number; y: number; screenX: number; screenY: number }
+    | { mode: 'edit'; id: string; screenX: number; screenY: number; initialText: string }
+    | null
+  >(null);
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
 
   const commitText = useCallback(
     (text: string) => {
       if (!editingText) return;
-      const { x, y } = editingText;
+      const et = editingText;
       setEditingText(null);
+      if (et.mode === 'edit') {
+        // Editing existing: update text, or delete if emptied
+        if (!text.trim()) {
+          useEditor.getState().deleteElement(et.id);
+        } else if (text !== et.initialText) {
+          useEditor.getState().updateElement(et.id, { text }, 'Edit text');
+        }
+        return;
+      }
+      // New text
+      const { x, y } = et;
       if (!text.trim()) return; // empty → discard, don't create element
       const id = crypto.randomUUID();
       addElement(
@@ -232,6 +261,22 @@ export function ElementOverlay({ page }: { page: Page }) {
     [editingText, addElement, page.id],
   );
 
+  // Start editing an existing text element (double-click)
+  const startEditText = useCallback(
+    (el: EditorElement, screenX: number, screenY: number) => {
+      if (el.kind !== 'text') return;
+      select(el.id);
+      setEditingText({
+        mode: 'edit',
+        id: el.id,
+        screenX,
+        screenY,
+        initialText: el.text,
+      });
+    },
+    [select],
+  );
+
   const onPageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('[data-el-id]')) return;
     const rect = e.currentTarget.getBoundingClientRect();
@@ -245,6 +290,7 @@ export function ElementOverlay({ page }: { page: Page }) {
         // Inline editing: show a textarea at the click position instead of window.prompt
         const rect2 = e.currentTarget.getBoundingClientRect();
         setEditingText({
+          mode: 'new',
           x,
           y,
           screenX: e.clientX - rect2.left,
@@ -329,20 +375,39 @@ export function ElementOverlay({ page }: { page: Page }) {
   };
 
   return (
-    <div className="absolute inset-0" onClick={onPageClick}>
+    <div className="element-overlay-root absolute inset-0" onClick={onPageClick}>
       {els.map((el) => (
-        <ElementView key={el.id} el={el} page={page} onGuides={onGuides} />
+        <ElementView
+          key={el.id}
+          el={el}
+          page={page}
+          onGuides={onGuides}
+          onEditText={startEditText}
+          isEditing={editingText?.mode === 'edit' && editingText.id === el.id}
+        />
       ))}
-      {/* Inline text editor — appears at click position when text tool is active */}
+      {/* Inline text editor — new text or editing existing */}
       {editingText && (
         <InlineTextEditor
           screenX={editingText.screenX}
           screenY={editingText.screenY}
           zoom={zoom}
+          initialText={editingText.mode === 'edit' ? editingText.initialText : ''}
           onCommit={commitText}
           onCancel={() => setEditingText(null)}
         />
       )}
+      {/* Floating toolbar for selected text (not while editing) */}
+      {(() => {
+        if (!selectedId || (editingText?.mode === 'edit' && editingText.id === selectedId))
+          return null;
+        const sel = els.find((e) => e.id === selectedId);
+        if (!sel || sel.kind !== 'text') return null;
+        // Position above the element's screen position
+        const sx = toScreen(sel.x, zoom);
+        const sy = toScreen(sel.y, zoom);
+        return <FloatingTextToolbar el={sel} screenX={sx} screenY={sy} />;
+      })()}
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>
         g.orientation === 'v' ? (
@@ -381,20 +446,23 @@ function InlineTextEditor({
   screenX,
   screenY,
   zoom,
+  initialText,
   onCommit,
   onCancel,
 }: {
   screenX: number;
   screenY: number;
   zoom: number;
+  initialText: string;
   onCommit: (text: string) => void;
   onCancel: () => void;
 }) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(initialText);
   const ref = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     ref.current?.focus();
+    ref.current?.select();
   }, []);
 
   return (
