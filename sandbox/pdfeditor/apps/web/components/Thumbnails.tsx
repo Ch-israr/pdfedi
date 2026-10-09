@@ -45,6 +45,8 @@ export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVer
             key={page.id}
             pageId={page.id}
             sourceIndex={page.sourceIndex}
+            width={page.width}
+            height={page.height}
             label={i + 1}
             active={page.id === activePageId}
             rotation={page.rotation}
@@ -97,6 +99,8 @@ function ThumbAction({
 function Thumbnail({
   pageId,
   sourceIndex,
+  width,
+  height,
   label,
   active,
   rotation,
@@ -111,6 +115,8 @@ function Thumbnail({
 }: {
   pageId: string;
   sourceIndex: number;
+  width: number;
+  height: number;
   label: number;
   active: boolean;
   rotation: number;
@@ -169,8 +175,14 @@ function Thumbnail({
           : 'border-transparent shadow-sm hover:border-slate-300 hover:shadow'
       }`}
     >
-      <div className="flex aspect-[3/4] items-center justify-center overflow-hidden rounded-md bg-slate-100">
-        <canvas ref={canvasRef} className="max-h-full max-w-full object-contain" />
+      <div
+        className="flex items-center justify-center overflow-hidden rounded-md bg-slate-100"
+        style={{ aspectRatio: `${width} / ${height}` }}
+      >
+        <canvas
+          ref={canvasRef}
+          className={sourceIndex === 0 ? 'h-full w-full bg-white' : 'max-h-full max-w-full object-contain'}
+        />
       </div>
       <div
         className={`mt-1.5 text-center text-xs tabular-nums ${
