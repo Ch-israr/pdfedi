@@ -77,6 +77,7 @@ interface EditorState {
   addElement: (el: EditorElement, label?: string) => void;
   updateElement: (id: string, patch: Partial<EditorElement>, label?: string) => void;
   deleteElement: (id: string) => void;
+  duplicateElement: (id: string) => void;
   select: (id: string | null) => void;
   rotatePage: (pageId: string) => void;
   deletePage: (pageId: string) => void;
@@ -264,6 +265,34 @@ export const useEditor = create<EditorState>()(
             useEditor.setState((st) => {
               delete st.elements[id];
               if (st.selectedId === id) st.selectedId = null;
+            });
+          },
+        });
+      });
+    },
+
+    duplicateElement: (id) => {
+      const el = get().elements[id];
+      if (!el) return;
+      const copyId = crypto.randomUUID();
+      // Offset slightly so the duplicate is visible
+      const copy = { ...el, id: copyId, x: el.x + 12, y: el.y - 12 };
+      set((s) => {
+        s.elements[copyId] = copy as EditorElement;
+        s.selectedId = copyId;
+        pushHistory(s, {
+          label: 'Duplicate element',
+          meta: { actionType: 'duplicate-element', pageId: el.pageId, objectIds: [copyId] },
+          undo: () => {
+            useEditor.setState((st) => {
+              delete st.elements[copyId];
+              st.selectedId = id;
+            });
+          },
+          redo: () => {
+            useEditor.setState((st) => {
+              st.elements[copyId] = copy as EditorElement;
+              st.selectedId = copyId;
             });
           },
         });

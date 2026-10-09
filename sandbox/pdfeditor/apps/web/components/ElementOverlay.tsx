@@ -5,6 +5,9 @@ import type { EditorElement, Page } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
 import { calcGuides, type Guide } from '@/lib/smart-guides';
 import { FloatingTextToolbar } from './FloatingTextToolbar';
+import { FloatingShapeToolbar } from './FloatingShapeToolbar';
+import { FloatingImageToolbar } from './FloatingImageToolbar';
+import { ResizeHandles } from './ResizeHandles';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -173,39 +176,76 @@ function ElementView({
             background: el.color,
             opacity: el.opacity,
           }}
-        />
+        >
+          {selected && <ResizeHandles el={el} zoom={zoom} />}
+        </div>
       );
     case 'shape':
+      // Lines/arrows have zero height — only show corner handles to avoid
+      // degenerate edge handles
+      const isLine = el.shape === 'line' || el.shape === 'arrow';
       return (
         <div
           {...common}
           style={{
             ...style,
             width: toScreen(Math.abs(el.width), zoom),
-            height: toScreen(Math.abs(el.height), zoom),
+            height: toScreen(Math.max(Math.abs(el.height), isLine ? 4 : 1), zoom),
             border: `${Math.max(1, toScreen(el.strokeWidth, zoom))}px solid ${el.stroke}`,
             background: el.fill ?? 'transparent',
             borderRadius: el.shape === 'ellipse' ? '50%' : 0,
           }}
-        />
+        >
+          {selected && <ResizeHandles el={el} zoom={zoom} cornersOnly={isLine} />}
+        </div>
       );
     case 'image':
     case 'signature':
       return (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          {...common}
-          src={el.src}
-          alt=""
-          draggable={false}
-          style={{
-            ...style,
-            width: toScreen(el.width, zoom),
-            height: toScreen(el.height, zoom),
-          }}
+        <ResizableImage
+          el={el}
+          page={page}
+          zoom={zoom}
+          selected={selected}
+          commonProps={common}
         />
       );
   }
+}
+
+// Wrapper that adds resize handles to img elements (can't have children)
+function ResizableImage({
+  el,
+  page,
+  zoom,
+  selected,
+  commonProps,
+}: {
+  el: Extract<EditorElement, { kind: 'image' | 'signature' }>;
+  page: Page;
+  zoom: number;
+  selected: boolean;
+  commonProps: Record<string, unknown>;
+}) {
+  return (
+    <div
+      {...(commonProps as React.HTMLAttributes<HTMLDivElement>)}
+      style={{
+        ...(commonProps.style as React.CSSProperties),
+        width: toScreen(el.width, zoom),
+        height: toScreen(el.height, zoom),
+      }}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={el.src}
+        alt=""
+        draggable={false}
+        style={{ width: '100%', height: '100%', display: 'block', pointerEvents: 'none' }}
+      />
+      {selected && <ResizeHandles el={el} zoom={zoom} lockAspect cornersOnly />}
+    </div>
+  );
 }
 
 /**
@@ -409,26 +449,67 @@ export function ElementOverlay({ page }: { page: Page }) {
       {(() => {
         if (!selectedId) return null;
         const sel = els.find((e) => e.id === selectedId);
-        if (!sel || sel.kind !== 'text') return null;
-        // Position above the element: use correct PDF→screen conversion
-        // and account for actual text height so toolbar follows font size changes.
-        const sx = toScreen(sel.x, zoom);
-        const baselineY = pdfYToScreenTop(sel.y, page, zoom);
-        // Estimate text height: fontSize * lineHeight * lines * zoom
-        const lineCount = Math.max(1, sel.text.split('\n').length);
-        const textH = sel.fontSize * 1.2 * lineCount * zoom;
-        const textTop = baselineY - textH;
-        const isEditing = editingText?.mode === 'edit' && editingText.id === selectedId;
-        return (
-          <FloatingTextToolbar
-            el={sel}
-            screenX={sx}
-            screenY={textTop}
-            textHeight={textH}
-            zoom={zoom}
-            editing={isEditing}
-          />
-        );
+        if (!sel) return null;
+        const duplicateElement = useEditor.getState().duplicateElement;
+
+        // Helper: compute screen position for shape/image elements
+        const elScreen = (e: typeof sel) => {
+          const sx = toScreen(e.x, zoom);
+          const baselineY = pdfYToScreenTop(e.y, page, zoom);
+          // Element height in screen px (for toolbar positioning below if needed)
+          const h = 'height' in e ? Math.abs(e.height) * zoom : 0;
+          const top = baselineY - h;
+          return { sx, top, h };
+        };
+
+        if (sel.kind === 'text') {
+          // Position above the element: use correct PDF→screen conversion
+          // and account for actual text height so toolbar follows font size changes.
+          const sx = toScreen(sel.x, zoom);
+          const baselineY = pdfYToScreenTop(sel.y, page, zoom);
+          // Estimate text height: fontSize * lineHeight * lines * zoom
+          const lineCount = Math.max(1, sel.text.split('\n').length);
+          const textH = sel.fontSize * 1.2 * lineCount * zoom;
+          const textTop = baselineY - textH;
+          const isEditing = editingText?.mode === 'edit' && editingText.id === selectedId;
+          return (
+            <FloatingTextToolbar
+              el={sel}
+              screenX={sx}
+              screenY={textTop}
+              textHeight={textH}
+              zoom={zoom}
+              editing={isEditing}
+            />
+          );
+        }
+        if (sel.kind === 'shape') {
+          const { sx, top, h } = elScreen(sel);
+          return (
+            <FloatingShapeToolbar
+              el={sel}
+              screenX={sx}
+              screenTop={top}
+              screenHeight={h}
+              zoom={zoom}
+              duplicateElement={duplicateElement}
+            />
+          );
+        }
+        if (sel.kind === 'image') {
+          const { sx, top, h } = elScreen(sel);
+          return (
+            <FloatingImageToolbar
+              el={sel}
+              screenX={sx}
+              screenTop={top}
+              screenHeight={h}
+              zoom={zoom}
+              duplicateElement={duplicateElement}
+            />
+          );
+        }
+        return null;
       })()}
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>
