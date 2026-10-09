@@ -505,26 +505,26 @@ export const useEditor = create<EditorState>()(
       const pages = doc.pages as Page[];
       const elements = doc.elements as Record<string, EditorElement>;
       const pdfBytes = new Uint8Array(doc.pdfBytes);
-      // Clear first to force PDF.js document reload, then restore
+      // Pause autosave during recovery to prevent overwriting the snapshot
+      // with intermediate empty state
       set((s) => {
-        s.pdfBytes = null;
-        s.pages = [];
-        s.elements = {};
+        s.saveStatus = 'saving'; // blocks autosave via the guard below
       });
-      // Brief pause to let the cleanup run
-      await new Promise((r) => setTimeout(r, 50));
       set((s) => {
         s.fileName = doc.fileName;
         s.fileSize = doc.fileSize;
-        s.pdfBytes = pdfBytes;
+        // Force PDF.js reload by changing the bytes reference
+        // (append a no-op copy to guarantee a new reference)
+        s.pdfBytes = pdfBytes.slice();
         s.pageCount = pages.length;
-        s.pages = pages;
-        s.elements = elements;
+        // Deep-clone to avoid any IndexedDB structured-clone proxy issues
+        s.pages = JSON.parse(JSON.stringify(pages));
+        s.elements = JSON.parse(JSON.stringify(elements));
         s.activePageId = pages[0]?.id ?? null;
         s.selectedId = null;
         s.past = [];
         s.future = [];
-        s.historyLog = (doc.historyLog as HistoryRecord[]) ?? [];
+        s.historyLog = JSON.parse(JSON.stringify(doc.historyLog ?? []));
         s.saveStatus = 'saved';
       });
       return true;
