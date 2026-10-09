@@ -11,6 +11,14 @@ function toScreen(v: number, zoom: number) {
   return v * zoom;
 }
 
+/**
+ * Convert PDF y (bottom-left origin, y up) to screen top (top-left origin, y down).
+ * This is the inverse of screenToPdf's y conversion.
+ */
+function pdfYToScreenTop(pdfY: number, page: Page, zoom: number): number {
+  return (page.height - pdfY) * zoom;
+}
+
 /** Convert a click on the page (offset px) to PDF points */
 export function screenToPdf(
   offsetX: number,
@@ -50,8 +58,8 @@ function ElementView({
   const selected = selectedId === el.id;
 
   const left = toScreen(el.x, zoom);
-  // el.y is bottom-left origin → CSS top
-  const top = toScreen(el.y, zoom);
+  // el.y is PDF bottom-left origin → convert to CSS top (screen top-left origin)
+  const top = pdfYToScreenTop(el.y, page, zoom);
 
   const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
@@ -403,10 +411,10 @@ export function ElementOverlay({ page }: { page: Page }) {
           return null;
         const sel = els.find((e) => e.id === selectedId);
         if (!sel || sel.kind !== 'text') return null;
-        // Position above the element's screen position
+        // Position above the element: use correct PDF→screen conversion
         const sx = toScreen(sel.x, zoom);
-        const sy = toScreen(sel.y, zoom);
-        return <FloatingTextToolbar el={sel} screenX={sx} screenY={sy} />;
+        const sy = pdfYToScreenTop(sel.y, page, zoom);
+        return <FloatingTextToolbar el={sel} screenX={sx} screenY={sy} zoom={zoom} />;
       })()}
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>

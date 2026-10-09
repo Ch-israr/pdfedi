@@ -101,10 +101,6 @@ export function PropertiesPanel() {
       <div className="mt-4 space-y-4">
         <section className="space-y-2">
           {sectionTitle('Position')}
-          <div className="grid grid-cols-2 gap-2">
-            {num('X (pt)', el.x, (v) => updateElement(el.id, { x: v } as Partial<EditorElement>))}
-            {num('Y (pt)', el.y, (v) => updateElement(el.id, { y: v } as Partial<EditorElement>))}
-          </div>
           {num('Rotation (°)', el.rotation, (v) =>
             updateElement(el.id, { rotation: v } as Partial<EditorElement>),
           )}

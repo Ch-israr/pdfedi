@@ -12,10 +12,12 @@ export function FloatingTextToolbar({
   el,
   screenX,
   screenY,
+  zoom,
 }: {
   el: Extract<EditorElement, { kind: 'text' }>;
   screenX: number;
   screenY: number;
+  zoom: number;
 }) {
   const updateElement = useEditor((s) => s.updateElement);
   const deleteElement = useEditor((s) => s.deleteElement);
@@ -25,6 +27,13 @@ export function FloatingTextToolbar({
   const btn =
     'flex h-8 w-8 items-center justify-center rounded-md text-sm transition-colors hover:bg-slate-100';
 
+  // Zoom-aware gap: scales with zoom so spacing stays consistent.
+  // screenY is the element's baseline (bottom edge on screen).
+  // Place toolbar above with clearance; if near top edge, place below instead.
+  const gap = 12 * zoom;
+  const toolbarH = 48;
+  const placeAbove = screenY - gap - toolbarH > 4;
+
   return (
     <div
       role="toolbar"
@@ -32,9 +41,7 @@ export function FloatingTextToolbar({
       className="absolute z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1.5 py-1 shadow-xl"
       style={{
         left: screenX,
-        // Position well above the text (account for text height + clearance)
-        // so the toolbar never covers the text or blocks double-click to edit.
-        top: Math.max(8, screenY - 64),
+        top: placeAbove ? screenY - gap - toolbarH : screenY + gap,
       }}
       onPointerDown={stop}
       onPointerMove={stop}
