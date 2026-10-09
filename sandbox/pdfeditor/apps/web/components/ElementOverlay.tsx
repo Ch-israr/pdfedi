@@ -101,6 +101,8 @@ function ElementView({
     cursor: 'move',
     outline: selected ? '2px solid #2f6bff' : 'none',
     outlineOffset: 2,
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
   };
 
   const common = {
