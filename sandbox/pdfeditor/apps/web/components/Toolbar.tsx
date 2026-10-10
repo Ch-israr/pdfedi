@@ -60,17 +60,13 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       onClick={() => onSelect(id)}
-      className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
+      className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
         active
           ? 'bg-brand-500 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
       }`}
     >
       <ToolIcon id={id} />
-      {/* Text labels on desktop; icon-only on smaller screens (tooltip covers it) */}
-      <span aria-hidden className="hidden xl:inline">
-        {label}
-      </span>
     </button>
   );
 }
@@ -150,13 +146,13 @@ export function Toolbar() {
       </div>
 
       {/* Zoom */}
-      <div className="flex h-9 items-center gap-0.5 rounded-lg border border-slate-200 px-1" role="group" aria-label="Zoom">
+      <div className="flex items-center gap-0.5 rounded-lg border border-slate-200 px-1" role="group" aria-label="Zoom">
         <button
           type="button"
           title="Zoom out"
           aria-label="Zoom out"
           onClick={() => setZoom(Math.max(0.25, zoom - 0.25))}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-base text-slate-600 hover:bg-slate-100"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-base text-slate-600 hover:bg-slate-100"
         >
           −
         </button>
@@ -168,7 +164,7 @@ export function Toolbar() {
           title="Zoom in"
           aria-label="Zoom in"
           onClick={() => setZoom(Math.min(4, zoom + 0.25))}
-          className="flex h-7 w-7 items-center justify-center rounded-md text-base text-slate-600 hover:bg-slate-100"
+          className="flex h-8 w-8 items-center justify-center rounded-md text-base text-slate-600 hover:bg-slate-100"
         >
           +
         </button>
