@@ -62,14 +62,6 @@ export function PageCanvas({ page, getDoc, docVersion }: Props) {
   }, [visible, zoom, page.sourceIndex, page.rotation, getDoc, docVersion]);
 
   const isActive = activePageId === page.id;
-  const setNativeText = useEditor((s) => s.setNativeText);
-
-  // Extract native text positions for direct editing (reads the PDF's own
-  // text operators — no OCR). Re-runs when the page or its rotation changes.
-  // DISABLED 2026-10-10: investigating upload crash — re-enable after fix.
-  useEffect(() => {
-    return undefined;
-  }, []);
 
   return (
     <div

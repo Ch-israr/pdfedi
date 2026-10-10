@@ -26,24 +26,24 @@ export function FloatingTextToolbar({
   editing,
   overrideUpdate,
 }: {
-  el: Extract<EditorElement, { kind: 'text' | 'native-text' }>;
+  el: Extract<EditorElement, { kind: 'text' }>;
   screenX: number;
   screenY: number;
   textHeight: number;
   zoom: number;
   editing: boolean;
   /** Optional: intercept updates (for new-text mode with pending formatting) */
-  overrideUpdate?: (id: string, patch: Partial<Extract<EditorElement, { kind: 'text' | 'native-text' }>>) => void;
+  overrideUpdate?: (id: string, patch: Partial<Extract<EditorElement, { kind: 'text' }>>) => void;
 }) {
   const storeUpdate = useEditor((s) => s.updateElement);
   const updateElement = overrideUpdate
-    ? (id: string, patch: Partial<Extract<EditorElement, { kind: 'text' | 'native-text' }>>, _label?: string) =>
+    ? (id: string, patch: Partial<Extract<EditorElement, { kind: 'text' }>>, _label?: string) =>
         overrideUpdate(id, patch)
     : storeUpdate;
   const deleteElement = useEditor((s) => s.deleteElement);
   const isNewMode = el.id === '__new__';
   const [showLink, setShowLink] = useState(false);
-  const [linkInput, setLinkInput] = useState(el.kind === 'text' ? (el.link ?? '') : '');
+  const [linkInput, setLinkInput] = useState(el.link ?? '');
   const [copied, setCopied] = useState(false);
 
   const stop = (e: React.SyntheticEvent) => e.stopPropagation();
@@ -80,7 +80,6 @@ export function FloatingTextToolbar({
   };
 
   const saveLink = () => {
-    if (el.kind !== 'text') return; // links are text-element only
     const url = normalizeUrl(linkInput);
     if (url) {
       updateElement(el.id, { link: url }, 'Add link');
@@ -230,8 +229,8 @@ export function FloatingTextToolbar({
           {copied ? '✓' : '⧉'}
         </button>
       )}
-      {/* Link (hidden in new mode; text elements only) */}
-      {!isNewMode && el.kind === 'text' && (
+      {/* Link (hidden in new mode) */}
+      {!isNewMode && (
         <button
           type="button"
           title={el.link ? `Edit link: ${el.link}` : 'Add link'}
@@ -260,8 +259,8 @@ export function FloatingTextToolbar({
         </button>
       )}
 
-      {/* Link editor popover (text elements only) */}
-      {showLink && el.kind === 'text' && (
+      {/* Link editor popover */}
+      {showLink && (
         <div
           className="absolute left-1/2 top-full z-40 mt-2 w-64 -translate-x-1/2 rounded-lg border border-slate-200 bg-white p-2 shadow-xl"
           onClick={stop}

@@ -1,11 +1,10 @@
 'use client';
 
 import { useRef, useState, useCallback, useEffect } from 'react';
-import type { EditorElement, NativeTextItem, Page } from '@pdfeditor/shared';
+import type { EditorElement, Page } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
 import { calcGuides, type Guide } from '@/lib/smart-guides';
 import { FloatingTextToolbar } from './FloatingTextToolbar';
-import { NativeEditWarning } from './NativeEditWarning';
 import { FloatingShapeToolbar } from './FloatingShapeToolbar';
 import { FloatingImageToolbar } from './FloatingImageToolbar';
 import { ResizeHandles } from './ResizeHandles';
@@ -192,7 +191,7 @@ function ElementView({
     onDoubleClick: (e: React.MouseEvent) => {
       e.stopPropagation();
       // Double-click on text enters editing mode (distinct from single-click select)
-      if ((el.kind === 'text' || el.kind === 'native-text') && !isEditing) {
+      if (el.kind === 'text' && !isEditing) {
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
         const overlay = (e.currentTarget as HTMLElement).closest('.element-overlay-root');
         const orect = overlay?.getBoundingClientRect();
@@ -221,33 +220,6 @@ function ElementView({
             fontStyle: el.italic ? 'italic' : 'normal',
             whiteSpace: 'pre-wrap',
             minWidth: 20,
-          }}
-        >
-          {el.text}
-        </div>
-      );
-    case 'native-text':
-      return (
-        <div
-          {...common}
-          style={{
-            ...style,
-            // Positioned by cover-box bottom-left (no baseline translate)
-            transform: `rotate(${-el.rotation}deg)`,
-            width: toScreen(el.width, zoom),
-            height: toScreen(el.height, zoom),
-            background: '#ffffff',
-            fontSize: toScreen(el.fontSize, zoom),
-            fontFamily: el.fontFamily,
-            color: el.color,
-            fontWeight: el.bold ? 'bold' : 'normal',
-            fontStyle: el.italic ? 'italic' : 'normal',
-            whiteSpace: 'pre-wrap',
-            overflow: 'visible',
-            // Align text to the original baseline within the cover box
-            paddingBottom: toScreen(el.baselineOffset, zoom),
-            display: 'flex',
-            alignItems: 'flex-end',
           }}
         >
           {el.text}
@@ -446,19 +418,10 @@ export function ElementOverlay({ page }: { page: Page }) {
   // Smart guides are temporary — shown only during drag, never stored/exported
   const [guides, setGuides] = useState<Guide[]>([]);
   const onGuides = useCallback((g: Guide[]) => setGuides(g), []);
-  // Inline text editing: new text, editing existing text element,
-  // or editing native PDF text (mode 'native')
+  // Inline text editing: new text or editing existing text element
   const [editingText, setEditingText] = useState<
     | { mode: 'new'; x: number; y: number; screenX: number; screenY: number }
     | { mode: 'edit'; id: string; screenX: number; screenY: number; initialText: string }
-    | {
-        mode: 'native';
-        nativeItem: NativeTextItem;
-        existingId: string | null;
-        screenX: number;
-        screenY: number;
-        initialText: string;
-      }
     | null
   >(null);
   // Pending formatting for new text (shown in toolbar while typing)
@@ -479,10 +442,6 @@ export function ElementOverlay({ page }: { page: Page }) {
     curY: number;
     shiftKey: boolean; // for circle constraint / angle snap
   } | null>(null);
-  // One-time warning when native editing is attempted on flat content
-  const [showNativeWarning, setShowNativeWarning] = useState(false);
-  const nativeEditWarned = useEditor((s) => s.nativeEditWarned);
-  const markNativeEditWarned = useEditor((s) => s.markNativeEditWarned);
   const drawRef = useRef<HTMLDivElement>(null);
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
@@ -498,45 +457,6 @@ export function ElementOverlay({ page }: { page: Page }) {
           useEditor.getState().deleteElement(et.id);
         } else if (text !== et.initialText) {
           useEditor.getState().updateElement(et.id, { text }, 'Edit text');
-        }
-        return;
-      }
-      if (et.mode === 'native') {
-        // Editing native PDF text: create (or update) a native-text element
-        // that covers the original with an opaque rect on export.
-        if (!text.trim()) {
-          // Emptied → remove the edit if one existed (original shows again)
-          if (et.existingId) useEditor.getState().deleteElement(et.existingId);
-          return;
-        }
-        if (text === et.initialText && et.existingId) return; // unchanged
-        const item = et.nativeItem;
-        const elId = et.existingId ?? crypto.randomUUID();
-        const label = `Edit native text — "${text.length > 30 ? text.slice(0, 30) + '…' : text}"`;
-        if (et.existingId) {
-          useEditor.getState().updateElement(et.existingId, { text }, label);
-        } else {
-          addElement(
-            {
-              id: elId,
-              pageId: page.id,
-              kind: 'native-text',
-              x: item.x,
-              y: item.y,
-              rotation: 0,
-              originalText: item.text,
-              text,
-              width: item.width,
-              height: item.height,
-              baselineOffset: item.baselineOffset,
-              fontSize: item.fontSize,
-              fontFamily: item.fontFamily,
-              color: '#000000',
-              bold: item.bold,
-              italic: item.italic,
-            },
-            label,
-          );
         }
         return;
       }
@@ -576,32 +496,8 @@ export function ElementOverlay({ page }: { page: Page }) {
   // Start editing an existing text element (double-click)
   const startEditText = useCallback(
     (el: EditorElement, screenX: number, screenY: number) => {
-      if (el.kind !== 'text' && el.kind !== 'native-text') return;
+      if (el.kind !== 'text') return;
       select(el.id);
-      if (el.kind === 'native-text') {
-        // Re-edit a native-text element: pre-fill with its current text
-        setEditingText({
-          mode: 'native',
-          nativeItem: {
-            id: `nt-${el.id}`,
-            x: el.x,
-            y: el.y,
-            width: el.width,
-            height: el.height,
-            baselineOffset: el.baselineOffset,
-            text: el.originalText,
-            fontSize: el.fontSize,
-            fontFamily: el.fontFamily,
-            bold: el.bold,
-            italic: el.italic,
-          },
-          existingId: el.id,
-          screenX,
-          screenY,
-          initialText: el.text,
-        });
-        return;
-      }
       setEditingText({
         mode: 'edit',
         id: el.id,
@@ -613,56 +509,11 @@ export function ElementOverlay({ page }: { page: Page }) {
     [select],
   );
 
-  // Native text items for this page (extracted from the PDF itself)
-  const nativeItems = useEditor((s) => s.nativeText[page.id] ?? []);
-
-  /** Find the native text fragment under a PDF-point position, if any. */
-  const hitNativeText = (x: number, y: number): NativeTextItem | null => {
-    for (let i = nativeItems.length - 1; i >= 0; i--) {
-      const it = nativeItems[i];
-      if (x >= it.x && x <= it.x + it.width && y >= it.y && y <= it.y + it.height) {
-        return it;
-      }
-    }
-    return null;
-  };
-
   const onPageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('[data-el-id]')) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
     const id = crypto.randomUUID();
-
-    // Direct native-text editing: with Select or Text active, clicking an
-    // existing PDF text fragment opens the inline editor for it instead of
-    // starting a new overlay. (Clicks on already-edited text hit the
-    // element overlay above and return early.)
-    if (tool === 'select' || tool === 'text') {
-      const hit = hitNativeText(x, y);
-      if (hit) {
-        // Skip if a native-text element already covers this fragment — the
-        // element itself handles the click (returned early above), but guard
-        // against stale overlap anyway.
-        const covered = els.some(
-          (el) =>
-            el.kind === 'native-text' &&
-            Math.abs(el.x - hit.x) < 1 &&
-            Math.abs(el.y - hit.y) < 1,
-        );
-        if (!covered) {
-          const orect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-          setEditingText({
-            mode: 'native',
-            nativeItem: hit,
-            existingId: null,
-            screenX: e.clientX - orect.left,
-            screenY: e.clientY - orect.top,
-            initialText: hit.text,
-          });
-          return;
-        }
-      }
-    }
 
     const place = (el: EditorElement, label: string) => addElement(el, label);
 
@@ -877,17 +728,6 @@ export function ElementOverlay({ page }: { page: Page }) {
       ref={drawRef}
       className="element-overlay-root absolute inset-0"
       onClick={onPageClick}
-      onDoubleClick={(e) => {
-        // One-time warning: double-click is the "edit this" gesture. If it
-        // lands on empty content of a page with no extractable native text,
-        // the existing content cannot be edited directly.
-        if (nativeEditWarned) return;
-        if (tool !== 'select' && tool !== 'text') return;
-        if ((e.target as HTMLElement).closest('[data-el-id]')) return;
-        if (nativeItems.length > 0) return;
-        markNativeEditWarned();
-        setShowNativeWarning(true);
-      }}
       onPointerDown={onPagePointerDown}
       onPointerMove={onPagePointerMove}
       onPointerUp={onPagePointerUp}
@@ -900,10 +740,7 @@ export function ElementOverlay({ page }: { page: Page }) {
           page={page}
           onGuides={onGuides}
           onEditText={startEditText}
-          isEditing={
-            (editingText?.mode === 'edit' && editingText.id === el.id) ||
-            (editingText?.mode === 'native' && editingText.existingId === el.id)
-          }
+          isEditing={editingText?.mode === 'edit' && editingText.id === el.id}
         />
       ))}
       {/* Drag-to-draw preview for lines/arrows */}
@@ -914,9 +751,7 @@ export function ElementOverlay({ page }: { page: Page }) {
           screenX={editingText.screenX}
           screenY={editingText.screenY}
           zoom={zoom}
-          initialText={
-            editingText.mode === 'new' ? '' : editingText.initialText
-          }
+          initialText={editingText.mode === 'edit' ? editingText.initialText : ''}
           onCommit={commitText}
           onCancel={() => setEditingText(null)}
         />
@@ -968,22 +803,16 @@ export function ElementOverlay({ page }: { page: Page }) {
           return { sx, top, h };
         };
 
-        if (sel.kind === 'text' || sel.kind === 'native-text') {
+        if (sel.kind === 'text') {
           // Position above the element: use correct PDF→screen conversion
           // and account for actual text height so toolbar follows font size changes.
           const sx = toScreen(sel.x, zoom);
-          // 'text' stores a baseline y; 'native-text' stores cover-box bottom
-          const baseY =
-            sel.kind === 'native-text' ? sel.y + sel.baselineOffset : sel.y;
-          const baselineY = pdfYToScreenTop(baseY, page, zoom);
+          const baselineY = pdfYToScreenTop(sel.y, page, zoom);
           // Estimate text height: fontSize * lineHeight * lines * zoom
           const lineCount = Math.max(1, sel.text.split('\n').length);
           const textH = sel.fontSize * 1.2 * lineCount * zoom;
           const textTop = baselineY - textH;
-          const isEditing =
-            sel.kind === 'text'
-              ? editingText?.mode === 'edit' && editingText.id === selectedId
-              : editingText?.mode === 'native' && editingText.existingId === selectedId;
+          const isEditing = editingText?.mode === 'edit' && editingText.id === selectedId;
           return (
             <FloatingTextToolbar
               el={sel}
@@ -1023,9 +852,6 @@ export function ElementOverlay({ page }: { page: Page }) {
         }
         return null;
       })()}
-      {showNativeWarning && (
-        <NativeEditWarning onClose={() => setShowNativeWarning(false)} />
-      )}
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>
         g.orientation === 'v' ? (
