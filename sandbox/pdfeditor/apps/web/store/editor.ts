@@ -96,12 +96,16 @@ interface EditorState {
 
 function pushHistory(
   state: { past: HistoryCommand[]; future: HistoryCommand[]; historyLog: HistoryRecord[]; pages: Page[] },
-  cmd: HistoryCommand,
+  cmd: Omit<HistoryCommand, 'id'>,
 ) {
-  state.past.push(cmd);
+  const id = crypto.randomUUID();
+  const fullCmd: HistoryCommand = { ...cmd, id };
+  state.past.push(fullCmd);
   if (state.past.length > 100) {
-    state.past.shift();
-    state.historyLog.shift();
+    const removed = state.past.shift()!;
+    // Remove the corresponding log record by command ID (stable across splices)
+    const logIdx = state.historyLog.findIndex((r) => r.commandId === removed.id);
+    if (logIdx !== -1) state.historyLog.splice(logIdx, 1);
   }
   state.future = [];
   // Create serializable metadata record
@@ -110,6 +114,7 @@ function pushHistory(
     : undefined;
   state.historyLog.push({
     id: crypto.randomUUID(),
+    commandId: id,
     actionType: cmd.meta?.actionType ?? 'unknown',
     label: cmd.label,
     timestamp: Date.now(),

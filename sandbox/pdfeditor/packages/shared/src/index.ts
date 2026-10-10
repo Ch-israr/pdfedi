@@ -190,6 +190,8 @@ export type ApiError = z.infer<typeof ApiErrorSchema>;
 // ---------------------------------------------------------------------------
 
 export interface HistoryCommand {
+  /** Unique ID linking this command to its HistoryRecord */
+  id: string;
   /** Human-readable label, e.g. "Add text" */
   label: string;
   undo(): void | Promise<void>;
@@ -210,6 +212,8 @@ export interface HistoryCommand {
 /** Serializable metadata for a history entry (for history panel, persistence). */
 export interface HistoryRecord {
   id: string;
+  /** ID of the HistoryCommand this record corresponds to (stable across splices) */
+  commandId: string;
   /** Machine-readable action type, e.g. "add-element", "move-element", "rotate-page" */
   actionType: string;
   label: string;

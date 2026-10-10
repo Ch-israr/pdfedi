@@ -157,6 +157,7 @@ export function ResizeHandles({
       {handles.map(({ pos, cursor, x, y }) => (
         <div
           key={pos}
+          data-handle={`resize-${pos}`}
           data-resize-handle={pos}
           onPointerDown={onHandleDown(pos)}
           onPointerMove={onHandleMove}

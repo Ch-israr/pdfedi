@@ -37,6 +37,22 @@ export function screenToPdf(
 }
 
 /**
+ * Snap a drag vector to 15-degree increments (for Shift-constrained
+ * line/arrow drawing). Preserves the drag length, snaps the angle.
+ */
+export function snapAngle(dx: number, dy: number): { dx: number; dy: number } {
+  const len = Math.hypot(dx, dy);
+  if (len < 0.001) return { dx, dy };
+  const angle = Math.atan2(dy, dx);
+  const snap = Math.PI / 12; // 15 degrees
+  const snapped = Math.round(angle / snap) * snap;
+  return {
+    dx: len * Math.cos(snapped),
+    dy: len * Math.sin(snapped),
+  };
+}
+
+/**
  * Screen geometry for a line/arrow element, whose model is a start point
  * (x, y) plus a delta vector (width, height) in PDF points. Returns the
  * endpoint positions in overlay-relative screen px plus the tight bounding
@@ -144,7 +160,7 @@ function ElementView({
     updateElement(
       el.id,
       { x: newX, y: newY } as Partial<EditorElement>,
-      'Move element',
+      `Move ${el.kind === 'text' ? 'text' : el.kind === 'shape' ? (el.shape === 'line' ? 'line' : el.shape === 'arrow' ? 'arrow' : el.shape) : el.kind}`,
       { mergeKey: d.mergeKey },
     );
   };
@@ -242,6 +258,8 @@ function ElementView({
         const hx2 = lx2 + headLen * Math.cos(a2);
         const hy2 = ly2 + headLen * Math.sin(a2);
         // Position div at bbox (override the default bottom-left positioning)
+        // No rectangular outline for lines/arrows — selection is shown via
+        // the two endpoint handles and a subtle line highlight instead.
         const lineStyle: React.CSSProperties = {
           position: 'absolute',
           left: bbLeft,
@@ -249,8 +267,7 @@ function ElementView({
           width: bbW,
           height: bbH,
           cursor: 'move',
-          outline: selected ? '2px solid #2f6bff' : 'none',
-          outlineOffset: 2,
+          outline: 'none',
           userSelect: 'none',
           WebkitUserSelect: 'none',
           touchAction: 'none',
@@ -289,6 +306,20 @@ function ElementView({
                 strokeWidth={sw}
                 strokeLinecap="round"
               />
+              {/* Subtle selection highlight (replaces rectangular box) */}
+              {selected && (
+                <line
+                  x1={lx1}
+                  y1={ly1}
+                  x2={lx2}
+                  y2={ly2}
+                  stroke="#2f6bff"
+                  strokeWidth={Math.max(1.5, sw * 0.4)}
+                  strokeLinecap="round"
+                  strokeDasharray={`${4 * zoom} ${3 * zoom}`}
+                  opacity={0.9}
+                />
+              )}
               {el.shape === 'arrow' && (
                 <polygon
                   points={`${lx2},${ly2} ${hx1},${hy1} ${hx2},${hy2}`}
@@ -401,13 +432,15 @@ export function ElementOverlay({ page }: { page: Page }) {
     bold: false,
     italic: false,
   });
-  // Drag-to-draw state for lines/arrows: press → drag → release
+  // Drag-to-draw state for shapes: press → drag → release
+  // (lines/arrows use start/end points; rect/ellipse use drag rectangle)
   const [drawing, setDrawing] = useState<{
-    shape: 'line' | 'arrow';
+    shape: 'line' | 'arrow' | 'rect' | 'ellipse';
     startX: number; // PDF points
     startY: number;
     curX: number;
     curY: number;
+    shiftKey: boolean; // for circle constraint / angle snap
   } | null>(null);
   const drawRef = useRef<HTMLDivElement>(null);
 
@@ -446,7 +479,7 @@ export function ElementOverlay({ page }: { page: Page }) {
           bold: pendingFormat.bold,
           italic: pendingFormat.italic,
         },
-        'Add text',
+        `Text Added — "${text.length > 30 ? text.slice(0, 30) + '…' : text}"`,
       );
       // Reset pending format for next time
       setPendingFormat({
@@ -503,19 +536,13 @@ export function ElementOverlay({ page }: { page: Page }) {
             id, pageId: page.id, kind: 'highlight', x, y: y - 10, rotation: 0,
             width: 120, height: 16, color: '#FFFF00', opacity: 0.4,
           },
-          'Add highlight',
+          'Highlight Added',
         );
         break;
       case 'shape-rect':
       case 'shape-ellipse':
-        place(
-          {
-            id, pageId: page.id, kind: 'shape', x, y: y - 60, rotation: 0,
-            shape: tool === 'shape-rect' ? 'rect' : 'ellipse',
-            width: 120, height: 60, stroke: '#000000', strokeWidth: 2, fill: null,
-          },
-          'Add shape',
-        );
+        // Drag-to-draw: handled by onPagePointerDown/Move/Up. Click without
+        // drag is intentionally discarded (no default-size element).
         break;
       case 'shape-line':
       case 'shape-arrow':
@@ -540,7 +567,7 @@ export function ElementOverlay({ page }: { page: Page }) {
                 rotation: 0, src: url, width: img.width * scale,
                 height: img.height * scale, mime: f.type,
               },
-              'Add image',
+              'Image Added',
             );
           };
           img.src = url;
@@ -557,7 +584,7 @@ export function ElementOverlay({ page }: { page: Page }) {
               id, pageId: page.id, kind: 'signature', x, y: y - h,
               rotation: 0, src: dataUrl, width: w, height: h,
             },
-            'Add signature',
+            'Signature Added',
           );
         });
         break;
@@ -567,21 +594,30 @@ export function ElementOverlay({ page }: { page: Page }) {
     }
   };
 
-  // Drag-to-draw for lines/arrows: press → drag → release defines the endpoints.
+  // Drag-to-draw for shapes: press → drag → release defines the geometry.
   // No default-size element is created; a click without drag is discarded.
   const onPagePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (tool !== 'shape-line' && tool !== 'shape-arrow') return;
+    const drawShape = tool === 'shape-line' ? 'line'
+      : tool === 'shape-arrow' ? 'arrow'
+      : tool === 'shape-rect' ? 'rect'
+      : tool === 'shape-ellipse' ? 'ellipse'
+      : null;
+    if (!drawShape) return;
+    // Handles take priority over drawing tools: if the pointer is on a
+    // resize/endpoint handle, let the handle's own handler run instead.
+    if ((e.target as HTMLElement).closest('[data-handle]')) return;
     if ((e.target as HTMLElement).closest('[data-el-id]')) return;
     e.preventDefault();
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
     const rect = e.currentTarget.getBoundingClientRect();
     const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
     setDrawing({
-      shape: tool === 'shape-arrow' ? 'arrow' : 'line',
+      shape: drawShape,
       startX: x,
       startY: y,
       curX: x,
       curY: y,
+      shiftKey: e.shiftKey,
     });
   };
 
@@ -589,37 +625,86 @@ export function ElementOverlay({ page }: { page: Page }) {
     if (!drawing) return;
     const rect = (drawRef.current ?? e.currentTarget).getBoundingClientRect();
     const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
-    setDrawing((d) => (d ? { ...d, curX: x, curY: y } : d));
+    setDrawing((d) => (d ? { ...d, curX: x, curY: y, shiftKey: e.shiftKey } : d));
+  };
+
+  const onPagePointerCancel = () => {
+    // Pointer cancelled (e.g., gesture interrupted): discard preview, no element.
+    setDrawing(null);
   };
 
   const onPagePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!drawing) return;
     const d = drawing;
     setDrawing(null);
-    // Require a minimum drag distance (in PDF points); a simple click is discarded.
     const dx = d.curX - d.startX;
     const dy = d.curY - d.startY;
-    if (Math.hypot(dx, dy) < 5) return;
+    // Require a minimum drag distance (in PDF points); a simple click is discarded.
+    if (d.shape === 'line' || d.shape === 'arrow') {
+      if (Math.hypot(dx, dy) < 5) return;
+    } else {
+      if (Math.abs(dx) < 5 || Math.abs(dy) < 5) return;
+    }
     const id = crypto.randomUUID();
-    // Normalize: store start at (x,y), end as width/height delta.
-    // Keep the actual drag direction (width/height may be negative).
-    addElement(
-      {
-        id,
-        pageId: page.id,
-        kind: 'shape',
-        x: d.startX,
-        y: d.startY,
-        rotation: 0,
-        shape: d.shape,
-        width: dx,
-        height: dy,
-        stroke: '#000000',
-        strokeWidth: 2,
-        fill: null,
-      },
-      d.shape === 'arrow' ? 'Add arrow' : 'Add line',
-    );
+
+    if (d.shape === 'line' || d.shape === 'arrow') {
+      // Apply angle snapping if Shift was held
+      let fdx = dx, fdy = dy;
+      if (d.shiftKey) {
+        const snapped = snapAngle(dx, dy);
+        fdx = snapped.dx; fdy = snapped.dy;
+      }
+      addElement(
+        {
+          id,
+          pageId: page.id,
+          kind: 'shape',
+          x: d.startX,
+          y: d.startY,
+          rotation: 0,
+          shape: d.shape,
+          width: fdx,
+          height: fdy,
+          stroke: '#000000',
+          strokeWidth: 2,
+          fill: null,
+        },
+        d.shape === 'arrow' ? 'Arrow Added' : 'Line Added',
+      );
+    } else {
+      // Rect/ellipse: normalize drag rectangle (handles all drag directions).
+      // x,y is the bottom-left in PDF coords; width/height are positive.
+      let x1 = d.startX, y1 = d.startY, x2 = d.curX, y2 = d.curY;
+      if (d.shiftKey && d.shape === 'ellipse') {
+        // Shift constrains ellipse to a circle: use max dimension
+        const w = Math.abs(x2 - x1);
+        const h = Math.abs(y2 - y1);
+        const size = Math.max(w, h);
+        x2 = x1 + Math.sign(x2 - x1 || 1) * size;
+        y2 = y1 + Math.sign(y2 - y1 || 1) * size;
+      }
+      const x = Math.min(x1, x2);
+      const y = Math.min(y1, y2);
+      const w = Math.abs(x2 - x1);
+      const h = Math.abs(y2 - y1);
+      addElement(
+        {
+          id,
+          pageId: page.id,
+          kind: 'shape',
+          x,
+          y,
+          rotation: 0,
+          shape: d.shape,
+          width: w,
+          height: h,
+          stroke: '#000000',
+          strokeWidth: 2,
+          fill: null,
+        },
+        d.shape === 'rect' ? 'Rectangle Added' : 'Ellipse Added',
+      );
+    }
   };
 
   return (
@@ -630,6 +715,7 @@ export function ElementOverlay({ page }: { page: Page }) {
       onPointerDown={onPagePointerDown}
       onPointerMove={onPagePointerMove}
       onPointerUp={onPagePointerUp}
+      onPointerCancel={onPagePointerCancel}
     >
       {els.map((el) => (
         <ElementView
@@ -792,16 +878,57 @@ function DrawingPreview({
   page,
   zoom,
 }: {
-  drawing: { shape: 'line' | 'arrow'; startX: number; startY: number; curX: number; curY: number };
+  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
   page: Page;
   zoom: number;
 }) {
   const sx1 = toScreen(drawing.startX, zoom);
   const sy1 = pdfYToScreenTop(drawing.startY, page, zoom);
-  const sx2 = toScreen(drawing.curX, zoom);
-  const sy2 = pdfYToScreenTop(drawing.curY, page, zoom);
+  let sx2 = toScreen(drawing.curX, zoom);
+  let sy2 = pdfYToScreenTop(drawing.curY, page, zoom);
 
   const sw = Math.max(1, 2 * zoom);
+
+  // Dimension badge text (in PDF points)
+  let badgeText = '';
+  // Badge position (screen coords, near cursor)
+  let badgeX = sx2, badgeY = sy2;
+
+  if (drawing.shape === 'line' || drawing.shape === 'arrow') {
+    // Apply angle snapping for preview if Shift held
+    let dx = drawing.curX - drawing.startX;
+    let dy = drawing.curY - drawing.startY;
+    if (drawing.shiftKey) {
+      const s = snapAngle(dx, dy);
+      dx = s.dx; dy = s.dy;
+      sx2 = toScreen(drawing.startX + dx, zoom);
+      sy2 = pdfYToScreenTop(drawing.startY + dy, page, zoom);
+    }
+    const len = Math.hypot(dx, dy);
+    const angleDeg = Math.round((Math.atan2(dy, dx) * 180) / Math.PI);
+    badgeText = `${len.toFixed(1)} pt · ${angleDeg}°`;
+  } else {
+    // Rect/ellipse: normalize drag rect for preview
+    let x1 = drawing.startX, y1 = drawing.startY, x2 = drawing.curX, y2 = drawing.curY;
+    if (drawing.shiftKey && drawing.shape === 'ellipse') {
+      const w = Math.abs(x2 - x1);
+      const h = Math.abs(y2 - y1);
+      const size = Math.max(w, h);
+      x2 = x1 + Math.sign(x2 - x1 || 1) * size;
+      y2 = y1 + Math.sign(y2 - y1 || 1) * size;
+    }
+    const w = Math.abs(x2 - x1);
+    const h = Math.abs(y2 - y1);
+    if (drawing.shape === 'ellipse' && drawing.shiftKey) {
+      badgeText = `⌀ ${w.toFixed(1)} pt`;
+    } else {
+      badgeText = `${w.toFixed(1)} × ${h.toFixed(1)} pt`;
+    }
+    // Update screen coords for circle constraint
+    sx2 = toScreen(x2, zoom);
+    sy2 = pdfYToScreenTop(y2, page, zoom);
+  }
+
   const headLen = Math.max(12, sw * 4);
   const angle = Math.atan2(sy2 - sy1, sx2 - sx1);
   const a1 = angle + Math.PI - 0.44;
@@ -811,31 +938,81 @@ function DrawingPreview({
   const hx2 = sx2 + headLen * Math.cos(a2);
   const hy2 = sy2 + headLen * Math.sin(a2);
 
+  // Rect/ellipse preview bounds (screen)
+  const rx = Math.min(sx1, sx2);
+  const ry = Math.min(sy1, sy2);
+  const rw = Math.abs(sx2 - sx1);
+  const rh = Math.abs(sy2 - sy1);
+
   return (
-    <svg
-      className="pointer-events-none absolute inset-0"
-      width="100%"
-      height="100%"
-      style={{ overflow: 'visible', zIndex: 20 }}
-    >
-      <line
-        x1={sx1}
-        y1={sy1}
-        x2={sx2}
-        y2={sy2}
-        stroke="#2f6bff"
-        strokeWidth={sw}
-        strokeLinecap="round"
-        strokeDasharray={`${6 * zoom} ${3 * zoom}`}
-      />
-      {drawing.shape === 'arrow' && (
-        <polygon
-          points={`${sx2},${sy2} ${hx1},${hy1} ${hx2},${hy2}`}
-          fill="#2f6bff"
-        />
+    <>
+      <svg
+        className="pointer-events-none absolute inset-0"
+        width="100%"
+        height="100%"
+        style={{ overflow: 'visible', zIndex: 20 }}
+      >
+        {(drawing.shape === 'line' || drawing.shape === 'arrow') && (
+          <>
+            <line
+              x1={sx1}
+              y1={sy1}
+              x2={sx2}
+              y2={sy2}
+              stroke="#2f6bff"
+              strokeWidth={sw}
+              strokeLinecap="round"
+              strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+            />
+            {drawing.shape === 'arrow' && (
+              <polygon
+                points={`${sx2},${sy2} ${hx1},${hy1} ${hx2},${hy2}`}
+                fill="#2f6bff"
+              />
+            )}
+            <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
+          </>
+        )}
+        {(drawing.shape === 'rect' || drawing.shape === 'ellipse') && (
+          drawing.shape === 'rect' ? (
+            <rect
+              x={rx}
+              y={ry}
+              width={rw}
+              height={rh}
+              fill="rgba(47,107,255,0.08)"
+              stroke="#2f6bff"
+              strokeWidth={sw}
+              strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+            />
+          ) : (
+            <ellipse
+              cx={rx + rw / 2}
+              cy={ry + rh / 2}
+              rx={rw / 2}
+              ry={rh / 2}
+              fill="rgba(47,107,255,0.08)"
+              stroke="#2f6bff"
+              strokeWidth={sw}
+              strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+            />
+          )
+        )}
+      </svg>
+      {/* Live dimension badge near cursor */}
+      {badgeText && (
+        <div
+          className="pointer-events-none absolute z-30 rounded-md bg-slate-900/90 px-2 py-1 text-[11px] font-medium tabular-nums text-white shadow-lg"
+          style={{
+            left: badgeX + 12,
+            top: badgeY - 28,
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {badgeText}
+        </div>
       )}
-      <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
-    </svg>
+    </>
   );
 }
 

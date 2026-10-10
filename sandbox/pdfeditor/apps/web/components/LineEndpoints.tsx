@@ -63,23 +63,40 @@ export function LineEndpoints({
       const p = pointerToPdf(e);
       const endX = el.x + el.width;
       const endY = el.y + el.height;
+      // Shift constrains angle to 15° increments (relative to the fixed endpoint)
+      const applySnap = (fromX: number, fromY: number, toX: number, toY: number) => {
+        if (!e.shiftKey) return { x: toX, y: toY };
+        const dx = toX - fromX;
+        const dy = toY - fromY;
+        const len = Math.hypot(dx, dy);
+        if (len < 0.001) return { x: toX, y: toY };
+        const angle = Math.atan2(dy, dx);
+        const snap = Math.PI / 12; // 15°
+        const snapped = Math.round(angle / snap) * snap;
+        return {
+          x: fromX + len * Math.cos(snapped),
+          y: fromY + len * Math.sin(snapped),
+        };
+      };
       if (d.which === 'start') {
         // Move the start point; the end stays fixed. The delta vector
         // (width/height) updates so length and angle follow the pointer.
         // Guard against a zero-length line (it would become unselectable).
-        const w = endX - p.x;
-        const h = endY - p.y;
+        const sp = applySnap(endX, endY, p.x, p.y);
+        const w = endX - sp.x;
+        const h = endY - sp.y;
         if (Math.hypot(w, h) < 1) return;
         updateElement(
           el.id,
-          { x: p.x, y: p.y, width: w, height: h } as Partial<EditorElement>,
+          { x: sp.x, y: sp.y, width: w, height: h } as Partial<EditorElement>,
           isArrow ? 'Move arrow tail' : 'Move line start',
           { mergeKey: d.mergeKey },
         );
       } else {
         // Move the end point; the start stays fixed.
-        const w = p.x - el.x;
-        const h = p.y - el.y;
+        const ep = applySnap(el.x, el.y, p.x, p.y);
+        const w = ep.x - el.x;
+        const h = ep.y - el.y;
         if (Math.hypot(w, h) < 1) return;
         updateElement(
           el.id,
@@ -119,6 +136,7 @@ export function LineEndpoints({
       {handles.map(({ which, cx, cy, title }) => (
         <div
           key={which}
+          data-handle={`line-endpoint-${which}`}
           title={title}
           onPointerDown={onHandleDown(which)}
           onPointerMove={onHandleMove}

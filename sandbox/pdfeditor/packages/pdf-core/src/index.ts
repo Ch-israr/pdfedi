@@ -193,8 +193,12 @@ export async function drawElement(
       if (el.shape === 'rect') {
         page.drawRectangle({ ...opts, width: el.width, height: el.height });
       } else if (el.shape === 'ellipse') {
+        // pdf-lib drawEllipse takes CENTER coordinates (it subtracts
+        // xScale/yScale internally), so offset by half size.
         page.drawEllipse({
           ...opts,
+          x: el.x + el.width / 2,
+          y: el.y + el.height / 2,
           xScale: el.width / 2,
           yScale: el.height / 2,
         });
