@@ -8,6 +8,7 @@ import Fastify from 'fastify';
 import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import cors from '@fastify/cors';
+import { ZodError } from 'zod';
 import { bearerToken, verifyJwt, type AuthConfig } from './auth.js';
 import { pdfRoutes } from './routes.js';
 import type { JwtClaims } from '@pdfeditor/shared';
@@ -75,6 +76,18 @@ async function main() {
   await app.register(pdfRoutes);
 
   app.setErrorHandler((err: unknown, _req, reply) => {
+    // Zod validation errors → 400 (not 500)
+    if (err instanceof ZodError) {
+      reply.code(400).send({
+        error: 'Validation failed',
+        code: 'bad_request',
+        details: err.errors.map((e) => ({
+          path: e.path.join('.'),
+          message: e.message,
+        })),
+      });
+      return;
+    }
     const status = (err as { statusCode?: number }).statusCode ?? 500;
     const message = err instanceof Error ? err.message : 'Internal server error';
     // Never echo file contents or sensitive details

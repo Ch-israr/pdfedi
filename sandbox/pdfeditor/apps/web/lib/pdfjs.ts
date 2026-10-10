@@ -51,6 +51,17 @@ export async function extractNativeText(
         continue;
       }
       const fontName = ((raw as { fontName?: string }).fontName ?? '').toLowerCase();
+      // Map embedded font name to closest standard PDF family.
+      // Removes subset prefix (e.g., "ABCDEE+Calibri" → "calibri").
+      const cleanName = fontName.replace(/^[a-z]{6}\+/, '');
+      let fontFamily = 'Helvetica'; // safe fallback
+      if (/times|georgia|serif/.test(cleanName)) {
+        fontFamily = 'Times-Roman';
+      } else if (/courier|mono|consolas|menlo/.test(cleanName)) {
+        fontFamily = 'Courier';
+      } else if (/arial|helvetica|verdana|tahoma|calibri/.test(cleanName)) {
+        fontFamily = 'Helvetica';
+      }
       items.push({
         id: `nt-${page.id}-${n++}`,
         x,
@@ -60,7 +71,7 @@ export async function extractNativeText(
         baselineOffset: padBottom,
         text: str,
         fontSize: Math.round(fontSize * 10) / 10,
-        fontFamily: 'Helvetica',
+        fontFamily,
         // Bold/italic hints from the embedded font name when available
         bold: /bold|black|heavy|demi/.test(fontName),
         italic: /italic|oblique/.test(fontName),

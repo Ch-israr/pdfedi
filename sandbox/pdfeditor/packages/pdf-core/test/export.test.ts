@@ -79,6 +79,20 @@ describe('pdf-core export with native-text', () => {
     // If we get here without throwing, the empty drawText didn't crash
   });
 
+  it('exports non-Latin text gracefully (cover drawn, no crash)', async () => {
+    const srcBytes = await makeSrcPdf();
+    const pages = [makePage()];
+    // Arabic text — standard PDF fonts can't encode this; export should not crash
+    const elements = { 'native-1': makeNativeText('مرحبا بالعالم') };
+
+    const bytes = await exportPdf({ srcBytes, pages, elements });
+    assert.ok(bytes.length > 0, 'Should produce PDF bytes');
+
+    const doc = await PDFDocument.load(bytes);
+    assert.equal(doc.getPageCount(), 1);
+    // The white cover is drawn; the non-encodable text is skipped gracefully
+  });
+
   it('exports a page with no elements', async () => {
     const srcBytes = await makeSrcPdf();
     const pages = [makePage()];

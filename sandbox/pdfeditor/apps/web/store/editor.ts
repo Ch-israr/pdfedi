@@ -105,6 +105,28 @@ interface EditorState {
   setNativeText: (pageId: string, items: NativeTextItem[]) => void;
   /** Mark the one-time native-edit warning as shown */
   markNativeEditWarned: () => void;
+  /**
+   * Find native text fragments matching a query.
+   * Returns matches with page info and any existing replacement element.
+   * Only searches natively extracted text (no OCR).
+   */
+  findTextMatches: (query: string, caseSensitive: boolean) => Array<{
+    pageId: string;
+    pageNumber: number;
+    item: NativeTextItem;
+    existingElementId: string | null;
+  }>;
+  /**
+   * Replace the text of a single native text fragment.
+   * @param pageId The page containing the fragment
+   * @param item The native text fragment (from findTextMatches)
+   * @param query The search query to replace
+   * @param replacement The replacement text
+   * @param caseSensitive Whether matching is case-sensitive
+   * Creates a native-text element or updates the existing one.
+   * Returns the element ID, or null if the replacement was not safe.
+   */
+  replaceTextMatch: (pageId: string, item: NativeTextItem, query: string, replacement: string, caseSensitive: boolean) => string | null;
 }
 
 function pushHistory(
@@ -669,6 +691,95 @@ export const useEditor = create<EditorState>()(
         s.nativeText[pageId] = items;
       }),
     markNativeEditWarned: () => set((s) => { s.nativeEditWarned = true; }),
+
+    findTextMatches: (query, caseSensitive) => {
+      if (!query) return [];
+      const s = get();
+      const matches: Array<{
+        pageId: string;
+        pageNumber: number;
+        item: NativeTextItem;
+        existingElementId: string | null;
+      }> = [];
+      const q = caseSensitive ? query : query.toLowerCase();
+      for (const page of s.pages) {
+        const items = s.nativeText?.[page.id] ?? [];
+        for (const item of items) {
+          const text = caseSensitive ? item.text : item.text.toLowerCase();
+          if (!text.includes(q)) continue;
+          // Check if a native-text element already covers this fragment
+          const existing = Object.values(s.elements).find(
+            (el) =>
+              el.kind === 'native-text' &&
+              el.pageId === page.id &&
+              Math.abs(el.x - item.x) < 1 &&
+              Math.abs(el.y - item.y) < 1,
+          );
+          matches.push({
+            pageId: page.id,
+            pageNumber: s.pages.indexOf(page) + 1,
+            item,
+            existingElementId: existing?.id ?? null,
+          });
+        }
+      }
+      return matches;
+    },
+
+    replaceTextMatch: (pageId, item, query, replacement, caseSensitive) => {
+      const s = get();
+      // Find existing element covering this fragment
+      const existing = Object.values(s.elements).find(
+        (el): el is Extract<EditorElement, { kind: 'native-text' }> =>
+          el.kind === 'native-text' &&
+          el.pageId === pageId &&
+          Math.abs(el.x - item.x) < 1 &&
+          Math.abs(el.y - item.y) < 1,
+      );
+      // Determine the source text: use the element's current text if it exists,
+      // otherwise the original fragment text.
+      const sourceText = existing ? existing.text : item.text;
+      // Perform the replacement (all occurrences within this fragment)
+      let newText: string;
+      if (caseSensitive) {
+        newText = sourceText.split(query).join(replacement);
+      } else {
+        const regex = new RegExp(query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi');
+        newText = sourceText.replace(regex, replacement);
+      }
+      // If nothing changed, skip
+      if (newText === sourceText) return existing?.id ?? null;
+
+      const label = `Find & Replace — "${replacement.length > 30 ? replacement.slice(0, 30) + '…' : replacement}"`;
+      if (existing) {
+        s.updateElement(existing.id, { text: newText }, label);
+        return existing.id;
+      } else {
+        const elId = crypto.randomUUID();
+        s.addElement(
+          {
+            id: elId,
+            pageId,
+            kind: 'native-text',
+            x: item.x,
+            y: item.y,
+            rotation: 0,
+            originalText: item.text,
+            text: newText,
+            width: item.width,
+            height: item.height,
+            baselineOffset: item.baselineOffset,
+            fontSize: item.fontSize,
+            fontFamily: item.fontFamily,
+            color: '#000000',
+            bold: item.bold,
+            italic: item.italic,
+          },
+          label,
+        );
+        return elId;
+      }
+    },
 
     autosave: () => {
       // Debounced in the caller; this performs the actual save

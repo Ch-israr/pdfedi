@@ -150,36 +150,42 @@ export async function drawElement(
 ): Promise<void> {
   switch (el.kind) {
     case 'text': {
-      const font = await getFont(ctx, el.fontFamily, el.bold, el.italic);
-      page.drawText(el.text, {
-        x: el.x,
-        y: el.y,
-        size: el.fontSize,
-        font,
-        color: hexToRgb(el.color),
-        rotate: degrees(el.rotation),
-      });
-      // Add hyperlink annotation if link is present
-      if (el.link) {
-        const textWidth = font.widthOfTextAtSize(el.text, el.fontSize);
-        const textHeight = el.fontSize * 1.2;
-        const annot = ctx.doc.context.obj({
-          Type: PDFName.of('Annot'),
-          Subtype: PDFName.of('Link'),
-          Rect: [el.x, el.y, el.x + textWidth, el.y + textHeight],
-          Border: [0, 0, 0],
-          A: {
-            Type: PDFName.of('Action'),
-            S: PDFName.of('URI'),
-            URI: PDFString.of(el.link),
-          },
+      // Skip non-WinAnsi text gracefully (standard fonts are Latin-only).
+      // Do not fail the entire export for one element.
+      try {
+        const font = await getFont(ctx, el.fontFamily, el.bold, el.italic);
+        page.drawText(el.text, {
+          x: el.x,
+          y: el.y,
+          size: el.fontSize,
+          font,
+          color: hexToRgb(el.color),
+          rotate: degrees(el.rotation),
         });
-        const annots = page.node.Annots();
-        if (annots) {
-          annots.push(annot);
-        } else {
-          page.node.set(PDFName.of('Annots'), ctx.doc.context.obj([annot]));
+        // Add hyperlink annotation if link is present
+        if (el.link) {
+          const textWidth = font.widthOfTextAtSize(el.text, el.fontSize);
+          const textHeight = el.fontSize * 1.2;
+          const annot = ctx.doc.context.obj({
+            Type: PDFName.of('Annot'),
+            Subtype: PDFName.of('Link'),
+            Rect: [el.x, el.y, el.x + textWidth, el.y + textHeight],
+            Border: [0, 0, 0],
+            A: {
+              Type: PDFName.of('Action'),
+              S: PDFName.of('URI'),
+              URI: PDFString.of(el.link),
+            },
+          });
+          const annots = page.node.Annots();
+          if (annots) {
+            annots.push(annot);
+          } else {
+            page.node.set(PDFName.of('Annots'), ctx.doc.context.obj([annot]));
+          }
         }
+      } catch {
+        // Non-encodable text: skip this element, don't fail the export.
       }
       break;
     }
@@ -194,15 +200,24 @@ export async function drawElement(
         color: rgb(1, 1, 1),
         opacity: 1,
       });
-      const nfont = await getFont(ctx, el.fontFamily, el.bold, el.italic);
-      page.drawText(el.text, {
-        x: el.x,
-        y: el.y + el.baselineOffset,
-        size: el.fontSize,
-        font: nfont,
-        color: hexToRgb(el.color),
-        rotate: degrees(el.rotation),
-      });
+      // Skip text drawing for empty masks or non-WinAnsi text (standard PDF
+      // fonts only support Latin; non-Latin would throw on encode). The cover
+      // is already drawn, so the original stays hidden.
+      if (!el.text) break;
+      try {
+        const nfont = await getFont(ctx, el.fontFamily, el.bold, el.italic);
+        page.drawText(el.text, {
+          x: el.x,
+          y: el.y + el.baselineOffset,
+          size: el.fontSize,
+          font: nfont,
+          color: hexToRgb(el.color),
+          rotate: degrees(el.rotation),
+        });
+      } catch {
+        // Non-encodable text: cover remains, replacement omitted.
+        // Do not fail the entire export for one element.
+      }
       break;
     }
     case 'highlight': {

@@ -66,6 +66,25 @@ function pdfResponse(reply: FastifyReply, bytes: Uint8Array, name: string) {
     .send(Buffer.from(bytes));
 }
 
+/**
+ * Load a PDF, converting encryption errors to 422 (not 500).
+ * Encrypted PDFs cannot be processed without the password.
+ */
+async function loadPdfOr422(data: Buffer): Promise<PDFDocument> {
+  try {
+    return await PDFDocument.load(data, { ignoreEncryption: false });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : '';
+    if (/encrypted|password|decrypt/i.test(msg)) {
+      throw Object.assign(
+        new Error('PDF is encrypted. Decrypt it first (e.g., with Unlock PDF).'),
+        { statusCode: 422 }
+      );
+    }
+    throw err;
+  }
+}
+
 export async function pdfRoutes(app: FastifyInstance) {
   // ---- POST /pdf/compress -------------------------------------------------
   app.post('/pdf/compress', async (req, reply) => {
@@ -84,7 +103,7 @@ export async function pdfRoutes(app: FastifyInstance) {
 
     // MVP strategy: re-save with object streams + drop metadata.
     // Real compression (image downsampling) is a post-MVP enhancement.
-    const doc = await PDFDocument.load(file.data, { ignoreEncryption: false });
+    const doc = await loadPdfOr422(file.data);
     doc.setTitle('');
     doc.setAuthor('');
     doc.setSubject('');
@@ -114,7 +133,7 @@ export async function pdfRoutes(app: FastifyInstance) {
 
     const out = await PDFDocument.create();
     for (const f of files) {
-      const src = await PDFDocument.load(f.data, { ignoreEncryption: false });
+      const src = await loadPdfOr422(f.data);
       const pages = await out.copyPages(src, src.getPageIndices());
       for (const p of pages) out.addPage(p);
     }
@@ -134,7 +153,7 @@ export async function pdfRoutes(app: FastifyInstance) {
     assertPdf(file);
 
     const rawRanges = (req.query as { ranges?: string }).ranges;
-    const src = await PDFDocument.load(file.data, { ignoreEncryption: false });
+    const src = await loadPdfOr422(file.data);
     const total = src.getPageCount();
 
     let ranges: { from: number; to: number }[];
@@ -184,7 +203,7 @@ export async function pdfRoutes(app: FastifyInstance) {
     if (![90, 180, 270].includes(angle)) {
       return reply.code(400).send({ error: 'angle must be 90, 180 or 270', code: 'bad_request' });
     }
-    const doc = await PDFDocument.load(file.data, { ignoreEncryption: false });
+    const doc = await loadPdfOr422(file.data);
     const total = doc.getPageCount();
     const targets = q.pages
       ? q.pages.split(',').map(Number).filter((n) => n >= 1 && n <= total)

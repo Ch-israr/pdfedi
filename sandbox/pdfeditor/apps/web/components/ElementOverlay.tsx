@@ -101,6 +101,7 @@ function ElementView({
   const zoom = useEditor((s) => s.zoom);
   const selectedId = useEditor((s) => s.selectedId);
   const select = useEditor((s) => s.select);
+  const tool = useEditor((s) => s.tool);
   const updateElement = useEditor((s) => s.updateElement);
   const elements = useEditor((s) => s.elements);
   const snapEnabled = useEditor((s) => s.snapEnabled);
@@ -189,9 +190,18 @@ function ElementView({
     onPointerDown,
     onPointerMove,
     onPointerUp,
+    onClick: (e: React.MouseEvent) => {
+      // Fallback selection: ensures the element is selected even if
+      // pointerdown was interrupted (e.g., by preventDefault in some browsers).
+      // Stop propagation so the page-level click handler doesn't deselect.
+      e.stopPropagation();
+      select(el.id);
+    },
     onDoubleClick: (e: React.MouseEvent) => {
       e.stopPropagation();
-      // Double-click on text enters editing mode (distinct from single-click select)
+      // Double-click on text enters editing mode (distinct from single-click select).
+      // Only with the Text tool active — the Select tool must never trigger editing.
+      if (tool !== 'text') return;
       if ((el.kind === 'text' || el.kind === 'native-text') && !isEditing) {
         const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
         const overlay = (e.currentTarget as HTMLElement).closest('.element-overlay-root');

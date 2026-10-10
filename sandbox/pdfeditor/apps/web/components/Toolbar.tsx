@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { useEditor, type ToolId } from '@/store/editor';
 import { HistoryPanel } from './HistoryPanel';
+import { FindReplaceDialog } from './FindReplaceDialog';
 import { ToolIcon } from './ToolIcon';
 
 function SaveStatus() {
@@ -76,6 +78,7 @@ function ToolButton({
 }
 
 export function Toolbar() {
+  const [showFindReplace, setShowFindReplace] = useState(false);
   const tool = useEditor((s) => s.tool);
   const setTool = useEditor((s) => s.setTool);
   const undo = useEditor((s) => s.undo);
@@ -147,6 +150,15 @@ export function Toolbar() {
         >
           <span aria-hidden>↪</span>
         </button>
+        <button
+          type="button"
+          title="Find & Replace (Ctrl+F)"
+          aria-label="Find & Replace"
+          onClick={() => setShowFindReplace(true)}
+          className="flex h-9 w-9 items-center justify-center rounded-lg text-base text-slate-600 transition-colors hover:bg-slate-200/70"
+        >
+          <span aria-hidden>🔍</span>
+        </button>
       </div>
 
       {/* Zoom */}
@@ -215,6 +227,7 @@ export function Toolbar() {
           Close
         </button>
       </div>
+      {showFindReplace && <FindReplaceDialog onClose={() => setShowFindReplace(false)} />}
     </header>
   );
 }
