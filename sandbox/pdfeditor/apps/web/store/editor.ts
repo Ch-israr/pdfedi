@@ -75,7 +75,7 @@ interface EditorState {
   setSnapEnabled: (enabled: boolean) => void;
   setSnapThreshold: (pt: number) => void;
   addElement: (el: EditorElement, label?: string) => void;
-  updateElement: (id: string, patch: Partial<EditorElement>, label?: string) => void;
+  updateElement: (id: string, patch: Partial<EditorElement>, label?: string, opts?: { mergeKey?: string }) => void;
   deleteElement: (id: string) => void;
   duplicateElement: (id: string) => void;
   select: (id: string | null) => void;
@@ -231,15 +231,29 @@ export const useEditor = create<EditorState>()(
       });
     },
 
-    updateElement: (id, patch, label = 'Edit element') => {
+    updateElement: (id, patch, label = 'Edit element', opts) => {
       const before = get().elements[id];
       if (!before) return;
-      const beforeSnap = { ...before };
+      const mergeKey = opts?.mergeKey;
       set((s) => {
         Object.assign(s.elements[id], patch);
         const afterSnap = { ...s.elements[id] };
+        const last = s.past[s.past.length - 1];
+        if (mergeKey && last && last.mergeKey === mergeKey) {
+          // Same drag session: fold into the previous command so one
+          // drag = one undo step. Keep the original undo (pre-drag state).
+          last.redo = () => {
+            useEditor.setState((st) => { st.elements[id] = afterSnap; });
+          };
+          last.label = label;
+          const logEntry = s.historyLog[s.historyLog.length - 1];
+          if (logEntry) logEntry.label = label;
+          return;
+        }
+        const beforeSnap = { ...before };
         pushHistory(s, {
           label,
+          mergeKey,
           undo: () => {
             useEditor.setState((st) => { st.elements[id] = beforeSnap; });
           },

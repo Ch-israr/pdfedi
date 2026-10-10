@@ -45,6 +45,7 @@ export function ResizeHandles({
     origH: number;
     origX: number;
     origY: number;
+    mergeKey: string;
   } | null>(null);
 
   const onHandleDown = useCallback(
@@ -60,6 +61,8 @@ export function ResizeHandles({
         origH: Math.abs(el.height),
         origX: el.x,
         origY: el.y,
+        // One drag session = one undo step (history entries are merged)
+        mergeKey: crypto.randomUUID(),
       };
     },
     [el.width, el.height, el.x, el.y],
@@ -74,7 +77,7 @@ export function ResizeHandles({
       const dx = (e.clientX - r.startX) / zoom;
       const dy = -(e.clientY - r.startY) / zoom;
 
-      let { origW, origH, origX, origY } = r;
+      const { origW, origH, origX, origY, mergeKey } = r;
       const handle = r.handle;
 
       // Determine which edges are being dragged
@@ -83,62 +86,48 @@ export function ResizeHandles({
       const top = handle.includes('n');
       const bottom = handle.includes('s');
 
-      let newW = origW;
-      let newH = origH;
-      let newX = origX;
-      let newY = origY;
+      let newW: number;
+      let newH: number;
+      let newX: number;
+      let newY: number;
 
       if (lockAspect) {
-        // Aspect-locked: use the dominant axis, scale proportionally.
-        // Anchor at the opposite corner.
-        const aspect = origW / origH;
-        // For corner handles, use max of dx/dy magnitude
+        // Aspect-locked: scale proportionally, anchored at the opposite side
+        // so the dragged edge/corner follows the pointer.
+        // The dragged axis drives the scale; a corner drag uses the dominant axis.
         const dw = right ? dx : left ? -dx : 0;
         const dh = top ? dy : bottom ? -dy : 0;
-        // Use the larger change to determine scale
-        const scaleDw = dw !== 0 ? (origW + dw) / origW : 1;
-        const scaleDh = dh !== 0 ? (origH + dh) / origH : 1;
-        const scale = Math.max(scaleDw, scaleDh);
-        const clampedScale = Math.max(0.1, scale); // min 10% of original
-        newW = Math.max(10, origW * clampedScale);
-        newH = Math.max(10, origH * clampedScale);
-        // Adjust position to keep the opposite corner anchored
-        if (left) newX = origX + (origW - newW);
-        if (bottom) newY = origY + (origH - newH);
-        // top/right don't move x/y (anchor is bottom-left for top/right handles)
-        // For 'n' handle (top edge only): anchor bottom, so y moves
-        if (handle === 'n') newY = origY + (origH - newH);
-        if (handle === 's') newY = origY; // anchor top... actually s = bottom edge
+        const scaleW = dw !== 0 ? (origW + dw) / origW : 0;
+        const scaleH = dh !== 0 ? (origH + dh) / origH : 0;
+        const scale = Math.max(0.05, Math.max(scaleW, scaleH));
+        newW = Math.max(10, origW * scale);
+        newH = Math.max(10, origH * scale);
+        newX = left ? origX + (origW - newW) : origX;
+        // Bottom edge drag anchors the top (y is the bottom-left origin)
+        newY = bottom ? origY + (origH - newH) : origY;
       } else {
+        newW = origW;
+        newH = origH;
+        newX = origX;
+        newY = origY;
         if (right) newW = Math.max(10, origW + dx);
         if (left) {
           newW = Math.max(10, origW - dx);
           newX = origX + (origW - newW);
         }
         if (top) {
+          // Top edge: anchor the bottom (y stays, height grows upward)
           newH = Math.max(10, origH + dy);
-          // top edge in screen = higher PDF y; anchor bottom
-          // newY stays, height grows upward — but our y is bottom-left,
-          // so growing top means y stays same, height increases
         }
         if (bottom) {
+          // Bottom edge: anchor the top
           newH = Math.max(10, origH - dy);
           newY = origY + (origH - newH);
-        }
-        // Handle pure edge cases:
-        if (handle === 'n') {
-          newH = Math.max(10, origH + dy);
-        }
-        if (handle === 's') {
-          newH = Math.max(10, origH - dy);
-          newY = origY + (origH - newH);
-        }
-        if (handle === 'e') newW = Math.max(10, origW + dx);
-        if (handle === 'w') {
-          newW = Math.max(10, origW - dx);
-          newX = origX + (origW - newW);
         }
       }
+
+      // Skip no-op updates (a plain click on a handle must not spam history)
+      if (newW === origW && newH === origH && newX === origX && newY === origY) return;
 
       // For shapes, preserve sign of width/height (can be negative for lines)
       const finalW = el.kind === 'shape' && el.width < 0 ? -newW : newW;
@@ -148,9 +137,10 @@ export function ResizeHandles({
         el.id,
         { width: finalW, height: finalH, x: newX, y: newY } as Partial<EditorElement>,
         'Resize element',
+        { mergeKey },
       );
     },
-    [el.id, el.kind, el.width, lockAspect, updateElement, zoom],
+    [el.id, el.kind, el.width, el.height, lockAspect, updateElement, zoom],
   );
 
   const onHandleUp = useCallback(() => {

@@ -194,6 +194,11 @@ export interface HistoryCommand {
   label: string;
   undo(): void | Promise<void>;
   redo(): void | Promise<void>;
+  /**
+   * Merge key for drag sessions: consecutive commands carrying the same key
+   * are folded into one entry so a single drag = a single undo step.
+   */
+  mergeKey?: string;
   /** Optional metadata for history panel (not used by undo/redo) */
   meta?: {
     actionType: string;

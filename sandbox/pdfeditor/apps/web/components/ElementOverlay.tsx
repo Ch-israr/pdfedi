@@ -8,6 +8,7 @@ import { FloatingTextToolbar } from './FloatingTextToolbar';
 import { FloatingShapeToolbar } from './FloatingShapeToolbar';
 import { FloatingImageToolbar } from './FloatingImageToolbar';
 import { ResizeHandles } from './ResizeHandles';
+import { LineEndpoints } from './LineEndpoints';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -35,6 +36,38 @@ export function screenToPdf(
   };
 }
 
+/**
+ * Screen geometry for a line/arrow element, whose model is a start point
+ * (x, y) plus a delta vector (width, height) in PDF points. Returns the
+ * endpoint positions in overlay-relative screen px plus the tight bounding
+ * box the element div is positioned at.
+ */
+export function lineScreenGeometry(
+  el: Extract<EditorElement, { kind: 'shape' }>,
+  page: Page,
+  zoom: number,
+) {
+  const sx1 = toScreen(el.x, zoom);
+  const sy1 = pdfYToScreenTop(el.y, page, zoom);
+  const sx2 = toScreen(el.x + el.width, zoom);
+  const sy2 = pdfYToScreenTop(el.y + el.height, page, zoom);
+  const bbLeft = Math.min(sx1, sx2);
+  const bbTop = Math.min(sy1, sy2);
+  const bbW = Math.max(Math.abs(sx2 - sx1), 2);
+  const bbH = Math.max(Math.abs(sy2 - sy1), 2);
+  return {
+    bbLeft,
+    bbTop,
+    bbW,
+    bbH,
+    // Endpoints relative to the bounding box
+    lx1: sx1 - bbLeft,
+    ly1: sy1 - bbTop,
+    lx2: sx2 - bbLeft,
+    ly2: sy2 - bbTop,
+  };
+}
+
 function ElementView({
   el,
   page,
@@ -55,9 +88,13 @@ function ElementView({
   const elements = useEditor((s) => s.elements);
   const snapEnabled = useEditor((s) => s.snapEnabled);
   const snapThreshold = useEditor((s) => s.snapThreshold);
-  const dragRef = useRef<{ startX: number; startY: number; origX: number; origY: number } | null>(
-    null,
-  );
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    mergeKey: string;
+  } | null>(null);
   const selected = selectedId === el.id;
 
   const left = toScreen(el.x, zoom);
@@ -73,6 +110,8 @@ function ElementView({
       startY: e.clientY,
       origX: el.x,
       origY: el.y,
+      // One drag session = one undo step (history entries are merged)
+      mergeKey: crypto.randomUUID(),
     };
     // Use currentTarget (the div with the handler), not target (may be a text node)
     (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
@@ -102,7 +141,12 @@ function ElementView({
     newX = snappedX;
     newY = snappedY;
 
-    updateElement(el.id, { x: newX, y: newY } as Partial<EditorElement>, 'Move element');
+    updateElement(
+      el.id,
+      { x: newX, y: newY } as Partial<EditorElement>,
+      'Move element',
+      { mergeKey: d.mergeKey },
+    );
   };
 
   const onPointerUp = () => {
@@ -181,55 +225,89 @@ function ElementView({
         </div>
       );
     case 'shape':
-      // Lines/arrows have zero height — only show corner handles to avoid
-      // degenerate edge handles
       const isLine = el.shape === 'line' || el.shape === 'arrow';
       if (isLine) {
-        const w = toScreen(Math.abs(el.width), zoom);
-        const h = toScreen(Math.max(Math.abs(el.height), 2), zoom);
+        // Lines/arrows: defined by start (x,y) and delta (width,height).
+        // Render in a bounding-box div with SVG; endpoints use dedicated handles.
+        const g = lineScreenGeometry(el, page, zoom);
+        const { bbLeft, bbTop, bbW, bbH, lx1, ly1, lx2, ly2 } = g;
         const sw = Math.max(1, toScreen(el.strokeWidth, zoom));
-        // Draw as SVG: line from bottom-left to top-right in element space.
-        // Arrowhead is a filled triangle at the end point.
-        const x1 = sw / 2;
-        const y1 = h - sw / 2;
-        const x2 = w - sw / 2;
-        const y2 = sw / 2;
-        // Arrowhead triangle
-        const headLen = Math.max(10, sw * 4);
-        const angle = Math.atan2(y2 - y1, x2 - x1);
+        // Arrowhead triangle at end point
+        const headLen = Math.max(12, sw * 4);
+        const angle = Math.atan2(ly2 - ly1, lx2 - lx1);
         const a1 = angle + Math.PI - 0.44;
         const a2 = angle + Math.PI + 0.44;
-        const hx1 = x2 + headLen * Math.cos(a1);
-        const hy1 = y2 + headLen * Math.sin(a1);
-        const hx2 = x2 + headLen * Math.cos(a2);
-        const hy2 = y2 + headLen * Math.sin(a2);
+        const hx1 = lx2 + headLen * Math.cos(a1);
+        const hy1 = ly2 + headLen * Math.sin(a1);
+        const hx2 = lx2 + headLen * Math.cos(a2);
+        const hy2 = ly2 + headLen * Math.sin(a2);
+        // Position div at bbox (override the default bottom-left positioning)
+        const lineStyle: React.CSSProperties = {
+          position: 'absolute',
+          left: bbLeft,
+          top: bbTop,
+          width: bbW,
+          height: bbH,
+          cursor: 'move',
+          outline: selected ? '2px solid #2f6bff' : 'none',
+          outlineOffset: 2,
+          userSelect: 'none',
+          WebkitUserSelect: 'none',
+          touchAction: 'none',
+        };
+        // Wider invisible hit area for easier middle-drag
+        const hitSw = Math.max(sw, 12);
         return (
-          <div {...common} style={{ ...style, width: w, height: h }}>
+          <div
+            {...common}
+            style={lineStyle}
+            data-el-id={el.id}
+          >
             <svg
-              width={w}
-              height={h}
+              width={bbW}
+              height={bbH}
               style={{ display: 'block', overflow: 'visible', pointerEvents: 'none' }}
             >
+              {/* Invisible wide hit line for middle-drag */}
               <line
-                x1={x1}
-                y1={y1}
-                x2={x2}
-                y2={y2}
+                x1={lx1}
+                y1={ly1}
+                x2={lx2}
+                y2={ly2}
+                stroke="transparent"
+                strokeWidth={hitSw}
+                strokeLinecap="round"
+                style={{ pointerEvents: 'stroke' }}
+              />
+              {/* Visible line */}
+              <line
+                x1={lx1}
+                y1={ly1}
+                x2={lx2}
+                y2={ly2}
                 stroke={el.stroke}
                 strokeWidth={sw}
                 strokeLinecap="round"
               />
               {el.shape === 'arrow' && (
                 <polygon
-                  points={`${x2},${y2} ${hx1},${hy1} ${hx2},${hy2}`}
+                  points={`${lx2},${ly2} ${hx1},${hy1} ${hx2},${hy2}`}
                   fill={el.stroke}
                 />
               )}
             </svg>
-            {selected && <ResizeHandles el={el} zoom={zoom} cornersOnly />}
+            {selected && (
+              <LineEndpoints el={el} page={page} zoom={zoom} />
+            )}
           </div>
         );
       }
+      // A circle is an ellipse whose width and height match. Resizing it must
+      // preserve proportions (aspect-locked corners) so it cannot be
+      // unintentionally distorted into an ellipse.
+      const isCircle =
+        el.shape === 'ellipse' &&
+        Math.abs(Math.abs(el.width) - Math.abs(el.height)) < 0.5;
       return (
         <div
           {...common}
@@ -242,7 +320,9 @@ function ElementView({
             borderRadius: el.shape === 'ellipse' ? '50%' : 0,
           }}
         >
-          {selected && <ResizeHandles el={el} zoom={zoom} />}
+          {selected && (
+            <ResizeHandles el={el} zoom={zoom} lockAspect={isCircle} cornersOnly={isCircle} />
+          )}
         </div>
       );
     case 'image':
@@ -321,6 +401,15 @@ export function ElementOverlay({ page }: { page: Page }) {
     bold: false,
     italic: false,
   });
+  // Drag-to-draw state for lines/arrows: press → drag → release
+  const [drawing, setDrawing] = useState<{
+    shape: 'line' | 'arrow';
+    startX: number; // PDF points
+    startY: number;
+    curX: number;
+    curY: number;
+  } | null>(null);
+  const drawRef = useRef<HTMLDivElement>(null);
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
 
@@ -430,14 +519,8 @@ export function ElementOverlay({ page }: { page: Page }) {
         break;
       case 'shape-line':
       case 'shape-arrow':
-        place(
-          {
-            id, pageId: page.id, kind: 'shape', x, y, rotation: 0,
-            shape: tool === 'shape-arrow' ? 'arrow' : 'line',
-            width: 120, height: 0, stroke: '#000000', strokeWidth: 2, fill: null,
-          },
-          'Add line',
-        );
+        // Drag-to-draw: handled by onPagePointerDown/Move/Up. Click without
+        // drag is intentionally discarded (no default-size element).
         break;
       case 'image': {
         const input = document.createElement('input');
@@ -484,8 +567,70 @@ export function ElementOverlay({ page }: { page: Page }) {
     }
   };
 
+  // Drag-to-draw for lines/arrows: press → drag → release defines the endpoints.
+  // No default-size element is created; a click without drag is discarded.
+  const onPagePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (tool !== 'shape-line' && tool !== 'shape-arrow') return;
+    if ((e.target as HTMLElement).closest('[data-el-id]')) return;
+    e.preventDefault();
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    const rect = e.currentTarget.getBoundingClientRect();
+    const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
+    setDrawing({
+      shape: tool === 'shape-arrow' ? 'arrow' : 'line',
+      startX: x,
+      startY: y,
+      curX: x,
+      curY: y,
+    });
+  };
+
+  const onPagePointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drawing) return;
+    const rect = (drawRef.current ?? e.currentTarget).getBoundingClientRect();
+    const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
+    setDrawing((d) => (d ? { ...d, curX: x, curY: y } : d));
+  };
+
+  const onPagePointerUp = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!drawing) return;
+    const d = drawing;
+    setDrawing(null);
+    // Require a minimum drag distance (in PDF points); a simple click is discarded.
+    const dx = d.curX - d.startX;
+    const dy = d.curY - d.startY;
+    if (Math.hypot(dx, dy) < 5) return;
+    const id = crypto.randomUUID();
+    // Normalize: store start at (x,y), end as width/height delta.
+    // Keep the actual drag direction (width/height may be negative).
+    addElement(
+      {
+        id,
+        pageId: page.id,
+        kind: 'shape',
+        x: d.startX,
+        y: d.startY,
+        rotation: 0,
+        shape: d.shape,
+        width: dx,
+        height: dy,
+        stroke: '#000000',
+        strokeWidth: 2,
+        fill: null,
+      },
+      d.shape === 'arrow' ? 'Add arrow' : 'Add line',
+    );
+  };
+
   return (
-    <div className="element-overlay-root absolute inset-0" onClick={onPageClick}>
+    <div
+      ref={drawRef}
+      className="element-overlay-root absolute inset-0"
+      onClick={onPageClick}
+      onPointerDown={onPagePointerDown}
+      onPointerMove={onPagePointerMove}
+      onPointerUp={onPagePointerUp}
+    >
       {els.map((el) => (
         <ElementView
           key={el.id}
@@ -496,6 +641,8 @@ export function ElementOverlay({ page }: { page: Page }) {
           isEditing={editingText?.mode === 'edit' && editingText.id === el.id}
         />
       ))}
+      {/* Drag-to-draw preview for lines/arrows */}
+      {drawing && <DrawingPreview drawing={drawing} page={page} zoom={zoom} />}
       {/* Inline text editor — new text or editing existing */}
       {editingText && (
         <InlineTextEditor
@@ -637,6 +784,61 @@ export function ElementOverlay({ page }: { page: Page }) {
 }
 
 /** Inline text editor: textarea overlay for the text tool (replaces window.prompt). */
+/**
+ * Drawing preview for drag-to-draw line/arrow.
+ */
+function DrawingPreview({
+  drawing,
+  page,
+  zoom,
+}: {
+  drawing: { shape: 'line' | 'arrow'; startX: number; startY: number; curX: number; curY: number };
+  page: Page;
+  zoom: number;
+}) {
+  const sx1 = toScreen(drawing.startX, zoom);
+  const sy1 = pdfYToScreenTop(drawing.startY, page, zoom);
+  const sx2 = toScreen(drawing.curX, zoom);
+  const sy2 = pdfYToScreenTop(drawing.curY, page, zoom);
+
+  const sw = Math.max(1, 2 * zoom);
+  const headLen = Math.max(12, sw * 4);
+  const angle = Math.atan2(sy2 - sy1, sx2 - sx1);
+  const a1 = angle + Math.PI - 0.44;
+  const a2 = angle + Math.PI + 0.44;
+  const hx1 = sx2 + headLen * Math.cos(a1);
+  const hy1 = sy2 + headLen * Math.sin(a1);
+  const hx2 = sx2 + headLen * Math.cos(a2);
+  const hy2 = sy2 + headLen * Math.sin(a2);
+
+  return (
+    <svg
+      className="pointer-events-none absolute inset-0"
+      width="100%"
+      height="100%"
+      style={{ overflow: 'visible', zIndex: 20 }}
+    >
+      <line
+        x1={sx1}
+        y1={sy1}
+        x2={sx2}
+        y2={sy2}
+        stroke="#2f6bff"
+        strokeWidth={sw}
+        strokeLinecap="round"
+        strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+      />
+      {drawing.shape === 'arrow' && (
+        <polygon
+          points={`${sx2},${sy2} ${hx1},${hy1} ${hx2},${hy2}`}
+          fill="#2f6bff"
+        />
+      )}
+      <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
+    </svg>
+  );
+}
+
 function InlineTextEditor({
   screenX,
   screenY,
