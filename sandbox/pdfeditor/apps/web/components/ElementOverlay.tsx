@@ -99,9 +99,24 @@ function ElementView({
   isEditing: boolean;
 }) {
   const zoom = useEditor((s) => s.zoom);
+  const selectedId = useEditor((s) => s.selectedId);
+  const select = useEditor((s) => s.select);
+  const tool = useEditor((s) => s.tool);
+  const updateElement = useEditor((s) => s.updateElement);
+  const elements = useEditor((s) => s.elements);
+  const snapEnabled = useEditor((s) => s.snapEnabled);
+  const snapThreshold = useEditor((s) => s.snapThreshold);
+  const dragRef = useRef<{
+    startX: number;
+    startY: number;
+    origX: number;
+    origY: number;
+    mergeKey: string;
+  } | null>(null);
   // Baked elements (restored from a source-less manifest) are already visible
   // in the page content. Render them as invisible hit-areas so the user can
   // click the baked text to edit it, without seeing a duplicate overlay.
+  // NOTE: All hooks must be called before this early return (Rules of Hooks).
   if ((el as any).baked) {
     const left = el.x * zoom;
     const width = ((el as any).width ?? 100) * zoom;
@@ -122,20 +137,6 @@ function ElementView({
       />
     );
   }
-  const selectedId = useEditor((s) => s.selectedId);
-  const select = useEditor((s) => s.select);
-  const tool = useEditor((s) => s.tool);
-  const updateElement = useEditor((s) => s.updateElement);
-  const elements = useEditor((s) => s.elements);
-  const snapEnabled = useEditor((s) => s.snapEnabled);
-  const snapThreshold = useEditor((s) => s.snapThreshold);
-  const dragRef = useRef<{
-    startX: number;
-    startY: number;
-    origX: number;
-    origY: number;
-    mergeKey: string;
-  } | null>(null);
   const selected = selectedId === el.id;
 
   const left = toScreen(el.x, zoom);
