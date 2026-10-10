@@ -99,6 +99,29 @@ function ElementView({
   isEditing: boolean;
 }) {
   const zoom = useEditor((s) => s.zoom);
+  // Baked elements (restored from a source-less manifest) are already visible
+  // in the page content. Render them as invisible hit-areas so the user can
+  // click the baked text to edit it, without seeing a duplicate overlay.
+  if ((el as any).baked) {
+    const left = el.x * zoom;
+    const width = ((el as any).width ?? 100) * zoom;
+    const height = ((el as any).height ?? (el.kind === 'text' ? (el as any).fontSize * 1.2 : 20)) * zoom;
+    const top = (page.height - (el.y + height / zoom)) * zoom;
+    return (
+      <div
+        data-el-id={el.id}
+        style={{
+          position: 'absolute',
+          left,
+          top,
+          width,
+          height,
+          pointerEvents: 'auto',
+          cursor: 'text',
+        }}
+      />
+    );
+  }
   const selectedId = useEditor((s) => s.selectedId);
   const select = useEditor((s) => s.select);
   const tool = useEditor((s) => s.tool);
@@ -218,7 +241,10 @@ function ElementView({
   };
 
   switch (el.kind) {
-    case 'text':
+    case 'text': {
+      // If this was a baked element that has been modified, add a white
+      // background to cover the old baked text underneath in the editor.
+      const wasBaked = (el as any).bakedBounds && !(el as any).baked;
       return (
         <div
           {...common}
@@ -231,11 +257,13 @@ function ElementView({
             fontStyle: el.italic ? 'italic' : 'normal',
             whiteSpace: 'pre-wrap',
             minWidth: 20,
+            ...(wasBaked ? { backgroundColor: 'white', padding: '2px 4px' } : {}),
           }}
         >
           {el.text}
         </div>
       );
+    }
     case 'native-text':
       return (
         <div
