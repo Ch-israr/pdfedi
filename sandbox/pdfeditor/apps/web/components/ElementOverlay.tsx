@@ -613,14 +613,13 @@ export function ElementOverlay({ page }: { page: Page }) {
     [select],
   );
 
-  // Native text items for this page (extracted from the PDF itself)
-  // Defensive: nativeText may be undefined during store rehydration/transitions
-  const nativeItems = useEditor((s) => s.nativeText?.[page.id] ?? []);
-
+  // Native text items for this page — read imperatively (not via a reactive
+  // selector) to avoid the render-crash seen with useEditor selectors here.
   /** Find the native text fragment under a PDF-point position, if any. */
   const hitNativeText = (x: number, y: number): NativeTextItem | null => {
-    for (let i = nativeItems.length - 1; i >= 0; i--) {
-      const it = nativeItems[i];
+    const items = useEditor.getState().nativeText?.[page.id] ?? [];
+    for (let i = items.length - 1; i >= 0; i--) {
+      const it = items[i];
       if (x >= it.x && x <= it.x + it.width && y >= it.y && y <= it.y + it.height) {
         return it;
       }
@@ -885,7 +884,7 @@ export function ElementOverlay({ page }: { page: Page }) {
         if (nativeEditWarned) return;
         if (tool !== 'select' && tool !== 'text') return;
         if ((e.target as HTMLElement).closest('[data-el-id]')) return;
-        if (nativeItems.length > 0) return;
+        if ((useEditor.getState().nativeText?.[page.id] ?? []).length > 0) return;
         markNativeEditWarned();
         setShowNativeWarning(true);
       }}
