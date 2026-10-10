@@ -54,6 +54,10 @@ interface EditorState {
   selectedId: string | null;
   zoom: number;
   loading: boolean;
+  /** True while a download is being prepared (prevents duplicate clicks) */
+  downloading: boolean;
+  /** Error message from a failed download (shown to user, cleared on next attempt) */
+  downloadError: string | null;
   error: string | null;
   /** Dismissible informational banner (restore status, scanned notice, …) */
   notice: { kind: 'info' | 'success' | 'warning'; message: string } | null;
@@ -173,6 +177,8 @@ export const useEditor = create<EditorState>()(
     selectedId: null,
     zoom: 1,
     loading: false,
+    downloading: false,
+    downloadError: null,
     error: null,
     notice: null,
     nativeText: {},
@@ -676,25 +682,65 @@ export const useEditor = create<EditorState>()(
       });
       const sourceHash = await sha256Hex(s.pdfBytes);
       const manifest = createManifest(sourceHash, s.pages, parts.elements, parts.manifestAssets);
-      return exportPdfWithState(
-        { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
-        { manifest, sourceBytes: s.pdfBytes, assets: parts.assets },
+
+      // Conditional source embedding: only embed the full source PDF when
+      // destructive edits exist (native-text masks that cover original content,
+      // or deleted pages). For additive-only edits (text, images, shapes, etc.),
+      // the elements are baked into the page content and the downloaded PDF's
+      // pages serve as the base on re-upload — no source needed.
+      const hasDestructiveEdits = Object.values(s.elements).some(
+        (el) => el.kind === 'native-text',
       );
+      const pagesDeleted = s.pages.length < s.pageCount;
+      const needsSource = hasDestructiveEdits || pagesDeleted;
+
+      if (needsSource) {
+        const { exportPdfWithState } = await import('@pdfeditor/pdf-core');
+        return exportPdfWithState(
+          { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
+          { manifest, sourceBytes: s.pdfBytes, assets: parts.assets },
+        );
+      } else {
+        // Additive-only: embed manifest + assets, no source PDF.
+        const { exportPdfWithManifestOnly } = await import('@pdfeditor/pdf-core');
+        return exportPdfWithManifestOnly(
+          { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
+          manifest,
+          parts.assets,
+        );
+      }
     },
 
     download: async () => {
-      const bytes = await get().exportBytes();
-      const blob = new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      const base = (get().fileName ?? 'document.pdf').replace(/\.pdf$/i, '');
-      a.href = url;
-      a.download = `${base}-edited.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      // Privacy: revoke immediately after the download starts
-      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      // Prevent duplicate downloads: if already preparing, ignore the click.
+      if (get().downloading) return;
+      set((s) => {
+        s.downloading = true;
+        s.downloadError = null;
+      });
+      try {
+        const bytes = await get().exportBytes();
+        const blob = new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const base = (get().fileName ?? 'document.pdf').replace(/\.pdf$/i, '');
+        a.href = url;
+        a.download = `${base}-edited.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        // Privacy: revoke immediately after the download starts
+        setTimeout(() => URL.revokeObjectURL(url), 10_000);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Failed to prepare PDF for download.';
+        set((s) => {
+          s.downloadError = msg;
+        });
+      } finally {
+        set((s) => {
+          s.downloading = false;
+        });
+      }
     },
 
     dismissNotice: () => set((s) => { s.notice = null; }),

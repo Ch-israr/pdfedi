@@ -103,12 +103,18 @@ export async function restorePdfediPackage(
   if (!manifestFile) {
     throw new RestoreError('manifest-corrupt', 'No PDFEDI editing data found in this file.');
   }
-  return restoreFromAttachments(atts);
+  const result = await restoreFromAttachments(atts);
+  if (!result) {
+    // Additive-only manifest without source: nothing to restore (elements are
+    // baked into the pages). Treat as unusable for the strict API.
+    throw new RestoreError('source-missing', 'No restorable editing data found in this file.');
+  }
+  return result;
 }
 
 async function restoreFromAttachments(
   atts: Record<string, PdfAttachment>,
-): Promise<PdfediRestoreResult> {
+): Promise<PdfediRestoreResult | null> {
   const manifestFile = atts[PDFEDI_MANIFEST_NAME];
   if (!manifestFile) {
     throw new RestoreError('manifest-corrupt', 'No PDFEDI editing data found in this file.');
@@ -152,6 +158,16 @@ async function restoreFromAttachments(
 
   const sourceFile = atts[PDFEDI_SOURCE_NAME];
   if (!sourceFile) {
+    // No source embedded: this happens for additive-only edits where elements
+    // are baked into the page content. Check if the manifest contains only
+    // additive elements (no native-text masks, no page deletions).
+    const hasDestructive = manifest.elements.some((el) => el.kind === 'native-text');
+    // For additive-only, we don't restore elements (they're baked into the
+    // pages and visible). Return null to load as a regular PDF — the user
+    // can continue adding new edits.
+    if (!hasDestructive) {
+      return null;
+    }
     throw new RestoreError(
       'source-missing',
       'The original document is missing from this file, so previous edits cannot be restored.',

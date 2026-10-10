@@ -19,6 +19,7 @@ import type { EditorElement, Page, PdfediManifest } from '@pdfeditor/shared';
 import {
   buildManifestParts,
   createManifest,
+  embedManifestOnly,
   embedStatePackage,
   sha256Hex,
   type ManifestParts,
@@ -406,5 +407,21 @@ export async function exportPdfWithState(
     statePackage.sourceBytes,
     statePackage.assets,
   );
+  return out.save();
+}
+
+/**
+ * Build the edited PDF and embed only the manifest + assets (no source PDF).
+ * Use when all edits are additive (no native-text masks, no page deletions) —
+ * the elements are baked into the page content, and re-upload uses the
+ * downloaded PDF's pages directly as the base. Returns fresh bytes.
+ */
+export async function exportPdfWithManifestOnly(
+  input: ExportInput,
+  manifest: PdfediManifest,
+  assets: StateAsset[],
+): Promise<Uint8Array> {
+  const out = await buildPdfDocument(input);
+  await embedManifestOnly(out, manifest, assets);
   return out.save();
 }

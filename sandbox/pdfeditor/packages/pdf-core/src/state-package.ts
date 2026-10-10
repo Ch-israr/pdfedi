@@ -146,3 +146,26 @@ export async function embedStatePackage(
     });
   }
 }
+
+/**
+ * Embed only the manifest + assets (no source PDF).
+ * Used for additive-only edits where the elements are baked into page content
+ * and the downloaded PDF's pages serve as the base on re-upload.
+ */
+export async function embedManifestOnly(
+  doc: PDFDocument,
+  manifest: PdfediManifest,
+  assets: StateAsset[],
+): Promise<void> {
+  const manifestJson = JSON.stringify(manifest);
+  await doc.attach(new TextEncoder().encode(manifestJson), PDFEDI_MANIFEST_NAME, {
+    mimeType: 'application/json',
+    description: 'PDFEDI editing state — re-upload this PDF to continue editing.',
+  });
+  for (const a of assets) {
+    await doc.attach(a.bytes, a.name, {
+      mimeType: a.mime,
+      description: 'PDFEDI image asset.',
+    });
+  }
+}

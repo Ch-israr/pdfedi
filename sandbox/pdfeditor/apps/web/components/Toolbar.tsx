@@ -86,6 +86,8 @@ export function Toolbar() {
   const past = useEditor((s) => s.past);
   const future = useEditor((s) => s.future);
   const download = useEditor((s) => s.download);
+  const downloading = useEditor((s) => s.downloading);
+  const downloadError = useEditor((s) => s.downloadError);
   const closeDocument = useEditor((s) => s.closeDocument);
   const fileName = useEditor((s) => s.fileName);
   const zoom = useEditor((s) => s.zoom);
@@ -214,9 +216,20 @@ export function Toolbar() {
         <button
           type="button"
           onClick={() => void download()}
-          className="flex h-9 items-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+          disabled={downloading}
+          title={downloading ? 'Your PDF is being prepared. Please wait...' : 'Download PDF'}
+          className="flex h-9 items-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <span aria-hidden>⬇</span> Download
+          {downloading ? (
+            <>
+              <span aria-hidden className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Preparing...
+            </>
+          ) : (
+            <>
+              <span aria-hidden>⬇</span> Download
+            </>
+          )}
         </button>
         <button
           type="button"
