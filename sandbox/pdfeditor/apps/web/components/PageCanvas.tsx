@@ -62,6 +62,28 @@ export function PageCanvas({ page, getDoc, docVersion }: Props) {
   }, [visible, zoom, page.sourceIndex, page.rotation, getDoc, docVersion]);
 
   const isActive = activePageId === page.id;
+  const setNativeText = useEditor((s) => s.setNativeText);
+
+  // Extract native text positions for direct editing (reads the PDF's own
+  // text operators — no OCR). Re-runs when the page or its rotation changes.
+  useEffect(() => {
+    if (!visible || !docVersion) return;
+    const doc = getDoc() as unknown as import('pdfjs-dist').PDFDocumentProxy | null;
+    if (!doc) return;
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { extractNativeText } = await import('@/lib/pdfjs');
+        const items = await extractNativeText(doc, page);
+        if (!cancelled) setNativeText(page.id, items);
+      } catch {
+        // Extraction never blocks the editor
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [visible, docVersion, page, getDoc, setNativeText]);
 
   return (
     <div

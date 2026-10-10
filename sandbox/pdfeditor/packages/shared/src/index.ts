@@ -49,6 +49,7 @@ export const ElementKindSchema = z.enum([
   'highlight',
   'signature',
   'shape',
+  'native-text',
 ]);
 export type ElementKind = z.infer<typeof ElementKindSchema>;
 
@@ -114,14 +115,56 @@ export const ShapeElementSchema = BaseElementSchema.extend({
   fill: z.string().regex(/^#[0-9a-fA-F]{6}$/).nullable().default(null),
 });
 
+/**
+ * An edit of existing native PDF text. x/y is the bottom-left of the
+ * opaque cover box (PDF points); the replacement text is drawn at the
+ * original baseline (y + baselineOffset). On export the original text is
+ * covered with an opaque rect so no remnants show through.
+ */
+export const NativeTextElementSchema = BaseElementSchema.extend({
+  kind: z.literal('native-text'),
+  /** Text as extracted from the PDF (reference only) */
+  originalText: z.string(),
+  /** Current edited text */
+  text: z.string(),
+  width: z.number().positive(),
+  height: z.number().positive(),
+  /** Distance from cover-box bottom to the text baseline */
+  baselineOffset: z.number().nonnegative().default(0),
+  fontSize: z.number().positive(),
+  fontFamily: z.string().default('Helvetica'),
+  color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#000000'),
+  bold: z.boolean().default(false),
+  italic: z.boolean().default(false),
+});
+
 export const EditorElementSchema = z.discriminatedUnion('kind', [
   TextElementSchema,
   ImageElementSchema,
   HighlightElementSchema,
   SignatureElementSchema,
   ShapeElementSchema,
+  NativeTextElementSchema,
 ]);
 export type EditorElement = z.infer<typeof EditorElementSchema>;
+
+/** A text fragment extracted from the PDF itself (not a user element). */
+export const NativeTextItemSchema = z.object({
+  id: z.string(),
+  /** PDF points, bottom-left origin — matches the editor coordinate system */
+  x: z.number(),
+  y: z.number(),
+  width: z.number().positive(),
+  height: z.number().positive(),
+  /** Baseline offset from the box bottom */
+  baselineOffset: z.number().nonnegative(),
+  text: z.string(),
+  fontSize: z.number().positive(),
+  fontFamily: z.string(),
+  bold: z.boolean(),
+  italic: z.boolean(),
+});
+export type NativeTextItem = z.infer<typeof NativeTextItemSchema>;
 
 export const PageSchema = z.object({
   /** UUID — never an array index */
@@ -229,6 +272,7 @@ const ManifestElementSchema = z.discriminatedUnion('kind', [
   HighlightElementSchema,
   ManifestSignatureElementSchema,
   ShapeElementSchema,
+  NativeTextElementSchema,
 ]);
 export type ManifestElement = z.infer<typeof ManifestElementSchema>;
 

@@ -20,6 +20,7 @@ import type {
   EditorElement,
   HistoryCommand,
   HistoryRecord,
+  NativeTextItem,
   Page,
 } from '@pdfeditor/shared';
 import { loadPdfDocument } from '@/lib/pdfjs';
@@ -55,6 +56,10 @@ interface EditorState {
   error: string | null;
   /** Dismissible informational banner (restore status, scanned notice, …) */
   notice: { kind: 'info' | 'success' | 'warning'; message: string } | null;
+  /** Native text fragments extracted per page (for direct text editing) */
+  nativeText: Record<string, NativeTextItem[]>;
+  /** One-time warning shown when native editing is attempted on flat content */
+  nativeEditWarned: boolean;
   // Smart guides + snapping (user-controlled, never forced)
   snapEnabled: boolean;
   snapThreshold: number; // PDF points
@@ -95,6 +100,10 @@ interface EditorState {
   recoverDocument: () => Promise<boolean>;
   /** Dismiss the informational banner */
   dismissNotice: () => void;
+  /** Store extracted native text items for a page */
+  setNativeText: (pageId: string, items: NativeTextItem[]) => void;
+  /** Mark the one-time native-edit warning as shown */
+  markNativeEditWarned: () => void;
 }
 
 function pushHistory(
@@ -143,6 +152,8 @@ export const useEditor = create<EditorState>()(
     loading: false,
     error: null,
     notice: null,
+    nativeText: {},
+    nativeEditWarned: false,
     snapEnabled: true,
     snapThreshold: 5,
     past: [],
@@ -243,6 +254,8 @@ export const useEditor = create<EditorState>()(
           s.tool = 'select';
           s.loading = false;
           s.notice = notice;
+          s.nativeText = {};
+          s.nativeEditWarned = false;
         });
       } catch (e) {
         set((s) => {
@@ -268,6 +281,8 @@ export const useEditor = create<EditorState>()(
         s.historyLog = [];
         s.error = null;
         s.notice = null;
+        s.nativeText = {};
+        s.nativeEditWarned = false;
       });
     },
 
@@ -621,6 +636,11 @@ export const useEditor = create<EditorState>()(
     },
 
     dismissNotice: () => set((s) => { s.notice = null; }),
+    setNativeText: (pageId, items) =>
+      set((s) => {
+        s.nativeText[pageId] = items;
+      }),
+    markNativeEditWarned: () => set((s) => { s.nativeEditWarned = true; }),
 
     autosave: () => {
       // Debounced in the caller; this performs the actual save

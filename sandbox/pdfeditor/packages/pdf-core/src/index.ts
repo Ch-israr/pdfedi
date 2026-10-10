@@ -183,6 +183,28 @@ export async function drawElement(
       }
       break;
     }
+    case 'native-text': {
+      // Cover the original native text with an opaque rect so no remnants
+      // show through, then draw the replacement at the original baseline.
+      page.drawRectangle({
+        x: el.x,
+        y: el.y,
+        width: el.width,
+        height: el.height,
+        color: rgb(1, 1, 1),
+        opacity: 1,
+      });
+      const nfont = await getFont(ctx, el.fontFamily, el.bold, el.italic);
+      page.drawText(el.text, {
+        x: el.x,
+        y: el.y + el.baselineOffset,
+        size: el.fontSize,
+        font: nfont,
+        color: hexToRgb(el.color),
+        rotate: degrees(el.rotation),
+      });
+      break;
+    }
     case 'highlight': {
       page.drawRectangle({
         x: el.x,
