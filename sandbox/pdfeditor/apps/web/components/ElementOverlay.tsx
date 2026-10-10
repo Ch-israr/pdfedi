@@ -700,6 +700,23 @@ export function ElementOverlay({ page }: { page: Page }) {
           });
           return;
         }
+        if (clickedEl && clickedEl.kind === 'text') {
+          // Open a restored/added text element for editing (pre-filled).
+          // This handles the re-upload case: the element was baked into the
+          // PDF on export, restored from the manifest, and must be editable
+          // without creating a duplicate.
+          const elLeft = clickedEl.x * zoom;
+          const elHeight = (clickedEl as any).height ?? clickedEl.fontSize * 1.2;
+          const elTop = (page.height - (clickedEl.y + elHeight)) * zoom;
+          setEditingText({
+            mode: 'edit',
+            id: clickedEl.id,
+            screenX: elLeft,
+            screenY: elTop,
+            initialText: clickedEl.text,
+          });
+          return;
+        }
       }
       return;
     }

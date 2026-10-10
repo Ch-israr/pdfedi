@@ -16,11 +16,13 @@ import {
 import { sha256Hex } from '@pdfeditor/pdf-core';
 
 export interface PdfediRestoreResult {
-  /** Clean source bytes — becomes the session's pdfBytes */
+  /** Clean source bytes — becomes the session's pdfBytes (null if no source embedded) */
   sourceBytes: Uint8Array;
   pages: Page[];
   elements: Record<string, EditorElement>;
   manifest: PdfediManifest;
+  /** True if no source was embedded (additive-only edits, elements baked into pages) */
+  noSource?: boolean;
 }
 
 export type RestoreFailureReason =
@@ -159,14 +161,36 @@ async function restoreFromAttachments(
   const sourceFile = atts[PDFEDI_SOURCE_NAME];
   if (!sourceFile) {
     // No source embedded: this happens for additive-only edits where elements
-    // are baked into the page content. Check if the manifest contains only
-    // additive elements (no native-text masks, no page deletions).
+    // are baked into the page content. Restore the elements as editable objects
+    // (marked as baked so they're not drawn twice on the next export).
     const hasDestructive = manifest.elements.some((el) => el.kind === 'native-text');
-    // For additive-only, we don't restore elements (they're baked into the
-    // pages and visible). Return null to load as a regular PDF — the user
-    // can continue adding new edits.
     if (!hasDestructive) {
-      return null;
+      // Resolve image/signature assets to blob URLs (memory only)
+      const elements: Record<string, EditorElement> = {};
+      for (const mel of manifest.elements) {
+        const nums = [mel.x, mel.y, mel.rotation];
+        if (!nums.every(Number.isFinite)) continue;
+        // Store the baked bounds so we can mask the old baked content if the
+        // element is modified after restore.
+        const bakedBounds = { x: mel.x, y: mel.y, width: (mel as any).width ?? 0, height: (mel as any).height ?? 0 };
+        if (mel.kind === 'image' || mel.kind === 'signature') {
+          const assetMeta = manifest.assets.find((a) => a.name === mel.assetRef);
+          const assetFile = atts[mel.assetRef];
+          if (!assetMeta || !assetFile) continue;
+          const blob = new Blob([assetFile.content as unknown as BlobPart], {
+            type: assetMeta.mime,
+          });
+          const src = URL.createObjectURL(blob);
+          const { assetRef: _ref, ...rest } = mel;
+          // Mark as baked: already rendered into the page content
+          elements[mel.id] = { ...rest, src, baked: true, bakedBounds } as unknown as EditorElement;
+        } else {
+          elements[mel.id] = { ...mel, baked: true, bakedBounds } as unknown as EditorElement;
+        }
+      }
+      const pages: Page[] = manifest.pages.map((p) => ({ ...p }));
+      // sourceBytes is null: caller uses the uploaded PDF bytes as the base
+      return { sourceBytes: null as unknown as Uint8Array, pages, elements, manifest, noSource: true as const };
     }
     throw new RestoreError(
       'source-missing',

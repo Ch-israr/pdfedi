@@ -234,7 +234,15 @@ export const useEditor = create<EditorState>()(
           // flattened overlays in the uploaded file are never duplicated.
           // This also prevents recursive nesting — every export re-embeds
           // the original clean source, never the previous output.
-          pdfBytes = restored.sourceBytes;
+          //
+          // For source-less packages (additive-only edits, elements baked into
+          // pages): use the uploaded bytes as the base. Elements are restored
+          // with baked=true so they're not drawn twice on the next export.
+          if (restored.noSource) {
+            pdfBytes = bytes; // uploaded PDF (with baked elements)
+          } else {
+            pdfBytes = restored.sourceBytes;
+          }
           pages = restored.pages;
           pageCount = pages.length;
           elements = restored.elements;
@@ -360,6 +368,12 @@ export const useEditor = create<EditorState>()(
       const mergeKey = opts?.mergeKey;
       set((s) => {
         Object.assign(s.elements[id], patch);
+        // If a baked element (restored from a source-less manifest) is modified,
+        // clear the baked flag so the updated version is drawn on next export.
+        // The bakedBounds are kept so the old baked content can be masked.
+        if ((s.elements[id] as any).baked) {
+          (s.elements[id] as any).baked = false;
+        }
         const afterSnap = { ...s.elements[id] };
         const last = s.past[s.past.length - 1];
         if (mergeKey && last && last.mergeKey === mergeKey) {

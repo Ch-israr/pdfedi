@@ -373,8 +373,24 @@ export async function buildPdfDocument(input: ExportInput): Promise<PDFDocument>
       pdfPage = cp;
     }
 
-    const els = Object.values(input.elements).filter((e) => e.pageId === page.id);
+    const els = Object.values(input.elements).filter(
+      (e) => e.pageId === page.id && !(e as any).baked,
+    );
     for (const el of els) {
+      // If this element was previously baked (restored from a source-less
+      // manifest) and has now been modified, mask the old baked content first
+      // so it doesn't show through underneath the updated version.
+      const bakedBounds = (el as any).bakedBounds;
+      if (bakedBounds && bakedBounds.width > 0 && bakedBounds.height > 0) {
+        pdfPage.drawRectangle({
+          x: bakedBounds.x,
+          y: bakedBounds.y,
+          width: bakedBounds.width,
+          height: bakedBounds.height,
+          color: rgb(1, 1, 1),
+          opacity: 1,
+        });
+      }
       await drawElement(ctx, pdfPage, el);
     }
   }
