@@ -914,7 +914,7 @@ export function ElementOverlay({ page }: { page: Page }) {
   return (
     <div
       ref={drawRef}
-      className="element-overlay-root absolute inset-0"
+      className={`element-overlay-root absolute inset-0 ${tool === 'move' ? 'cursor-move' : ''}`}
       onClick={onPageClick}
       onDoubleClick={(e) => {
         // One-time warning: double-click with the Text tool is the "edit this"

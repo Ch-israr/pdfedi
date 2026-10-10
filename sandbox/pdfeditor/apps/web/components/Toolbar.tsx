@@ -23,7 +23,10 @@ function SaveStatus() {
 
 const TOOL_GROUPS: { id: ToolId; label: string; shortcut?: string }[][] = [
   // Selection
-  [{ id: 'select', label: 'Select', shortcut: 'V' }],
+  [
+    { id: 'select', label: 'Select', shortcut: 'V' },
+    { id: 'move', label: 'Move', shortcut: 'M' },
+  ],
   // Annotate
   [
     { id: 'text', label: 'Text', shortcut: 'T' },

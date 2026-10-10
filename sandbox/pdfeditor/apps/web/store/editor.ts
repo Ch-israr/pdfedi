@@ -27,6 +27,7 @@ import { loadPdfDocument } from '@/lib/pdfjs';
 
 export type ToolId =
   | 'select'
+  | 'move'
   | 'text'
   | 'image'
   | 'highlight'

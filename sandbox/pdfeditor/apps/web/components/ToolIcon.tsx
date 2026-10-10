@@ -30,6 +30,14 @@ export function ToolIcon({ id }: { id: ToolId }) {
           <path d="M5 3l7 18 2.5-7.5L22 11 5 3z" />
         </svg>
       );
+    case 'move':
+      // Four-directional move arrows
+      return (
+        <svg {...base()}>
+          <path d="M12 2v20M2 12h20" />
+          <path d="M12 2l-3 3m3-3l3 3M12 22l-3-3m3 3l3-3M2 12l3-3m-3 3l3 3M22 12l-3-3m3 3l-3 3" />
+        </svg>
+      );
     case 'text':
       // Typography: text lines (not a bare "T")
       return (
