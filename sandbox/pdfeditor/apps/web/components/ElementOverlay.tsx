@@ -630,40 +630,63 @@ export function ElementOverlay({ page }: { page: Page }) {
     return null;
   };
 
+  /**
+   * Check whether a native text fragment can be safely edited by the current
+   * implementation. Returns false for fragments with missing/degenerate
+   * geometry or empty text — these must not be treated as directly editable
+   * (and must not be auto-classified as "scanned"; the limitation is explicit).
+   */
+  const isNativeTextEditable = (item: NativeTextItem): boolean => {
+    if (!item.text || item.text.trim().length === 0) return false;
+    if (!Number.isFinite(item.x) || !Number.isFinite(item.y)) return false;
+    if (!Number.isFinite(item.width) || item.width <= 0) return false;
+    if (!Number.isFinite(item.height) || item.height <= 0) return false;
+    if (!Number.isFinite(item.fontSize) || item.fontSize <= 0) return false;
+    return true;
+  };
+
   const onPageClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if ((e.target as HTMLElement).closest('[data-el-id]')) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
     const id = crypto.randomUUID();
 
-    // Direct native-text editing: with Select or Text active, clicking an
+    // Direct native-text editing: with the Text tool active, clicking an
     // existing PDF text fragment opens the inline editor for it instead of
-    // starting a new overlay. (Clicks on already-edited text hit the
+    // starting a new overlay. (The Select tool performs selection only and
+    // must not trigger text editing. Clicks on already-edited text hit the
     // element overlay above and return early.)
-    if (tool === 'select' || tool === 'text') {
+    if (tool === 'text') {
       const hit = hitNativeText(x, y);
       if (hit) {
-        // Skip if a native-text element already covers this fragment — the
-        // element itself handles the click (returned early above), but guard
-        // against stale overlap anyway.
-        const covered = els.some(
-          (el) =>
-            el.kind === 'native-text' &&
-            Math.abs(el.x - hit.x) < 1 &&
-            Math.abs(el.y - hit.y) < 1,
-        );
-        if (!covered) {
-          const orect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-          setEditingText({
-            mode: 'native',
-            nativeItem: hit,
-            existingId: null,
-            screenX: e.clientX - orect.left,
-            screenY: e.clientY - orect.top,
-            initialText: hit.text,
-          });
-          return;
+        // Verify the fragment is actually editable before opening the editor
+        // (non-empty text, valid dimensions, supported orientation).
+        if (isNativeTextEditable(hit)) {
+          // Skip if a native-text element already covers this fragment — the
+          // element itself handles the click (returned early above), but guard
+          // against stale overlap anyway.
+          const covered = els.some(
+            (el) =>
+              el.kind === 'native-text' &&
+              Math.abs(el.x - hit.x) < 1 &&
+              Math.abs(el.y - hit.y) < 1,
+          );
+          if (!covered) {
+            const orect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            setEditingText({
+              mode: 'native',
+              nativeItem: hit,
+              existingId: null,
+              screenX: e.clientX - orect.left,
+              screenY: e.clientY - orect.top,
+              initialText: hit.text,
+            });
+            return;
+          }
         }
+        // Fragment hit but not safely editable: fall through to the
+        // one-time warning via double-click (handled separately), or to
+        // new-text creation for single click. Do not create a duplicate.
       }
     }
 
@@ -881,11 +904,12 @@ export function ElementOverlay({ page }: { page: Page }) {
       className="element-overlay-root absolute inset-0"
       onClick={onPageClick}
       onDoubleClick={(e) => {
-        // One-time warning: double-click is the "edit this" gesture. If it
-        // lands on empty content of a page with no extractable native text,
-        // the existing content cannot be edited directly.
+        // One-time warning: double-click with the Text tool is the "edit this"
+        // gesture. If it lands on empty content of a page with no extractable
+        // native text, the existing content cannot be edited directly.
+        // (Select tool does not trigger editing, so no warning there.)
         if (nativeEditWarned) return;
-        if (tool !== 'select' && tool !== 'text') return;
+        if (tool !== 'text') return;
         if ((e.target as HTMLElement).closest('[data-el-id]')) return;
         if ((useEditor.getState().nativeText?.[page.id] ?? []).length > 0) return;
         markNativeEditWarned();

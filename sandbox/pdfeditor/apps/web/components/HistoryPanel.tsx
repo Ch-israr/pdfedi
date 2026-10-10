@@ -133,7 +133,7 @@ export function HistoryPanel() {
       </div>
 
       {historyLog.length > 0 && (
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
+        <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-4 py-2">
           <label className="flex cursor-pointer items-center gap-2 text-xs text-slate-600">
             <input
               type="checkbox"
@@ -150,6 +150,35 @@ export function HistoryPanel() {
           <span className="text-xs tabular-nums text-slate-500" aria-live="polite">
             {selected.size > 0 ? `${selected.size} selected` : `${historyLog.length} entries`}
           </span>
+          {selected.size > 0 &&
+            (confirmingBulk ? (
+              <span className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={bulkRevert}
+                  disabled={reverting !== null}
+                  className="rounded-md bg-red-600 px-2 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
+                >
+                  {reverting === 'bulk' ? '...' : 'Confirm'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmingBulk(false)}
+                  disabled={reverting !== null}
+                  className="rounded-md border border-slate-200 px-2 py-1 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+                >
+                  ✕
+                </button>
+              </span>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmingBulk(true)}
+                className="rounded-md border border-red-200 bg-red-50 px-2 py-1 text-xs font-medium text-red-700 hover:bg-red-100"
+              >
+                Revert {selected.size} selected
+              </button>
+            ))}
         </div>
       )}
 
@@ -200,45 +229,6 @@ export function HistoryPanel() {
           </div>
         )}
       </div>
-
-      {selected.size > 0 && (
-        <div className="border-t border-slate-100 px-4 py-3">
-          {confirmingBulk ? (
-            <div className="space-y-2">
-              <p className="text-xs text-slate-600">
-                Revert {selected.size} selected action{selected.size === 1 ? '' : 's'}? This
-                will undo each one.
-              </p>
-              <div className="flex gap-2">
-                <button
-                  type="button"
-                  onClick={bulkRevert}
-                  disabled={reverting !== null}
-                  className="flex-1 rounded-lg bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
-                >
-                  {reverting === 'bulk' ? 'Reverting...' : 'Confirm revert'}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setConfirmingBulk(false)}
-                  disabled={reverting !== null}
-                  className="flex-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 disabled:opacity-50"
-                >
-                  Cancel
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={() => setConfirmingBulk(true)}
-              className="w-full rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-xs font-medium text-red-700 hover:bg-red-100"
-            >
-              Revert {selected.size} selected
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 }
