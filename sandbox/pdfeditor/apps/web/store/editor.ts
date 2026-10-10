@@ -13,7 +13,6 @@ import { immer } from 'zustand/middleware/immer';
 import {
   deletePage as coreDeletePage,
   duplicatePage as coreDuplicatePage,
-  exportPdf,
   reorderPage as coreReorderPage,
   rotatePage as coreRotatePage,
 } from '@pdfeditor/pdf-core';
@@ -54,6 +53,8 @@ interface EditorState {
   zoom: number;
   loading: boolean;
   error: string | null;
+  /** Dismissible informational banner (restore status, scanned notice, …) */
+  notice: { kind: 'info' | 'success' | 'warning'; message: string } | null;
   // Smart guides + snapping (user-controlled, never forced)
   snapEnabled: boolean;
   snapThreshold: number; // PDF points
@@ -92,6 +93,8 @@ interface EditorState {
   autosave: () => void;
   /** Load recovered document from IndexedDB */
   recoverDocument: () => Promise<boolean>;
+  /** Dismiss the informational banner */
+  dismissNotice: () => void;
 }
 
 function pushHistory(
@@ -139,6 +142,7 @@ export const useEditor = create<EditorState>()(
     zoom: 1,
     loading: false,
     error: null,
+    notice: null,
     snapEnabled: true,
     snapThreshold: 5,
     past: [],
@@ -150,6 +154,7 @@ export const useEditor = create<EditorState>()(
       set((s) => {
         s.loading = true;
         s.error = null;
+        s.notice = null;
       });
       try {
         if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
@@ -159,14 +164,77 @@ export const useEditor = create<EditorState>()(
           throw new Error('File exceeds the 50 MB limit.');
         }
         const bytes = new Uint8Array(await file.arrayBuffer());
-        const { pageCount, pages } = await loadPdfDocument(bytes);
+
+        // PDFEDI state package: a previously downloaded PDF carries its own
+        // editing state as attachments — restore it instead of starting fresh.
+        const { tryRestorePdfediPackage, looksScanned, RestoreError } = await import(
+          '@/lib/pdfedi-state'
+        );
+        let pdfBytes: Uint8Array = bytes;
+        let pages: Page[];
+        let pageCount: number;
+        let elements: Record<string, EditorElement> = {};
+        let notice: { kind: 'info' | 'success' | 'warning'; message: string } | null = null;
+
+        let restoreError: unknown = null;
+        let restored: Awaited<ReturnType<typeof tryRestorePdfediPackage>> = null;
+        try {
+          restored = await tryRestorePdfediPackage(bytes);
+        } catch (e) {
+          if (e instanceof RestoreError) restoreError = e;
+          else throw e;
+        }
+
+        if (restored) {
+          // Valid package: edit against the embedded CLEAN source so the
+          // flattened overlays in the uploaded file are never duplicated.
+          // This also prevents recursive nesting — every export re-embeds
+          // the original clean source, never the previous output.
+          pdfBytes = restored.sourceBytes;
+          pages = restored.pages;
+          pageCount = pages.length;
+          elements = restored.elements;
+          const n = Object.keys(elements).length;
+          notice = {
+            kind: 'success',
+            message:
+              n > 0
+                ? `Editing session restored — ${n} object${n === 1 ? '' : 's'} recovered. Continue editing.`
+                : 'Editing session restored. Continue editing.',
+          };
+        } else {
+          const loaded = await loadPdfDocument(bytes);
+          pageCount = loaded.pageCount;
+          pages = loaded.pages;
+          if (restoreError instanceof RestoreError) {
+            // A manifest was present but unusable: open the visible content
+            // as a new document and explain clearly. Never invent objects.
+            notice = { kind: 'warning', message: `${restoreError.message} Opened as a new document.` };
+          } else if (/-edited\.pdf$/i.test(file.name)) {
+            // Likely a PDFEDI download whose attachments were stripped by
+            // another application.
+            notice = {
+              kind: 'warning',
+              message:
+                'This looks like a PDFEDI download, but its editing data was not found (it may have been removed by another app). Previous additions cannot be restored.',
+            };
+          } else if (await looksScanned(bytes)) {
+            // Heuristic only — no OCR is performed.
+            notice = {
+              kind: 'info',
+              message:
+                'This PDF appears to contain scanned or flattened content. The original content cannot be edited directly, but you can add and edit your own text, signatures, images, shapes, and other supported objects.',
+            };
+          }
+        }
+
         set((s) => {
           s.fileName = file.name;
           s.fileSize = file.size;
-          s.pdfBytes = bytes;
+          s.pdfBytes = pdfBytes;
           s.pageCount = pageCount;
           s.pages = pages;
-          s.elements = {};
+          s.elements = elements;
           s.activePageId = pages[0]?.id ?? null;
           s.selectedId = null;
           s.past = [];
@@ -174,6 +242,7 @@ export const useEditor = create<EditorState>()(
           s.historyLog = [];
           s.tool = 'select';
           s.loading = false;
+          s.notice = notice;
         });
       } catch (e) {
         set((s) => {
@@ -198,6 +267,7 @@ export const useEditor = create<EditorState>()(
         s.future = [];
         s.historyLog = [];
         s.error = null;
+        s.notice = null;
       });
     },
 
@@ -502,11 +572,37 @@ export const useEditor = create<EditorState>()(
     exportBytes: async () => {
       const s = get();
       if (!s.pdfBytes) throw new Error('No document loaded.');
-      return exportPdf({
-        srcBytes: s.pdfBytes,
-        pages: s.pages,
-        elements: s.elements,
+      // Build the PDFEDI state package: manifest + clean source + assets,
+      // embedded as file attachments so the download stays re-editable.
+      // s.pdfBytes is always the clean source (for restored sessions it is
+      // the extracted original), so recursive nesting cannot occur.
+      const {
+        buildManifestParts,
+        createManifest,
+        sha256Hex,
+        exportPdfWithState,
+      } = await import('@pdfeditor/pdf-core');
+      const parts = await buildManifestParts(s.pages, s.elements, async (el) => {
+        if (el.kind !== 'image' && el.kind !== 'signature') return null;
+        try {
+          const res = await fetch(el.src);
+          if (!res.ok) return null;
+          const buf = await res.arrayBuffer();
+          if (buf.byteLength === 0) return null;
+          return {
+            bytes: new Uint8Array(buf),
+            mime: el.kind === 'image' ? el.mime : 'image/png',
+          };
+        } catch {
+          return null;
+        }
       });
+      const sourceHash = await sha256Hex(s.pdfBytes);
+      const manifest = createManifest(sourceHash, s.pages, parts.elements, parts.manifestAssets);
+      return exportPdfWithState(
+        { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
+        { manifest, sourceBytes: s.pdfBytes, assets: parts.assets },
+      );
     },
 
     download: async () => {
@@ -523,6 +619,8 @@ export const useEditor = create<EditorState>()(
       // Privacy: revoke immediately after the download starts
       setTimeout(() => URL.revokeObjectURL(url), 10_000);
     },
+
+    dismissNotice: () => set((s) => { s.notice = null; }),
 
     autosave: () => {
       // Debounced in the caller; this performs the actual save

@@ -15,7 +15,24 @@ import {
   degrees,
   StandardFonts,
 } from 'pdf-lib';
-import type { EditorElement, Page } from '@pdfeditor/shared';
+import type { EditorElement, Page, PdfediManifest } from '@pdfeditor/shared';
+import {
+  buildManifestParts,
+  createManifest,
+  embedStatePackage,
+  sha256Hex,
+  type ManifestParts,
+  type StateAsset,
+} from './state-package';
+
+export {
+  buildManifestParts,
+  createManifest,
+  embedStatePackage,
+  sha256Hex,
+  type ManifestParts,
+  type StateAsset,
+};
 
 // ---------------------------------------------------------------------------
 // Page operations (pure — return new arrays, never mutate)
@@ -265,11 +282,19 @@ export interface ExportInput {
   elements: Record<string, EditorElement>;
 }
 
+/** Optional PDFEDI state package to embed as file attachments. */
+export interface StatePackageInput {
+  manifest: PdfediManifest;
+  /** Clean source PDF bytes — the manifest's sourceHash must match these */
+  sourceBytes: Uint8Array;
+  assets: StateAsset[];
+}
+
 /**
- * Build the edited PDF. Returns fresh bytes — the input is never modified.
- * Pages follow the current `pages` order; deleted pages are dropped.
+ * Build the edited PDFDocument (visible pages with flattened overlays).
+ * The caller owns saving; use `exportPdfWithState` to embed attachments.
  */
-export async function exportPdf(input: ExportInput): Promise<Uint8Array> {
+export async function buildPdfDocument(input: ExportInput): Promise<PDFDocument> {
   const src = await PDFDocument.load(input.srcBytes, { ignoreEncryption: false });
   const out = await PDFDocument.create();
   const ctx = createDrawContext(out);
@@ -299,5 +324,33 @@ export async function exportPdf(input: ExportInput): Promise<Uint8Array> {
     }
   }
 
+  return out;
+}
+
+/**
+ * Build the edited PDF. Returns fresh bytes — the input is never modified.
+ * Pages follow the current `pages` order; deleted pages are dropped.
+ */
+export async function exportPdf(input: ExportInput): Promise<Uint8Array> {
+  const out = await buildPdfDocument(input);
+  return out.save();
+}
+
+/**
+ * Build the edited PDF and embed the PDFEDI state package (manifest +
+ * clean source + assets) as file attachments, making the download
+ * re-editable on re-upload. Returns fresh bytes.
+ */
+export async function exportPdfWithState(
+  input: ExportInput,
+  statePackage: StatePackageInput,
+): Promise<Uint8Array> {
+  const out = await buildPdfDocument(input);
+  await embedStatePackage(
+    out,
+    statePackage.manifest,
+    statePackage.sourceBytes,
+    statePackage.assets,
+  );
   return out.save();
 }

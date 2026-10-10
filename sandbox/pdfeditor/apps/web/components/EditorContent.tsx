@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useEditor } from '@/store/editor';
 import { Dropzone } from '@/components/Dropzone';
 import { Toolbar } from '@/components/Toolbar';
+import { DocNotice } from '@/components/DocNotice';
 import { Thumbnails } from '@/components/Thumbnails';
 import { PropertiesPanel } from '@/components/PropertiesPanel';
 import { PageCanvas } from '@/components/PageCanvas';
@@ -160,6 +161,7 @@ export function EditorContent() {
   return (
     <div className="pdfeditor-root flex h-full min-h-0 flex-col overflow-hidden bg-slate-100">
       <Toolbar />
+      <DocNotice />
       {recoveryDoc && (
         <div className="flex items-center justify-between gap-4 border-b border-amber-200 bg-amber-50 px-4 py-2.5">
           <p className="text-sm text-amber-900">

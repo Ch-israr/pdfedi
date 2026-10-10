@@ -186,6 +186,81 @@ export const ApiErrorSchema = z.object({
 export type ApiError = z.infer<typeof ApiErrorSchema>;
 
 // ---------------------------------------------------------------------------
+// PDFEDI embedded state package (re-editable PDF via attachments)
+//
+// A downloaded PDF carries:
+//   - "PDFEDI_STATE.json" — this manifest (current active objects)
+//   - "PDFEDI_SOURCE.pdf" — the clean original source PDF
+//   - "PDFEDI_ASSET_<id>.<ext>" — image/signature binaries referenced below
+// No database, no server storage: everything travels inside the one PDF.
+// ---------------------------------------------------------------------------
+
+/** Attachment filenames inside the exported PDF. */
+export const PDFEDI_MANIFEST_NAME = 'PDFEDI_STATE.json';
+export const PDFEDI_SOURCE_NAME = 'PDFEDI_SOURCE.pdf';
+export const PDFEDI_ASSET_PREFIX = 'PDFEDI_ASSET_';
+export const PDFEDI_MANIFEST_VERSION = 1;
+/** Upper bounds for untrusted manifest data (DoS protection). */
+export const PDFEDI_MAX_MANIFEST_BYTES = 10 * 1024 * 1024;
+export const PDFEDI_MAX_ELEMENTS = 10_000;
+export const PDFEDI_MAX_ASSETS = 500;
+
+const ManifestPageSchema = z.object({
+  id: z.string().uuid(),
+  sourceIndex: z.number().int().min(0),
+  width: z.number().positive().finite(),
+  height: z.number().positive().finite(),
+  rotation: z.number().finite().default(0),
+});
+export type ManifestPage = z.infer<typeof ManifestPageSchema>;
+
+// Image/signature elements reference an embedded binary attachment instead
+// of carrying a (possibly blob:) URL that cannot survive a download.
+const ManifestImageElementSchema = ImageElementSchema.omit({ src: true }).extend({
+  /** Attachment filename, e.g. "PDFEDI_ASSET_<uuid>.png" */
+  assetRef: z.string().min(1).max(128),
+});
+const ManifestSignatureElementSchema = SignatureElementSchema.omit({ src: true }).extend({
+  assetRef: z.string().min(1).max(128),
+});
+const ManifestElementSchema = z.discriminatedUnion('kind', [
+  TextElementSchema,
+  ManifestImageElementSchema,
+  HighlightElementSchema,
+  ManifestSignatureElementSchema,
+  ShapeElementSchema,
+]);
+export type ManifestElement = z.infer<typeof ManifestElementSchema>;
+
+export const PdfediManifestSchema = z.object({
+  /** Format identifier so future versions can recognise this file */
+  format: z.literal('pdfedi-state'),
+  /** Schema version — readers must reject unknown versions */
+  version: z.literal(PDFEDI_MANIFEST_VERSION),
+  /** SHA-256 hex of the clean source PDF this manifest belongs to */
+  sourceHash: z.string().regex(/^[0-9a-f]{64}$/),
+  /** ISO-8601 export timestamp */
+  exportedAt: z.string().datetime(),
+  /** Current page order (UUIDs preserved across round trips) */
+  pages: z.array(ManifestPageSchema).min(1).max(5000),
+  /** Current active objects only — no history, no deleted objects */
+  elements: z.array(ManifestElementSchema).max(PDFEDI_MAX_ELEMENTS),
+  /** Binary assets embedded alongside the manifest */
+  assets: z
+    .array(
+      z.object({
+        /** Attachment filename referenced by assetRef */
+        name: z.string().min(1).max(128),
+        /** UUID of the element that uses this asset */
+        elementId: z.string().uuid(),
+        mime: z.string().min(1).max(64),
+      }),
+    )
+    .max(PDFEDI_MAX_ASSETS),
+});
+export type PdfediManifest = z.infer<typeof PdfediManifestSchema>;
+
+// ---------------------------------------------------------------------------
 // Command-based history entries
 // ---------------------------------------------------------------------------
 
