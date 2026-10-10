@@ -378,8 +378,10 @@ export async function buildPdfDocument(input: ExportInput): Promise<PDFDocument>
     );
     // Masks for deleted baked elements (tombstones): cover the old baked
     // content so the deletion is reflected in the exported PDF.
+    // Check bakedBounds (not the baked flag): a modified-then-deleted element
+    // is unbaked, but its original baked content is still in the page.
     const deletedMasks = Object.values(input.elements).filter(
-      (e) => e.pageId === page.id && (e as any).deleted && (e as any).baked,
+      (e) => e.pageId === page.id && (e as any).deleted && (e as any).bakedBounds,
     );
     for (const el of deletedMasks) {
       const bb = (el as any).bakedBounds;
