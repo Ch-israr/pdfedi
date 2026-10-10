@@ -232,7 +232,10 @@ function ElementView({
           {...common}
           style={{
             ...style,
-            // Positioned by cover-box bottom-left (no baseline translate)
+            // Positioned by cover-box TOP-left: override the baseline-based top.
+            // (The shared `style` uses el.y as a baseline; native-text stores
+            // the cover-box bottom, so shift up by the box height.)
+            top: pdfYToScreenTop(el.y + el.height, page, zoom),
             transform: `rotate(${-el.rotation}deg)`,
             width: toScreen(el.width, zoom),
             height: toScreen(el.height, zoom),
