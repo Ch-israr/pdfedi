@@ -133,6 +133,10 @@ interface EditorState {
   replaceTextMatch: (pageId: string, item: NativeTextItem, query: string, replacement: string, caseSensitive: boolean) => string | null;
 }
 
+// Module-level lock for download deduplication. Synchronous (not via Zustand)
+// so rapid clicks cannot slip through between the check and the state update.
+const downloadLock = { locked: false };
+
 function pushHistory(
   state: { past: HistoryCommand[]; future: HistoryCommand[]; historyLog: HistoryRecord[]; pages: Page[] },
   cmd: Omit<HistoryCommand, 'id'>,
@@ -712,8 +716,11 @@ export const useEditor = create<EditorState>()(
     },
 
     download: async () => {
-      // Prevent duplicate downloads: if already preparing, ignore the click.
-      if (get().downloading) return;
+      // Prevent duplicate downloads using a synchronous module-level lock.
+      // This guards against rapid clicks that can slip through the async
+      // Zustand state update.
+      if (downloadLock.locked) return;
+      downloadLock.locked = true;
       set((s) => {
         s.downloading = true;
         s.downloadError = null;
@@ -737,6 +744,7 @@ export const useEditor = create<EditorState>()(
           s.downloadError = msg;
         });
       } finally {
+        downloadLock.locked = false;
         set((s) => {
           s.downloading = false;
         });
