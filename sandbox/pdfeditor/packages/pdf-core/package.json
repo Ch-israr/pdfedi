@@ -25,7 +25,8 @@
     "clean": "rm -rf dist",
     "dev": "tsc -p tsconfig.json --watch",
     "lint": "echo \"no lint configured\"",
-    "typecheck": "tsc -p tsconfig.json --noEmit"
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --test test/*.test.ts"
   },
   "types": "./dist/index.d.ts",
   "version": "0.1.0",

@@ -358,6 +358,32 @@ export const useEditor = create<EditorState>()(
     deleteElement: (id) => {
       const el = get().elements[id];
       if (!el) return;
+
+      // Native-text deletion: convert to a mask (empty text) instead of
+      // removing, so the source text stays covered and the area remains blank.
+      // Deleting a mask (already empty) removes it entirely, revealing the
+      // original. This preserves masking state through delete/undo/redo.
+      if (el.kind === 'native-text' && el.text.trim() !== '') {
+        const maskEl = { ...el, text: '' };
+        set((s) => {
+          s.elements[id] = maskEl as EditorElement;
+          if (s.selectedId === id) s.selectedId = null;
+          pushHistory(s, {
+            label: 'Delete native text',
+            undo: () => {
+              useEditor.setState((st) => { st.elements[id] = el; });
+            },
+            redo: () => {
+              useEditor.setState((st) => {
+                st.elements[id] = maskEl as EditorElement;
+                if (st.selectedId === id) st.selectedId = null;
+              });
+            },
+          });
+        });
+        return;
+      }
+
       set((s) => {
         delete s.elements[id];
         if (s.selectedId === id) s.selectedId = null;

@@ -1,1 +1,36 @@
-{"dependencies":{"@pdfeditor/pdf-core":"workspace:*","@pdfeditor/shared":"workspace:*","immer":"^10.1.1","next":"^14.2.21","pdf-lib":"^1.17.1","pdfjs-dist":"^4.8.69","react":"^18.3.1","react-dom":"^18.3.1","zod":"^3.24.1","zustand":"^5.0.2"},"description":"Privacy-first PDF editor — Next.js frontend","devDependencies":{"@types/node":"^20.17.10","@types/react":"^18.3.18","@types/react-dom":"^18.3.5","autoprefixer":"^10.4.20","postcss":"^8.4.49","tailwindcss":"^3.4.17","typescript":"^5.7.2"},"name":"@pdfeditor/web","private":true,"scripts":{"build":"next build","clean":"rm -rf .next out","dev":"next dev -p 3000","lint":"next lint","start":"next start -p 3000","typecheck":"tsc --noEmit"},"version":"0.1.0"}
+{
+  "dependencies": {
+    "@pdfeditor/pdf-core": "workspace:*",
+    "@pdfeditor/shared": "workspace:*",
+    "immer": "^10.1.1",
+    "next": "^14.2.21",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.8.69",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "zod": "^3.24.1",
+    "zustand": "^5.0.2"
+  },
+  "description": "Privacy-first PDF editor — Next.js frontend",
+  "devDependencies": {
+    "@types/node": "^20.17.10",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.7.2"
+  },
+  "name": "@pdfeditor/web",
+  "private": true,
+  "scripts": {
+    "build": "next build",
+    "clean": "rm -rf .next out",
+    "dev": "next dev -p 3000",
+    "lint": "next lint",
+    "start": "next start -p 3000",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --loader ./test/loader.mjs --test test/*.test.ts"
+  },
+  "version": "0.1.0"
+}
