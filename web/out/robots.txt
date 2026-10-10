@@ -1,0 +1,6 @@
+User-Agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+Sitemap: https://pdfedi.onrender.com/sitemap.xml

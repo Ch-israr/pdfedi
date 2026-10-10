@@ -2,6 +2,7 @@
 
 import { useEditor, type ToolId } from '@/store/editor';
 import { HistoryPanel } from './HistoryPanel';
+import { ToolIcon } from './ToolIcon';
 
 function SaveStatus() {
   const saveStatus = useEditor((s) => s.saveStatus);
@@ -20,36 +21,34 @@ function SaveStatus() {
   );
 }
 
-const TOOL_GROUPS: { id: ToolId; label: string; icon: string; shortcut?: string }[][] = [
+const TOOL_GROUPS: { id: ToolId; label: string; shortcut?: string }[][] = [
   // Selection
-  [{ id: 'select', label: 'Select / Move', icon: '↖', shortcut: 'V' }],
+  [{ id: 'select', label: 'Select', shortcut: 'V' }],
   // Annotate
   [
-    { id: 'text', label: 'Text', icon: 'T', shortcut: 'T' },
-    { id: 'image', label: 'Image', icon: '🖼' },
-    { id: 'highlight', label: 'Highlight', icon: '🖍', shortcut: 'H' },
-    { id: 'signature', label: 'Signature', icon: '✍' },
+    { id: 'text', label: 'Text', shortcut: 'T' },
+    { id: 'image', label: 'Image' },
+    { id: 'highlight', label: 'Highlight', shortcut: 'H' },
+    { id: 'signature', label: 'Signature' },
   ],
   // Shapes
   [
-    { id: 'shape-rect', label: 'Rectangle', icon: '▭', shortcut: 'R' },
-    { id: 'shape-ellipse', label: 'Ellipse', icon: '⬭' },
-    { id: 'shape-line', label: 'Line', icon: '╱', shortcut: 'L' },
-    { id: 'shape-arrow', label: 'Arrow', icon: '→', shortcut: 'A' },
+    { id: 'shape-rect', label: 'Rectangle', shortcut: 'R' },
+    { id: 'shape-ellipse', label: 'Ellipse' },
+    { id: 'shape-line', label: 'Line', shortcut: 'L' },
+    { id: 'shape-arrow', label: 'Arrow', shortcut: 'A' },
   ],
 ];
 
 function ToolButton({
   id,
   label,
-  icon,
   shortcut,
   active,
   onSelect,
 }: {
   id: ToolId;
   label: string;
-  icon: string;
   shortcut?: string;
   active: boolean;
   onSelect: (id: ToolId) => void;
@@ -61,13 +60,17 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       onClick={() => onSelect(id)}
-      className={`flex h-9 w-9 items-center justify-center rounded-lg text-base transition-colors ${
+      className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
         active
           ? 'bg-brand-500 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
       }`}
     >
-      <span aria-hidden>{icon}</span>
+      <ToolIcon id={id} />
+      {/* Text labels on desktop; icon-only on smaller screens (tooltip covers it) */}
+      <span aria-hidden className="hidden xl:inline">
+        {label}
+      </span>
     </button>
   );
 }
@@ -111,7 +114,6 @@ export function Toolbar() {
                 key={t.id}
                 id={t.id}
                 label={t.label}
-                icon={t.icon}
                 shortcut={t.shortcut}
                 active={tool === t.id}
                 onSelect={setTool}

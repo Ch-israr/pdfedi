@@ -432,10 +432,10 @@ export function ElementOverlay({ page }: { page: Page }) {
     bold: false,
     italic: false,
   });
-  // Drag-to-draw state for shapes: press → drag → release
-  // (lines/arrows use start/end points; rect/ellipse use drag rectangle)
+  // Drag-to-draw state for shapes + highlight: press → drag → release
+  // (lines/arrows use start/end points; rect/ellipse/highlight use drag rectangle)
   const [drawing, setDrawing] = useState<{
-    shape: 'line' | 'arrow' | 'rect' | 'ellipse';
+    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight';
     startX: number; // PDF points
     startY: number;
     curX: number;
@@ -531,13 +531,8 @@ export function ElementOverlay({ page }: { page: Page }) {
         break;
       }
       case 'highlight':
-        place(
-          {
-            id, pageId: page.id, kind: 'highlight', x, y: y - 10, rotation: 0,
-            width: 120, height: 16, color: '#FFFF00', opacity: 0.4,
-          },
-          'Highlight Added',
-        );
+        // Drag-to-draw: handled by onPagePointerDown/Move/Up. A click without
+        // drag is intentionally discarded (no default-size box).
         break;
       case 'shape-rect':
       case 'shape-ellipse':
@@ -601,6 +596,7 @@ export function ElementOverlay({ page }: { page: Page }) {
       : tool === 'shape-arrow' ? 'arrow'
       : tool === 'shape-rect' ? 'rect'
       : tool === 'shape-ellipse' ? 'ellipse'
+      : tool === 'highlight' ? 'highlight'
       : null;
     if (!drawShape) return;
     // Handles take priority over drawing tools: if the pointer is on a
@@ -687,23 +683,43 @@ export function ElementOverlay({ page }: { page: Page }) {
       const y = Math.min(y1, y2);
       const w = Math.abs(x2 - x1);
       const h = Math.abs(y2 - y1);
-      addElement(
-        {
-          id,
-          pageId: page.id,
-          kind: 'shape',
-          x,
-          y,
-          rotation: 0,
-          shape: d.shape,
-          width: w,
-          height: h,
-          stroke: '#000000',
-          strokeWidth: 2,
-          fill: null,
-        },
-        d.shape === 'rect' ? 'Rectangle Added' : 'Ellipse Added',
-      );
+      if (d.shape === 'highlight') {
+        // Highlight: commit the dragged rectangle with the standard
+        // highlight style (yellow, translucent). Same undo/history path.
+        addElement(
+          {
+            id,
+            pageId: page.id,
+            kind: 'highlight',
+            x,
+            y,
+            rotation: 0,
+            width: w,
+            height: h,
+            color: '#FFFF00',
+            opacity: 0.4,
+          },
+          'Highlight Added',
+        );
+      } else {
+        addElement(
+          {
+            id,
+            pageId: page.id,
+            kind: 'shape',
+            x,
+            y,
+            rotation: 0,
+            shape: d.shape,
+            width: w,
+            height: h,
+            stroke: '#000000',
+            strokeWidth: 2,
+            fill: null,
+          },
+          d.shape === 'rect' ? 'Rectangle Added' : 'Ellipse Added',
+        );
+      }
     }
   };
 
@@ -878,7 +894,7 @@ function DrawingPreview({
   page,
   zoom,
 }: {
-  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
+  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
   page: Page;
   zoom: number;
 }) {
@@ -973,8 +989,19 @@ function DrawingPreview({
             <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
           </>
         )}
-        {(drawing.shape === 'rect' || drawing.shape === 'ellipse') && (
-          drawing.shape === 'rect' ? (
+        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight') && (
+          drawing.shape === 'highlight' ? (
+            <rect
+              x={rx}
+              y={ry}
+              width={rw}
+              height={rh}
+              fill="rgba(255,255,0,0.35)"
+              stroke="#c9a900"
+              strokeWidth={sw}
+              strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+            />
+          ) : drawing.shape === 'rect' ? (
             <rect
               x={rx}
               y={ry}
