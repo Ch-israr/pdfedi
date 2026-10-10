@@ -736,9 +736,14 @@ export const useEditor = create<EditorState>()(
           Math.abs(el.x - item.x) < 1 &&
           Math.abs(el.y - item.y) < 1,
       );
-      // Determine the source text: use the element's current text if it exists,
-      // otherwise the original fragment text.
-      const sourceText = existing ? existing.text : item.text;
+      // Determine the source text:
+      // - If an element exists with non-empty text, use its current text.
+      // - If it's a mask (empty text from deletion), use the originalText
+      //   so Replace can restore content into the masked area.
+      // - Otherwise, use the fragment's original text.
+      const sourceText = existing
+        ? (existing.text ? existing.text : existing.originalText)
+        : item.text;
       // Perform the replacement (all occurrences within this fragment)
       let newText: string;
       if (caseSensitive) {

@@ -148,4 +148,38 @@ describe('find & replace', () => {
     const updatedMatches = useEditor.getState().findTextMatches('Quarterly', false);
     assert.ok(updatedMatches[0].existingElementId, 'Should have existing element ID');
   });
+
+  it('replaceTextMatch on a mask (deleted fragment) restores with replacement', () => {
+    const state = useEditor.getState();
+    const matches = state.findTextMatches('Quarterly', false);
+    const match = matches[0];
+
+    // Create a mask by deleting (simulating the deletion fix)
+    const elId = state.replaceTextMatch(match.pageId, match.item, 'Quarterly', 'Annual', false);
+    assert.ok(elId);
+    // Delete it → becomes mask (empty text)
+    state.deleteElement(elId);
+    const mask = useEditor.getState().elements[elId];
+    assert.ok(mask, 'Mask should exist');
+    assert.equal(mask.kind, 'native-text');
+    if (mask.kind === 'native-text') {
+      assert.equal(mask.text, '', 'Mask should have empty text');
+    }
+
+    // Now Find & Replace on the original query should restore into the mask
+    const id2 = useEditor.getState().replaceTextMatch(
+      match.pageId, match.item, 'Quarterly', 'Fiscal', false
+    );
+    assert.equal(id2, elId, 'Should reuse the mask element');
+    const restored = useEditor.getState().elements[elId];
+    assert.ok(restored && restored.kind === 'native-text');
+    if (restored.kind === 'native-text') {
+      assert.ok(restored.text.includes('Fiscal'), 'Mask should now contain replacement');
+      assert.ok(!restored.text.includes('Quarterly'), 'Original should be replaced');
+    }
+    // History should record the replace
+    const log = useEditor.getState().historyLog;
+    const lastEntry = log[log.length - 1];
+    assert.match(lastEntry.label, /find & replace/i);
+  });
 });
