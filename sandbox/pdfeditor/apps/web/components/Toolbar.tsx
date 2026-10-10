@@ -60,13 +60,14 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       onClick={() => onSelect(id)}
-      className={`flex h-9 w-9 items-center justify-center rounded-lg transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
+      className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
         active
           ? 'bg-brand-500 text-white shadow-sm'
           : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
       }`}
     >
       <ToolIcon id={id} />
+      <span aria-hidden>{label}</span>
     </button>
   );
 }
