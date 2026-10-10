@@ -660,7 +660,49 @@ export function ElementOverlay({ page }: { page: Page }) {
   };
 
   const onPageClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if ((e.target as HTMLElement).closest('[data-el-id]')) return;
+    // If clicking on an existing element: with the Text tool, clicking a
+    // native-text element opens it for editing (pre-filled). For other tools
+    // or element kinds, let the element's own handlers deal with it.
+    const elIdAttr = (e.target as HTMLElement).closest('[data-el-id]');
+    if (elIdAttr) {
+      if (tool === 'text') {
+        const clickedId = elIdAttr.getAttribute('data-el-id');
+        const clickedEl = clickedId ? els.find((el) => el.id === clickedId) : undefined;
+        if (clickedEl && clickedEl.kind === 'native-text') {
+          // Open the existing native-text element for editing (pre-filled).
+          // Position the editor over the element bounds.
+          const elLeft = clickedEl.x * zoom;
+          const elTop = (page.height - (clickedEl.y + clickedEl.height)) * zoom;
+          const elWidth = clickedEl.width * zoom;
+          const elHeight = clickedEl.height * zoom;
+          setEditingText({
+            mode: 'native',
+            nativeItem: {
+              id: `nt-${clickedEl.id}`,
+              x: clickedEl.x,
+              y: clickedEl.y,
+              width: clickedEl.width,
+              height: clickedEl.height,
+              baselineOffset: clickedEl.baselineOffset,
+              text: clickedEl.originalText,
+              fontSize: clickedEl.fontSize,
+              fontFamily: clickedEl.fontFamily,
+              bold: clickedEl.bold,
+              italic: clickedEl.italic,
+            },
+            existingId: clickedEl.id,
+            screenX: elLeft,
+            screenY: elTop,
+            screenW: elWidth,
+            screenH: elHeight,
+            fontSize: clickedEl.fontSize,
+            initialText: clickedEl.text,
+          });
+          return;
+        }
+      }
+      return;
+    }
     const rect = e.currentTarget.getBoundingClientRect();
     const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
     const id = crypto.randomUUID();
@@ -928,13 +970,19 @@ export function ElementOverlay({ page }: { page: Page }) {
       onClick={onPageClick}
       onDoubleClick={(e) => {
         // One-time warning: double-click with the Text tool is the "edit this"
-        // gesture. If it lands on empty content of a page with no extractable
-        // native text, the existing content cannot be edited directly.
-        // (Select tool does not trigger editing, so no warning there.)
+        // gesture. If it lands on non-editable content (not a native text
+        // fragment, not an existing element), the content cannot be edited
+        // directly. (Select tool does not trigger editing, so no warning there.)
         if (nativeEditWarned) return;
         if (tool !== 'text') return;
         if ((e.target as HTMLElement).closest('[data-el-id]')) return;
-        if ((useEditor.getState().nativeText?.[page.id] ?? []).length > 0) return;
+        // Check if the click hit an editable native text fragment at this
+        // position (not just whether the page has any text). If it hit one,
+        // no warning is needed — the fragment is editable.
+        const rect = e.currentTarget.getBoundingClientRect();
+        const { x, y } = screenToPdf(e.clientX - rect.left, e.clientY - rect.top, page, zoom);
+        const hit = hitNativeText(x, y);
+        if (hit && isNativeTextEditable(hit)) return;
         markNativeEditWarned();
         setShowNativeWarning(true);
       }}
