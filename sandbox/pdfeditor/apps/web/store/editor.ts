@@ -638,6 +638,7 @@ export const useEditor = create<EditorState>()(
     dismissNotice: () => set((s) => { s.notice = null; }),
     setNativeText: (pageId, items) =>
       set((s) => {
+        if (!s.nativeText) s.nativeText = {};
         s.nativeText[pageId] = items;
       }),
     markNativeEditWarned: () => set((s) => { s.nativeEditWarned = true; }),

@@ -614,9 +614,8 @@ export function ElementOverlay({ page }: { page: Page }) {
   );
 
   // Native text items for this page (extracted from the PDF itself)
-  // BISECT: temporarily disabled to isolate crash
-  const nativeItems: NativeTextItem[] = [];
-  // const nativeItems = useEditor((s) => s.nativeText[page.id] ?? []);
+  // Defensive: nativeText may be undefined during store rehydration/transitions
+  const nativeItems = useEditor((s) => s.nativeText?.[page.id] ?? []);
 
   /** Find the native text fragment under a PDF-point position, if any. */
   const hitNativeText = (x: number, y: number): NativeTextItem | null => {
