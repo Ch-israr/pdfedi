@@ -41,6 +41,7 @@ export function FloatingTextToolbar({
         overrideUpdate(id, patch)
     : storeUpdate;
   const deleteElement = useEditor((s) => s.deleteElement);
+  const setTool = useEditor((s) => s.setTool);
   const isNewMode = el.id === '__new__';
   const [showLink, setShowLink] = useState(false);
   const [linkInput, setLinkInput] = useState(el.kind === 'text' ? (el.link ?? '') : '');
@@ -247,6 +248,18 @@ export function FloatingTextToolbar({
         </button>
       )}
       {!isNewMode && <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />}
+      {/* Move (hidden in new mode) — switches to Move tool for dragging */}
+      {!isNewMode && (
+        <button
+          type="button"
+          title="Move text (drag to reposition)"
+          aria-label="Move text"
+          className={`${btn} text-slate-700`}
+          onClick={() => setTool('move')}
+        >
+          ✥
+        </button>
+      )}
       {/* Delete (hidden in new mode) */}
       {!isNewMode && (
         <button
