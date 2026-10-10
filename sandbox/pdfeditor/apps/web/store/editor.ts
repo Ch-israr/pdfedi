@@ -636,6 +636,19 @@ export const useEditor = create<EditorState>()(
     exportBytes: async () => {
       const s = get();
       if (!s.pdfBytes) throw new Error('No document loaded.');
+
+      // Fast path: no edits made — return the original bytes unchanged.
+      // This avoids embedding the source PDF and manifest when the user
+      // simply uploads and downloads without changes, keeping the output
+      // size identical to the input.
+      const hasElements = Object.keys(s.elements).length > 0;
+      const pagesModified =
+        s.pages.length !== s.pageCount ||
+        s.pages.some((p, i) => p.sourceIndex !== i + 1 || (p.rotation ?? 0) !== 0);
+      if (!hasElements && !pagesModified) {
+        return s.pdfBytes;
+      }
+
       // Build the PDFEDI state package: manifest + clean source + assets,
       // embedded as file attachments so the download stays re-editable.
       // s.pdfBytes is always the clean source (for restored sessions it is

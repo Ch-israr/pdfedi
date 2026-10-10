@@ -23,7 +23,7 @@ import {
   sha256Hex,
   type ManifestParts,
   type StateAsset,
-} from './state-package';
+} from './state-package.js';
 
 export {
   buildManifestParts,
@@ -336,15 +336,32 @@ export async function buildPdfDocument(input: ExportInput): Promise<PDFDocument>
   const out = await PDFDocument.create();
   const ctx = createDrawContext(out);
 
-  for (const page of input.pages) {
-    let copied;
+  // Batch copy all non-blank pages in a single copyPages() call so pdf-lib's
+  // PDFObjectCopier deduplicates shared resources (e.g., image XObjects used
+  // by multiple pages) instead of copying them once per page.
+  const srcIndices: number[] = [];
+  const pageToSrcPos = new Map<number, number>(); // model index -> position in copied array
+  input.pages.forEach((page, modelIdx) => {
+    if (page.sourceIndex !== 0) {
+      pageToSrcPos.set(modelIdx, srcIndices.length);
+      srcIndices.push(page.sourceIndex - 1);
+    }
+  });
+
+  const copiedPages =
+    srcIndices.length > 0 ? await out.copyPages(src, srcIndices) : [];
+
+  // Add pages to `out` in model order, applying rotation and drawing elements.
+  for (let i = 0; i < input.pages.length; i++) {
+    const page = input.pages[i];
+    let pdfPage;
     if (page.sourceIndex === 0) {
       // Blank inserted page: create new instead of copying.
       // Dimensions are in PDF points and already reflect the reference page's
       // size and orientation (including any rotation at insertion time).
-      copied = out.addPage([page.width, page.height]);
+      pdfPage = out.addPage([page.width, page.height]);
     } else {
-      const [cp] = await out.copyPages(src, [page.sourceIndex - 1]);
+      const cp = copiedPages[pageToSrcPos.get(i)!];
       // The model's rotation now includes the PDF's native /Rotate plus any
       // user-applied rotation. Set absolute (don't add) to avoid double-applying
       // the native rotation that's already on the copied page.
@@ -352,12 +369,12 @@ export async function buildPdfDocument(input: ExportInput): Promise<PDFDocument>
         cp.setRotation(degrees(page.rotation % 360));
       }
       out.addPage(cp);
-      copied = cp;
+      pdfPage = cp;
     }
 
     const els = Object.values(input.elements).filter((e) => e.pageId === page.id);
     for (const el of els) {
-      await drawElement(ctx, copied, el);
+      await drawElement(ctx, pdfPage, el);
     }
   }
 
