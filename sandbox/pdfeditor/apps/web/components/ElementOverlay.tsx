@@ -704,6 +704,8 @@ export function ElementOverlay({ page }: { page: Page }) {
           const elTop = (page.height - (clickedEl.y + clickedEl.height)) * zoom;
           const elWidth = clickedEl.width * zoom;
           const elHeight = clickedEl.height * zoom;
+          // Select the element so the floating toolbar appears during editing.
+          select(clickedEl.id);
           setEditingText({
             mode: 'native',
             nativeItem: {
@@ -737,6 +739,8 @@ export function ElementOverlay({ page }: { page: Page }) {
           const elLeft = clickedEl.x * zoom;
           const elHeight = (clickedEl as any).height ?? clickedEl.fontSize * 1.2;
           const elTop = (page.height - (clickedEl.y + elHeight)) * zoom;
+          // Select the element so the floating toolbar appears during editing.
+          select(clickedEl.id);
           setEditingText({
             mode: 'edit',
             id: clickedEl.id,
