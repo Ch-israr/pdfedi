@@ -374,8 +374,26 @@ export async function buildPdfDocument(input: ExportInput): Promise<PDFDocument>
     }
 
     const els = Object.values(input.elements).filter(
-      (e) => e.pageId === page.id && !(e as any).baked,
+      (e) => e.pageId === page.id && !(e as any).baked && !(e as any).deleted,
     );
+    // Masks for deleted baked elements (tombstones): cover the old baked
+    // content so the deletion is reflected in the exported PDF.
+    const deletedMasks = Object.values(input.elements).filter(
+      (e) => e.pageId === page.id && (e as any).deleted && (e as any).baked,
+    );
+    for (const el of deletedMasks) {
+      const bb = (el as any).bakedBounds;
+      if (bb && bb.width > 0 && bb.height > 0) {
+        pdfPage.drawRectangle({
+          x: bb.x,
+          y: bb.y,
+          width: bb.width,
+          height: bb.height,
+          color: rgb(1, 1, 1),
+          opacity: 1,
+        });
+      }
+    }
     for (const el of els) {
       // If this element was previously baked (restored from a source-less
       // manifest) and has now been modified, mask the old baked content first

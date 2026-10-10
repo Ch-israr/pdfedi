@@ -15,6 +15,77 @@ import {
 } from '@pdfeditor/shared';
 import { sha256Hex } from '@pdfeditor/pdf-core';
 
+/**
+ * Measure text width in PDF points using a canvas. Used to compute accurate
+ * baked bounds for text elements (which don't store width/height).
+ * Falls back to a heuristic estimate if canvas is unavailable.
+ */
+function measureTextWidth(
+  text: string,
+  fontSize: number,
+  fontFamily: string,
+  bold: boolean,
+  italic: boolean,
+): number {
+  try {
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) throw new Error('no 2d context');
+    // Map PDF font names to CSS families
+    const cssFamily = /courier/i.test(fontFamily)
+      ? 'monospace'
+      : /times/i.test(fontFamily)
+        ? 'serif'
+        : 'sans-serif';
+    ctx.font = `${italic ? 'italic ' : ''}${bold ? 'bold ' : ''}${fontSize}px ${cssFamily}`;
+    const w = ctx.measureText(text).width;
+    if (w > 0 && Number.isFinite(w)) return w;
+  } catch {
+    // fall through to heuristic
+  }
+  // Heuristic: average Latin glyph ≈ 0.55 × fontSize
+  return text.length * fontSize * 0.55;
+}
+
+/**
+ * Compute the baked bounds for a manifest element — the rectangle in PDF
+ * points that the element occupies in the page content. Used to mask the
+ * old baked content when the element is modified or deleted after restore.
+ */
+function computeBakedBounds(mel: {
+  kind: string;
+  x: number;
+  y: number;
+  text?: string;
+  fontSize?: number;
+  fontFamily?: string;
+  bold?: boolean;
+  italic?: boolean;
+  width?: number;
+  height?: number;
+}): { x: number; y: number; width: number; height: number } {
+  if (mel.kind === 'text') {
+    const fontSize = mel.fontSize ?? 12;
+    const width = measureTextWidth(
+      mel.text ?? '',
+      fontSize,
+      mel.fontFamily ?? 'Helvetica',
+      mel.bold ?? false,
+      mel.italic ?? false,
+    );
+    // el.y is the text baseline. Extend below for descenders (g,j,p,q,y)
+    // and above for ascenders. Add small padding for safety.
+    const padX = fontSize * 0.1;
+    const y = mel.y - fontSize * 0.3;
+    const height = fontSize * 1.5;
+    return { x: mel.x - padX, y, width: width + padX * 2, height };
+  }
+  // Image, signature, highlight, shape, native-text all store width/height
+  const w = mel.width ?? 0;
+  const h = mel.height ?? 0;
+  return { x: mel.x, y: mel.y, width: Math.max(0, w), height: Math.max(0, h) };
+}
+
 export interface PdfediRestoreResult {
   /** Clean source bytes — becomes the session's pdfBytes (null if no source embedded) */
   sourceBytes: Uint8Array;
@@ -170,9 +241,9 @@ async function restoreFromAttachments(
       for (const mel of manifest.elements) {
         const nums = [mel.x, mel.y, mel.rotation];
         if (!nums.every(Number.isFinite)) continue;
-        // Store the baked bounds so we can mask the old baked content if the
-        // element is modified after restore.
-        const bakedBounds = { x: mel.x, y: mel.y, width: (mel as any).width ?? 0, height: (mel as any).height ?? 0 };
+        // Compute accurate baked bounds so the old baked content can be
+        // masked if the element is modified or deleted after restore.
+        const bakedBounds = computeBakedBounds(mel as any);
         if (mel.kind === 'image' || mel.kind === 'signature') {
           const assetMeta = manifest.assets.find((a) => a.name === mel.assetRef);
           const assetFile = atts[mel.assetRef];

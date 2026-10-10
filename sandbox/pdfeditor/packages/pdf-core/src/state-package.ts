@@ -74,6 +74,11 @@ export async function buildManifestParts(
   );
 
   for (const el of sorted) {
+    // Deleted baked elements are tombstones for export masking only.
+    // They must not reappear on re-upload.
+    if ((el as any).deleted) continue;
+    // Strip transient baked-state fields; restore re-derives them.
+    const { baked: _baked, bakedBounds: _bb, deleted: _del, ...clean } = el as any;
     if (el.kind === 'image' || el.kind === 'signature') {
       const resolved = await resolveAsset(el);
       if (!resolved) {
@@ -84,10 +89,10 @@ export async function buildManifestParts(
       const name = `${PDFEDI_ASSET_PREFIX}${el.id}.${extForMime(resolved.mime)}`;
       assets.push({ name, mime: resolved.mime, bytes: resolved.bytes, elementId: el.id });
       manifestAssets.push({ name, elementId: el.id, mime: resolved.mime });
-      const { src: _src, ...rest } = el;
+      const { src: _src, ...rest } = clean;
       manifestElements.push({ ...rest, assetRef: name } as ManifestElement);
     } else {
-      manifestElements.push(el as ManifestElement);
+      manifestElements.push(clean as ManifestElement);
     }
   }
 

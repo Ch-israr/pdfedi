@@ -430,6 +430,34 @@ export const useEditor = create<EditorState>()(
         return;
       }
 
+      // Baked element deletion: mark as deleted instead of removing, so the
+      // old baked content in the page can be masked on export. The element
+      // is hidden in the editor. Undo restores it via the snapshot.
+      // (Non-baked elements are removed entirely as before.)
+      // Note: check bakedBounds (not just baked) — a modified-then-deleted
+      // element is unbaked but its original baked content is still in the page.
+      const wasBaked = (el as any).baked === true || !!(el as any).bakedBounds;
+      if (wasBaked) {
+        const deletedEl = { ...el, deleted: true };
+        set((s) => {
+          s.elements[id] = deletedEl as unknown as EditorElement;
+          if (s.selectedId === id) s.selectedId = null;
+          pushHistory(s, {
+            label: 'Delete element',
+            undo: () => {
+              useEditor.setState((st) => { st.elements[id] = el; });
+            },
+            redo: () => {
+              useEditor.setState((st) => {
+                st.elements[id] = deletedEl as unknown as EditorElement;
+                if (st.selectedId === id) st.selectedId = null;
+              });
+            },
+          });
+        });
+        return;
+      }
+
       set((s) => {
         delete s.elements[id];
         if (s.selectedId === id) s.selectedId = null;

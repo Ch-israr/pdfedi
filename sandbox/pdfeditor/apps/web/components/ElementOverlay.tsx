@@ -113,6 +113,12 @@ function ElementView({
     origY: number;
     mergeKey: string;
   } | null>(null);
+  // Deleted baked elements are kept as tombstones (for export masking) but
+  // never rendered in the editor.
+  // NOTE: All hooks must be called before these early returns (Rules of Hooks).
+  if ((el as any).deleted) {
+    return null;
+  }
   // Baked elements (restored from a source-less manifest) are already visible
   // in the page content. Render them as invisible hit-areas so the user can
   // click the baked text to edit it, without seeing a duplicate overlay.
