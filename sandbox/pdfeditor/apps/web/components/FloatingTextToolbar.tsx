@@ -53,9 +53,6 @@ export function FloatingTextToolbar({
     e.stopPropagation();
   };
 
-  const btn =
-    'flex h-8 min-w-[2rem] items-center justify-center rounded-md px-1 text-sm transition-colors hover:bg-slate-100';
-
   // screenY is the text TOP. Position toolbar above with zoom-aware gap.
   // If insufficient space above, place below the text bottom.
   const gap = 12 * zoom;
@@ -117,7 +114,7 @@ export function FloatingTextToolbar({
     <div
       role="toolbar"
       aria-label="Text formatting"
-      className="absolute z-30 flex -translate-x-1/2 items-center gap-0.5 rounded-xl border border-slate-200 bg-white px-1.5 py-1 shadow-xl"
+      className="absolute z-30 flex -translate-x-1/2 items-center gap-1 rounded-lg border border-brand-500 bg-white px-2 py-1.5 shadow-lg"
       style={{
         left: screenX,
         top,
@@ -129,14 +126,64 @@ export function FloatingTextToolbar({
       onClick={stop}
       onDoubleClick={stop}
     >
-      {/* Font family */}
+      {/* Bold */}
+      <button
+        type="button"
+        title="Bold"
+        aria-label="Bold"
+        aria-pressed={el.bold}
+        className={`flex h-8 w-8 items-center justify-center rounded text-lg font-bold transition-colors ${
+          el.bold ? 'bg-brand-50 text-brand-600' : 'text-brand-600 hover:bg-slate-100'
+        }`}
+        onClick={() => updateElement(el.id, { bold: !el.bold }, 'Toggle bold')}
+      >
+        B
+      </button>
+      {/* Italic */}
+      <button
+        type="button"
+        title="Italic"
+        aria-label="Italic"
+        aria-pressed={el.italic}
+        className={`flex h-8 w-8 items-center justify-center rounded text-lg italic transition-colors ${
+          el.italic ? 'bg-brand-50 text-brand-600' : 'text-brand-600 hover:bg-slate-100'
+        }`}
+        onClick={() => updateElement(el.id, { italic: !el.italic }, 'Toggle italic')}
+      >
+        I
+      </button>
+      <div className="h-6 w-px bg-slate-200" aria-hidden />
+      {/* Font size dropdown */}
+      <div className="relative">
+        <button
+          type="button"
+          title="Font size"
+          aria-label="Font size"
+          className="flex h-8 items-center gap-0.5 rounded px-1.5 text-brand-600 hover:bg-slate-100"
+          onClick={(e) => {
+            e.stopPropagation();
+            // Simple cycle through common sizes; full dropdown would need popover
+            const sizes = [8, 10, 12, 14, 16, 18, 20, 24, 28, 32, 36, 48];
+            const idx = sizes.findIndex((s) => s >= el.fontSize);
+            const next = sizes[(idx + 1) % sizes.length];
+            updateElement(el.id, { fontSize: next }, 'Change font size');
+          }}
+        >
+          <span className="text-base font-bold">T</span>
+          <span className="text-xs">T</span>
+          <span className="text-[10px]">▼</span>
+        </button>
+      </div>
+      <div className="h-6 w-px bg-slate-200" aria-hidden />
+      {/* Font family dropdown */}
       <select
         value={el.fontFamily}
         aria-label="Font family"
         title="Font family"
         onChange={(e) => updateElement(el.id, { fontFamily: e.target.value }, 'Change font')}
         onClick={stop}
-        className="h-8 max-w-[7rem] rounded-md border border-slate-200 bg-white px-1 text-xs text-slate-700 hover:bg-slate-50"
+        className="h-8 cursor-pointer rounded bg-transparent px-1 text-sm font-medium text-brand-600 hover:bg-slate-100"
+        style={{ maxWidth: '4rem' }}
       >
         {FONTS.map((f) => (
           <option key={f.label} value={f.value}>
@@ -144,69 +191,17 @@ export function FloatingTextToolbar({
           </option>
         ))}
       </select>
-      <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />
-      {/* Bold / Italic */}
-      <button
-        type="button"
-        title="Bold"
-        aria-label="Bold"
-        aria-pressed={el.bold}
-        className={`${btn} font-bold ${el.bold ? 'bg-brand-50 text-brand-600' : 'text-slate-700'}`}
-        onClick={() => updateElement(el.id, { bold: !el.bold }, 'Toggle bold')}
-      >
-        B
-      </button>
-      <button
-        type="button"
-        title="Italic"
-        aria-label="Italic"
-        aria-pressed={el.italic}
-        className={`${btn} italic ${el.italic ? 'bg-brand-50 text-brand-600' : 'text-slate-700'}`}
-        onClick={() => updateElement(el.id, { italic: !el.italic }, 'Toggle italic')}
-      >
-        I
-      </button>
-      <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />
-      {/* Font size */}
-      <button
-        type="button"
-        title="Decrease font size"
-        aria-label="Decrease font size"
-        className={`${btn} text-slate-700`}
-        onClick={() =>
-          updateElement(el.id, { fontSize: Math.max(6, el.fontSize - 2) }, 'Decrease font size')
-        }
-      >
-        A−
-      </button>
-      <span className="min-w-[2rem] text-center text-xs tabular-nums text-slate-600" aria-live="polite">
-        {el.fontSize}
-      </span>
-      <button
-        type="button"
-        title="Increase font size"
-        aria-label="Increase font size"
-        className={`${btn} text-slate-700`}
-        onClick={() =>
-          updateElement(el.id, { fontSize: Math.min(144, el.fontSize + 2) }, 'Increase font size')
-        }
-      >
-        A+
-      </button>
-      <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />
+      <div className="h-6 w-px bg-slate-200" aria-hidden />
       {/* Color */}
       <label
         title="Text color"
-        className={`${btn} relative cursor-pointer text-slate-700`}
+        className="relative flex h-8 w-8 cursor-pointer items-center justify-center rounded text-brand-600 hover:bg-slate-100"
         onClick={stop}
       >
-        <span
-          aria-hidden
-          className="flex h-5 w-5 items-center justify-center rounded border border-slate-300 text-xs font-bold"
-          style={{ color: el.color, borderBottom: `3px solid ${el.color}` }}
-        >
-          A
+        <span aria-hidden className="text-lg">
+          🎨
         </span>
+        <span className="text-[10px]">▼</span>
         <span className="sr-only">Text color</span>
         <input
           type="color"
@@ -217,46 +212,53 @@ export function FloatingTextToolbar({
           onClick={stop}
         />
       </label>
-      <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />
-      {/* Copy (hidden in new mode) */}
-      {!isNewMode && (
-        <button
-          type="button"
-          title={copied ? 'Copied!' : 'Copy text'}
-          aria-label="Copy text"
-          className={`${btn} text-slate-700`}
-          onClick={copyText}
-        >
-          {copied ? '✓' : '⧉'}
-        </button>
-      )}
+      <div className="h-6 w-px bg-slate-200" aria-hidden />
       {/* Link (hidden in new mode; text elements only) */}
       {!isNewMode && el.kind === 'text' && (
-        <button
-          type="button"
-          title={el.link ? `Edit link: ${el.link}` : 'Add link'}
-          aria-label={el.link ? 'Edit hyperlink' : 'Add hyperlink'}
-          aria-pressed={!!el.link}
-          className={`${btn} ${el.link ? 'bg-brand-50 text-brand-600' : 'text-slate-700'}`}
-          onClick={() => {
-            setLinkInput(el.link ?? '');
-            setShowLink((v) => !v);
-          }}
-        >
-          🔗
-        </button>
+        <>
+          <button
+            type="button"
+            title={el.link ? `Edit link: ${el.link}` : 'Add link'}
+            aria-label={el.link ? 'Edit hyperlink' : 'Add hyperlink'}
+            aria-pressed={!!el.link}
+            className={`flex h-8 w-8 items-center justify-center rounded transition-colors ${
+              el.link ? 'bg-brand-50 text-brand-600' : 'text-brand-600 hover:bg-slate-100'
+            }`}
+            onClick={() => {
+              setLinkInput(el.link ?? '');
+              setShowLink((v) => !v);
+            }}
+          >
+            <span className="text-base">🔗</span>
+          </button>
+          <div className="h-6 w-px bg-slate-200" aria-hidden />
+        </>
       )}
-      {!isNewMode && <div className="mx-0.5 h-5 w-px bg-slate-200" aria-hidden />}
+      {/* Copy (hidden in new mode) */}
+      {!isNewMode && (
+        <>
+          <button
+            type="button"
+            title={copied ? 'Copied!' : 'Copy text'}
+            aria-label="Copy text"
+            className="flex h-8 w-8 items-center justify-center rounded text-brand-600 hover:bg-slate-100"
+            onClick={copyText}
+          >
+            <span className="text-base">{copied ? '✓' : '⧉'}</span>
+          </button>
+          <div className="h-6 w-px bg-slate-200" aria-hidden />
+        </>
+      )}
       {/* Delete (hidden in new mode) */}
       {!isNewMode && (
         <button
           type="button"
           title="Delete text"
           aria-label="Delete text element"
-          className={`${btn} text-red-600 hover:bg-red-50`}
+          className="flex h-8 w-8 items-center justify-center rounded text-brand-600 hover:bg-red-50 hover:text-red-600"
           onClick={() => deleteElement(el.id)}
         >
-          🗑
+          <span className="text-base">🗑</span>
         </button>
       )}
 
