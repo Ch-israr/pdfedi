@@ -460,6 +460,10 @@ export function ElementOverlay({ page }: { page: Page }) {
         existingId: string | null;
         screenX: number;
         screenY: number;
+        /** Fragment bounds in screen px — editor covers the original exactly */
+        screenW?: number;
+        screenH?: number;
+        fontSize?: number;
         initialText: string;
       }
     | null
@@ -672,13 +676,22 @@ export function ElementOverlay({ page }: { page: Page }) {
               Math.abs(el.y - hit.y) < 1,
           );
           if (!covered) {
-            const orect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+            // Position the editor exactly over the fragment bounds (not the
+            // click point) so the opaque textarea covers the original text —
+            // no duplicate visual. Convert fragment PDF bounds to screen px.
+            const fragLeft = hit.x * zoom;
+            const fragTop = (page.height - (hit.y + hit.height)) * zoom;
+            const fragWidth = hit.width * zoom;
+            const fragHeight = hit.height * zoom;
             setEditingText({
               mode: 'native',
               nativeItem: hit,
               existingId: null,
-              screenX: e.clientX - orect.left,
-              screenY: e.clientY - orect.top,
+              screenX: fragLeft,
+              screenY: fragTop,
+              screenW: fragWidth,
+              screenH: fragHeight,
+              fontSize: hit.fontSize,
               initialText: hit.text,
             });
             return;
@@ -940,6 +953,9 @@ export function ElementOverlay({ page }: { page: Page }) {
         <InlineTextEditor
           screenX={editingText.screenX}
           screenY={editingText.screenY}
+          screenW={editingText.mode === 'native' ? editingText.screenW : undefined}
+          screenH={editingText.mode === 'native' ? editingText.screenH : undefined}
+          fontSize={editingText.mode === 'native' ? editingText.fontSize : undefined}
           zoom={zoom}
           initialText={
             editingText.mode === 'new' ? '' : editingText.initialText
@@ -1247,6 +1263,9 @@ function DrawingPreview({
 function InlineTextEditor({
   screenX,
   screenY,
+  screenW,
+  screenH,
+  fontSize,
   zoom,
   initialText,
   onCommit,
@@ -1254,6 +1273,10 @@ function InlineTextEditor({
 }: {
   screenX: number;
   screenY: number;
+  /** When set, the editor covers this exact rect (native text — no duplicate visual) */
+  screenW?: number;
+  screenH?: number;
+  fontSize?: number;
   zoom: number;
   initialText: string;
   onCommit: (text: string) => void;
@@ -1266,6 +1289,10 @@ function InlineTextEditor({
     ref.current?.focus();
     ref.current?.select();
   }, []);
+
+  // Native-text mode: cover the original fragment exactly with an opaque
+  // background so the user edits "in place" — no duplicate text visible.
+  const isNative = screenW !== undefined && screenH !== undefined;
 
   return (
     <textarea
@@ -1286,12 +1313,19 @@ function InlineTextEditor({
       }}
       placeholder="Type text… (Enter to place, Esc to cancel)"
       aria-label="Text content"
-      className="absolute z-20 min-h-[32px] min-w-[120px] rounded border-2 border-brand-500 bg-white/95 p-1 shadow-lg focus:outline-none"
+      className={`absolute z-20 rounded border-2 border-brand-500 shadow-lg focus:outline-none ${
+        isNative ? 'bg-white p-0' : 'min-h-[32px] min-w-[120px] bg-white/95 p-1'
+      }`}
       style={{
         left: screenX,
-        top: screenY - 14 * zoom,
-        fontSize: 14 * zoom,
+        top: isNative ? screenY : screenY - 14 * zoom,
+        width: isNative ? screenW : undefined,
+        height: isNative ? screenH : undefined,
+        fontSize: (fontSize ?? 14) * zoom,
         fontFamily: 'Helvetica, sans-serif',
+        lineHeight: isNative ? `${screenH}px` : undefined,
+        resize: 'none',
+        overflow: 'hidden',
       }}
     />
   );
