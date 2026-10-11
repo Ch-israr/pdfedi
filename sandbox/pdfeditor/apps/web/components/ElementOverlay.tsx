@@ -1674,7 +1674,21 @@ function InlineTextEditor({
       onBlur={() => commitOnce(value)}
       onKeyDown={(e) => {
         e.stopPropagation();
-        if (e.key === 'Enter' && !e.shiftKey) {
+        if (e.key === 'Enter' && e.shiftKey) {
+          // Explicit newline insertion at the caret (do not rely on the
+          // textarea default, which assistive/automation input paths may
+          // not trigger): the box grows vertically via auto-sizing.
+          e.preventDefault();
+          const ta = e.currentTarget;
+          const start = ta.selectionStart ?? value.length;
+          const end = ta.selectionEnd ?? value.length;
+          const next = `${value.slice(0, start)}\n${value.slice(end)}`;
+          setValue(next);
+          requestAnimationFrame(() => {
+            const el = ref.current;
+            if (el) el.selectionStart = el.selectionEnd = start + 1;
+          });
+        } else if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
           commitOnce(value);
         } else if (e.key === 'Escape') {
