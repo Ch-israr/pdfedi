@@ -13,6 +13,17 @@ import { EditorContent } from './EditorContent';
  *   <YourProductionHeader />
  *   <EditorContent />
  *   <YourProductionFooter />
+ *
+ * Recommended scroll behavior (per UI reference review):
+ * - The production site header (logo/nav) should NOT be fixed — let it
+ *   scroll away with the page so the document gets maximum vertical space.
+ * - The editor Toolbar must stay visible while scrolling: keep it
+ *   `position: sticky; top: 0` (or the equivalent in the site's layout)
+ *   so tools remain reachable on long documents.
+ * - The footer is not fixed either — it sits at the page bottom, after
+ *   the editor. (In this dev preview the app uses a fixed viewport with
+ *   internal document scrolling, so the toolbar is already always visible
+ *   and the placeholders demonstrate the mount points.)
  */
 const DEV_LAYOUT_ENABLED =
   process.env.NEXT_PUBLIC_DEV_LAYOUT !== 'false';

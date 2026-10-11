@@ -6,6 +6,7 @@ import { HistoryPanel } from './HistoryPanel';
 import { FindReplaceDialog } from './FindReplaceDialog';
 import { ToolIcon } from './ToolIcon';
 import { ShapesDropdown } from './ShapesDropdown';
+import { AnnotateDropdown } from './AnnotateDropdown';
 
 function SaveStatus() {
   const saveStatus = useEditor((s) => s.saveStatus);
@@ -24,23 +25,16 @@ function SaveStatus() {
   );
 }
 
-const TOOL_GROUPS: { id: ToolId; label: string; shortcut?: string }[][] = [
-  // Selection
-  [
-    { id: 'select', label: 'Select', shortcut: 'V' },
-    { id: 'move', label: 'Move', shortcut: 'M' },
-  ],
-  // Annotate
-  [
-    { id: 'text', label: 'Text', shortcut: 'T' },
-    { id: 'image', label: 'Image' },
-    { id: 'highlight', label: 'Highlight', shortcut: 'H' },
-    { id: 'whiteout', label: 'Whiteout', shortcut: 'W' },
-    { id: 'signature', label: 'Signature' },
-  ],
+// Tools inside the grouped pill, in reference order (existing tools only:
+// Links and Forms do not exist in this editor, so they are not shown).
+const PILL_TOOLS: { id: ToolId; label: string; shortcut?: string }[] = [
+  { id: 'text', label: 'Text', shortcut: 'T' },
+  { id: 'image', label: 'Image' },
+  { id: 'signature', label: 'Sign' },
+  { id: 'whiteout', label: 'Whiteout', shortcut: 'W' },
 ];
 
-function ToolButton({
+function PillToolButton({
   id,
   label,
   shortcut,
@@ -60,16 +54,20 @@ function ToolButton({
       aria-label={label}
       aria-pressed={active}
       onClick={() => onSelect(id)}
-      className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
+      className={`flex h-9 items-center justify-center gap-1.5 px-2.5 text-xs font-medium transition-colors first:rounded-l-[10px] focus-visible:outline-2 focus-visible:outline-brand-500 ${
         active
           ? 'bg-brand-500 text-white shadow-sm'
-          : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
+          : 'text-slate-600 hover:bg-sky-50 hover:text-sky-800'
       }`}
     >
       <ToolIcon id={id} />
       <span aria-hidden>{label}</span>
     </button>
   );
+}
+
+function PillDivider() {
+  return <div className="h-6 w-px shrink-0 bg-sky-100" aria-hidden />;
 }
 
 export function Toolbar() {
@@ -104,54 +102,59 @@ export function Toolbar() {
 
       <div className="hidden h-8 w-px bg-slate-200 sm:block" aria-hidden />
 
-      {/* Tool groups */}
-      <div className="flex flex-wrap items-center gap-1" role="toolbar" aria-label="Annotation tools">
-        {TOOL_GROUPS.map((group, gi) => (
-          <div key={gi} className="flex items-center gap-0.5">
-            {gi > 0 && <div className="mx-1 h-6 w-px bg-slate-200" aria-hidden />}
-            {group.map((t) => (
-              <ToolButton
-                key={t.id}
-                id={t.id}
-                label={t.label}
-                shortcut={t.shortcut}
-                active={tool === t.id}
-                onSelect={setTool}
-              />
-            ))}
-          </div>
-        ))}
-        {/* Shapes live in one compact dropdown (all four shape tools) */}
-        <div className="flex items-center gap-0.5">
-          <div className="mx-1 h-6 w-px bg-slate-200" aria-hidden />
-          <ShapesDropdown />
+      {/* Grouped tool pill (reference style): pointer tools, content tools,
+          annotate/shapes dropdowns, and undo/redo in one outlined bar. */}
+      <div
+        className="flex flex-wrap items-center"
+        role="toolbar"
+        aria-label="Annotation tools"
+      >
+        <div className="flex items-center overflow-visible rounded-xl border border-sky-200 bg-white shadow-sm">
+          <PillToolButton id="select" label="Select" shortcut="V" active={tool === 'select'} onSelect={setTool} />
+          <PillToolButton id="move" label="Move" shortcut="M" active={tool === 'move'} onSelect={setTool} />
+          <PillDivider />
+          {PILL_TOOLS.map((t) => (
+            <PillToolButton
+              key={t.id}
+              id={t.id}
+              label={t.label}
+              shortcut={t.shortcut}
+              active={tool === t.id}
+              onSelect={setTool}
+            />
+          ))}
+          <PillDivider />
+          <AnnotateDropdown inPill />
+          <ShapesDropdown inPill />
+          <PillDivider />
+          <button
+            type="button"
+            title="Undo (Ctrl+Z)"
+            aria-label="Undo"
+            onClick={undo}
+            disabled={past.length === 0}
+            className="flex h-9 items-center justify-center gap-1.5 px-2.5 text-xs font-medium text-slate-600 transition-colors hover:bg-sky-50 hover:text-sky-800 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
+          >
+            <span aria-hidden className="text-sm">↩</span>
+            <span aria-hidden>Undo</span>
+          </button>
+          <button
+            type="button"
+            title="Redo (Ctrl+Y)"
+            aria-label="Redo"
+            onClick={redo}
+            disabled={future.length === 0}
+            className="flex h-9 w-9 items-center justify-center rounded-r-[10px] text-base text-slate-600 transition-colors hover:bg-sky-50 hover:text-sky-800 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
+          >
+            <span aria-hidden>↪</span>
+          </button>
         </div>
       </div>
 
       <div className="hidden h-8 w-px bg-slate-200 sm:block" aria-hidden />
 
-      {/* History */}
-      <div className="flex items-center gap-0.5" role="group" aria-label="History">
-        <button
-          type="button"
-          title="Undo (Ctrl+Z)"
-          aria-label="Undo"
-          onClick={undo}
-          disabled={past.length === 0}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-base text-slate-600 transition-colors hover:bg-slate-200/70 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
-        >
-          <span aria-hidden>↩</span>
-        </button>
-        <button
-          type="button"
-          title="Redo (Ctrl+Y)"
-          aria-label="Redo"
-          onClick={redo}
-          disabled={future.length === 0}
-          className="flex h-9 w-9 items-center justify-center rounded-lg text-base text-slate-600 transition-colors hover:bg-slate-200/70 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent"
-        >
-          <span aria-hidden>↪</span>
-        </button>
+      {/* Find & replace + history log */}
+      <div className="flex items-center gap-0.5" role="group" aria-label="Search and history">
         <button
           type="button"
           title="Find & Replace (Ctrl+F)"

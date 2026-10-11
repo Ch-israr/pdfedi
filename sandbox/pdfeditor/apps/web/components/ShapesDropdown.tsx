@@ -12,7 +12,7 @@ const SHAPE_IDS = new Set<ToolId>(SHAPE_TOOLS.map((t) => t.id));
  * buttons. Opens a menu listing every supported shape; selecting one
  * activates its existing drawing workflow and closes the menu.
  */
-export function ShapesDropdown() {
+export function ShapesDropdown({ inPill = false }: { inPill?: boolean }) {
   const tool = useEditor((s) => s.tool);
   const setTool = useEditor((s) => s.setTool);
   const [open, setOpen] = useState(false);
@@ -44,11 +44,19 @@ export function ShapesDropdown() {
         aria-haspopup="menu"
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
-        className={`flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
-          activeShape
-            ? 'bg-brand-500 text-white shadow-sm'
-            : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
-        }`}
+        className={
+          inPill
+            ? `flex h-9 items-center justify-center gap-1.5 px-2.5 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-brand-500 ${
+                activeShape
+                  ? 'bg-brand-500 text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-sky-50 hover:text-sky-800'
+              }`
+            : `flex h-9 items-center justify-center gap-1.5 rounded-lg px-2 text-xs font-medium transition-colors focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-brand-500 ${
+                activeShape
+                  ? 'bg-brand-500 text-white shadow-sm'
+                  : 'text-slate-600 hover:bg-slate-200/70 hover:text-slate-900'
+              }`
+        }
       >
         <ToolIcon id={buttonTool} />
         <span aria-hidden>{buttonLabel}</span>
