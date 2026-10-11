@@ -197,6 +197,19 @@ export function PropertiesPanel() {
             {colorField('Stroke color', el.stroke, (v) => updateElement(el.id, { stroke: v }))}
           </section>
         )}
+        {el.kind === 'whiteout' && (
+          <section className="space-y-2 border-t border-slate-100 pt-4">
+            {sectionTitle('Whiteout')}
+            <div className="grid grid-cols-2 gap-2">
+              {num('Width', el.width, (v) => updateElement(el.id, { width: v }))}
+              {num('Height', el.height, (v) => updateElement(el.id, { height: v }))}
+            </div>
+            <p className="text-xs leading-relaxed text-slate-500">
+              Solid white cover with no outline. Visual covering only — the
+              content underneath is not removed from the file.
+            </p>
+          </section>
+        )}
       </div>
     </aside>
   );

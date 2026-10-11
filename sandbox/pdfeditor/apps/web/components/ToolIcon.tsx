@@ -96,6 +96,13 @@ export function ToolIcon({ id }: { id: ToolId }) {
           <path d="M14 4h6v6" />
         </svg>
       );
+    case 'whiteout':
+      // Solid white-filled rectangle (the cover), no outline
+      return (
+        <svg {...base()}>
+          <rect x="4" y="6" width="16" height="12" rx="1" fill="#fff" stroke="currentColor" strokeWidth={1.5} strokeDasharray="3 2" />
+        </svg>
+      );
     default:
       return null;
   }

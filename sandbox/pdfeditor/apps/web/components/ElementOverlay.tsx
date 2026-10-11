@@ -562,6 +562,29 @@ function ElementView({
           )}
         </div>
       );
+    case 'whiteout':
+      // Solid white cover. No border in the editor either — selection is
+      // shown via the resize handles + a dashed outline when selected.
+      return (
+        <div
+          {...common}
+          style={{
+            ...style,
+            width: toScreen(el.width, zoom),
+            height: toScreen(el.height, zoom),
+            background: '#ffffff',
+            border: 'none',
+            outline: selected ? `${Math.max(1.5, 2 * zoom)}px dashed #2f6bff` : 'none',
+            outlineOffset: 1,
+          }}
+          data-el-id={el.id}
+          title="Whiteout (visual cover — not redaction)"
+        >
+          {selected && (
+            <ResizeHandles el={el} zoom={zoom} />
+          )}
+        </div>
+      );
     case 'image':
     case 'signature':
       return (
@@ -656,7 +679,7 @@ export function ElementOverlay({ page }: { page: Page }) {
   // Drag-to-draw state for shapes + highlight: press → drag → release
   // (lines/arrows use start/end points; rect/ellipse/highlight use drag rectangle)
   const [drawing, setDrawing] = useState<{
-    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight';
+    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout';
     startX: number; // PDF points
     startY: number;
     curX: number;
@@ -1084,6 +1107,7 @@ export function ElementOverlay({ page }: { page: Page }) {
       : tool === 'shape-rect' ? 'rect'
       : tool === 'shape-ellipse' ? 'ellipse'
       : tool === 'highlight' ? 'highlight'
+      : tool === 'whiteout' ? 'whiteout'
       : null;
     if (!drawShape) return;
     // Handles take priority over drawing tools: if the pointer is on a
@@ -1187,6 +1211,21 @@ export function ElementOverlay({ page }: { page: Page }) {
             opacity: 0.4,
           },
           'Highlight Added',
+        );
+      } else if (d.shape === 'whiteout') {
+        // Whiteout: solid white cover, no outline. Same undo/history path.
+        addElement(
+          {
+            id,
+            pageId: page.id,
+            kind: 'whiteout',
+            x,
+            y,
+            rotation: 0,
+            width: w,
+            height: h,
+          },
+          'Whiteout Added',
         );
       } else {
         addElement(
@@ -1445,7 +1484,7 @@ function DrawingPreview({
   page,
   zoom,
 }: {
-  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
+  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
   page: Page;
   zoom: number;
 }) {
@@ -1540,7 +1579,7 @@ function DrawingPreview({
             <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
           </>
         )}
-        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight') && (
+        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight' || drawing.shape === 'whiteout') && (
           drawing.shape === 'highlight' ? (
             <rect
               x={rx}
@@ -1549,6 +1588,17 @@ function DrawingPreview({
               height={rh}
               fill="rgba(255,255,0,0.35)"
               stroke="#c9a900"
+              strokeWidth={sw}
+              strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+            />
+          ) : drawing.shape === 'whiteout' ? (
+            <rect
+              x={rx}
+              y={ry}
+              width={rw}
+              height={rh}
+              fill="rgba(255,255,255,0.85)"
+              stroke="#94a3b8"
               strokeWidth={sw}
               strokeDasharray={`${6 * zoom} ${3 * zoom}`}
             />

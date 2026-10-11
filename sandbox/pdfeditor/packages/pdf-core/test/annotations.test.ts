@@ -257,4 +257,54 @@ describe('annotation persistence', () => {
     // Size stability: cycle 2 (one element fewer, edited text) within 20% of cycle 1
     assert.ok(Math.abs(bytes2.length - bytes1.length) / bytes1.length < 0.2, `sizes ${bytes1.length} -> ${bytes2.length}`);
   });
+
+  it('whiteout exports with no outline and round-trips without duplication', async () => {
+    const srcBytes = await makeSrcPdf();
+    const WO_ID = '99999999-9999-4999-8999-999999999999';
+    const elements = {
+      [WO_ID]: {
+        id: WO_ID, pageId: PAGE_ID, kind: 'whiteout',
+        x: 50, y: 500, rotation: 0, width: 200, height: 60,
+      },
+    };
+    const bytes = await exportAnnotatedPdf({ srcBytes, pages: [makePage()], elements });
+    const doc = await PDFDocument.load(bytes);
+    // Exactly one pdfedi-whiteout annotation, no border entries.
+    const annots = doc.getPage(0).node.Annots();
+    assert.ok(annots, 'page has annotations');
+    const found = [];
+    for (let i = 0; i < annots.size(); i++) {
+      const a = doc.context.lookup(annots.get(i));
+      const nm = a.get(PDFName.of('NM'));
+      const nmStr = nm instanceof PDFString ? nm.decodeText() : null;
+      if (nmStr === `pdfedi-whiteout-${WO_ID}`) found.push(a);
+    }
+    assert.equal(found.length, 1, 'exactly one whiteout annotation');
+    const wo = found[0];
+    assert.equal(wo.get(PDFName.of('Subtype')).toString(), '/Square');
+    assert.ok(!wo.get(PDFName.of('C')), 'no stroke color → no outline');
+    assert.ok(!wo.get(PDFName.of('BS')), 'no border style → no outline');
+    const ic = wo.lookup(PDFName.of('IC'));
+    assert.ok(ic, 'white interior color present');
+    // Restore: parsed back as an editable whiteout element.
+    const parsed = await parsePdfediAnnotations(bytes);
+    assert.equal(parsed.length, 1);
+    const el = parsed[0].element;
+    assert.equal(el.kind, 'whiteout');
+    assert.equal(el.id, WO_ID);
+    assert.ok(near(el.width, 200) && near(el.height, 60));
+    assert.ok(near(el.x, 50) && near(el.y, 500));
+    // Second cycle: no duplicate annotation.
+    const session = { [WO_ID]: { ...el, pageId: PAGE_ID } };
+    const bytes2 = await exportAnnotatedPdf({ srcBytes: bytes, pages: [makePage()], elements: session });
+    const doc2 = await PDFDocument.load(bytes2);
+    const annots2 = doc2.getPage(0).node.Annots();
+    let count = 0;
+    for (let i = 0; i < annots2.size(); i++) {
+      const a = doc2.context.lookup(annots2.get(i));
+      const nm = a.get(PDFName.of('NM'));
+      if (nm instanceof PDFString && nm.decodeText() === `pdfedi-whiteout-${WO_ID}`) count++;
+    }
+    assert.equal(count, 1, 'still exactly one whiteout annotation after re-export');
+  });
 });

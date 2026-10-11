@@ -49,6 +49,7 @@ export const ElementKindSchema = z.enum([
   'highlight',
   'signature',
   'shape',
+  'whiteout',
   'native-text',
 ]);
 export type ElementKind = z.infer<typeof ElementKindSchema>;
@@ -116,6 +117,17 @@ export const ShapeElementSchema = BaseElementSchema.extend({
 });
 
 /**
+ * A whiteout cover rectangle: solid white fill, no outline. Visual
+ * covering only — not secure redaction; the underlying content is not
+ * removed from the file.
+ */
+export const WhiteoutElementSchema = BaseElementSchema.extend({
+  kind: z.literal('whiteout'),
+  width: z.number().positive(),
+  height: z.number().positive(),
+});
+
+/**
  * An edit of existing native PDF text. x/y is the bottom-left of the
  * opaque cover box (PDF points); the replacement text is drawn at the
  * original baseline (y + baselineOffset). On export the original text is
@@ -153,6 +165,7 @@ export const EditorElementSchema = z.discriminatedUnion('kind', [
   HighlightElementSchema,
   SignatureElementSchema,
   ShapeElementSchema,
+  WhiteoutElementSchema,
   NativeTextElementSchema,
 ]);
 export type EditorElement = z.infer<typeof EditorElementSchema>;

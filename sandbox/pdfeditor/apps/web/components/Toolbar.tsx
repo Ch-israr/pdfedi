@@ -5,6 +5,7 @@ import { useEditor, type ToolId } from '@/store/editor';
 import { HistoryPanel } from './HistoryPanel';
 import { FindReplaceDialog } from './FindReplaceDialog';
 import { ToolIcon } from './ToolIcon';
+import { ShapesDropdown } from './ShapesDropdown';
 
 function SaveStatus() {
   const saveStatus = useEditor((s) => s.saveStatus);
@@ -34,14 +35,8 @@ const TOOL_GROUPS: { id: ToolId; label: string; shortcut?: string }[][] = [
     { id: 'text', label: 'Text', shortcut: 'T' },
     { id: 'image', label: 'Image' },
     { id: 'highlight', label: 'Highlight', shortcut: 'H' },
+    { id: 'whiteout', label: 'Whiteout', shortcut: 'W' },
     { id: 'signature', label: 'Signature' },
-  ],
-  // Shapes
-  [
-    { id: 'shape-rect', label: 'Rectangle', shortcut: 'R' },
-    { id: 'shape-ellipse', label: 'Ellipse' },
-    { id: 'shape-line', label: 'Line', shortcut: 'L' },
-    { id: 'shape-arrow', label: 'Arrow', shortcut: 'A' },
   ],
 ];
 
@@ -126,6 +121,11 @@ export function Toolbar() {
             ))}
           </div>
         ))}
+        {/* Shapes live in one compact dropdown (all four shape tools) */}
+        <div className="flex items-center gap-0.5">
+          <div className="mx-1 h-6 w-px bg-slate-200" aria-hidden />
+          <ShapesDropdown />
+        </div>
       </div>
 
       <div className="hidden h-8 w-px bg-slate-200 sm:block" aria-hidden />

@@ -38,6 +38,7 @@ import {
   PDFDict,
   PDFRef,
   PDFObject,
+  PDFNumber,
   PDFRawStream,
   StandardFonts,
   rgb,
@@ -450,6 +451,58 @@ async function addShapeAnnotation(
   pushAnnot(page, out.context.register(annot));
 }
 
+/**
+ * Whiteout: a solid white-filled rectangle with NO outline.
+ * Written two ways:
+ *  1. Painted into the page content stream, so the covering is visible
+ *     even in viewers that hide annotations.
+ *  2. A /Square annotation (white interior, no border) carrying the
+ *     pdfedi-whiteout-<uuid> identity, so the element restores as
+ *     editable on re-upload. Previous annotations are stripped from the
+ *     source before copying, so re-exports never duplicate.
+ * Visual covering only — not secure redaction.
+ */
+async function addWhiteoutAnnotation(
+  out: PDFDocument,
+  ctx: DrawContext,
+  page: PDFPage,
+  el: Extract<EditorElement, { kind: 'whiteout' }>,
+): Promise<void> {
+  // 1. Content paint: solid white, no border.
+  page.drawRectangle({
+    x: el.x,
+    y: el.y,
+    width: el.width,
+    height: el.height,
+    color: rgb(1, 1, 1),
+    opacity: 1,
+    borderWidth: 0,
+  });
+  // 2. Identity annotation for restore (no C, no BS → no outline).
+  const ap = await appearanceRef(out, el.width, el.height, async (tctx, tp) => {
+    tp.drawRectangle({
+      x: 0,
+      y: 0,
+      width: el.width,
+      height: el.height,
+      color: rgb(1, 1, 1),
+      opacity: 1,
+      borderWidth: 0,
+    });
+  });
+  const annot = out.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Square'),
+    Rect: [el.x, el.y, el.x + el.width, el.y + el.height],
+    IC: [PDFNumber.of(1), PDFNumber.of(1), PDFNumber.of(1)],
+    Border: [0, 0, 0],
+    F: 4,
+    NM: PDFString.of(`${PDFEDI_NM_PREFIX}whiteout-${el.id}`),
+    AP: { N: ap },
+  });
+  pushAnnot(page, out.context.register(annot));
+}
+
 async function addStampAnnotation(
   out: PDFDocument,
   ctx: DrawContext,
@@ -656,6 +709,9 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
           break;
         case 'shape':
           await addShapeAnnotation(out, ctx, pdfPage, el);
+          break;
+        case 'whiteout':
+          await addWhiteoutAnnotation(out, ctx, pdfPage, el);
           break;
         case 'image':
         case 'signature':
@@ -926,6 +982,20 @@ export async function parsePdfediAnnotations(bytes: Uint8Array): Promise<ParsedA
             stroke: c && c.length >= 3 ? rgbToHex(c[0], c[1], c[2]) : '#000000',
             strokeWidth: (bs && num(bs, 'W')) ?? 2,
             fill: ic && ic.length >= 3 ? rgbToHex(ic[0], ic[1], ic[2]) : null,
+          } as EditorElement,
+        });
+      } else if (tag === 'whiteout' && subtype === '/Square') {
+        results.push({
+          pageIndex,
+          element: {
+            id,
+            pageId: '',
+            kind: 'whiteout',
+            x: x0,
+            y: y0,
+            rotation: 0,
+            width: x1 - x0,
+            height: y1 - y0,
           } as EditorElement,
         });
       } else if ((tag === 'image' || tag === 'signature') && subtype === '/Stamp') {
