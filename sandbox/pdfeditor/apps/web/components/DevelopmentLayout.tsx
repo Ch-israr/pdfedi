@@ -20,10 +20,9 @@ import { EditorContent } from './EditorContent';
  * - The editor Toolbar must stay visible while scrolling: keep it
  *   `position: sticky; top: 0` (or the equivalent in the site's layout)
  *   so tools remain reachable on long documents.
- * - The footer is not fixed either — it sits at the page bottom, after
- *   the editor. (In this dev preview the app uses a fixed viewport with
- *   internal document scrolling, so the toolbar is already always visible
- *   and the placeholders demonstrate the mount points.)
+ * - The footer is not fixed either — it sits at the page end, after
+ *   the editor. The Pages sidebar is sticky below the toolbar with its
+ *   own scroll for many-page documents.
  */
 const DEV_LAYOUT_ENABLED =
   process.env.NEXT_PUBLIC_DEV_LAYOUT !== 'false';
@@ -31,18 +30,19 @@ const DEV_LAYOUT_ENABLED =
 export function DevelopmentLayout() {
   if (!DEV_LAYOUT_ENABLED) {
     return (
-      <div className="h-screen">
+      <div className="min-h-screen">
         <EditorContent />
       </div>
     );
   }
 
+  // Document-flow page (reference behavior): the page itself scrolls, the
+  // dev header scrolls away with it, the editor Toolbar sticks to the top,
+  // and the footer sits at the page end — nothing is viewport-fixed.
   return (
-    <div className="flex h-screen flex-col overflow-hidden">
+    <div className="min-h-screen bg-slate-100">
       <DevHeader />
-      <div className="min-h-0 flex-1">
-        <EditorContent />
-      </div>
+      <EditorContent />
       <DevFooter />
     </div>
   );

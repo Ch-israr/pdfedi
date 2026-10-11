@@ -168,14 +168,14 @@ export function EditorContent() {
 
   if (!pdfBytes) {
     return (
-      <div className="pdfeditor-root flex h-full min-h-0 flex-col overflow-hidden bg-slate-100">
+      <div className="pdfeditor-root flex min-h-[60vh] flex-col bg-slate-100">
         <Dropzone />
       </div>
     );
   }
 
   return (
-    <div className="pdfeditor-root flex h-full min-h-0 flex-col overflow-hidden bg-slate-100">
+    <div className="pdfeditor-root flex flex-col bg-slate-100">
       <Toolbar />
       <DocNotice />
       {recoveryDoc && (
@@ -202,7 +202,7 @@ export function EditorContent() {
           </div>
         </div>
       )}
-      <div className="flex min-h-0 flex-1">
+      <div className="flex items-start">
         {pagesOpen ? (
           <Thumbnails
             getDoc={getDoc}
@@ -215,7 +215,7 @@ export function EditorContent() {
             onClick={() => setPagesOpen(true)}
             title="Show pages panel"
             aria-label="Show pages panel"
-            className="hidden w-9 shrink-0 flex-col items-center border-r border-slate-200 bg-slate-50 pt-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 sm:flex"
+            className="sticky top-16 hidden w-9 shrink-0 flex-col items-center self-start border-r border-slate-200 bg-slate-50 pt-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 sm:flex"
           >
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
               <path d="M9 18l6-6-6-6" />
@@ -227,7 +227,7 @@ export function EditorContent() {
         )}
         <main
           ref={mainRef}
-          className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 px-2 py-4 sm:px-4 sm:py-6"
+          className="min-w-0 flex-1 bg-slate-200 px-2 py-4 sm:px-4 sm:py-6"
         >
           {pages.map((page) => (
             <PageCanvas key={page.id} page={page} getDoc={getDoc} docVersion={docVersion} />

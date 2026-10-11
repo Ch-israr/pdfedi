@@ -89,7 +89,7 @@ export function Toolbar() {
   const setSnapEnabled = useEditor((s) => s.setSnapEnabled);
 
   return (
-    <header className="pdfeditor-toolbar flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-4">
+    <header className="pdfeditor-toolbar sticky top-0 z-30 flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-slate-200 bg-white px-3 py-2 sm:px-4">
       {/* Document identity */}
       <div className="mr-1 min-w-0 max-w-[180px] sm:max-w-[240px]">
         <div className="truncate text-sm font-semibold text-slate-800" title={fileName ?? ''}>

@@ -29,7 +29,7 @@ export function Thumbnails({
   return (
     <aside
       aria-label="Pages"
-      className="thin-scroll hidden w-40 shrink-0 flex-col overflow-y-auto border-r border-slate-200 bg-slate-50 p-2 sm:flex md:w-44"
+      className="thin-scroll sticky top-16 hidden max-h-[calc(100vh-4rem)] w-40 shrink-0 self-start flex-col overflow-y-auto border-r border-slate-200 bg-slate-50 p-2 sm:flex md:w-44"
     >
       <div className="mb-2 flex items-center justify-between px-1">
         <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
