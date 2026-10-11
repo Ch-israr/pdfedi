@@ -6,7 +6,6 @@ import { Dropzone } from '@/components/Dropzone';
 import { Toolbar } from '@/components/Toolbar';
 import { DocNotice } from '@/components/DocNotice';
 import { Thumbnails } from '@/components/Thumbnails';
-import { PropertiesPanel } from '@/components/PropertiesPanel';
 import { PageCanvas } from '@/components/PageCanvas';
 
 /**
@@ -196,7 +195,6 @@ export function EditorContent() {
             <PageCanvas key={page.id} page={page} getDoc={getDoc} docVersion={docVersion} />
           ))}
         </main>
-        <PropertiesPanel />
       </div>
     </div>
   );
