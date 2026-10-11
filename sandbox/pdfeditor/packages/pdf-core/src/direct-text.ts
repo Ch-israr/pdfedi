@@ -59,7 +59,7 @@ const WINANSI_80_9F: Record<number, string> = {
   0x9c: 'œ', 0x9e: 'ž', 0x9f: 'Ÿ',
 };
 
-function decodeWinAnsi(bytes: string): string {
+export function decodeWinAnsi(bytes: string): string {
   let out = '';
   for (let i = 0; i < bytes.length; i++) {
     const c = bytes.charCodeAt(i) & 0xff;
@@ -181,7 +181,7 @@ function fontDecoders(doc: PDFDocument, pageDict: PDFDict): Map<string, FontDeco
 // Content stream tokenizer + light interpreter
 // ---------------------------------------------------------------------------
 
-interface Token {
+export interface Token {
   kind: 'str' | 'hexstr' | 'num' | 'name' | 'op' | 'arrStart' | 'arrEnd' | 'dict';
   start: number;
   end: number;
@@ -190,7 +190,7 @@ interface Token {
   num?: number;
 }
 
-function tokenize(content: string): Token[] {
+export function tokenize(content: string): Token[] {
   const tokens: Token[] = [];
   const n = content.length;
   let i = 0;

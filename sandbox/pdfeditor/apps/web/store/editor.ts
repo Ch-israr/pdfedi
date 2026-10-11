@@ -38,7 +38,8 @@ export type ToolId =
   | 'shape-line'
   | 'shape-arrow'
   | 'whiteout'
-  | 'link';
+  | 'link'
+  | 'redact';
 
 interface EditorState {
   // Document (memory only)

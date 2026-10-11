@@ -224,6 +224,20 @@ export function PropertiesPanel() {
             </p>
           </section>
         )}
+        {el.kind === 'redact' && (
+          <section className="space-y-2 border-t border-slate-100 pt-4">
+            {sectionTitle('Redaction')}
+            <div className="grid grid-cols-2 gap-2">
+              {num('Width', el.width, (v) => updateElement(el.id, { width: v }))}
+              {num('Height', el.height, (v) => updateElement(el.id, { height: v }))}
+            </div>
+            <p className="text-xs leading-relaxed text-slate-500">
+              Text under this region is <strong>permanently removed</strong> from
+              the downloaded file — not just covered. Whole text runs touched
+              by the rectangle are removed. Undo is available until download.
+            </p>
+          </section>
+        )}
         {el.kind === 'whiteout' && (
           <section className="space-y-2 border-t border-slate-100 pt-4">
             {sectionTitle('Whiteout')}

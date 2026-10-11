@@ -50,6 +50,7 @@ import {
 import type { EditorElement, Page } from '@pdfeditor/shared';
 import { createDrawContext, drawElement, type DrawContext } from './index.js';
 import { findDirectRun, rewritePageContent, moveRunRaw, type TextRun } from './direct-text.js';
+import { applyRedactions, type RedactRect } from './redact.js';
 
 export const PDFEDI_NM_PREFIX = 'pdfedi-';
 
@@ -636,6 +637,29 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
     }
   }
 
+  // REDACTION (permanent text removal): for each redact element, delete
+  // every text run intersecting its rectangle from the source content
+  // (page and Form XObject streams), then paint the rectangle black.
+  // Throws RedactUnsafeError when safe removal cannot be verified — the
+  // caller must surface this instead of shipping a black box over live
+  // text.
+  {
+    const redactByPage = new Map<number, RedactRect[]>();
+    input.pages.forEach((page) => {
+      if (page.sourceIndex === 0) return;
+      const rects = Object.values(input.elements)
+        .filter((e) => e.pageId === page.id && e.kind === 'redact')
+        .map((e) => {
+          const r = e as Extract<EditorElement, { kind: 'redact' }>;
+          return { x: r.x, y: r.y, width: r.width, height: r.height };
+        });
+      if (rects.length > 0) redactByPage.set(page.sourceIndex - 1, rects);
+    });
+    for (const [srcIdx, rects] of redactByPage) {
+      await applyRedactions(src, srcIdx, rects);
+    }
+  }
+
   const out = await PDFDocument.create();
   const ctx = createDrawContext(out);
   const fontCache = new Map<string, PDFFont>();
@@ -735,6 +759,16 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
         case 'link':
           await addLinkAnnotation(out, pdfPage, el);
           break;
+        case 'redact': {
+          // Sourced pages: text removed + black box painted in the
+          // planning pass above. Blank inserted pages have no source
+          // content stream: paint the box here instead.
+          if (page.sourceIndex === 0) {
+            const r = el as Extract<EditorElement, { kind: 'redact' }>;
+            pdfPage.drawRectangle({ x: r.x, y: r.y, width: r.width, height: r.height, color: rgb(0, 0, 0) });
+          }
+          break;
+        }
         case 'image':
         case 'signature':
           await addStampAnnotation(out, ctx, pdfPage, el, imageCache);

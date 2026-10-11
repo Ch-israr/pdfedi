@@ -171,6 +171,18 @@ export const LinkElementSchema = BaseElementSchema.extend({
   url: z.string().url(),
 });
 
+/**
+ * A true redaction region: on download, text runs intersecting the rect
+ * are permanently removed from the page content stream (not covered),
+ * and the rect is painted black. Destructive — undoable only before
+ * download.
+ */
+export const RedactElementSchema = BaseElementSchema.extend({
+  kind: z.literal('redact'),
+  width: z.number().positive(),
+  height: z.number().positive(),
+});
+
 export const EditorElementSchema = z.discriminatedUnion('kind', [
   TextElementSchema,
   ImageElementSchema,
@@ -180,6 +192,7 @@ export const EditorElementSchema = z.discriminatedUnion('kind', [
   WhiteoutElementSchema,
   NativeTextElementSchema,
   LinkElementSchema,
+  RedactElementSchema,
 ]);
 export type EditorElement = z.infer<typeof EditorElementSchema>;
 

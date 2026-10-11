@@ -616,6 +616,27 @@ function ElementView({
         </div>
       );
     }
+    case 'redact':
+      // True redaction: solid black. Selection shown via resize handles +
+      // a red dashed outline when selected.
+      return (
+        <div
+          {...common}
+          style={{
+            ...style,
+            width: toScreen(el.width, zoom),
+            height: toScreen(el.height, zoom),
+            background: '#000000',
+            border: 'none',
+            outline: selected ? `${Math.max(1.5, 2 * zoom)}px dashed #ff2f2f` : 'none',
+            outlineOffset: 1,
+          }}
+          data-el-id={el.id}
+          title="Redaction — text underneath is permanently removed on download"
+        >
+          {selected && <ResizeHandles el={el} zoom={zoom} />}
+        </div>
+      );
     case 'image':
     case 'signature':
       return (
@@ -711,7 +732,7 @@ export function ElementOverlay({ page }: { page: Page }) {
   // Drag-to-draw state for shapes + highlight: press → drag → release
   // (lines/arrows use start/end points; rect/ellipse/highlight use drag rectangle)
   const [drawing, setDrawing] = useState<{
-    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout' | 'link';
+    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout' | 'link' | 'redact';
     startX: number; // PDF points
     startY: number;
     curX: number;
@@ -1152,6 +1173,7 @@ export function ElementOverlay({ page }: { page: Page }) {
       : tool === 'highlight' ? 'highlight'
       : tool === 'whiteout' ? 'whiteout'
       : tool === 'link' ? 'link'
+      : tool === 'redact' ? 'redact'
       : null;
     if (!drawShape) return;
     // Handles take priority over drawing tools: if the pointer is on a
@@ -1242,6 +1264,22 @@ export function ElementOverlay({ page }: { page: Page }) {
         // Link: keep the dragged rect pending until the user supplies a
         // URL (Escape/empty discards it — no element is created).
         setPendingLink({ x, y, w, h });
+      } else if (d.shape === 'redact') {
+        // Redact: solid black region. The text underneath is permanently
+        // removed on download (unlike whiteout, which only covers).
+        addElement(
+          {
+            id,
+            pageId: page.id,
+            kind: 'redact',
+            x,
+            y,
+            rotation: 0,
+            width: w,
+            height: h,
+          },
+          'Redaction Added',
+        );
       } else if (d.shape === 'highlight') {
         // Highlight: commit the dragged rectangle with the standard
         // highlight style (yellow, translucent). Same undo/history path.
@@ -1566,7 +1604,7 @@ function DrawingPreview({
   page,
   zoom,
 }: {
-  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout' | 'link'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
+  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout' | 'link' | 'redact'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
   page: Page;
   zoom: number;
 }) {
@@ -1661,8 +1699,18 @@ function DrawingPreview({
             <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
           </>
         )}
-        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight' || drawing.shape === 'whiteout' || drawing.shape === 'link') && (
-          drawing.shape === 'link' ? (
+        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight' || drawing.shape === 'whiteout' || drawing.shape === 'link' || drawing.shape === 'redact') && (
+          drawing.shape === 'redact' ? (
+            <rect
+              x={rx}
+              y={ry}
+              width={rw}
+              height={rh}
+              fill="rgba(0,0,0,0.85)"
+              stroke="#000"
+              strokeWidth={sw}
+            />
+          ) : drawing.shape === 'link' ? (
             <rect
               x={rx}
               y={ry}

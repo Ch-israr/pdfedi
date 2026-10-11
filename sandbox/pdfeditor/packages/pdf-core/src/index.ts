@@ -56,6 +56,12 @@ export {
   type TextRun,
 } from './direct-text.js';
 
+export {
+  applyRedactions,
+  RedactUnsafeError,
+  type RedactRect,
+} from './redact.js';
+
 // ---------------------------------------------------------------------------
 // Page operations (pure — return new arrays, never mutate)
 // ---------------------------------------------------------------------------

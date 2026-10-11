@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useEditor, type ToolId } from '@/store/editor';
 import { HistoryPanel } from './HistoryPanel';
 import { FindReplaceDialog } from './FindReplaceDialog';
+import { RedactConfirmDialog } from './RedactConfirmDialog';
 import { ToolIcon } from './ToolIcon';
 import { ShapesDropdown } from './ShapesDropdown';
 import { AnnotateDropdown } from './AnnotateDropdown';
@@ -26,13 +27,14 @@ function SaveStatus() {
 }
 
 // Tools inside the grouped pill, in reference order. (Forms does not exist
-// in this editor and is not shown; Links is a real drag-to-draw tool.)
+// in this editor and is not shown.)
 const PILL_TOOLS: { id: ToolId; label: string; shortcut?: string }[] = [
   { id: 'text', label: 'Text', shortcut: 'T' },
   { id: 'image', label: 'Image' },
   { id: 'signature', label: 'Sign' },
   { id: 'whiteout', label: 'Whiteout', shortcut: 'W' },
   { id: 'link', label: 'Link', shortcut: 'L' },
+  { id: 'redact', label: 'Redact', shortcut: 'R' },
 ];
 
 function PillToolButton({
@@ -73,6 +75,8 @@ function PillDivider() {
 
 export function Toolbar() {
   const [showFindReplace, setShowFindReplace] = useState(false);
+  const [showRedactConfirm, setShowRedactConfirm] = useState(false);
+  const redactCount = useEditor((s) => Object.values(s.elements).filter((e) => e.kind === 'redact').length);
   const tool = useEditor((s) => s.tool);
   const setTool = useEditor((s) => s.setTool);
   const undo = useEditor((s) => s.undo);
@@ -219,7 +223,10 @@ export function Toolbar() {
       <div className="ml-auto flex items-center gap-2">
         <button
           type="button"
-          onClick={() => void download()}
+          onClick={() => {
+            if (redactCount > 0) setShowRedactConfirm(true);
+            else void download();
+          }}
           disabled={downloading}
           title={downloading ? 'Your PDF is being prepared. Please wait...' : 'Download PDF'}
           className="flex h-9 items-center gap-1.5 rounded-lg bg-brand-500 px-4 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-600 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:cursor-not-allowed disabled:opacity-60"
@@ -245,6 +252,16 @@ export function Toolbar() {
         </button>
       </div>
       {showFindReplace && <FindReplaceDialog onClose={() => setShowFindReplace(false)} />}
+      {showRedactConfirm && (
+        <RedactConfirmDialog
+          count={redactCount}
+          onCancel={() => setShowRedactConfirm(false)}
+          onConfirm={() => {
+            setShowRedactConfirm(false);
+            void download();
+          }}
+        />
+      )}
     </header>
   );
 }

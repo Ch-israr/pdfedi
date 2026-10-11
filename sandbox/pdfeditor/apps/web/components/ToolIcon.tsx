@@ -104,6 +104,13 @@ export function ToolIcon({ id }: { id: ToolId }) {
           <path d="M14 10a4.5 4.5 0 00-6.4-.4l-3 3a4.5 4.5 0 006.4 6.4l1.7-1.7" />
         </svg>
       );
+    case 'redact':
+      // Solid black redaction block
+      return (
+        <svg {...base()}>
+          <rect x="4" y="6" width="16" height="12" rx="1" fill="#111" stroke="currentColor" strokeWidth={1.5} />
+        </svg>
+      );
     case 'whiteout':
       // Solid white-filled rectangle (the cover), no outline
       return (

@@ -430,3 +430,137 @@ describe('link annotation export/restore', () => {
     assert.equal(el.width, 120);
   });
 });
+
+describe('redaction', () => {
+  const REDACT_ID = 'cccccccc-3333-4222-8222-222222222222';
+  function redactEl(overrides: Record<string, unknown> = {}) {
+    return {
+      id: REDACT_ID,
+      pageId: PAGE_ID,
+      kind: 'redact',
+      x: 90,
+      y: 688,
+      rotation: 0,
+      width: 130,
+      height: 26,
+      ...overrides,
+    };
+  }
+  async function pageContentText(bytes: Uint8Array): Promise<string> {
+    const doc = await PDFDocument.load(bytes);
+    const page = doc.getPage(0);
+    const { decodePDFRawStream } = await import('pdf-lib');
+    const looked = doc.context.lookup(page.node.get(PDFName.of('Contents')));
+    const parts: string[] = [];
+    const push = (s: unknown) => {
+      const st = s as { getContents?: () => Uint8Array };
+      if (st && typeof st.getContents === 'function') {
+        parts.push(Buffer.from(decodePDFRawStream(st as never).decode()).toString('latin1'));
+      }
+    };
+    if ((looked as { size?: () => number }).size) {
+      const arr = looked as { size(): number; get(i: number): unknown };
+      for (let i = 0; i < arr.size(); i++) push(doc.context.lookup(arr.get(i)));
+    } else push(looked);
+    return parts.join('\n');
+  }
+
+  it('removes text under the rect, keeps the rest, paints black', async () => {
+    const src = await makeSource(); // 'Hello World' @ (100,700); 'Unrelated line' @ (100,650)
+    const out = await exportAnnotatedPdf({
+      srcBytes: src,
+      pages: [makePage()],
+      elements: { [REDACT_ID]: redactEl() },
+    });
+    const text = await pageContentText(out);
+    assert.ok(!text.includes('Hello') && !text.includes('48656C6C6F'), 'redacted word gone in all encodings');
+    // pdf-lib hex-encodes the survivor: <556E72656C61746564206C696E65> = "Unrelated line"
+    assert.ok(text.includes('Unrelated') || text.includes('556E72656C61746564206C696E65'), 'untouched line survives');
+    assert.ok(text.includes('0 g') && /\b90 688 130 26 re\b/.test(text), 'black box painted over the rect');
+    const parsed = await parsePdfediAnnotations(out);
+    assert.ok(!parsed.some((p) => (p.element as { kind: string }).kind === 'redact'), 'no annotation residue');
+  });
+
+  it('a rect over empty space removes nothing but still paints', async () => {
+    const src = await makeSource();
+    const out = await exportAnnotatedPdf({
+      srcBytes: src,
+      pages: [makePage()],
+      elements: { [REDACT_ID]: redactEl({ x: 400, y: 100, width: 50, height: 20 }) },
+    });
+    const text = await pageContentText(out);
+    assert.ok(text.includes('Hello') || text.includes('48656C6C6F'), 'no text removed');
+    assert.ok(/\b400 100 50 20 re\b/.test(text), 'black box painted');
+  });
+
+  it('refuses when glyph widths are unavailable (no /Widths, non-standard font)', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const fontDict = doc.context.obj({
+      Type: PDFName.of('Font'), Subtype: PDFName.of('Type1'),
+      BaseFont: PDFName.of('WeirdFont'), Encoding: PDFName.of('WinAnsiEncoding'),
+    });
+    const fontRef = doc.context.register(fontDict);
+    let resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    if (!resources) {
+      resources = doc.context.obj({});
+      page.node.set(PDFName.of('Resources'), doc.context.register(resources));
+    }
+    let fontRes = doc.context.lookup((resources as { get(k: unknown): unknown }).get(PDFName.of('Font')));
+    if (!fontRes) {
+      fontRes = doc.context.obj({});
+      (resources as { set(k: unknown, v: unknown): void }).set(PDFName.of('Font'), doc.context.register(fontRes));
+    }
+    (fontRes as { set(k: unknown, v: unknown): void }).set(PDFName.of('F9'), fontRef);
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream('BT /F9 14 Tf 1 0 0 1 100 700 Tm (Secret Data) Tj ET')));
+    const src = await doc.save();
+    const { RedactUnsafeError } = await import('../dist/index.js');
+    await assert.rejects(
+      exportAnnotatedPdf({ srcBytes: src, pages: [makePage()], elements: { [REDACT_ID]: redactEl() } }),
+      (e: unknown) => e instanceof (RedactUnsafeError as new (...a: never[]) => Error),
+      'download blocked instead of shipping a black box over live text',
+    );
+  });
+
+  it('removes text inside Form XObjects', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const helv = await doc.embedFont(StandardFonts.Helvetica);
+    page.drawText('x', { x: 0, y: 0, size: 10, font: helv });
+    const formStream = doc.context.flateStream('BT /F1 12 Tf 1 0 0 1 10 10 Tm (Hidden Secret) Tj ET');
+    formStream.dict.set(PDFName.of('Type'), PDFName.of('XObject'));
+    formStream.dict.set(PDFName.of('Subtype'), PDFName.of('Form'));
+    formStream.dict.set(PDFName.of('BBox'), doc.context.obj([0, 0, 200, 50]));
+    const pageRes = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const pageFonts = doc.context.lookup((pageRes as { get(k: unknown): unknown }).get(PDFName.of('Font')));
+    const helvName = [...(pageFonts as Map<unknown, unknown>).entries()][0][0] as unknown;
+    const helvRef = (pageFonts as { get(k: unknown): unknown }).get(helvName);
+    const formRes = doc.context.obj({});
+    const formFonts = doc.context.obj({});
+    (formFonts as { set(k: unknown, v: unknown): void }).set(PDFName.of('F1'), helvRef);
+    (formRes as { set(k: unknown, v: unknown): void }).set(PDFName.of('Font'), doc.context.register(formFonts));
+    formStream.dict.set(PDFName.of('Resources'), doc.context.register(formRes));
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    let xobj = doc.context.lookup((resources as { get(k: unknown): unknown }).get(PDFName.of('XObject')));
+    if (!xobj) {
+      xobj = doc.context.obj({});
+      (resources as { set(k: unknown, v: unknown): void }).set(PDFName.of('XObject'), doc.context.register(xobj));
+    }
+    (xobj as { set(k: unknown, v: unknown): void }).set(PDFName.of('Fm1'), doc.context.register(formStream));
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream('q\n1 0 0 1 300 400 cm\n/Fm1 Do\nQ')));
+    const src = await doc.save();
+    const out = await exportAnnotatedPdf({
+      srcBytes: src,
+      pages: [makePage()],
+      elements: { [REDACT_ID]: redactEl({ x: 290, y: 395, width: 150, height: 30 }) },
+    });
+    const d2 = await PDFDocument.load(out);
+    const p2 = d2.getPages()[0];
+    const r2 = d2.context.lookup(p2.node.get(PDFName.of('Resources')));
+    const x2 = d2.context.lookup((r2 as { get(k: unknown): unknown }).get(PDFName.of('XObject')));
+    const f2 = d2.context.lookup((x2 as { get(k: unknown): unknown }).get(PDFName.of('Fm1')));
+    const { decodePDFRawStream } = await import('pdf-lib');
+    const ftxt = Buffer.from(decodePDFRawStream(f2 as never).decode()).toString('latin1');
+    assert.ok(!ftxt.includes('Secret'), 'form XObject text removed');
+  });
+});
