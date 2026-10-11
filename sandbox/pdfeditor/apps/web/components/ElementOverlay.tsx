@@ -4,6 +4,24 @@ import { useRef, useState, useCallback, useEffect } from 'react';
 import type { EditorElement, NativeTextItem, Page } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
 import { calcGuides, type Guide } from '@/lib/smart-guides';
+import {
+  findTextElementAt,
+  findNativeCovering,
+  type MeasureFn,
+} from '@/lib/text-hit';
+
+/** Canvas-backed text measurer for logical hit-testing (see lib/text-hit). */
+let measureCtx: CanvasRenderingContext2D | null = null;
+const measureTextWidth: MeasureFn = (text, font) => {
+  try {
+    if (!measureCtx) measureCtx = document.createElement('canvas').getContext('2d');
+    if (!measureCtx) return text.length * font.fontSize * 0.55;
+    measureCtx.font = `${font.italic ? 'italic ' : ''}${font.bold ? 'bold ' : ''}${font.fontSize}px ${font.fontFamily}`;
+    return measureCtx.measureText(text).width;
+  } catch {
+    return text.length * font.fontSize * 0.55;
+  }
+};
 import { FloatingTextToolbar } from './FloatingTextToolbar';
 import { NativeEditWarning } from './NativeEditWarning';
 import { FloatingShapeToolbar } from './FloatingShapeToolbar';
@@ -642,7 +660,11 @@ export function ElementOverlay({ page }: { page: Page }) {
           if (et.existingId) useEditor.getState().deleteElement(et.existingId);
           return;
         }
-        if (text === et.initialText && et.existingId) return; // unchanged
+        // Unchanged text is a no-op — whether or not an element already
+        // exists. Pressing Enter without changes must never mint an
+        // element (previously a pristine fragment opened and confirmed
+        // unchanged still created a mask+replacement object).
+        if (text === et.initialText) return;
         const item = et.nativeItem;
         const elId = et.existingId ?? crypto.randomUUID();
         const label = `Edit native text — "${text.length > 30 ? text.slice(0, 30) + '…' : text}"`;
@@ -746,6 +768,72 @@ export function ElementOverlay({ page }: { page: Page }) {
     [select],
   );
 
+  /**
+   * Open an existing text-like element in the inline editor, pre-filled
+   * with its current text. Used by every "edit this object" entry point
+   * (element click, page-click routing) so they all behave identically:
+   * the SAME element is edited in place — never a new one.
+   */
+  const openElementEditor = useCallback(
+    (el: EditorElement) => {
+      select(el.id);
+      if (el.kind === 'native-text') {
+        setEditingText({
+          mode: 'native',
+          nativeItem: {
+            id: `nt-${el.id}`,
+            x: el.x,
+            y: el.y,
+            width: el.width,
+            height: el.height,
+            baselineOffset: el.baselineOffset,
+            text: el.originalText,
+            fontSize: el.fontSize,
+            fontFamily: el.fontFamily,
+            bold: el.bold,
+            italic: el.italic,
+          },
+          existingId: el.id,
+          screenX: el.x * zoom,
+          screenY: (page.height - (el.y + el.height)) * zoom,
+          screenW: el.width * zoom,
+          screenH: el.height * zoom,
+          fontSize: el.fontSize,
+          initialText: el.text,
+        });
+      } else if (el.kind === 'text') {
+        const elHeight = (el as { height?: number }).height ?? el.fontSize * 1.2;
+        setEditingText({
+          mode: 'edit',
+          id: el.id,
+          screenX: el.x * zoom,
+          screenY: (page.height - (el.y + elHeight)) * zoom,
+          initialText: el.text,
+        });
+      }
+    },
+    [select, page.height, zoom],
+  );
+
+  // Enter with a text object selected opens it for editing (the natural
+  // "select the name, press Enter" flow). Committing unchanged is a
+  // no-op in commitText, so this can never create a duplicate.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Enter' || e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) return;
+      if (editingText) return;
+      const tag = (document.activeElement?.tagName ?? '').toUpperCase();
+      if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' || tag === 'BUTTON') return;
+      const el = selectedId ? els.find((x) => x.id === selectedId) : undefined;
+      if (el && (el.kind === 'text' || el.kind === 'native-text')) {
+        e.preventDefault();
+        openElementEditor(el);
+      }
+    };
+    document.addEventListener('keydown', onKey);
+    return () => document.removeEventListener('keydown', onKey);
+  }, [selectedId, editingText, els, openElementEditor]);
+
   // Native text items for this page — read imperatively (not via a reactive
   // selector) to avoid the render-crash seen with useEditor selectors here.
   /** Find the native text fragment under a PDF-point position, if any. */
@@ -784,57 +872,10 @@ export function ElementOverlay({ page }: { page: Page }) {
       if (tool === 'text') {
         const clickedId = elIdAttr.getAttribute('data-el-id');
         const clickedEl = clickedId ? els.find((el) => el.id === clickedId) : undefined;
-        if (clickedEl && clickedEl.kind === 'native-text') {
-          // Open the existing native-text element for editing (pre-filled).
-          // Position the editor over the element bounds.
-          const elLeft = clickedEl.x * zoom;
-          const elTop = (page.height - (clickedEl.y + clickedEl.height)) * zoom;
-          const elWidth = clickedEl.width * zoom;
-          const elHeight = clickedEl.height * zoom;
-          // Select the element so the floating toolbar appears during editing.
-          select(clickedEl.id);
-          setEditingText({
-            mode: 'native',
-            nativeItem: {
-              id: `nt-${clickedEl.id}`,
-              x: clickedEl.x,
-              y: clickedEl.y,
-              width: clickedEl.width,
-              height: clickedEl.height,
-              baselineOffset: clickedEl.baselineOffset,
-              text: clickedEl.originalText,
-              fontSize: clickedEl.fontSize,
-              fontFamily: clickedEl.fontFamily,
-              bold: clickedEl.bold,
-              italic: clickedEl.italic,
-            },
-            existingId: clickedEl.id,
-            screenX: elLeft,
-            screenY: elTop,
-            screenW: elWidth,
-            screenH: elHeight,
-            fontSize: clickedEl.fontSize,
-            initialText: clickedEl.text,
-          });
-          return;
-        }
-        if (clickedEl && clickedEl.kind === 'text') {
-          // Open a restored/added text element for editing (pre-filled).
-          // This handles the re-upload case: the element was baked into the
-          // PDF on export, restored from the manifest, and must be editable
-          // without creating a duplicate.
-          const elLeft = clickedEl.x * zoom;
-          const elHeight = (clickedEl as any).height ?? clickedEl.fontSize * 1.2;
-          const elTop = (page.height - (clickedEl.y + elHeight)) * zoom;
-          // Select the element so the floating toolbar appears during editing.
-          select(clickedEl.id);
-          setEditingText({
-            mode: 'edit',
-            id: clickedEl.id,
-            screenX: elLeft,
-            screenY: elTop,
-            initialText: clickedEl.text,
-          });
+        if (clickedEl && (clickedEl.kind === 'native-text' || clickedEl.kind === 'text')) {
+          // Edit the SAME existing element in place (pre-filled) — never
+          // a new one. Covers restored objects after re-upload.
+          openElementEditor(clickedEl);
           return;
         }
       }
@@ -850,41 +891,52 @@ export function ElementOverlay({ page }: { page: Page }) {
     // must not trigger text editing. Clicks on already-edited text hit the
     // element overlay above and return early.)
     if (tool === 'text') {
+      // DUPLICATE GUARD: this click missed the element's DOM node (it hit
+      // the selection halo, a collapsed trailing line, or a spot a few
+      // pixels off the glyphs), but it lands inside an existing text
+      // element's logical box — edit THAT element in place instead of
+      // falling through to native detection / new-text creation, which
+      // used to mint a second element next to the existing one.
+      const hitEl = findTextElementAt(els, x, y, measureTextWidth, 3);
+      if (hitEl) {
+        openElementEditor(hitEl);
+        return;
+      }
       const hit = hitNativeText(x, y);
       if (hit) {
         // Verify the fragment is actually editable before opening the editor
         // (non-empty text, valid dimensions, supported orientation).
         if (isNativeTextEditable(hit)) {
-          // Skip if a native-text element already covers this fragment — the
-          // element itself handles the click (returned early above), but guard
-          // against stale overlap anyway.
-          const covered = els.some(
-            (el) =>
-              el.kind === 'native-text' &&
-              Math.abs(el.x - hit.x) < 1 &&
-              Math.abs(el.y - hit.y) < 1,
+          // A native-text element substantially covering this fragment owns
+          // the edit — route to it instead of creating a second element.
+          const covering = findNativeCovering(
+            els,
+            { x0: hit.x, y0: hit.y, x1: hit.x + hit.width, y1: hit.y + hit.height },
+            measureTextWidth,
           );
-          if (!covered) {
-            // Position the editor exactly over the fragment bounds (not the
-            // click point) so the opaque textarea covers the original text —
-            // no duplicate visual. Convert fragment PDF bounds to screen px.
-            const fragLeft = hit.x * zoom;
-            const fragTop = (page.height - (hit.y + hit.height)) * zoom;
-            const fragWidth = hit.width * zoom;
-            const fragHeight = hit.height * zoom;
-            setEditingText({
-              mode: 'native',
-              nativeItem: hit,
-              existingId: null,
-              screenX: fragLeft,
-              screenY: fragTop,
-              screenW: fragWidth,
-              screenH: fragHeight,
-              fontSize: hit.fontSize,
-              initialText: hit.text,
-            });
+          if (covering) {
+            openElementEditor(covering);
             return;
           }
+          // Position the editor exactly over the fragment bounds (not the
+          // click point) so the opaque textarea covers the original text —
+          // no duplicate visual. Convert fragment PDF bounds to screen px.
+          const fragLeft = hit.x * zoom;
+          const fragTop = (page.height - (hit.y + hit.height)) * zoom;
+          const fragWidth = hit.width * zoom;
+          const fragHeight = hit.height * zoom;
+          setEditingText({
+            mode: 'native',
+            nativeItem: hit,
+            existingId: null,
+            screenX: fragLeft,
+            screenY: fragTop,
+            screenW: fragWidth,
+            screenH: fragHeight,
+            fontSize: hit.fontSize,
+            initialText: hit.text,
+          });
+          return;
         }
         // Fragment hit but not safely editable: fall through to the
         // one-time warning via double-click (handled separately), or to
@@ -1479,6 +1531,20 @@ function InlineTextEditor({
 }) {
   const [value, setValue] = useState(initialText);
   const ref = useRef<HTMLTextAreaElement>(null);
+  // Commit/cancel at most once: Enter commits and unmounts the textarea,
+  // which can also fire blur — a second commit of a 'new' draft would
+  // create a duplicate element at the same position.
+  const settledRef = useRef(false);
+  const commitOnce = (v: string) => {
+    if (settledRef.current) return;
+    settledRef.current = true;
+    onCommit(v);
+  };
+  const cancelOnce = () => {
+    if (settledRef.current) return;
+    settledRef.current = true;
+    onCancel();
+  };
 
   useEffect(() => {
     ref.current?.focus();
@@ -1495,15 +1561,15 @@ function InlineTextEditor({
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onClick={(e) => e.stopPropagation()}
-      onBlur={() => onCommit(value)}
+      onBlur={() => commitOnce(value)}
       onKeyDown={(e) => {
         e.stopPropagation();
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
-          onCommit(value);
+          commitOnce(value);
         } else if (e.key === 'Escape') {
           e.preventDefault();
-          onCancel();
+          cancelOnce();
         }
       }}
       placeholder="Type text… (Enter to place, Esc to cancel)"
