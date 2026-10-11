@@ -575,7 +575,7 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
   const directDraw = new Set<string>(); // handled directly, replacement drawn post-copy
   {
     const rewrites = new Map<number, { removals: TextRun[]; appends: string[] }>();
-    const claimed = new Map<number, Set<number>>();
+    const claimed = new Map<number, Set<string>>();
     input.pages.forEach((page, modelIdx) => {
       if (page.sourceIndex === 0) return;
       const srcIdx = page.sourceIndex - 1;
@@ -594,9 +594,10 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
           baselineY: originY + el.baselineOffset,
         });
         if (res.status !== 'ok') continue;
-        const pageClaimed = claimed.get(srcIdx) ?? new Set<number>();
-        if (pageClaimed.has(res.run.start)) continue; // two elements, one run — first wins
-        pageClaimed.add(res.run.start);
+        const pageClaimed = claimed.get(srcIdx) ?? new Set<string>();
+        const runKey = res.run.spans.map(([a, b]) => `${a}-${b}`).join(',');
+        if (pageClaimed.has(runKey)) continue; // two elements, one run — first wins
+        pageClaimed.add(runKey);
         claimed.set(srcIdx, pageClaimed);
         const acc = rewrites.get(srcIdx) ?? { removals: [], appends: [] };
         acc.removals.push(res.run);

@@ -293,6 +293,8 @@ function tokenize(content: string): Token[] {
 export interface TextRun {
   start: number;
   end: number;
+  /** Byte spans to remove from the content stream (single-show runs: one span = the block). */
+  spans: Array<[number, number]>;
   raw: string;
   decodedText: string;
   originX: number;
@@ -306,10 +308,21 @@ export interface TextRun {
   tmSpan: [number, number] | null;
 }
 
+interface ShowInfo {
+  text: string;
+  originX: number;
+  originY: number;
+  fontResource: string;
+  fontSize: number;
+  colorHex: string;
+  /** Byte span of the show operation itself (operands + operator). */
+  span: [number, number];
+}
+
 interface BlockInfo {
   start: number;
   end: number;
-  shows: { text: string; originX: number; originY: number; fontResource: string; fontSize: number; colorHex: string }[];
+  shows: ShowInfo[];
   fontSetInBlock: boolean;
   tmCount: number;
   tdCount: number;
@@ -496,6 +509,7 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
             fontResource: fontName,
             fontSize,
             colorHex: color,
+            span: [strTok.start, tok.end],
           });
         }
         break;
@@ -520,6 +534,7 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
             fontResource: fontName,
             fontSize,
             colorHex: color,
+            span: [arrTok.start, tok.end],
           });
         }
         break;
@@ -554,6 +569,7 @@ function blockToRun(content: string, block: BlockInfo): TextRun {
   return {
     start: block.start,
     end: block.end,
+    spans: [[block.start, block.end]],
     raw: content.slice(block.start, block.end),
     decodedText: show.text,
     originX: show.originX,
@@ -566,10 +582,84 @@ function blockToRun(content: string, block: BlockInfo): TextRun {
   };
 }
 
+const UNDECODABLE = '\u0001UNDECODABLE\u0001';
+
+/**
+ * Build a TextRun from a window of consecutive show operations whose
+ * concatenated text equals the fragment. Multi-show runs are editable
+ * but never movable: only the show operations themselves are removed
+ * (surrounding state ops are untouched), and the replacement is drawn
+ * by the export's element renderer.
+ */
+function multiShowToRun(content: string, shows: ShowInfo[]): TextRun {
+  const first = shows[0];
+  const last = shows[shows.length - 1];
+  const spans = shows.map((sh) => sh.span as [number, number]);
+  return {
+    start: spans[0][0],
+    end: spans[spans.length - 1][1],
+    spans,
+    raw: content.slice(spans[0][0], spans[spans.length - 1][1]),
+    decodedText: shows.map((sh) => sh.text).join(''),
+    originX: first.originX,
+    originY: first.originY,
+    fontResource: first.fontResource,
+    fontSize: first.fontSize,
+    colorHex: first.colorHex,
+    movable: false,
+    tmSpan: null,
+  };
+}
+
+/**
+ * Match a fragment against consecutive show operations. Guards (all must
+ * hold for every show in the window):
+ *   - decodable text, identical font resource, size and colour,
+ *   - baseline Y within 1pt of the window's first show (a Y-moving
+ *     positioning op between shows breaks the window),
+ *   - X positions monotonically non-decreasing in stream order,
+ *   - concatenated text exactly equals the fragment text.
+ * Returns the matching windows (in stream order); the caller requires
+ * exactly one whose first show sits at the expected baseline origin.
+ */
+function findMultiShowWindows(blocks: BlockInfo[], text: string): ShowInfo[][] {
+  const flat: ShowInfo[] = [];
+  for (const b of blocks) for (const sh of b.shows) flat.push(sh);
+  const windows: ShowInfo[][] = [];
+  for (let i = 0; i < flat.length; i++) {
+    const first = flat[i];
+    if (first.text === UNDECODABLE || first.text === '') continue;
+    const win: ShowInfo[] = [first];
+    let concat = first.text;
+    if (concat === text) windows.push([...win]);
+    for (let j = i + 1; j < flat.length; j++) {
+      const sh = flat[j];
+      if (sh.text === UNDECODABLE || sh.text === '') break;
+      const prev = win[win.length - 1];
+      if (
+        sh.fontResource !== first.fontResource ||
+        sh.fontSize !== first.fontSize ||
+        sh.colorHex !== first.colorHex ||
+        Math.abs(sh.originY - first.originY) > 1 ||
+        sh.originX < prev.originX - 0.01
+      ) {
+        break;
+      }
+      win.push(sh);
+      concat += sh.text;
+      if (concat === text) windows.push([...win]);
+      if (concat.length >= text.length) break;
+    }
+  }
+  return windows;
+}
+
 /**
  * Find the content-stream run for a native text fragment. Strict: the
- * fragment must match exactly one decodable, self-contained, single-show
- * block at the expected baseline origin.
+ * fragment must match exactly one decodable run at the expected baseline
+ * origin — either a self-contained single-show block (fast path), or a
+ * run of consecutive show operations with identical font, size, colour
+ * and baseline (multi-show path for text split across operations).
  */
 export function findDirectRun(doc: PDFDocument, pageIndex: number, query: DirectRunQuery): DirectRunResult {
   const parsed = collectTextBlocks(doc, pageIndex);
@@ -577,8 +667,31 @@ export function findDirectRun(doc: PDFDocument, pageIndex: number, query: Direct
   const tol = query.tolerance ?? 3;
   const { content, blocks } = parsed;
   const textMatches = blocks.filter((b) => b.shows.some((s) => s.text === query.text));
+  const candidates = textMatches.filter((b) => {
+    if (b.shows.length !== 1 || !b.fontSetInBlock) return false;
+    const s = b.shows[0];
+    return Math.abs(s.originX - query.baselineX) <= tol && Math.abs(s.originY - query.baselineY) <= tol;
+  });
+  if (candidates.length === 1) {
+    return { status: 'ok', run: blockToRun(content, candidates[0]) };
+  }
+  if (candidates.length > 1) {
+    return { status: 'not-editable', reason: 'Several identical text runs match — editing could affect the wrong one.' };
+  }
+  // Multi-show path: the fragment's text may be split across consecutive
+  // show operations (common in producer and round-tripped output).
+  const windows = findMultiShowWindows(blocks, query.text).filter((w) => {
+    const f = w[0];
+    return Math.abs(f.originX - query.baselineX) <= tol && Math.abs(f.originY - query.baselineY) <= tol;
+  });
+  if (windows.length === 1) {
+    return { status: 'ok', run: multiShowToRun(content, windows[0]) };
+  }
+  if (windows.length > 1) {
+    return { status: 'not-editable', reason: 'Several identical text runs match — editing could affect the wrong one.' };
+  }
   if (textMatches.length === 0) {
-    const anyText = blocks.some((b) => b.shows.some((s) => s.text !== '\u0001UNDECODABLE\u0001'));
+    const anyText = blocks.some((b) => b.shows.some((s) => s.text !== UNDECODABLE));
     return {
       status: 'not-editable',
       reason: anyText
@@ -586,21 +699,10 @@ export function findDirectRun(doc: PDFDocument, pageIndex: number, query: Direct
         : 'This text uses a font encoding that cannot be decoded safely.',
     };
   }
-  const candidates = textMatches.filter((b) => {
-    if (b.shows.length !== 1 || !b.fontSetInBlock) return false;
-    const s = b.shows[0];
-    return Math.abs(s.originX - query.baselineX) <= tol && Math.abs(s.originY - query.baselineY) <= tol;
-  });
-  if (candidates.length === 0) {
-    return {
-      status: 'not-editable',
-      reason: 'This text is drawn by a complex operation sequence and cannot be rewritten safely.',
-    };
-  }
-  if (candidates.length > 1) {
-    return { status: 'not-editable', reason: 'Several identical text runs match — editing could affect the wrong one.' };
-  }
-  return { status: 'ok', run: blockToRun(content, candidates[0]) };
+  return {
+    status: 'not-editable',
+    reason: 'This text is drawn by a complex operation sequence and cannot be rewritten safely.',
+  };
 }
 
 /** Probe used by the editor before opening a native edit. */
@@ -637,17 +739,27 @@ export function moveRunRaw(run: TextRun, newBaselineX: number, newBaselineY: num
 }
 
 /**
- * Rewrite a page's content stream: remove the given runs' blocks and
- * append extra operations (e.g. moved runs) at the end.
+ * Rewrite a page's content stream: remove the given runs' spans and
+ * append extra operations (e.g. moved runs) at the end. Spans are merged
+ * so overlapping removals from different runs stay safe.
  */
 export function rewritePageContent(doc: PDFDocument, pageIndex: number, removals: TextRun[], append: string): void {
   const page = doc.getPage(pageIndex);
   const parsed = collectTextBlocks(doc, pageIndex);
   if (!parsed) throw new Error('Cannot rewrite unreadable page content.');
   let content = parsed.content;
-  const sorted = [...removals].sort((a, b) => b.start - a.start);
-  for (const run of sorted) {
-    content = content.slice(0, run.start) + content.slice(run.end);
+  const spans: Array<[number, number]> = [];
+  for (const run of removals) spans.push(...run.spans);
+  spans.sort((a, b) => a[0] - b[0]);
+  const merged: Array<[number, number]> = [];
+  for (const sp of spans) {
+    const last = merged[merged.length - 1];
+    if (last && sp[0] <= last[1]) last[1] = Math.max(last[1], sp[1]);
+    else merged.push([sp[0], sp[1]]);
+  }
+  for (let i = merged.length - 1; i >= 0; i--) {
+    const [a, b] = merged[i];
+    content = content.slice(0, a) + content.slice(b);
   }
   if (append) content += `\n${append}\n`;
   const stream = doc.context.flateStream(latin1ToBytes(content));

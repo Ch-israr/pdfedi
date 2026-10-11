@@ -225,3 +225,104 @@ describe('direct export', () => {
     assert.equal(parsed.length, 0); // no FreeText annotation anymore
   });
 });
+
+describe('multi-show run matching (text split across operations)', () => {
+  /** Raw page whose heading is split across two show ops, like round-tripped producer output. */
+  async function makeSplitSource(): Promise<{ bytes: Uint8Array; resName: string }> {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    page.drawText('x', { x: 0, y: 0, size: 10, font }); // registers the font resource
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const fonts = doc.context.lookup(resources.get(PDFName.of('Font')));
+    const resName = [...fonts.entries()][0][0].toString().slice(1);
+    const content =
+      `BT /${resName} 14 Tf 1 0 0 1 100 700 Tm (Hello ) Tj (World) Tj ET\n` +
+      `BT /${resName} 12 Tf 1 0 0 1 100 650 Tm (Unrelated line) Tj ET`;
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(content)));
+    const bytes = await doc.save();
+    return { bytes, resName };
+  }
+
+  it('matches a fragment split across two show ops', async () => {
+    const { bytes } = await makeSplitSource();
+    const doc = await PDFDocument.load(bytes);
+    const res = findDirectRun(doc, 0, { text: 'Hello World', baselineX: 100, baselineY: 700 });
+    assert.equal(res.status, 'ok');
+    assert.equal(res.run.spans.length, 2);
+    assert.equal(res.run.movable, false, 'multi-show runs are editable but not movable');
+    assert.equal(res.run.decodedText, 'Hello World');
+  });
+
+  it('export removes every show op of a split run and draws the replacement as content', async () => {
+    const { bytes } = await makeSplitSource();
+    const out = await exportAnnotatedPdf({
+      srcBytes: bytes,
+      pages: [makePage()],
+      elements: { [NATIVE_ID]: nativeEl({ text: 'Hi There' }) },
+    });
+    const doc = await PDFDocument.load(out);
+    const oldRun = findDirectRun(doc, 0, { text: 'Hello World', baselineX: 100, baselineY: 700 });
+    assert.equal(oldRun.status, 'not-editable', 'both original show ops are gone');
+    const partial = findDirectRun(doc, 0, { text: 'Hello ', baselineX: 100, baselineY: 700 });
+    assert.equal(partial.status, 'not-editable', 'no leftover fragment remains');
+    const newRun = findDirectRun(doc, 0, { text: 'Hi There', baselineX: 100, baselineY: 700 });
+    assert.equal(newRun.status, 'ok', 'replacement is real content');
+    const other = findDirectRun(doc, 0, { text: 'Unrelated line', baselineX: 100, baselineY: 650 });
+    assert.equal(other.status, 'ok', 'neighbouring block untouched');
+    const parsed = await parsePdfediAnnotations(out);
+    assert.equal(parsed.length, 0, 'no annotation pair, no mask');
+  });
+
+  it('does not merge shows with different fonts', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const helv = await doc.embedFont(StandardFonts.Helvetica);
+    const times = await doc.embedFont(StandardFonts.TimesRoman);
+    page.drawText('x', { x: 0, y: 0, size: 10, font: helv });
+    page.drawText('x', { x: 0, y: 0, size: 10, font: times });
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const fonts = doc.context.lookup(resources.get(PDFName.of('Font')));
+    const names = [...fonts.entries()].map(([k]) => k.toString().slice(1));
+    const content =
+      `BT /${names[0]} 14 Tf 1 0 0 1 100 700 Tm (Hello ) Tj /${names[1]} 14 Tf (World) Tj ET`;
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(content)));
+    const reloaded = await PDFDocument.load(await doc.save());
+    const res = findDirectRun(reloaded, 0, { text: 'Hello World', baselineX: 100, baselineY: 700 });
+    assert.equal(res.status, 'not-editable');
+  });
+
+  it('does not merge shows on different baselines', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    page.drawText('x', { x: 0, y: 0, size: 10, font });
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const fonts = doc.context.lookup(resources.get(PDFName.of('Font')));
+    const resName = [...fonts.entries()][0][0].toString().slice(1);
+    const content =
+      `BT /${resName} 14 Tf 1 0 0 1 100 700 Tm (Hello ) Tj 0 -20 Td (World) Tj ET`;
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(content)));
+    const reloaded = await PDFDocument.load(await doc.save());
+    const res = findDirectRun(reloaded, 0, { text: 'Hello World', baselineX: 100, baselineY: 700 });
+    assert.equal(res.status, 'not-editable');
+  });
+
+  it('disambiguates two identical split runs by baseline origin', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    page.drawText('x', { x: 0, y: 0, size: 10, font });
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const fonts = doc.context.lookup(resources.get(PDFName.of('Font')));
+    const resName = [...fonts.entries()][0][0].toString().slice(1);
+    const content =
+      `BT /${resName} 14 Tf 1 0 0 1 100 700 Tm (Hello ) Tj (World) Tj ET\n` +
+      `BT /${resName} 14 Tf 1 0 0 1 100 600 Tm (Hello ) Tj (World) Tj ET`;
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(content)));
+    const reloaded = await PDFDocument.load(await doc.save());
+    const near = findDirectRun(reloaded, 0, { text: 'Hello World', baselineX: 100, baselineY: 600 });
+    assert.equal(near.status, 'ok');
+    assert.equal(Math.round(near.run.originY), 600);
+  });
+});
