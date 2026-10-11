@@ -337,12 +337,13 @@ export const useEditor = create<EditorState>()(
             // as a new document and explain clearly. Never invent objects.
             notice = { kind: 'warning', message: `${restoreError.message} Opened as a new document.` };
           } else if (/-edited\.pdf$/i.test(file.name)) {
-            // Likely a PDFEDI download whose attachments were stripped by
-            // another application.
+            // A PDFEDI download whose edits were written directly into the
+            // document text (no stored objects). Everything visible remains
+            // editable — click any text to edit it.
             notice = {
-              kind: 'warning',
+              kind: 'info',
               message:
-                'This looks like a PDFEDI download, but it contains no editable objects — either every added object was deleted before it was downloaded, or its editing data was removed by another app.',
+                'This PDFEDI download contains no stored editing objects — its text edits were written directly into the document. Click any text to keep editing.',
             };
           } else if (await looksScanned(bytes)) {
             // Heuristic only — no OCR is performed.
