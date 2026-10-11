@@ -330,7 +330,7 @@ export const useEditor = create<EditorState>()(
             notice = {
               kind: 'warning',
               message:
-                'This looks like a PDFEDI download, but its editing data was not found (it may have been removed by another app). Previous additions cannot be restored.',
+                'This looks like a PDFEDI download, but it contains no editable objects — either every added object was deleted before it was downloaded, or its editing data was removed by another app.',
             };
           } else if (await looksScanned(bytes)) {
             // Heuristic only — no OCR is performed.
