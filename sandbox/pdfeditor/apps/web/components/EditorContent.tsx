@@ -58,6 +58,23 @@ export function EditorContent() {
   const setZoom = useEditor((s) => s.setZoom);
   const prevPageCount = useRef(0);
 
+  // Collapsible Pages sidebar. Preference persists across visits.
+  const [pagesOpen, setPagesOpen] = useState<boolean>(() => {
+    try {
+      const v = window.localStorage.getItem('pdfedi.pagesOpen');
+      return v === null ? true : v === '1';
+    } catch {
+      return true;
+    }
+  });
+  useEffect(() => {
+    try {
+      window.localStorage.setItem('pdfedi.pagesOpen', pagesOpen ? '1' : '0');
+    } catch {
+      /* storage unavailable — session-only */
+    }
+  }, [pagesOpen]);
+
   // Debounced autosave: save to IndexedDB 2s after last change.
   // Only saves when there are actual edits (historyLog non-empty) —
   // this prevents a fresh upload from overwriting a recovery snapshot
@@ -186,7 +203,28 @@ export function EditorContent() {
         </div>
       )}
       <div className="flex min-h-0 flex-1">
-        <Thumbnails getDoc={getDoc} docVersion={docVersion} />
+        {pagesOpen ? (
+          <Thumbnails
+            getDoc={getDoc}
+            docVersion={docVersion}
+            onCollapse={() => setPagesOpen(false)}
+          />
+        ) : (
+          <button
+            type="button"
+            onClick={() => setPagesOpen(true)}
+            title="Show pages panel"
+            aria-label="Show pages panel"
+            className="hidden w-9 shrink-0 flex-col items-center border-r border-slate-200 bg-slate-50 pt-2 text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700 sm:flex"
+          >
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+            <span className="mt-1 text-[10px] font-medium tabular-nums">
+              {pages.length}
+            </span>
+          </button>
+        )}
         <main
           ref={mainRef}
           className="thin-scroll min-w-0 flex-1 overflow-y-auto bg-slate-200 px-2 py-4 sm:px-4 sm:py-6"

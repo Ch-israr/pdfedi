@@ -8,7 +8,15 @@ import { renderPageToCanvas } from '@/lib/pdfjs';
  * Left sidebar: page thumbnails with rotate / duplicate / delete actions.
  * Thumbnails render lazily at low scale. Collapses on small screens.
  */
-export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVersion: number }) {
+export function Thumbnails({
+  getDoc,
+  docVersion,
+  onCollapse,
+}: {
+  getDoc: () => never;
+  docVersion: number;
+  onCollapse?: () => void;
+}) {
   const pages = useEditor((s) => s.pages);
   const activePageId = useEditor((s) => s.activePageId);
   const setActivePage = useEditor((s) => s.setActivePage);
@@ -27,9 +35,24 @@ export function Thumbnails({ getDoc, docVersion }: { getDoc: () => never; docVer
         <h2 className="text-xs font-semibold uppercase tracking-wide text-slate-500">
           Pages
         </h2>
-        <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] tabular-nums text-slate-600">
-          {pages.length}
-        </span>
+        <div className="flex items-center gap-1">
+          <span className="rounded-full bg-slate-200 px-2 py-0.5 text-[11px] tabular-nums text-slate-600">
+            {pages.length}
+          </span>
+          {onCollapse && (
+            <button
+              type="button"
+              onClick={onCollapse}
+              title="Hide pages panel"
+              aria-label="Hide pages panel"
+              className="flex h-6 w-6 items-center justify-center rounded-md text-slate-500 transition-colors hover:bg-slate-200 hover:text-slate-700"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                <path d="M15 18l-6-6 6-6" />
+              </svg>
+            </button>
+          )}
+        </div>
       </div>
       <button
         type="button"
