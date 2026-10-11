@@ -141,6 +141,61 @@ describe('direct export', () => {
     assert.equal(parsed.length, 0);
   });
 
+  it('multiline added text is drawn as one block per line', async () => {
+    const src = await makeSource();
+    const TEXT_ID = 'aaaaaaaa-1111-4111-8111-111111111111';
+    const out = await exportAnnotatedPdf({
+      srcBytes: src,
+      pages: [makePage()],
+      elements: {
+        [TEXT_ID]: {
+          id: TEXT_ID,
+          pageId: PAGE_ID,
+          kind: 'text',
+          x: 200,
+          y: 500,
+          text: 'Alpha\nBeta',
+          fontSize: 16,
+          fontFamily: 'Helvetica',
+          color: '#000000',
+          bold: false,
+          italic: false,
+          rotation: 0,
+        },
+      },
+    });
+    const doc = await runsOf(out);
+    const line1 = findDirectRun(doc, 0, { text: 'Alpha', baselineX: 200, baselineY: 500 });
+    assert.equal(line1.status, 'ok', 'first line is its own directly-editable run');
+    const line2 = findDirectRun(doc, 0, { text: 'Beta', baselineX: 200, baselineY: 500 - 16 * 1.25 });
+    assert.equal(line2.status, 'ok', 'second line is its own run one line-step lower');
+  });
+
+  it('T* advances the text position by the text leading', async () => {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const font = await doc.embedFont(StandardFonts.Helvetica);
+    page.drawText('x', { x: 0, y: 0, size: 10, font }); // registers the font resource
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const fonts = doc.context.lookup(resources.get(PDFName.of('Font')));
+    const resName = [...fonts.entries()][0][0].toString().slice(1);
+    const content =
+      `BT /${resName} 14 Tf 24 TL 1 0 0 1 100 700 Tm (One) Tj T* (Two) Tj ET`;
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(content)));
+    // Round-trip through save/load so indirect font objects resolve,
+    // as in real documents.
+    const reloaded = await PDFDocument.load(await doc.save());
+    const { collectTextBlocks } = await import('../dist/index.js');
+    const parsed = collectTextBlocks(reloaded, 0);
+    assert.ok(parsed);
+    assert.equal(parsed.blocks.length, 1);
+    const [s1, s2] = parsed.blocks[0].shows;
+    assert.equal(s1.text, 'One');
+    assert.equal(Math.round(s1.originY), 700);
+    assert.equal(s2.text, 'Two');
+    assert.equal(Math.round(s2.originY), 676, 'T* moved down by the 24pt leading');
+  });
+
   it('added text element is written as content and re-probes as editable', async () => {
     const src = await makeSource();
     const TEXT_ID = 'aaaaaaaa-1111-4111-8111-111111111111';

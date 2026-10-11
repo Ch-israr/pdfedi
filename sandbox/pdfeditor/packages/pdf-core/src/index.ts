@@ -176,14 +176,22 @@ export async function drawElement(
       // Do not fail the entire export for one element.
       try {
         const font = await getFont(ctx, el.fontFamily, el.bold, el.italic);
-        page.drawText(el.text, {
-          x: el.x,
-          y: el.y,
-          size: el.fontSize,
-          font,
-          color: hexToRgb(el.color),
-          rotate: degrees(el.rotation),
-        });
+        // Draw each line as its own text block (pdf-lib collapses embedded
+        // newlines into one block, which would also defeat the direct-edit
+        // matcher on re-upload). Line step matches the annotation renderer.
+        const lineHeight = el.fontSize * 1.25;
+        const lines = el.text.split('\n');
+        for (let i = 0; i < lines.length; i++) {
+          if (!lines[i]) continue; // blank line: no operators needed
+          page.drawText(lines[i], {
+            x: el.x,
+            y: el.y - i * lineHeight,
+            size: el.fontSize,
+            font,
+            color: hexToRgb(el.color),
+            rotate: degrees(el.rotation),
+          });
+        }
         // Add hyperlink annotation if link is present
         if (el.link) {
           const textWidth = font.widthOfTextAtSize(el.text, el.fontSize);

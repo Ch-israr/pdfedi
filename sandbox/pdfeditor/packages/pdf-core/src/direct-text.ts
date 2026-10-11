@@ -366,6 +366,7 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
   let fontSize = 0;
   let tm = [1, 0, 0, 1, 0, 0];
   let tlm = [1, 0, 0, 1, 0, 0];
+  let leading = 0; // TL operator
   let color = '#000000';
   let stack: Token[] = [];
 
@@ -409,6 +410,7 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
       block = { start: tok.start, end: tok.end, shows: [], fontSetInBlock: false, tmCount: 0, tdCount: 0, tmSpanAbs: null, tmRotationZero: false };
       tm = [1, 0, 0, 1, 0, 0];
       tlm = [1, 0, 0, 1, 0, 0];
+      leading = 0;
       stack = [];
       continue;
     }
@@ -455,6 +457,19 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
           tm = [...tlm];
           block.tdCount++;
         }
+        break;
+      }
+      case 'TL': {
+        const v = nums(1);
+        if (Number.isFinite(v[0])) leading = v[0];
+        break;
+      }
+      case 'T*': {
+        // Move to the start of the next line: Td(0, -leading)
+        const [a, b, c, d, e, f] = tlm;
+        tlm = [a, b, c, d, -leading * c + e, -leading * d + f];
+        tm = [...tlm];
+        block.tdCount++;
         break;
       }
       case 'rg': {
@@ -510,7 +525,6 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
         break;
       }
       default:
-        if (op === 'T*') block.tdCount++; // line break via leading — treat as relative move
         break;
     }
     stack = [];

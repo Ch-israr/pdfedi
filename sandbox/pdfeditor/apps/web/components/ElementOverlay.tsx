@@ -29,6 +29,7 @@ import { FloatingImageToolbar } from './FloatingImageToolbar';
 import { ResizeHandles } from './ResizeHandles';
 import { LineEndpoints } from './LineEndpoints';
 import { probeDirectEdit } from '@/lib/direct-probe';
+import { computeEditorSize } from '@/lib/text-editor-size';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -364,6 +365,8 @@ function ElementView({
             fontStyle: el.italic ? 'italic' : 'normal',
             whiteSpace: 'pre-wrap',
             minWidth: 20,
+            // Match the line step used when drawing text into the PDF.
+            lineHeight: 1.25,
             ...(wasBaked ? { backgroundColor: 'white', padding: '2px 4px' } : {}),
           }}
         >
@@ -1251,21 +1254,50 @@ export function ElementOverlay({ page }: { page: Page }) {
       {/* Drag-to-draw preview for lines/arrows */}
       {drawing && <DrawingPreview drawing={drawing} page={page} zoom={zoom} />}
       {/* Inline text editor — new text or editing existing */}
-      {editingText && (
-        <InlineTextEditor
-          screenX={editingText.screenX}
-          screenY={editingText.screenY}
-          screenW={editingText.mode === 'native' ? editingText.screenW : undefined}
-          screenH={editingText.mode === 'native' ? editingText.screenH : undefined}
-          fontSize={editingText.mode === 'native' ? editingText.fontSize : undefined}
-          zoom={zoom}
-          initialText={
-            editingText.mode === 'new' ? '' : editingText.initialText
+      {editingText &&
+        (() => {
+          // Non-native modes: auto-sizing font + page-boundary props.
+          let editorFont: { fontSize: number; fontFamily: string; bold: boolean; italic: boolean } | undefined;
+          let maxWidth: number | undefined;
+          if (editingText.mode === 'new') {
+            editorFont = {
+              fontSize: pendingFormat.fontSize,
+              fontFamily: pendingFormat.fontFamily,
+              bold: pendingFormat.bold,
+              italic: pendingFormat.italic,
+            };
+            maxWidth = Math.max(80, (page.width - editingText.x) * zoom);
+          } else if (editingText.mode === 'edit') {
+            const el = els.find((e) => e.id === editingText.id);
+            if (el && (el.kind === 'text' || el.kind === 'native-text')) {
+              editorFont = {
+                fontSize: el.fontSize,
+                fontFamily: el.fontFamily,
+                bold: el.bold,
+                italic: el.italic,
+              };
+              maxWidth = Math.max(80, (page.width - el.x) * zoom);
+            }
           }
-          onCommit={commitText}
-          onCancel={() => setEditingText(null)}
-        />
-      )}
+          return (
+            <InlineTextEditor
+              screenX={editingText.screenX}
+              screenY={editingText.screenY}
+              screenW={editingText.mode === 'native' ? editingText.screenW : undefined}
+              screenH={editingText.mode === 'native' ? editingText.screenH : undefined}
+              fontSize={editingText.mode === 'native' ? editingText.fontSize : undefined}
+              zoom={zoom}
+              initialText={
+                editingText.mode === 'new' ? '' : editingText.initialText
+              }
+              onCommit={commitText}
+              onCancel={() => setEditingText(null)}
+              maxWidth={maxWidth}
+              editorFont={editorFont}
+              placeholder="Type your text"
+            />
+          );
+        })()}
       {/* Floating toolbar for selected text (shown during selection AND editing) */}
       {(() => {
         // During new-text mode: show toolbar with pending formatting
@@ -1572,6 +1604,9 @@ function InlineTextEditor({
   initialText,
   onCommit,
   onCancel,
+  maxWidth,
+  editorFont,
+  placeholder,
 }: {
   screenX: number;
   screenY: number;
@@ -1583,6 +1618,11 @@ function InlineTextEditor({
   initialText: string;
   onCommit: (text: string) => void;
   onCancel: () => void;
+  /** New/edit modes only: page boundary in screen px — the box auto-expands up to this width. */
+  maxWidth?: number;
+  /** New/edit modes only: font spec (PDF points) used for measuring the auto-sized box. */
+  editorFont?: { fontSize: number; fontFamily: string; bold: boolean; italic: boolean };
+  placeholder?: string;
 }) {
   const [value, setValue] = useState(initialText);
   const ref = useRef<HTMLTextAreaElement>(null);
@@ -1610,6 +1650,21 @@ function InlineTextEditor({
   // background so the user edits "in place" — no duplicate text visible.
   const isNative = screenW !== undefined && screenH !== undefined;
 
+  // New/edit modes: the box auto-expands horizontally to fit the typed
+  // text (clamped to the page boundary) and grows vertically per line.
+  // Native mode keeps its exact fragment cover — never auto-sized.
+  const autoSize =
+    !isNative && editorFont && maxWidth !== undefined
+      ? computeEditorSize({
+          value,
+          placeholder: placeholder ?? 'Type your text',
+          font: editorFont,
+          zoom,
+          maxWidthPx: maxWidth,
+          measure: measureTextWidth,
+        })
+      : null;
+
   return (
     <textarea
       ref={ref}
@@ -1627,21 +1682,24 @@ function InlineTextEditor({
           cancelOnce();
         }
       }}
-      placeholder="Type text… (Enter to place, Esc to cancel)"
+      placeholder={placeholder ?? 'Type your text'}
       aria-label="Text content"
       className={`absolute z-20 rounded border-2 border-brand-500 shadow-lg focus:outline-none ${
-        isNative ? 'bg-white p-0' : 'min-h-[32px] min-w-[120px] bg-white/95 p-1'
+        isNative ? 'bg-white p-0' : 'bg-white/95 p-1'
       }`}
       style={{
         left: screenX,
         top: isNative ? screenY : screenY - 14 * zoom,
-        width: isNative ? screenW : undefined,
-        height: isNative ? screenH : undefined,
-        fontSize: (fontSize ?? 14) * zoom,
-        fontFamily: 'Helvetica, sans-serif',
-        lineHeight: isNative ? `${screenH}px` : undefined,
+        width: isNative ? screenW : autoSize?.widthPx,
+        height: isNative ? screenH : autoSize?.heightPx,
+        fontSize: (fontSize ?? editorFont?.fontSize ?? 14) * zoom,
+        fontFamily: editorFont?.fontFamily ?? 'Helvetica, sans-serif',
+        fontWeight: editorFont?.bold ? 'bold' : 'normal',
+        fontStyle: editorFont?.italic ? 'italic' : 'normal',
+        lineHeight: isNative ? `${screenH}px` : autoSize ? `${autoSize.lineHeightPx}px` : undefined,
         resize: 'none',
         overflow: 'hidden',
+        whiteSpace: 'pre',
       }}
     />
   );
