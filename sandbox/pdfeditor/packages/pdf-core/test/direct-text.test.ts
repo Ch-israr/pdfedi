@@ -274,7 +274,7 @@ describe('multi-show run matching (text split across operations)', () => {
     assert.equal(parsed.length, 0, 'no annotation pair, no mask');
   });
 
-  it('does not merge shows with different fonts', async () => {
+  it('merges shows with different fonts when size/colour/baseline match', async () => {
     const doc = await PDFDocument.create();
     const page = doc.addPage([612, 792]);
     const helv = await doc.embedFont(StandardFonts.Helvetica);
@@ -289,7 +289,8 @@ describe('multi-show run matching (text split across operations)', () => {
     page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(content)));
     const reloaded = await PDFDocument.load(await doc.save());
     const res = findDirectRun(reloaded, 0, { text: 'Hello World', baselineX: 100, baselineY: 700 });
-    assert.equal(res.status, 'not-editable');
+    assert.equal(res.status, 'ok', 'font substitution splits no longer block editing');
+    assert.equal(res.run.spans.length, 2);
   });
 
   it('does not merge shows on different baselines', async () => {
@@ -324,5 +325,78 @@ describe('multi-show run matching (text split across operations)', () => {
     const near = findDirectRun(reloaded, 0, { text: 'Hello World', baselineX: 100, baselineY: 600 });
     assert.equal(near.status, 'ok');
     assert.equal(Math.round(near.run.originY), 600);
+  });
+});
+
+describe('match-guard refinements (trailing whitespace, mixed fonts)', () => {
+  async function makeCustomSource(content: string): Promise<Uint8Array> {
+    const doc = await PDFDocument.create();
+    const page = doc.addPage([612, 792]);
+    const helv = await doc.embedFont(StandardFonts.Helvetica);
+    const times = await doc.embedFont(StandardFonts.TimesRoman);
+    page.drawText('x', { x: 0, y: 0, size: 10, font: helv });
+    page.drawText('x', { x: 0, y: 0, size: 10, font: times });
+    const resources = doc.context.lookup(page.node.get(PDFName.of('Resources')));
+    const fonts = doc.context.lookup(resources.get(PDFName.of('Font')));
+    const names = [...fonts.entries()].map(([k]) => k.toString().slice(1));
+    const filled = content.replaceAll('$F1', names[0]).replaceAll('$F2', names[1]);
+    page.node.set(PDFName.of('Contents'), doc.context.register(doc.context.flateStream(filled)));
+    return doc.save();
+  }
+
+  it('matches when the stream has a trailing space PDF.js does not report', async () => {
+    const bytes = await makeCustomSource(
+      `BT /$F1 14 Tf 1 0 0 1 100 700 Tm (Isra muammed ) Tj ET`,
+    );
+    const doc = await PDFDocument.load(bytes);
+    // PDF.js reports "Isra muammed" (no trailing space) — the old
+    // exact-equality match refused this.
+    const res = findDirectRun(doc, 0, { text: 'Isra muammed', baselineX: 100, baselineY: 700 });
+    assert.equal(res.status, 'ok');
+  });
+
+  it('merges shows that differ only by font resource (glyph-substitution split)', async () => {
+    const bytes = await makeCustomSource(
+      `BT /$F1 18 Tf 1 0 0 1 100 700 Tm (Globe Link Int) Tj /$F2 18 Tf (\x92) Tj /$F1 18 Tf (l) Tj ET`,
+    );
+    const doc = await PDFDocument.load(bytes);
+    const res = findDirectRun(doc, 0, { text: 'Globe Link Int\u2019l', baselineX: 100, baselineY: 700 });
+    assert.equal(res.status, 'ok');
+    assert.equal(res.run.spans.length, 3, 'all three show ops claimed');
+    assert.equal(res.run.movable, false);
+  });
+
+  it('export removes every show op of a mixed-font run', async () => {
+    const bytes = await makeCustomSource(
+      `BT /$F1 18 Tf 1 0 0 1 100 700 Tm (Globe Link Int) Tj /$F2 18 Tf (\x92) Tj /$F1 18 Tf (l) Tj ET`,
+    );
+    const out = await exportAnnotatedPdf({
+      srcBytes: bytes,
+      pages: [makePage()],
+      elements: {
+        [NATIVE_ID]: nativeEl({
+          originalText: 'Globe Link Int\u2019l',
+          text: 'Globe Link Edited',
+          x: 100,
+          y: 700 - BASELINE_OFFSET,
+          originX: 100,
+          originY: 700 - BASELINE_OFFSET,
+        }),
+      },
+    });
+    const doc = await PDFDocument.load(out);
+    const leftover = findDirectRun(doc, 0, { text: 'Globe Link Int\u2019l', baselineX: 100, baselineY: 700 });
+    assert.equal(leftover.status, 'not-editable', 'all original show ops gone');
+    const fresh = findDirectRun(doc, 0, { text: 'Globe Link Edited', baselineX: 100, baselineY: 700 });
+    assert.equal(fresh.status, 'ok', 'replacement is real content');
+  });
+
+  it('still refuses when sizes differ across the split', async () => {
+    const bytes = await makeCustomSource(
+      `BT /$F1 18 Tf 1 0 0 1 100 700 Tm (Hello ) Tj /$F1 24 Tf (World) Tj ET`,
+    );
+    const doc = await PDFDocument.load(bytes);
+    const res = findDirectRun(doc, 0, { text: 'Hello World', baselineX: 100, baselineY: 700 });
+    assert.equal(res.status, 'not-editable', 'size guard still enforced');
   });
 });

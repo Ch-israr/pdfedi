@@ -585,6 +585,15 @@ function blockToRun(content: string, block: BlockInfo): TextRun {
 const UNDECODABLE = '\u0001UNDECODABLE\u0001';
 
 /**
+ * Trailing whitespace is rendering-insignificant (producers and PDF.js
+ * disagree on it, e.g. stream "Name " vs extracted "Name"), so
+ * comparisons ignore it. Leading/internal whitespace stays exact.
+ */
+function normTail(t: string): string {
+  return t.replace(/[\t\n\f\r ]+$/, '');
+}
+
+/**
  * Build a TextRun from a window of consecutive show operations whose
  * concatenated text equals the fragment. Multi-show runs are editable
  * but never movable: only the show operations themselves are removed
@@ -614,15 +623,20 @@ function multiShowToRun(content: string, shows: ShowInfo[]): TextRun {
 /**
  * Match a fragment against consecutive show operations. Guards (all must
  * hold for every show in the window):
- *   - decodable text, identical font resource, size and colour,
+ *   - decodable text, identical size and colour (font resource may
+ *     differ: producers substitute fonts for single glyphs — removal
+ *     is span-exact per show op, and the replacement is drawn in the
+ *     element's mapped font anyway),
  *   - baseline Y within 1pt of the window's first show (a Y-moving
  *     positioning op between shows breaks the window),
  *   - X positions monotonically non-decreasing in stream order,
- *   - concatenated text exactly equals the fragment text.
+ *   - concatenated text equals the fragment text modulo trailing
+ *     whitespace.
  * Returns the matching windows (in stream order); the caller requires
  * exactly one whose first show sits at the expected baseline origin.
  */
 function findMultiShowWindows(blocks: BlockInfo[], text: string): ShowInfo[][] {
+  const normText = normTail(text);
   const flat: ShowInfo[] = [];
   for (const b of blocks) for (const sh of b.shows) flat.push(sh);
   const windows: ShowInfo[][] = [];
@@ -631,13 +645,12 @@ function findMultiShowWindows(blocks: BlockInfo[], text: string): ShowInfo[][] {
     if (first.text === UNDECODABLE || first.text === '') continue;
     const win: ShowInfo[] = [first];
     let concat = first.text;
-    if (concat === text) windows.push([...win]);
+    if (normTail(concat) === normText) windows.push([...win]);
     for (let j = i + 1; j < flat.length; j++) {
       const sh = flat[j];
       if (sh.text === UNDECODABLE || sh.text === '') break;
       const prev = win[win.length - 1];
       if (
-        sh.fontResource !== first.fontResource ||
         sh.fontSize !== first.fontSize ||
         sh.colorHex !== first.colorHex ||
         Math.abs(sh.originY - first.originY) > 1 ||
@@ -647,8 +660,14 @@ function findMultiShowWindows(blocks: BlockInfo[], text: string): ShowInfo[][] {
       }
       win.push(sh);
       concat += sh.text;
-      if (concat === text) windows.push([...win]);
-      if (concat.length >= text.length) break;
+      if (normTail(concat) === normText) {
+        // Take the shortest match: extending a matched window can only
+        // add trailing-whitespace shows, which normTail would match again
+        // as a phantom second window (false ambiguity).
+        windows.push([...win]);
+        break;
+      }
+      if (concat.length >= normText.length) break;
     }
   }
   return windows;
@@ -666,7 +685,8 @@ export function findDirectRun(doc: PDFDocument, pageIndex: number, query: Direct
   if (!parsed) return { status: 'not-editable', reason: 'The page content could not be read.' };
   const tol = query.tolerance ?? 3;
   const { content, blocks } = parsed;
-  const textMatches = blocks.filter((b) => b.shows.some((s) => s.text === query.text));
+  const normQuery = normTail(query.text);
+  const textMatches = blocks.filter((b) => b.shows.some((s) => normTail(s.text) === normQuery));
   const candidates = textMatches.filter((b) => {
     if (b.shows.length !== 1 || !b.fontSetInBlock) return false;
     const s = b.shows[0];
