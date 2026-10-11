@@ -99,6 +99,14 @@ export async function bindAnnotationElements(
     const page = pages[item.pageIndex];
     if (!page) continue;
     const el = { ...item.element, pageId: page.id } as EditorElement;
+    if (el.kind === 'native-text') {
+      // Pin the original fragment position: the parsed box (x/y) is the
+      // original location before any move in this session, so export's
+      // direct-edit matching can still find the original run and convert
+      // this restored edit to a direct rewrite.
+      el.originX = el.x;
+      el.originY = el.y;
+    }
     if (el.kind === 'image' || el.kind === 'signature') {
       if (!item.image) continue;
       const src = await imageDataToSrc(item.image);

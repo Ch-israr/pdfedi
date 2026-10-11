@@ -48,6 +48,7 @@ import {
 } from 'pdf-lib';
 import type { EditorElement, Page } from '@pdfeditor/shared';
 import { createDrawContext, drawElement, type DrawContext } from './index.js';
+import { findDirectRun, rewritePageContent, moveRunRaw, type TextRun } from './direct-text.js';
 
 export const PDFEDI_NM_PREFIX = 'pdfedi-';
 
@@ -280,7 +281,38 @@ async function addTextAnnotation(
   }
 }
 
- async function addNativeTextAnnotations(
+/** Link-only annotation for content-drawn text (the text itself is real
+ *  page content now; only the hyperlink target needs an annotation). */
+async function addTextLinkAnnotation(
+  out: PDFDocument,
+  page: PDFPage,
+  el: Extract<EditorElement, { kind: 'text' }>,
+  fontCache: Map<string, PDFFont>,
+): Promise<void> {
+  if (!el.link) return;
+  const font = await measureFont(out, fontCache, el.fontFamily, el.bold, el.italic);
+  const lines = el.text.split('\n');
+  let width = 0;
+  for (const line of lines) {
+    try {
+      width = Math.max(width, font.widthOfTextAtSize(line, el.fontSize));
+    } catch {
+      width = Math.max(width, line.length * el.fontSize * 0.55);
+    }
+  }
+  const box = textBoxFor(el.x, el.y, lines.length, width, el.fontSize);
+  const linkAnnot = out.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [box.x0, box.y0, box.x1, box.y1],
+    Border: [0, 0, 0],
+    NM: PDFString.of(`${PDFEDI_NM_PREFIX}link-${el.id}`),
+    A: { Type: PDFName.of('Action'), S: PDFName.of('URI'), URI: PDFString.of(el.link) },
+  });
+  pushAnnot(page, out.context.register(linkAnnot));
+}
+
+async function addNativeTextAnnotations(
   out: PDFDocument,
   ctx: DrawContext,
   page: PDFPage,
@@ -473,6 +505,65 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
   // export/re-upload cycle. Removing them here (the loaded source is a
   // scratch copy) keeps cycles size-stable. Foreign annotations stay.
   for (const srcPage of src.getPages()) stripPdfediAnnots(srcPage);
+
+  // DIRECT TEXT EDITING (no masks): for each native-text element, try to
+  // match its original run in the source page's content stream. A match
+  // means the original operators are REMOVED here, before copying:
+  //   - text emptied        → pure deletion, nothing replaces it
+  //   - text unchanged      → the original block is re-emitted verbatim
+  //                           at the element's current position (a true
+  //                           move: same font, same encoded bytes)
+  //   - text changed        → the replacement is drawn into the copied
+  //                           page's content by the page loop below
+  // Elements whose run cannot be matched exactly (only reachable for
+  // legacy/restored edits — the editor probes before creating new ones)
+  // keep the annotation-pair fallback so their edit is never lost.
+  const directHandled = new Set<string>();
+  const directDraw = new Set<string>(); // handled directly, replacement drawn post-copy
+  {
+    const rewrites = new Map<number, { removals: TextRun[]; appends: string[] }>();
+    const claimed = new Map<number, Set<number>>();
+    input.pages.forEach((page, modelIdx) => {
+      if (page.sourceIndex === 0) return;
+      const srcIdx = page.sourceIndex - 1;
+      const els = Object.values(input.elements).filter(
+        (e) => e.pageId === page.id && e.kind === 'native-text',
+      );
+      for (const el of els) {
+        if (el.kind !== 'native-text') continue;
+        const anyEl = el as unknown as { baked?: boolean; bakedBounds?: unknown; deleted?: boolean };
+        if (anyEl.deleted || anyEl.baked || anyEl.bakedBounds) continue; // legacy paths unchanged
+        const originX = el.originX ?? el.x;
+        const originY = el.originY ?? el.y;
+        const res = findDirectRun(src, srcIdx, {
+          text: el.originalText,
+          baselineX: originX,
+          baselineY: originY + el.baselineOffset,
+        });
+        if (res.status !== 'ok') continue;
+        const pageClaimed = claimed.get(srcIdx) ?? new Set<number>();
+        if (pageClaimed.has(res.run.start)) continue; // two elements, one run — first wins
+        pageClaimed.add(res.run.start);
+        claimed.set(srcIdx, pageClaimed);
+        const acc = rewrites.get(srcIdx) ?? { removals: [], appends: [] };
+        acc.removals.push(res.run);
+        if (el.text && el.text === el.originalText) {
+          const movedRaw = moveRunRaw(res.run, el.x, el.y + el.baselineOffset);
+          if (movedRaw) acc.appends.push(movedRaw);
+          else directDraw.add(el.id); // matched but not movable verbatim — redraw
+        } else if (el.text) {
+          directDraw.add(el.id);
+        }
+        directHandled.add(el.id);
+        rewrites.set(srcIdx, acc);
+      }
+      void modelIdx;
+    });
+    for (const [srcIdx, acc] of rewrites) {
+      rewritePageContent(src, srcIdx, acc.removals, acc.appends.join('\n'));
+    }
+  }
+
   const out = await PDFDocument.create();
   const ctx = createDrawContext(out);
   const fontCache = new Map<string, PDFFont>();
@@ -526,9 +617,38 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
       }
       switch (el.kind) {
         case 'text':
-          await addTextAnnotation(out, ctx, pdfPage, el, fontCache);
+          // Added text is real page content (drawn into the content
+          // stream), so after re-upload it is ordinary document text —
+          // selectable, directly editable and movable like any other
+          // run. Only an optional hyperlink remains an annotation.
+          await drawElement(ctx, pdfPage, el);
+          if (el.link) await addTextLinkAnnotation(out, pdfPage, el, fontCache);
           break;
         case 'native-text':
+          if (directHandled.has(el.id)) {
+            // Original run already removed from the content stream in
+            // the planning pass. Draw the replacement into the content
+            // only when it changed (unchanged text was re-emitted
+            // verbatim; emptied text is a pure deletion).
+            if (directDraw.has(el.id)) {
+              const asText = {
+                id: el.id,
+                pageId: el.pageId,
+                kind: 'text',
+                x: el.x,
+                y: el.y + el.baselineOffset,
+                text: el.text,
+                fontSize: el.fontSize,
+                fontFamily: el.fontFamily,
+                color: el.color,
+                bold: el.bold,
+                italic: el.italic,
+                rotation: el.rotation,
+              } as EditorElement;
+              await drawElement(ctx, pdfPage, asText);
+            }
+            break;
+          }
           await addNativeTextAnnotations(out, ctx, pdfPage, el);
           break;
         case 'highlight':

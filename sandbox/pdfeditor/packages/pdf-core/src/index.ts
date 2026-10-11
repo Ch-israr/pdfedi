@@ -45,6 +45,17 @@ export {
   type ParsedImageData,
 } from './annotations.js';
 
+export {
+  collectTextBlocks,
+  findDirectRun,
+  moveRunRaw,
+  probeDirectTextEdit,
+  rewritePageContent,
+  type DirectRunQuery,
+  type DirectRunResult,
+  type TextRun,
+} from './direct-text.js';
+
 // ---------------------------------------------------------------------------
 // Page operations (pure — return new arrays, never mutate)
 // ---------------------------------------------------------------------------

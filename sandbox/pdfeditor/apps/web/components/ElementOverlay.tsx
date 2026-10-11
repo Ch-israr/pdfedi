@@ -28,6 +28,7 @@ import { FloatingShapeToolbar } from './FloatingShapeToolbar';
 import { FloatingImageToolbar } from './FloatingImageToolbar';
 import { ResizeHandles } from './ResizeHandles';
 import { LineEndpoints } from './LineEndpoints';
+import { probeDirectEdit } from '@/lib/direct-probe';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -370,36 +371,63 @@ function ElementView({
         </div>
       );
     }
-    case 'native-text':
+    case 'native-text': {
+      // If the element was moved, the editor canvas still shows the
+      // ORIGINAL run at its original position (the canvas renders the
+      // unmodified document). On export the original run is REMOVED, so
+      // the in-editor preview pins a plain white cover at the origin to
+      // match exactly what the downloaded file will show — original
+      // covered where it was, text where it is now. This is a preview
+      // device only: the exported file contains no mask.
+      const ox = el.originX ?? el.x;
+      const oy = el.originY ?? el.y;
+      const moved = Math.abs(ox - el.x) > 0.5 || Math.abs(oy - el.y) > 0.5;
       return (
-        <div
-          {...common}
-          style={{
-            ...style,
-            // Positioned by cover-box TOP-left: override the baseline-based top.
-            // (The shared `style` uses el.y as a baseline; native-text stores
-            // the cover-box bottom, so shift up by the box height.)
-            top: pdfYToScreenTop(el.y + el.height, page, zoom),
-            transform: `rotate(${-el.rotation}deg)`,
-            width: toScreen(el.width, zoom),
-            height: toScreen(el.height, zoom),
-            background: '#ffffff',
-            fontSize: toScreen(el.fontSize, zoom),
-            fontFamily: el.fontFamily,
-            color: el.color,
-            fontWeight: el.bold ? 'bold' : 'normal',
-            fontStyle: el.italic ? 'italic' : 'normal',
-            whiteSpace: 'pre-wrap',
-            overflow: 'visible',
-            // Align text to the original baseline within the cover box
-            paddingBottom: toScreen(el.baselineOffset, zoom),
-            display: 'flex',
-            alignItems: 'flex-end',
-          }}
-        >
-          {el.text}
-        </div>
+        <>
+          {moved ? (
+            <div
+              aria-hidden
+              style={{
+                position: 'absolute',
+                left: toScreen(ox, zoom),
+                top: pdfYToScreenTop(oy + el.height, page, zoom),
+                width: toScreen(el.width, zoom),
+                height: toScreen(el.height, zoom),
+                background: '#ffffff',
+                pointerEvents: 'none',
+              }}
+            />
+          ) : null}
+          <div
+            {...common}
+            style={{
+              ...style,
+              // Positioned by cover-box TOP-left: override the baseline-based top.
+              // (The shared `style` uses el.y as a baseline; native-text stores
+              // the cover-box bottom, so shift up by the box height.)
+              top: pdfYToScreenTop(el.y + el.height, page, zoom),
+              transform: `rotate(${-el.rotation}deg)`,
+              width: toScreen(el.width, zoom),
+              height: toScreen(el.height, zoom),
+              background: '#ffffff',
+              fontSize: toScreen(el.fontSize, zoom),
+              fontFamily: el.fontFamily,
+              color: el.color,
+              fontWeight: el.bold ? 'bold' : 'normal',
+              fontStyle: el.italic ? 'italic' : 'normal',
+              whiteSpace: 'pre-wrap',
+              overflow: 'visible',
+              // Align text to the original baseline within the cover box
+              paddingBottom: toScreen(el.baselineOffset, zoom),
+              display: 'flex',
+              alignItems: 'flex-end',
+            }}
+          >
+            {el.text}
+          </div>
+        </>
       );
+    }
     case 'highlight':
       return (
         <div
@@ -609,6 +637,8 @@ export function ElementOverlay({ page }: { page: Page }) {
         screenH?: number;
         fontSize?: number;
         initialText: string;
+        /** Fill colour captured from the fragment's content-stream run */
+        probeColor?: string;
       }
     | null
   >(null);
@@ -653,8 +683,11 @@ export function ElementOverlay({ page }: { page: Page }) {
         return;
       }
       if (et.mode === 'native') {
-        // Editing native PDF text: create (or update) a native-text element
-        // that covers the original with an opaque rect on export.
+        // Editing native PDF text: create (or update) a native-text
+        // element whose ORIGINAL run is rewritten directly in the
+        // content stream on export — no mask, no duplicate layer. The
+        // probe that admitted this fragment already matched its run;
+        // export re-verifies the match and draws nothing extra.
         if (!text.trim()) {
           // Emptied → remove the edit if one existed (original shows again)
           if (et.existingId) useEditor.getState().deleteElement(et.existingId);
@@ -686,9 +719,16 @@ export function ElementOverlay({ page }: { page: Page }) {
               baselineOffset: item.baselineOffset,
               fontSize: item.fontSize,
               fontFamily: item.fontFamily,
-              color: '#000000',
+              // Preserve the original run's colour (captured by the probe);
+              // previously this was always black.
+              color: et.probeColor ?? '#000000',
               bold: item.bold,
               italic: item.italic,
+              // Pin the original fragment position: the element's x/y may
+              // be moved afterwards; export matches the ORIGINAL run
+              // against this anchor, so moving never resurrects the text.
+              originX: item.x,
+              originY: item.y,
             },
             label,
           );
@@ -863,7 +903,7 @@ export function ElementOverlay({ page }: { page: Page }) {
     return true;
   };
 
-  const onPageClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const onPageClick = async (e: React.MouseEvent<HTMLDivElement>) => {
     // If clicking on an existing element: with the Text tool, clicking a
     // native-text element opens it for editing (pre-filled). For other tools
     // or element kinds, let the element's own handlers deal with it.
@@ -918,6 +958,20 @@ export function ElementOverlay({ page }: { page: Page }) {
             openElementEditor(covering);
             return;
           }
+          // DIRECT-EDIT PROBE: the fragment must match a single,
+          // self-contained text run in the content stream so the original
+          // can be rewritten directly on export. When it cannot, the
+          // editor says so instead of silently masking it — the user
+          // requirement forbids the mask fallback for new edits.
+          const st = useEditor.getState();
+          const probe = await probeDirectEdit(st.pdfBytes, page.sourceIndex - 1, hit);
+          if (!probe.editable) {
+            st.showNotice({
+              kind: 'warning',
+              message: `This text can't be edited directly (${probe.reason ?? 'the run could not be matched safely'}). You can still add new text on top of it instead.`,
+            });
+            return;
+          }
           // Position the editor exactly over the fragment bounds (not the
           // click point) so the opaque textarea covers the original text —
           // no duplicate visual. Convert fragment PDF bounds to screen px.
@@ -935,6 +989,7 @@ export function ElementOverlay({ page }: { page: Page }) {
             screenH: fragHeight,
             fontSize: hit.fontSize,
             initialText: hit.text,
+            probeColor: probe.colorHex,
           });
           return;
         }

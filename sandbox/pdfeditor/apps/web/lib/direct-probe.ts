@@ -1,0 +1,46 @@
+/**
+ * Probe whether a native text fragment can be edited DIRECTLY in the
+ * page's content stream (original run removed, replacement written as
+ * real text — no mask). Wraps pdf-core's probeDirectTextEdit with a
+ * per-fragment result cache so repeated clicks are instant.
+ */
+import { probeDirectTextEdit } from '@pdfeditor/pdf-core';
+import type { NativeTextItem } from '@pdfeditor/shared';
+
+export interface DirectProbeResult {
+  editable: boolean;
+  colorHex?: string;
+  reason?: string;
+}
+
+const cache = new Map<string, Promise<DirectProbeResult>>();
+
+/** Forget cached probe results (call when a new document is loaded). */
+export function clearDirectProbeCache(): void {
+  cache.clear();
+}
+
+/**
+ * @param pdfBytes the uploaded document bytes
+ * @param pageIndex 0-based page index in the SOURCE document (sourceIndex - 1)
+ */
+export function probeDirectEdit(
+  pdfBytes: Uint8Array | null,
+  pageIndex: number,
+  item: Pick<NativeTextItem, 'id' | 'text' | 'x' | 'y' | 'baselineOffset'>,
+): Promise<DirectProbeResult> {
+  if (!pdfBytes || pageIndex < 0) {
+    return Promise.resolve({ editable: false, reason: 'The document could not be inspected.' });
+  }
+  const key = `${pageIndex}:${item.id}:${Math.round(item.x * 10)},${Math.round(item.y * 10)}`;
+  const hit = cache.get(key);
+  if (hit) return hit;
+  const baselineX = item.x;
+  const baselineY = item.y + item.baselineOffset;
+  const p = probeDirectTextEdit(pdfBytes, pageIndex, { text: item.text, baselineX, baselineY }).then(
+    (r) => ({ editable: r.editable, colorHex: r.colorHex, reason: r.reason }),
+    () => ({ editable: false, reason: 'The document could not be inspected for direct editing.' }),
+  );
+  cache.set(key, p);
+  return p;
+}

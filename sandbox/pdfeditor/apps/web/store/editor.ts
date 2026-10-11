@@ -24,6 +24,7 @@ import type {
   Page,
 } from '@pdfeditor/shared';
 import { loadPdfDocument } from '@/lib/pdfjs';
+import { probeDirectEdit } from '@/lib/direct-probe';
 
 export type ToolId =
   | 'select'
@@ -105,6 +106,8 @@ interface EditorState {
   recoverDocument: () => Promise<boolean>;
   /** Dismiss the informational banner */
   dismissNotice: () => void;
+  /** Show a dismissible banner (e.g. a direct-editing limitation). */
+  showNotice: (notice: { kind: 'info' | 'success' | 'warning'; message: string }) => void;
   /** Store extracted native text items for a page */
   setNativeText: (pageId: string, items: NativeTextItem[]) => void;
   /** Mark the one-time native-edit warning as shown */
@@ -130,7 +133,13 @@ interface EditorState {
    * Creates a native-text element or updates the existing one.
    * Returns the element ID, or null if the replacement was not safe.
    */
-  replaceTextMatch: (pageId: string, item: NativeTextItem, query: string, replacement: string, caseSensitive: boolean) => string | null;
+  replaceTextMatch: (
+    pageId: string,
+    item: NativeTextItem,
+    query: string,
+    replacement: string,
+    caseSensitive: boolean,
+  ) => Promise<string | null | 'skipped'>;
 }
 
 // Module-level lock for download deduplication. Synchronous (not via Zustand)
@@ -208,6 +217,9 @@ export const useEditor = create<EditorState>()(
           throw new Error('File exceeds the 50 MB limit.');
         }
         const bytes = new Uint8Array(await file.arrayBuffer());
+        // New document → forget any direct-edit probe results for the old one.
+        const { clearDirectProbeCache } = await import('@/lib/direct-probe');
+        clearDirectProbeCache();
 
         // Restore order:
         // 1) PDF-native annotations (current format): edits live in the
@@ -819,6 +831,7 @@ export const useEditor = create<EditorState>()(
     },
 
     dismissNotice: () => set((s) => { s.notice = null; }),
+    showNotice: (notice) => set((s) => { s.notice = notice; }),
     setNativeText: (pageId, items) =>
       set((s) => {
         if (!s.nativeText) s.nativeText = {};
@@ -860,7 +873,7 @@ export const useEditor = create<EditorState>()(
       return matches;
     },
 
-    replaceTextMatch: (pageId, item, query, replacement, caseSensitive) => {
+    replaceTextMatch: async (pageId, item, query, replacement, caseSensitive) => {
       const s = get();
       // Find existing element covering this fragment
       const existing = Object.values(s.elements).find(
@@ -889,6 +902,17 @@ export const useEditor = create<EditorState>()(
       // If nothing changed, skip
       if (newText === sourceText) return existing?.id ?? null;
 
+      // No masks anywhere: a new element is only created when the
+      // fragment's run can be rewritten directly in the content stream.
+      // (An existing element was already gated when it was created.)
+      let color: string | undefined;
+      if (!existing) {
+        const page = s.pages.find((p) => p.id === pageId);
+        const probe = await probeDirectEdit(s.pdfBytes, page ? page.sourceIndex - 1 : -1, item);
+        if (!probe.editable) return 'skipped';
+        color = probe.colorHex;
+      }
+
       const label = `Find & Replace — "${replacement.length > 30 ? replacement.slice(0, 30) + '…' : replacement}"`;
       if (existing) {
         s.updateElement(existing.id, { text: newText }, label);
@@ -910,9 +934,11 @@ export const useEditor = create<EditorState>()(
             baselineOffset: item.baselineOffset,
             fontSize: item.fontSize,
             fontFamily: item.fontFamily,
-            color: '#000000',
+            color: color ?? '#000000',
             bold: item.bold,
             italic: item.italic,
+            originX: item.x,
+            originY: item.y,
           },
           label,
         );

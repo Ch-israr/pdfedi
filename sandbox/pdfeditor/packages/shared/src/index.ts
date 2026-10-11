@@ -131,6 +131,15 @@ export const NativeTextElementSchema = BaseElementSchema.extend({
   height: z.number().positive(),
   /** Distance from cover-box bottom to the text baseline */
   baselineOffset: z.number().nonnegative().default(0),
+  /**
+   * ORIGINAL fragment box position (bottom-left) at edit time. The
+   * element's x/y track the CURRENT position (the text may be moved);
+   * originX/originY stay pinned to where the original text lives in the
+   * page content stream, which is what direct content-stream editing
+   * matches against when removing the original run on export.
+   */
+  originX: z.number().optional(),
+  originY: z.number().optional(),
   fontSize: z.number().positive(),
   fontFamily: z.string().default('Helvetica'),
   color: z.string().regex(/^#[0-9a-fA-F]{6}$/).default('#000000'),

@@ -13,7 +13,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import zlib from 'node:zlib';
 import { PDFDocument, PDFName, PDFDict, PDFArray, PDFString, StandardFonts } from 'pdf-lib';
-import { exportAnnotatedPdf, parsePdfediAnnotations } from '../dist/index.js';
+import { exportAnnotatedPdf, parsePdfediAnnotations, findDirectRun } from '../dist/index.js';
 
 const PAGE_ID = '123e4567-e89b-12d3-a456-426614174000';
 const IDS = {
@@ -150,8 +150,11 @@ describe('annotation persistence', () => {
     const doc = await PDFDocument.load(bytes);
     assert.deepEqual(attachmentNames(doc), [], 'no embedded files at all');
     const nms = allAnnotNMs(doc);
-    // foreign link preserved + pdfedi link also present, so >= 7 annots
-    assert.ok(nms.filter((n) => n && n.startsWith('pdfedi-')).length >= 7, `pdfedi annots: ${nms}`);
+    // Added text and native edits are real content now, not annotations:
+    // pdfedi annots = text link + native edit conversion is content, so:
+    // link, highlight, rect, arrow, image = 5
+    assert.ok(nms.filter((n) => n && n.startsWith('pdfedi-')).length >= 5, `pdfedi annots: ${nms}`);
+    assert.ok(!nms.some((n) => n && n.startsWith('pdfedi-text-')), 'no FreeText annotation for added text');
     assert.ok(nms.includes(null), 'foreign annotation preserved');
     // Reasonable size: source was tiny; 6 elements must stay well under 60KB total
     assert.ok(bytes.length < 60000, `size ${bytes.length}`);
@@ -162,24 +165,25 @@ describe('annotation persistence', () => {
     const bytes = await exportAnnotatedPdf({ srcBytes, pages: [makePage()], elements: makeElements() });
     const parsed = await parsePdfediAnnotations(bytes);
     const byId = new Map(parsed.map((p) => [p.element.id, p]));
-    assert.equal(parsed.length, 6, `expected 6 elements, got ${parsed.length}`);
+    // Text and native edits are real content now (no annotation pairs):
+    // highlight, rect, arrow, image = 4 annotation elements.
+    assert.equal(parsed.length, 4, `expected 4 annotation elements, got ${parsed.length}`);
 
-    const text = byId.get(IDS.text).element;
-    assert.equal(text.kind, 'text');
-    assert.equal(text.text, 'Hello annotations');
-    assert.equal(text.fontSize, 14);
-    assert.equal(text.bold, true);
-    assert.equal(text.italic, false);
-    assert.equal(text.color, '#FF0000');
-    assert.equal(text.link, 'https://example.org/link');
-    assert.ok(near(text.x, 100) && near(text.y, 600), `text pos ${text.x},${text.y}`);
-
-    const native = byId.get(IDS.native).element;
-    assert.equal(native.kind, 'native-text');
-    assert.equal(native.text, 'Replacement line');
-    assert.ok(near(native.x, 100) && near(native.y, 695));
-    assert.ok(near(native.width, 200) && near(native.height, 24));
-    assert.ok(near(native.baselineOffset, 5), `baselineOffset ${native.baselineOffset}`);
+    // Added text lives in the content stream — directly editable again.
+    const doc = await PDFDocument.load(bytes);
+    const addedRun = findDirectRun(doc, 0, { text: 'Hello annotations', baselineX: 100, baselineY: 600 });
+    assert.equal(addedRun.status, 'ok', 'added text is real content');
+    if (addedRun.status === 'ok') {
+      assert.equal(addedRun.run.fontSize, 14);
+      assert.equal(addedRun.run.colorHex, '#FF0000');
+    }
+    const nms = allAnnotNMs(doc);
+    assert.ok(nms.includes(`pdfedi-link-${IDS.text}`), 'hyperlink still an annotation');
+    // The native edit replaced the original run with the replacement run.
+    const replaced = findDirectRun(doc, 0, { text: 'Replacement line', baselineX: 100, baselineY: 700 });
+    assert.equal(replaced.status, 'ok', 'replacement text is real content');
+    const originalGone = findDirectRun(doc, 0, { text: 'Original native line', baselineX: 100, baselineY: 700 });
+    assert.equal(originalGone.status, 'not-editable', 'original run removed — nothing underneath');
 
     const hl = byId.get(IDS.highlight).element;
     assert.equal(hl.kind, 'highlight');
@@ -212,23 +216,42 @@ describe('annotation persistence', () => {
     const elements = makeElements();
     const bytes1 = await exportAnnotatedPdf({ srcBytes, pages: [makePage()], elements });
     const parsed1 = await parsePdfediAnnotations(bytes1);
-    // Simulate a session: parsed elements (pageId rebound), text edited, rect deleted
+    // Simulate a session: annotation elements rebound, text content edits
+    // re-created as native-text elements (as the web layer would after
+    // probing the re-uploaded bytes), rect deleted.
     const session = {};
     for (const p of parsed1) {
       const el = { ...p.element, pageId: PAGE_ID };
       if (el.kind === 'image') el.src = tinyPngDataUrl(); // web layer supplies blob src
       session[el.id] = el;
     }
-    session[IDS.text] = { ...session[IDS.text], text: 'Edited in cycle 2' };
+    session[IDS.text] = {
+      id: IDS.text, pageId: PAGE_ID, kind: 'native-text', x: 100, y: 600 - 4.2, rotation: 0,
+      originalText: 'Hello annotations', text: 'Edited in cycle 2',
+      width: 120, height: 21.7, baselineOffset: 4.2,
+      fontSize: 14, fontFamily: 'Helvetica', color: '#FF0000', bold: true, italic: false,
+      originX: 100, originY: 600 - 4.2,
+    };
+    session[IDS.native] = {
+      id: IDS.native, pageId: PAGE_ID, kind: 'native-text', x: 100, y: 695, rotation: 0,
+      originalText: 'Replacement line', text: 'Replacement line',
+      width: 200, height: 24, baselineOffset: 5,
+      fontSize: 16, fontFamily: 'Helvetica', color: '#000000', bold: false, italic: false,
+      originX: 100, originY: 695,
+    };
     delete session[IDS.rect];
     const bytes2 = await exportAnnotatedPdf({ srcBytes: bytes1, pages: [makePage()], elements: session });
     const doc2 = await PDFDocument.load(bytes2);
     assert.deepEqual(attachmentNames(doc2), [], 'still no attachments in cycle 2');
     const parsed2 = await parsePdfediAnnotations(bytes2);
     const ids2 = parsed2.map((p) => p.element.id).sort();
-    assert.deepEqual(ids2, [IDS.arrow, IDS.highlight, IDS.image, IDS.native, IDS.text].sort(), 'exactly the surviving 5, once each');
-    const text2 = parsed2.find((p) => p.element.id === IDS.text).element;
-    assert.equal(text2.text, 'Edited in cycle 2');
+    assert.deepEqual(ids2, [IDS.arrow, IDS.highlight, IDS.image].sort(), 'exactly the surviving 3, once each');
+    const edited = findDirectRun(doc2, 0, { text: 'Edited in cycle 2', baselineX: 100, baselineY: 600 });
+    assert.equal(edited.status, 'ok', 'cycle-2 edit is real content');
+    const superseded = findDirectRun(doc2, 0, { text: 'Hello annotations', baselineX: 100, baselineY: 600 });
+    assert.equal(superseded.status, 'not-editable', 'cycle-1 text fully replaced, not duplicated');
+    const replaced = findDirectRun(doc2, 0, { text: 'Replacement line', baselineX: 100, baselineY: 700 });
+    assert.equal(replaced.status, 'ok', 'unchanged native edit carried through');
     const nms2 = allAnnotNMs(doc2);
     assert.ok(nms2.includes(null), 'foreign annotation still preserved in cycle 2');
     // Size stability: cycle 2 (one element fewer, edited text) within 20% of cycle 1

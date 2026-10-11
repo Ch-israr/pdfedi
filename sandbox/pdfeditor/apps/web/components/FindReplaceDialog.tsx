@@ -1,7 +1,9 @@
 /**
  * Find & Replace dialog for native PDF text.
  * Searches extracted native text (no OCR) across all pages.
- * Reuses the existing native-text masking/replacement mechanism.
+ * Replacements rewrite the text directly in the page content stream
+ * (no masks); matches whose run cannot be rewritten are skipped with
+ * an explanation, never silently masked.
  */
 'use client';
 
@@ -14,6 +16,7 @@ export function FindReplaceDialog({ onClose }: { onClose: () => void }) {
   const [caseSensitive, setCaseSensitive] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [message, setMessage] = useState('');
+  const [busy, setBusy] = useState(false);
 
   const findTextMatches = useEditor((s) => s.findTextMatches);
   const replaceTextMatch = useEditor((s) => s.replaceTextMatch);
@@ -21,32 +24,49 @@ export function FindReplaceDialog({ onClose }: { onClose: () => void }) {
 
   const matches = query ? findTextMatches(query, caseSensitive) : [];
 
-  const handleReplace = () => {
+  const handleReplace = async () => {
     if (matches.length === 0) {
       setMessage('No matches found.');
       return;
     }
-    const match = matches[currentIndex % matches.length];
-    const id = replaceTextMatch(match.pageId, match.item, query, replacement, caseSensitive);
-    if (id) {
-      setMessage(`Replaced on page ${match.pageNumber}.`);
-      setActivePage(match.pageId);
-    } else {
-      setMessage('Replacement did not change the text.');
+    setBusy(true);
+    try {
+      const match = matches[currentIndex % matches.length];
+      const result = await replaceTextMatch(match.pageId, match.item, query, replacement, caseSensitive);
+      if (result === 'skipped') {
+        setMessage('Skipped: this text cannot be edited directly in the document.');
+      } else if (result) {
+        setMessage(`Replaced on page ${match.pageNumber}.`);
+        setActivePage(match.pageId);
+      } else {
+        setMessage('Replacement did not change the text.');
+      }
+    } finally {
+      setBusy(false);
     }
   };
 
-  const handleReplaceAll = () => {
+  const handleReplaceAll = async () => {
     if (matches.length === 0) {
       setMessage('No matches found.');
       return;
     }
-    let count = 0;
-    for (const match of matches) {
-      const id = replaceTextMatch(match.pageId, match.item, query, replacement, caseSensitive);
-      if (id) count++;
+    setBusy(true);
+    try {
+      let count = 0;
+      let skipped = 0;
+      for (const match of matches) {
+        const result = await replaceTextMatch(match.pageId, match.item, query, replacement, caseSensitive);
+        if (result === 'skipped') skipped++;
+        else if (result) count++;
+      }
+      setMessage(
+        `Replaced ${count} of ${matches.length} matches.` +
+          (skipped > 0 ? ` ${skipped} could not be edited directly and were skipped.` : ''),
+      );
+    } finally {
+      setBusy(false);
     }
-    setMessage(`Replaced ${count} of ${matches.length} matches.`);
   };
 
   const handleNext = () => {
@@ -164,7 +184,7 @@ export function FindReplaceDialog({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={handleReplace}
-              disabled={matches.length === 0 || !replacement}
+              disabled={matches.length === 0 || !replacement || busy}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:opacity-40"
             >
               Replace
@@ -172,7 +192,7 @@ export function FindReplaceDialog({ onClose }: { onClose: () => void }) {
             <button
               type="button"
               onClick={handleReplaceAll}
-              disabled={matches.length === 0 || !replacement}
+              disabled={matches.length === 0 || !replacement || busy}
               className="rounded-lg bg-blue-600 px-3 py-1.5 text-sm text-white hover:bg-blue-700 disabled:opacity-40"
             >
               Replace All
