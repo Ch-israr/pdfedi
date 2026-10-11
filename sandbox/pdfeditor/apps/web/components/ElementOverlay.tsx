@@ -113,6 +113,7 @@ function ElementView({
     origY: number;
     mergeKey: string;
   } | null>(null);
+  const [bakedHovered, setBakedHovered] = useState(false);
   // Deleted baked elements are kept as tombstones (for export masking) but
   // never rendered in the editor.
   // NOTE: All hooks must be called before these early returns (Rules of Hooks).
@@ -124,13 +125,55 @@ function ElementView({
   // click the baked text to edit it, without seeing a duplicate overlay.
   // NOTE: All hooks must be called before this early return (Rules of Hooks).
   if ((el as any).baked) {
-    const left = el.x * zoom;
-    const width = ((el as any).width ?? 100) * zoom;
-    const height = ((el as any).height ?? (el.kind === 'text' ? (el as any).fontSize * 1.2 : 20)) * zoom;
-    const top = (page.height - (el.y + height / zoom)) * zoom;
+    // Legacy path only: new downloads always embed the clean source, so
+    // their elements restore as normal visible objects and never reach
+    // this branch. Source-less downloads (older files) still restore as
+    // baked — for those, the hit-area must be the element's MEASURED
+    // baked bounds, not a guessed fixed width. A guessed 100pt box made
+    // clicks on the tail of longer text (or on descenders) miss the
+    // element entirely and fall through to the page handler, which
+    // created a new duplicate text box instead of editing this one.
+    const bb = (el as any).bakedBounds as
+      | { x: number; y: number; width: number; height: number }
+      | undefined;
+    let left: number;
+    let top: number;
+    let width: number;
+    let height: number;
+    if (bb && bb.width > 0 && bb.height > 0) {
+      // bakedBounds is a PDF-space rectangle (bottom-left origin).
+      left = bb.x * zoom;
+      width = bb.width * zoom;
+      height = bb.height * zoom;
+      top = (page.height - (bb.y + bb.height)) * zoom;
+    } else {
+      left = el.x * zoom;
+      width = ((el as any).width ?? 100) * zoom;
+      height =
+        ((el as any).height ??
+          (el.kind === 'text' ? (el as any).fontSize * 1.2 : 20)) * zoom;
+      top = (page.height - (el.y + height / zoom)) * zoom;
+    }
+    // Visible affordance: hovering or selecting a baked object outlines
+    // it, so the user can see the object is there and clickable instead
+    // of aiming at a completely invisible rectangle.
+    const isSel = selectedId === el.id;
     return (
       <div
         data-el-id={el.id}
+        onMouseEnter={() => setBakedHovered(true)}
+        onMouseLeave={() => setBakedHovered(false)}
+        onPointerDown={(e) => {
+          e.stopPropagation();
+          select(el.id);
+        }}
+        onClick={() => {
+          // Select here, but do NOT stop propagation: the click must keep
+          // bubbling to the page-level handler, which reads data-el-id
+          // from the event target and opens the pre-filled editor when
+          // the Text tool is active.
+          select(el.id);
+        }}
         style={{
           position: 'absolute',
           left,
@@ -139,6 +182,13 @@ function ElementView({
           height,
           pointerEvents: 'auto',
           cursor: 'text',
+          outline: isSel
+            ? '2px solid #2f6bff'
+            : bakedHovered
+              ? '2px dashed #2f6bff'
+              : 'none',
+          outlineOffset: 1,
+          backgroundColor: isSel || bakedHovered ? 'rgba(47,107,255,0.08)' : 'transparent',
         }}
       />
     );

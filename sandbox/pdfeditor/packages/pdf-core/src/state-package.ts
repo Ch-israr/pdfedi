@@ -154,8 +154,10 @@ export async function embedStatePackage(
 
 /**
  * Embed only the manifest + assets (no source PDF).
- * Used for additive-only edits where the elements are baked into page content
- * and the downloaded PDF's pages serve as the base on re-upload.
+ * Legacy use only: sessions whose base is itself a baked (source-less)
+ * download, where no clean source exists to embed. New exports always
+ * embed the clean source via embedStatePackage so re-upload restores
+ * elements as normal visible objects against the clean pages.
  */
 export async function embedManifestOnly(
   doc: PDFDocument,

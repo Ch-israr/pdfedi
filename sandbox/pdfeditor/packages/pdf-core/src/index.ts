@@ -448,9 +448,10 @@ export async function exportPdfWithState(
 
 /**
  * Build the edited PDF and embed only the manifest + assets (no source PDF).
- * Use when all edits are additive (no native-text masks, no page deletions) —
- * the elements are baked into the page content, and re-upload uses the
- * downloaded PDF's pages directly as the base. Returns fresh bytes.
+ * Legacy use only — for sessions whose base is a baked source-less
+ * download (no clean source exists). Normal exports use
+ * exportPdfWithState, which always embeds the clean source. Returns
+ * fresh bytes.
  */
 export async function exportPdfWithManifestOnly(
   input: ExportInput,

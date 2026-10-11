@@ -729,32 +729,39 @@ export const useEditor = create<EditorState>()(
       const sourceHash = await sha256Hex(s.pdfBytes);
       const manifest = createManifest(sourceHash, s.pages, parts.elements, parts.manifestAssets);
 
-      // Conditional source embedding: only embed the full source PDF when
-      // destructive edits exist (native-text masks that cover original content,
-      // or deleted pages). For additive-only edits (text, images, shapes, etc.),
-      // the elements are baked into the page content and the downloaded PDF's
-      // pages serve as the base on re-upload — no source needed.
-      const hasDestructiveEdits = Object.values(s.elements).some(
-        (el) => el.kind === 'native-text',
+      // Always embed the clean source PDF (when the session base IS the
+      // clean source). On re-upload the elements are then restored as
+      // normal, visible, editable objects against the clean pages — never
+      // as invisible baked hit-areas over already-flattened content. This
+      // applies to additive-only edits too: the earlier conditional
+      // embedding (source only for destructive edits) forced additive
+      // edits down the fragile baked-restore path, where a missed click
+      // created a duplicate text box instead of editing the object.
+      //
+      // Exception: a legacy session restored from a source-less download
+      // (produced before this change) uses the baked upload itself as its
+      // base — its elements carry baked/bakedBounds markers. Embedding
+      // that baked file as the "clean source" would poison future
+      // restores (baked content + restored overlay = duplicate), so those
+      // sessions keep the manifest-only export and stay on the legacy
+      // baked-restore path.
+      const baseIsBaked = Object.values(s.elements).some(
+        (el) => (el as any).baked || (el as any).bakedBounds,
       );
-      const pagesDeleted = s.pages.length < s.pageCount;
-      const needsSource = hasDestructiveEdits || pagesDeleted;
 
-      if (needsSource) {
-        const { exportPdfWithState } = await import('@pdfeditor/pdf-core');
+      if (!baseIsBaked) {
         return exportPdfWithState(
           { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
           { manifest, sourceBytes: s.pdfBytes, assets: parts.assets },
         );
-      } else {
-        // Additive-only: embed manifest + assets, no source PDF.
-        const { exportPdfWithManifestOnly } = await import('@pdfeditor/pdf-core');
-        return exportPdfWithManifestOnly(
-          { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
-          manifest,
-          parts.assets,
-        );
       }
+      // Legacy baked-base session: embed manifest + assets, no source PDF.
+      const { exportPdfWithManifestOnly } = await import('@pdfeditor/pdf-core');
+      return exportPdfWithManifestOnly(
+        { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
+        manifest,
+        parts.assets,
+      );
     },
 
     download: async () => {
