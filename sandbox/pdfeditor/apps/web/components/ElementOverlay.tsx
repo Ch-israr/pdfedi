@@ -114,6 +114,9 @@ function ElementView({
     mergeKey: string;
   } | null>(null);
   const [bakedHovered, setBakedHovered] = useState(false);
+  // Set when a pointer drag actually moved the element, so the click that
+  // follows a drag-to-move doesn't also open the text editor.
+  const movedRef = useRef(false);
   // Deleted baked elements are kept as tombstones (for export masking) but
   // never rendered in the editor.
   // NOTE: All hooks must be called before these early returns (Rules of Hooks).
@@ -202,6 +205,7 @@ function ElementView({
   const onPointerDown = (e: React.PointerEvent) => {
     e.stopPropagation();
     e.preventDefault();
+    movedRef.current = false;
     select(el.id);
     dragRef.current = {
       startX: e.clientX,
@@ -218,6 +222,9 @@ function ElementView({
   const onPointerMove = (e: React.PointerEvent) => {
     const d = dragRef.current;
     if (!d) return;
+    if (Math.abs(e.clientX - d.startX) + Math.abs(e.clientY - d.startY) > 3) {
+      movedRef.current = true;
+    }
     const dx = (e.clientX - d.startX) / zoom;
     const dy = -(e.clientY - d.startY) / zoom; // screen y down → pdf y up
     let newX = d.origX + dx;
@@ -276,6 +283,30 @@ function ElementView({
       // Stop propagation so the page-level click handler doesn't deselect.
       e.stopPropagation();
       select(el.id);
+      // Text tool + a text object: a click means "edit this text" — the
+      // same behaviour as clicking native or legacy-restored text at page
+      // level. Previously this handler only selected the object, which
+      // made the page-level edit branch unreachable (stopPropagation
+      // above), and the double-click fallback below proved unreliable in
+      // live testing: for a restored object the inline editor never
+      // opened at all (single OR double click), leaving the Properties
+      // panel as the only way to change the text. Open the editor here,
+      // on the first click — unless the click was the end of a drag.
+      if (
+        tool === 'text' &&
+        (el.kind === 'text' || el.kind === 'native-text') &&
+        !isEditing &&
+        !movedRef.current
+      ) {
+        const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
+        const overlay = (e.currentTarget as HTMLElement).closest('.element-overlay-root');
+        const orect = overlay?.getBoundingClientRect();
+        onEditText(
+          el,
+          rect.left - (orect?.left ?? 0),
+          rect.bottom - (orect?.top ?? 0),
+        );
+      }
     },
     onDoubleClick: (e: React.MouseEvent) => {
       e.stopPropagation();
