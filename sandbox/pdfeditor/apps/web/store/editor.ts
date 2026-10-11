@@ -209,27 +209,89 @@ export const useEditor = create<EditorState>()(
         }
         const bytes = new Uint8Array(await file.arrayBuffer());
 
-        // PDFEDI state package: a previously downloaded PDF carries its own
-        // editing state as attachments — restore it instead of starting fresh.
+        // Restore order:
+        // 1) PDF-native annotations (current format): edits live in the
+        //    PDF's own annotation layer — no attachments involved.
+        // 2) Legacy PDFEDI state package (downloads made before the
+        //    annotation system): manifest + embedded source attachments.
+        // 3) Fresh document.
+        const { parseAnnotations, bindAnnotationElements } = await import(
+          '@/lib/annotation-restore'
+        );
+        const parsedAnnots = await parseAnnotations(bytes);
+
         const { tryRestorePdfediPackage, looksScanned, RestoreError } = await import(
           '@/lib/pdfedi-state'
         );
         let pdfBytes: Uint8Array = bytes;
-        let pages: Page[];
-        let pageCount: number;
+        let pages: Page[] = [];
+        let pageCount = 0;
         let elements: Record<string, EditorElement> = {};
         let notice: { kind: 'info' | 'success' | 'warning'; message: string } | null = null;
 
-        let restoreError: unknown = null;
-        let restored: Awaited<ReturnType<typeof tryRestorePdfediPackage>> = null;
-        try {
-          restored = await tryRestorePdfediPackage(bytes);
-        } catch (e) {
-          if (e instanceof RestoreError) restoreError = e;
-          else throw e;
+        let annotHandled = false;
+        if (parsedAnnots) {
+          const loaded = await loadPdfDocument(bytes);
+          pages = loaded.pages;
+          pageCount = loaded.pageCount;
+          elements = await bindAnnotationElements(parsedAnnots, pages);
+          // Fill originalText for restored native-text elements from the
+          // page's own text layer (best-overlap fragment under the mask).
+          const nativeEls = Object.values(elements).filter((e) => e.kind === 'native-text');
+          if (nativeEls.length > 0) {
+            try {
+              const { extractNativeText } = await import('@/lib/pdfjs');
+              for (const page of pages) {
+                const onPage = nativeEls.filter((e) => e.pageId === page.id);
+                if (onPage.length === 0) continue;
+                const items = await extractNativeText(loaded.doc, page);
+                for (const el of onPage) {
+                  if (el.kind !== 'native-text') continue;
+                  let best: (typeof items)[number] | null = null;
+                  let bestArea = 0;
+                  for (const it of items) {
+                    const ox = Math.max(0, Math.min(el.x + el.width, it.x + it.width) - Math.max(el.x, it.x));
+                    const oy = Math.max(0, Math.min(el.y + el.height, it.y + it.height) - Math.max(el.y, it.y));
+                    if (ox * oy > bestArea) {
+                      bestArea = ox * oy;
+                      best = it;
+                    }
+                  }
+                  if (best) el.originalText = best.text;
+                }
+              }
+            } catch {
+              // originalText is reference-only; editing works without it.
+            }
+          }
+          const n = Object.keys(elements).length;
+          if (n > 0) {
+            notice = {
+              kind: 'success',
+              message: `Editing session restored — ${n} object${n === 1 ? '' : 's'} recovered. Continue editing.`,
+            };
+            annotHandled = true;
+          } else {
+            elements = {};
+          }
         }
 
-        if (restored) {
+        let restoreError: unknown = null;
+        let restored: Awaited<ReturnType<typeof tryRestorePdfediPackage>> = null;
+        if (!annotHandled) {
+          try {
+            restored = await tryRestorePdfediPackage(bytes);
+          } catch (e) {
+            if (e instanceof RestoreError) restoreError = e;
+            else throw e;
+          }
+        }
+
+        if (annotHandled) {
+          // Pages/elements/notice set above; pdfBytes stays the uploaded
+          // bytes (its annotation layer is stripped and rewritten on the
+          // next export, so nothing duplicates).
+        } else if (restored) {
           // Valid package: edit against the embedded CLEAN source so the
           // flattened overlays in the uploaded file are never duplicated.
           // This also prevents recursive nesting — every export re-embeds
@@ -689,10 +751,8 @@ export const useEditor = create<EditorState>()(
       const s = get();
       if (!s.pdfBytes) throw new Error('No document loaded.');
 
-      // Fast path: no edits made — return the original bytes unchanged.
-      // This avoids embedding the source PDF and manifest when the user
-      // simply uploads and downloads without changes, keeping the output
-      // size identical to the input.
+      // Fast path: no edits made — return the original bytes unchanged,
+      // keeping the output size identical to the input.
       const hasElements = Object.keys(s.elements).length > 0;
       const pagesModified =
         s.pages.length !== s.pageCount ||
@@ -701,67 +761,18 @@ export const useEditor = create<EditorState>()(
         return s.pdfBytes;
       }
 
-      // Build the PDFEDI state package: manifest + clean source + assets,
-      // embedded as file attachments so the download stays re-editable.
-      // s.pdfBytes is always the clean source (for restored sessions it is
-      // the extracted original), so recursive nesting cannot occur.
-      const {
-        buildManifestParts,
-        createManifest,
-        sha256Hex,
-        exportPdfWithState,
-      } = await import('@pdfeditor/pdf-core');
-      const parts = await buildManifestParts(s.pages, s.elements, async (el) => {
-        if (el.kind !== 'image' && el.kind !== 'signature') return null;
-        try {
-          const res = await fetch(el.src);
-          if (!res.ok) return null;
-          const buf = await res.arrayBuffer();
-          if (buf.byteLength === 0) return null;
-          return {
-            bytes: new Uint8Array(buf),
-            mime: el.kind === 'image' ? el.mime : 'image/png',
-          };
-        } catch {
-          return null;
-        }
+      // PDF-native persistence: elements are written as standard PDF
+      // annotations (FreeText/Square/Circle/Line/Stamp with appearance
+      // streams). The download carries NO custom JSON manifest and NO
+      // embedded source PDF — re-editability comes from the PDF's own
+      // annotation layer, and file size grows only by the annotations
+      // themselves (~1 KB per object, not a second copy of the document).
+      const { exportAnnotatedPdf } = await import('@pdfeditor/pdf-core');
+      return exportAnnotatedPdf({
+        srcBytes: s.pdfBytes,
+        pages: s.pages,
+        elements: s.elements,
       });
-      const sourceHash = await sha256Hex(s.pdfBytes);
-      const manifest = createManifest(sourceHash, s.pages, parts.elements, parts.manifestAssets);
-
-      // Always embed the clean source PDF (when the session base IS the
-      // clean source). On re-upload the elements are then restored as
-      // normal, visible, editable objects against the clean pages — never
-      // as invisible baked hit-areas over already-flattened content. This
-      // applies to additive-only edits too: the earlier conditional
-      // embedding (source only for destructive edits) forced additive
-      // edits down the fragile baked-restore path, where a missed click
-      // created a duplicate text box instead of editing the object.
-      //
-      // Exception: a legacy session restored from a source-less download
-      // (produced before this change) uses the baked upload itself as its
-      // base — its elements carry baked/bakedBounds markers. Embedding
-      // that baked file as the "clean source" would poison future
-      // restores (baked content + restored overlay = duplicate), so those
-      // sessions keep the manifest-only export and stay on the legacy
-      // baked-restore path.
-      const baseIsBaked = Object.values(s.elements).some(
-        (el) => (el as any).baked || (el as any).bakedBounds,
-      );
-
-      if (!baseIsBaked) {
-        return exportPdfWithState(
-          { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
-          { manifest, sourceBytes: s.pdfBytes, assets: parts.assets },
-        );
-      }
-      // Legacy baked-base session: embed manifest + assets, no source PDF.
-      const { exportPdfWithManifestOnly } = await import('@pdfeditor/pdf-core');
-      return exportPdfWithManifestOnly(
-        { srcBytes: s.pdfBytes, pages: s.pages, elements: s.elements },
-        manifest,
-        parts.assets,
-      );
     },
 
     download: async () => {

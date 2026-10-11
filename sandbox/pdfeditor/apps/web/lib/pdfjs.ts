@@ -154,6 +154,11 @@ export async function renderPageToCanvas(
   await pdfPage.render({
     canvasContext: ctx,
     viewport: viewport.clone({ scale: viewport.scale * dpr }),
+    // Annotations are NOT painted into the page canvas: pdfedi elements
+    // live in the annotation layer of the file and are shown in the
+    // editor as DOM overlays. Painting them here as well would show
+    // every restored object twice (canvas + overlay).
+    annotationMode: 0, // pdf.js AnnotationMode.DISABLE
   } as never).promise;
   pdfPage.cleanup();
 }

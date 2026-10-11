@@ -35,6 +35,16 @@ export {
   type StateAsset,
 };
 
+export {
+  buildAnnotatedPdfDocument,
+  exportAnnotatedPdf,
+  parsePdfediAnnotations,
+  PDFEDI_NM_PREFIX,
+  type AnnotatedExportInput,
+  type ParsedAnnotationElement,
+  type ParsedImageData,
+} from './annotations.js';
+
 // ---------------------------------------------------------------------------
 // Page operations (pure — return new arrays, never mutate)
 // ---------------------------------------------------------------------------
