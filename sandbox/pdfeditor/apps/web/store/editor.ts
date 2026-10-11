@@ -751,13 +751,20 @@ export const useEditor = create<EditorState>()(
       const s = get();
       if (!s.pdfBytes) throw new Error('No document loaded.');
 
-      // Fast path: no edits made — return the original bytes unchanged,
-      // keeping the output size identical to the input.
+      // Fast path: session completely untouched — return the original
+      // bytes unchanged, keeping the output size identical to the input.
+      // The history check matters: in an annotation-restored session the
+      // base bytes THEMSELVES contain the restored objects, so deleting
+      // the last element (elements == {}) must still go through the
+      // annotation export, which strips the deleted object's annotation.
+      // Without this, a delete-all download would resurrect the object on
+      // the next upload.
       const hasElements = Object.keys(s.elements).length > 0;
       const pagesModified =
         s.pages.length !== s.pageCount ||
         s.pages.some((p, i) => p.sourceIndex !== i + 1 || (p.rotation ?? 0) !== 0);
-      if (!hasElements && !pagesModified) {
+      const untouched = s.past.length === 0 && s.future.length === 0;
+      if (!hasElements && !pagesModified && untouched) {
         return s.pdfBytes;
       }
 
