@@ -37,7 +37,8 @@ export type ToolId =
   | 'shape-ellipse'
   | 'shape-line'
   | 'shape-arrow'
-  | 'whiteout';
+  | 'whiteout'
+  | 'link';
 
 interface EditorState {
   // Document (memory only)

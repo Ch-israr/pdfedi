@@ -159,6 +159,18 @@ export const NativeTextElementSchema = BaseElementSchema.extend({
   italic: z.boolean().default(false),
 });
 
+/**
+ * A clickable hyperlink region: drag-drawn rectangle carrying a URL.
+ * Exports as a standard /Link annotation (invisible in print); the
+ * editor shows a dashed outline. http/https only.
+ */
+export const LinkElementSchema = BaseElementSchema.extend({
+  kind: z.literal('link'),
+  width: z.number().positive(),
+  height: z.number().positive(),
+  url: z.string().url(),
+});
+
 export const EditorElementSchema = z.discriminatedUnion('kind', [
   TextElementSchema,
   ImageElementSchema,
@@ -167,6 +179,7 @@ export const EditorElementSchema = z.discriminatedUnion('kind', [
   ShapeElementSchema,
   WhiteoutElementSchema,
   NativeTextElementSchema,
+  LinkElementSchema,
 ]);
 export type EditorElement = z.infer<typeof EditorElementSchema>;
 

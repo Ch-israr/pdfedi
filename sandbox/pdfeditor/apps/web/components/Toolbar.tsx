@@ -25,13 +25,14 @@ function SaveStatus() {
   );
 }
 
-// Tools inside the grouped pill, in reference order (existing tools only:
-// Links and Forms do not exist in this editor, so they are not shown).
+// Tools inside the grouped pill, in reference order. (Forms does not exist
+// in this editor and is not shown; Links is a real drag-to-draw tool.)
 const PILL_TOOLS: { id: ToolId; label: string; shortcut?: string }[] = [
   { id: 'text', label: 'Text', shortcut: 'T' },
   { id: 'image', label: 'Image' },
   { id: 'signature', label: 'Sign' },
   { id: 'whiteout', label: 'Whiteout', shortcut: 'W' },
+  { id: 'link', label: 'Link', shortcut: 'L' },
 ];
 
 function PillToolButton({

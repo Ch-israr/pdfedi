@@ -282,6 +282,24 @@ async function addTextAnnotation(
   }
 }
 
+/** Standalone hyperlink region: a standard /Link annotation with a URI
+ *  action. Invisible in print; readers make the rect clickable. */
+async function addLinkAnnotation(
+  out: PDFDocument,
+  page: PDFPage,
+  el: Extract<EditorElement, { kind: 'link' }>,
+): Promise<void> {
+  const linkAnnot = out.context.obj({
+    Type: PDFName.of('Annot'),
+    Subtype: PDFName.of('Link'),
+    Rect: [el.x, el.y, el.x + el.width, el.y + el.height],
+    Border: [0, 0, 0],
+    NM: PDFString.of(`${PDFEDI_NM_PREFIX}linkbox-${el.id}`),
+    A: { Type: PDFName.of('Action'), S: PDFName.of('URI'), URI: PDFString.of(el.url) },
+  });
+  pushAnnot(page, out.context.register(linkAnnot));
+}
+
 /** Link-only annotation for content-drawn text (the text itself is real
  *  page content now; only the hyperlink target needs an annotation). */
 async function addTextLinkAnnotation(
@@ -714,6 +732,9 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
         case 'whiteout':
           await addWhiteoutAnnotation(out, ctx, pdfPage, el);
           break;
+        case 'link':
+          await addLinkAnnotation(out, pdfPage, el);
+          break;
         case 'image':
         case 'signature':
           await addStampAnnotation(out, ctx, pdfPage, el, imageCache);
@@ -883,6 +904,28 @@ export async function parsePdfediAnnotations(bytes: Uint8Array): Promise<ParsedA
       const subtype = nameOf(annot, 'Subtype');
       const rect = numArray(annot, 'Rect');
       if (tag === 'link') continue; // rebuilt from the FreeText's link on export
+      if (tag === 'linkbox' && subtype === '/Link') {
+        const aDict = dictOf(doc, annot.lookup(PDFName.of('A')));
+        const uri = aDict ? textOf(aDict, 'URI') : undefined;
+        if (rect && uri) {
+          const [x0, y0, x1, y1] = rect;
+          results.push({
+            pageIndex,
+            element: {
+              id,
+              pageId: '',
+              kind: 'link',
+              x: x0,
+              y: y0,
+              rotation: 0,
+              width: x1 - x0,
+              height: y1 - y0,
+              url: uri,
+            } as EditorElement,
+          });
+        }
+        continue;
+      }
       if (tag === 'native-mask') {
         if (rect) nativeMasks.set(id, { pageIndex, rect });
         continue;

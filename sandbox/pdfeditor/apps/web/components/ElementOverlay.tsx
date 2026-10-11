@@ -23,6 +23,7 @@ const measureTextWidth: MeasureFn = (text, font) => {
   }
 };
 import { FloatingTextToolbar } from './FloatingTextToolbar';
+import { LinkUrlEditor } from './LinkUrlEditor';
 import { NativeEditWarning } from './NativeEditWarning';
 import { FloatingShapeToolbar } from './FloatingShapeToolbar';
 import { FloatingImageToolbar } from './FloatingImageToolbar';
@@ -585,6 +586,36 @@ function ElementView({
           )}
         </div>
       );
+    case 'link': {
+      // Clickable hyperlink region. Invisible in the exported PDF (a
+      // standard /Link annotation has no appearance); the editor shows a
+      // dashed blue outline so the region is discoverable and editable.
+      const linkEl = el as Extract<EditorElement, { kind: 'link' }>;
+      return (
+        <div
+          {...common}
+          style={{
+            ...style,
+            width: toScreen(el.width, zoom),
+            height: toScreen(el.height, zoom),
+            background: 'rgba(47,107,255,0.06)',
+            border: `${Math.max(1, 1.5 * zoom)}px dashed #2f6bff`,
+            outline: selected ? `${Math.max(1.5, 2 * zoom)}px solid #2f6bff` : 'none',
+            outlineOffset: 2,
+          }}
+          data-el-id={el.id}
+          title={linkEl.url}
+        >
+          <span
+            aria-hidden
+            className="pointer-events-none absolute left-1 top-1 rounded bg-[#2f6bff] px-1 text-[10px] font-bold text-white"
+          >
+            &#128279;
+          </span>
+          {selected && <ResizeHandles el={el} zoom={zoom} />}
+        </div>
+      );
+    }
     case 'image':
     case 'signature':
       return (
@@ -642,6 +673,7 @@ export function ElementOverlay({ page }: { page: Page }) {
   const tool = useEditor((s) => s.tool);
   const zoom = useEditor((s) => s.zoom);
   const addElement = useEditor((s) => s.addElement);
+  const setTool = useEditor((s) => s.setTool);
   const select = useEditor((s) => s.select);
   const selectedId = useEditor((s) => s.selectedId);
   // Smart guides are temporary — shown only during drag, never stored/exported
@@ -679,13 +711,15 @@ export function ElementOverlay({ page }: { page: Page }) {
   // Drag-to-draw state for shapes + highlight: press → drag → release
   // (lines/arrows use start/end points; rect/ellipse/highlight use drag rectangle)
   const [drawing, setDrawing] = useState<{
-    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout';
+    shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout' | 'link';
     startX: number; // PDF points
     startY: number;
     curX: number;
     curY: number;
     shiftKey: boolean; // for circle constraint / angle snap
   } | null>(null);
+  // Pending link region (pdf coords) awaiting its URL
+  const [pendingLink, setPendingLink] = useState<{ x: number; y: number; w: number; h: number } | null>(null);
   // One-time warning when native editing is attempted on flat content
   const [showNativeWarning, setShowNativeWarning] = useState(false);
   const nativeEditWarned = useEditor((s) => s.nativeEditWarned);
@@ -694,10 +728,16 @@ export function ElementOverlay({ page }: { page: Page }) {
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
 
+  // Timestamp of the last inline-editor commit. Committing by clicking
+  // blank page space blurs the editor (commit) and then the same click
+  // reaches onPageClick — without this guard the Text tool would open a
+  // second, empty editor at the click point.
+  const lastTextCommitAt = useRef(0);
   const commitText = useCallback(
     (text: string) => {
       if (!editingText) return;
       const et = editingText;
+      lastTextCommitAt.current = Date.now();
       setEditingText(null);
       if (et.mode === 'edit') {
         // Editing existing: update text, or delete if emptied
@@ -1029,6 +1069,9 @@ export function ElementOverlay({ page }: { page: Page }) {
 
     switch (tool as ToolId) {
       case 'text': {
+        // Ignore the click that just committed an editor via blur (see
+        // lastTextCommitAt) — it must not spawn a new empty editor.
+        if (Date.now() - lastTextCommitAt.current < 350) return;
         // Inline editing: show a textarea at the click position instead of window.prompt
         const rect2 = e.currentTarget.getBoundingClientRect();
         setEditingText({
@@ -1108,6 +1151,7 @@ export function ElementOverlay({ page }: { page: Page }) {
       : tool === 'shape-ellipse' ? 'ellipse'
       : tool === 'highlight' ? 'highlight'
       : tool === 'whiteout' ? 'whiteout'
+      : tool === 'link' ? 'link'
       : null;
     if (!drawShape) return;
     // Handles take priority over drawing tools: if the pointer is on a
@@ -1194,7 +1238,11 @@ export function ElementOverlay({ page }: { page: Page }) {
       const y = Math.min(y1, y2);
       const w = Math.abs(x2 - x1);
       const h = Math.abs(y2 - y1);
-      if (d.shape === 'highlight') {
+      if (d.shape === 'link') {
+        // Link: keep the dragged rect pending until the user supplies a
+        // URL (Escape/empty discards it — no element is created).
+        setPendingLink({ x, y, w, h });
+      } else if (d.shape === 'highlight') {
         // Highlight: commit the dragged rectangle with the standard
         // highlight style (yellow, translucent). Same undo/history path.
         addElement(
@@ -1292,6 +1340,40 @@ export function ElementOverlay({ page }: { page: Page }) {
       ))}
       {/* Drag-to-draw preview for lines/arrows */}
       {drawing && <DrawingPreview drawing={drawing} page={page} zoom={zoom} />}
+      {pendingLink &&
+        (() => {
+          const lx = toScreen(pendingLink.x, zoom);
+          const topAbove = pdfYToScreenTop(pendingLink.y + pendingLink.h, page, zoom);
+          const placeAbove = topAbove - 8 - 110 > 0;
+          const ly = placeAbove
+            ? topAbove - 8 - 110
+            : pdfYToScreenTop(pendingLink.y, page, zoom) + 8;
+          return (
+            <LinkUrlEditor
+              screenX={lx}
+              screenY={ly}
+              onSave={(url) => {
+                addElement(
+                  {
+                    id: crypto.randomUUID(),
+                    pageId: page.id,
+                    kind: 'link',
+                    x: pendingLink.x,
+                    y: pendingLink.y,
+                    rotation: 0,
+                    width: pendingLink.w,
+                    height: pendingLink.h,
+                    url,
+                  },
+                  'Link Added',
+                );
+                setPendingLink(null);
+                setTool('select');
+              }}
+              onDiscard={() => setPendingLink(null)}
+            />
+          );
+        })()}
       {/* Inline text editor — new text or editing existing */}
       {editingText &&
         (() => {
@@ -1484,7 +1566,7 @@ function DrawingPreview({
   page,
   zoom,
 }: {
-  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
+  drawing: { shape: 'line' | 'arrow' | 'rect' | 'ellipse' | 'highlight' | 'whiteout' | 'link'; startX: number; startY: number; curX: number; curY: number; shiftKey: boolean };
   page: Page;
   zoom: number;
 }) {
@@ -1579,7 +1661,19 @@ function DrawingPreview({
             <circle cx={sx1} cy={sy1} r={4} fill="#2f6bff" stroke="#fff" strokeWidth={2} />
           </>
         )}
-        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight' || drawing.shape === 'whiteout') && (
+        {(drawing.shape === 'rect' || drawing.shape === 'ellipse' || drawing.shape === 'highlight' || drawing.shape === 'whiteout' || drawing.shape === 'link') && (
+          drawing.shape === 'link' ? (
+            <rect
+              x={rx}
+              y={ry}
+              width={rw}
+              height={rh}
+              fill="rgba(47,107,255,0.06)"
+              stroke="#2f6bff"
+              strokeWidth={sw}
+              strokeDasharray={`${6 * zoom} ${3 * zoom}`}
+            />
+          ) :
           drawing.shape === 'highlight' ? (
             <rect
               x={rx}

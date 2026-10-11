@@ -2,6 +2,7 @@
 
 import { useEditor } from '@/store/editor';
 import type { EditorElement } from '@pdfeditor/shared';
+import { normalizeUrl } from '@/lib/url';
 
 /**
  * Right sidebar: properties of the selected element.
@@ -195,6 +196,32 @@ export function PropertiesPanel() {
             </div>
             {num('Stroke width', el.strokeWidth, (v) => updateElement(el.id, { strokeWidth: v }), 0.5)}
             {colorField('Stroke color', el.stroke, (v) => updateElement(el.id, { stroke: v }))}
+          </section>
+        )}
+        {el.kind === 'link' && (
+          <section className="space-y-2 border-t border-slate-100 pt-4">
+            {sectionTitle('Link')}
+            <label className="block">
+              <span className="mb-1 block text-xs font-medium text-slate-600">Address</span>
+              <input
+                type="url"
+                defaultValue={el.url}
+                key={el.id}
+                onBlur={(e) => {
+                  const url = normalizeUrl(e.target.value);
+                  if (url && url !== el.url) updateElement(el.id, { url }, 'Edit link address');
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                }}
+                placeholder="https://example.com"
+                className="w-full rounded border border-slate-300 px-2 py-1 text-sm focus:border-brand-500 focus:outline-none"
+              />
+            </label>
+            <p className="text-xs leading-relaxed text-slate-500">
+              Clicking this region opens the address. The region is invisible
+              in the exported PDF.
+            </p>
           </section>
         )}
         {el.kind === 'whiteout' && (

@@ -96,6 +96,14 @@ export function ToolIcon({ id }: { id: ToolId }) {
           <path d="M14 4h6v6" />
         </svg>
       );
+    case 'link':
+      // Chain-link: two interlocked rounded links
+      return (
+        <svg {...base()}>
+          <path d="M10 14a4.5 4.5 0 006.4.4l3-3a4.5 4.5 0 00-6.4-6.4l-1.7 1.7" />
+          <path d="M14 10a4.5 4.5 0 00-6.4-.4l-3 3a4.5 4.5 0 006.4 6.4l1.7-1.7" />
+        </svg>
+      );
     case 'whiteout':
       // Solid white-filled rectangle (the cover), no outline
       return (

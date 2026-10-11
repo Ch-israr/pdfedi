@@ -400,3 +400,33 @@ describe('match-guard refinements (trailing whitespace, mixed fonts)', () => {
     assert.equal(res.status, 'not-editable', 'size guard still enforced');
   });
 });
+
+describe('link annotation export/restore', () => {
+  it('writes a /Link annotation with URI action and restores it', async () => {
+    const out = await exportAnnotatedPdf({
+      srcBytes: await makeSource('hello'),
+      pages: [makePage()],
+      elements: {
+        [NATIVE_ID]: nativeEl({}),
+        'aaaaaaaa-1111-4222-8222-222222222222': {
+          id: 'aaaaaaaa-1111-4222-8222-222222222222',
+          pageId: makePage().id,
+          kind: 'link',
+          x: 100,
+          y: 600,
+          rotation: 0,
+          width: 120,
+          height: 24,
+          url: 'https://example.com/page',
+        } as never,
+      },
+    });
+    const parsed = await parsePdfediAnnotations(out);
+    const link = parsed.find((p) => (p.element as { kind: string }).kind === 'link');
+    assert.ok(link, 'link element restored from annotations');
+    const el = link!.element as unknown as { url: string; x: number; y: number; width: number; height: number };
+    assert.equal(el.url, 'https://example.com/page');
+    assert.equal(el.x, 100);
+    assert.equal(el.width, 120);
+  });
+});

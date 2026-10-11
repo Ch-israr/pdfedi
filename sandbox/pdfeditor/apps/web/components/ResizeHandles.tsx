@@ -31,7 +31,7 @@ export function ResizeHandles({
   lockAspect = false,
   cornersOnly = false,
 }: {
-  el: Extract<EditorElement, { kind: 'shape' | 'image' | 'signature' | 'highlight' | 'whiteout' }>;
+  el: Extract<EditorElement, { kind: 'shape' | 'image' | 'signature' | 'highlight' | 'whiteout' | 'link' }>;
   zoom: number;
   lockAspect?: boolean;
   cornersOnly?: boolean;
