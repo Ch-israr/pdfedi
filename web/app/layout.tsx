@@ -6,6 +6,9 @@ export const metadata: Metadata = {
   title: "PDFEDI — Free Online PDF Tools",
   description:
     "Merge, split, compress, convert and protect PDFs online. Free, no sign-up, no watermarks.",
+  verification: {
+    google: "B8JxEkvHXO4JaUEYYhl6W8nD59onzRApzrSQhN9xMlI",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
