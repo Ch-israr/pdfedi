@@ -12,6 +12,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${BASE_URL}/editor`,
+      lastModified: now,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
     ...TOOL_SLUGS.map((slug) => ({
       url: `${BASE_URL}/tools/${slug}`,
       lastModified: now,
