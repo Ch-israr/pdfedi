@@ -89,7 +89,7 @@ async function getPdfjs() {
   if (!pdfjs) {
     pdfjs = await import('pdfjs-dist');
     // Local worker — no CDN dependency, works offline / behind CSP
-    pdfjs.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+    pdfjs.GlobalWorkerOptions.workerSrc = `${process.env.NEXT_BASE_PATH || ''}/pdf.worker.min.mjs`;
   }
   return pdfjs;
 }

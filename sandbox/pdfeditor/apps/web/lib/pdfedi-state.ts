@@ -122,7 +122,7 @@ async function getPdfAttachments(
 ): Promise<Record<string, PdfAttachment>> {
   const pdfjsLib = await import('pdfjs-dist');
   if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.NEXT_BASE_PATH || ''}/pdf.worker.min.mjs`;
   }
   const doc = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
   try {
@@ -326,7 +326,7 @@ export async function looksScanned(bytes: Uint8Array): Promise<boolean> {
   try {
     const pdfjsLib = await import('pdfjs-dist');
     if (!pdfjsLib.GlobalWorkerOptions.workerSrc) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `${process.env.NEXT_BASE_PATH || ''}/pdf.worker.min.mjs`;
     }
     const doc = await pdfjsLib.getDocument({ data: bytes.slice() }).promise;
     try {

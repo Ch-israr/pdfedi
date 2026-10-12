@@ -15,6 +15,32 @@ export default function Home() {
         </p>
       </section>
 
+      <section className="mt-4">
+        <div className="mb-4 text-xs font-bold uppercase tracking-widest text-brand-600">
+          Most popular
+        </div>
+        <Link
+          href="/editor"
+          className="group block rounded-2xl bg-white p-5 shadow-sm ring-2 ring-brand-600 transition hover:-translate-y-0.5 hover:shadow-md"
+        >
+          <div className="flex items-center gap-4">
+            <div className="text-4xl">✏️</div>
+            <div>
+              <div className="text-lg font-semibold group-hover:text-brand-600">
+                PDF Editor
+              </div>
+              <div className="mt-1 text-sm text-slate-500">
+                Edit text, add images &amp; shapes, sign, redact — right in your
+                browser. Your file never leaves your device.
+              </div>
+            </div>
+            <div className="ml-auto hidden text-sm font-medium text-brand-600 sm:block">
+              Open →
+            </div>
+          </div>
+        </Link>
+      </section>
+
       {CATEGORIES.map((cat) => {
         const tools = TOOL_CARDS.filter((t) => t.category === cat.key);
         if (tools.length === 0) return null;
