@@ -51,6 +51,8 @@ def _prune(ip: str) -> list[float]:
 
 
 def _record_attempt(db: Session, username: str, ip: str, success: bool) -> None:
+    from datetime import datetime, timedelta, timezone
+
     db.add(
         AdminLoginAttempt(
             id=uuid.uuid4().hex,
@@ -60,6 +62,9 @@ def _record_attempt(db: Session, username: str, ip: str, success: bool) -> None:
             created_at=utcnow_iso(),
         )
     )
+    # 7-day retention for audit data, same as analytics.
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    db.query(AdminLoginAttempt).filter(AdminLoginAttempt.created_at < cutoff).delete()
     db.commit()
 
 

@@ -22,7 +22,7 @@ from urllib.parse import urlparse
 
 log = logging.getLogger("pdfedi.analytics")
 
-RETENTION_DAYS = 30
+RETENTION_DAYS = 7
 GEOIP_PATH = Path("/srv/geoip/dbip-city-lite.mmdb")
 
 # ---------------------------------------------------------------------------
@@ -308,7 +308,7 @@ def log_bot_visit(db, *, ip: str, user_agent: str, path: str) -> None:
             pass
 
 
-def get_analytics(db, days: int = 30) -> dict:
+def get_analytics(db, days: int = 7) -> dict:
     """Aggregated stats for the admin dashboard. Never raises."""
     from sqlalchemy import func
 

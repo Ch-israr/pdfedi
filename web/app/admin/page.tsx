@@ -213,7 +213,7 @@ export default function AdminPage() {
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div className="rounded-2xl bg-white p-5 shadow-sm">
               <div className="text-3xl font-extrabold">{analytics.total_visits}</div>
-              <div className="text-sm text-slate-500">Visits (30d)</div>
+              <div className="text-sm text-slate-500">Visits (7d)</div>
             </div>
             <div className="rounded-2xl bg-white p-5 shadow-sm">
               <div className="text-3xl font-extrabold">{analytics.unique_visitors}</div>
