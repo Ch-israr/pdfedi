@@ -96,7 +96,8 @@ def create_app() -> FastAPI:
     @app.middleware("http")
     async def visit_tracking(request, call_next):
         # Privacy-first page-view logging for the admin analytics dashboard.
-        # Runs after the response is built; never breaks a request.
+        # Humans -> visits table; bots -> separate bot_visits table (name +
+        # country only). Runs after the response is built; never breaks a request.
         response = await call_next(request)
         try:
             from pdfedi import analytics as _analytics
@@ -104,16 +105,21 @@ def create_app() -> FastAPI:
 
             path = request.url.path
             ua = request.headers.get("user-agent", "")
-            if _analytics.should_track(path, ua):
+            is_bot = _analytics.is_bot(ua)
+            if _analytics.should_track(path, ua) or _analytics.should_track_bot(path, ua):
                 db = SessionLocal()
                 try:
-                    _analytics.log_visit(
-                        db,
-                        ip=_analytics.client_ip_from_headers(request.headers),
-                        user_agent=ua,
-                        referrer=request.headers.get("referer", ""),
-                        path=path,
-                    )
+                    ip = _analytics.client_ip_from_headers(request.headers)
+                    if is_bot:
+                        _analytics.log_bot_visit(db, ip=ip, user_agent=ua, path=path)
+                    else:
+                        _analytics.log_visit(
+                            db,
+                            ip=ip,
+                            user_agent=ua,
+                            referrer=request.headers.get("referer", ""),
+                            path=path,
+                        )
                 finally:
                     db.close()
         except Exception:

@@ -120,6 +120,19 @@ class Visit(Base):
     created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
 
 
+class BotVisit(Base):
+    """Bot/crawler page-view record — name + country only, separate table.
+    Rows auto-expire after 30 days."""
+
+    __tablename__ = "bot_visits"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    name: Mapped[str] = mapped_column(String(64), nullable=False)
+    country: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    path: Mapped[str] = mapped_column(String(256), nullable=False)
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
+
+
 class Quota(Base):
     """Per-IP, per-tool, per-hour usage counters (survives restarts)."""
     __tablename__ = "quotas"

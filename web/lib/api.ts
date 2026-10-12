@@ -119,6 +119,11 @@ export const api = {
     by_browser: Array<{ name: string; count: number }>;
     by_source: Array<{ name: string; count: number }>;
     by_day: Array<{ date: string; count: number }>;
+    bots: {
+      total: number;
+      by_name: Array<{ name: string; count: number }>;
+      by_country: Array<{ name: string; count: number }>;
+    };
     recent: Array<{
       created_at: string;
       ip: string;

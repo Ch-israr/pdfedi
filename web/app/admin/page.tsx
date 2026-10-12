@@ -278,6 +278,54 @@ export default function AdminPage() {
       )}
 
       <h2 className="mt-10 text-lg font-bold">
+        Bot traffic{" "}
+        {analytics && analytics.bots.total > 0 && (
+          <span className="ml-2 rounded-full bg-slate-200 px-2 py-0.5 text-xs font-semibold text-slate-700">
+            {analytics.bots.total} hits
+          </span>
+        )}
+      </h2>
+      {analytics ? (
+        <>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <h3 className="font-bold">By bot name</h3>
+              <ul className="mt-2 space-y-1 text-sm">
+                {analytics.bots.by_name.map((r) => (
+                  <li key={r.name} className="flex justify-between">
+                    <span className="text-slate-700">{r.name}</span>
+                    <span className="font-semibold">{r.count}</span>
+                  </li>
+                ))}
+                {analytics.bots.by_name.length === 0 && (
+                  <li className="text-slate-500">No bot visits yet.</li>
+                )}
+              </ul>
+            </div>
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <h3 className="font-bold">By country</h3>
+              <ul className="mt-2 space-y-1 text-sm">
+                {analytics.bots.by_country.map((r) => (
+                  <li key={r.name} className="flex justify-between">
+                    <span className="text-slate-700">{r.name}</span>
+                    <span className="font-semibold">{r.count}</span>
+                  </li>
+                ))}
+                {analytics.bots.by_country.length === 0 && (
+                  <li className="text-slate-500">No data yet.</li>
+                )}
+              </ul>
+            </div>
+          </div>
+          <p className="mt-3 text-xs text-slate-400">
+            Bots are tracked separately (name + country only) and never counted as visitors.
+          </p>
+        </>
+      ) : (
+        <p className="mt-3 text-sm text-slate-500">Loading bot stats…</p>
+      )}
+
+      <h2 className="mt-10 text-lg font-bold">
         Recent login attempts{" "}
         {failedRecent > 0 && (
           <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">

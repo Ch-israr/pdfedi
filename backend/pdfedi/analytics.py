@@ -45,6 +45,47 @@ def is_bot(user_agent: str) -> bool:
     return bool(user_agent) and bool(_BOT_RE.search(user_agent))
 
 
+# Known bot tokens -> friendly display names (checked in order).
+_BOT_NAMES = [
+    ("GPTBot", "GPTBot (OpenAI)"),
+    ("OAI-SearchBot", "OAI-SearchBot (OpenAI)"),
+    ("ChatGPT-User", "ChatGPT-User (OpenAI)"),
+    ("ClaudeBot", "ClaudeBot (Anthropic)"),
+    ("Claude-SearchBot", "Claude-SearchBot (Anthropic)"),
+    ("Claude-User", "Claude-User (Anthropic)"),
+    ("PerplexityBot", "PerplexityBot"),
+    ("Perplexity-User", "Perplexity-User"),
+    ("Googlebot", "Googlebot"),
+    ("Google-Extended", "Google-Extended"),
+    ("bingbot", "Bingbot"),
+    ("Applebot", "Applebot"),
+    ("DuckAssistBot", "DuckAssistBot"),
+    ("CCBot", "CCBot (Common Crawl)"),
+    ("facebookexternalhit", "Facebook External Hit"),
+    ("meta-externalagent", "Meta External Agent"),
+    ("meta-externalfetcher", "Meta External Fetcher"),
+    ("meta-webindexer", "Meta Web Indexer"),
+    ("Bytespider", "Bytespider"),
+    ("SemrushBot", "SemrushBot"),
+    ("AhrefsBot", "AhrefsBot"),
+    ("MJ12bot", "MJ12bot"),
+    ("DotBot", "DotBot"),
+    ("PetalBot", "PetalBot"),
+]
+
+
+def bot_name(user_agent: str) -> str:
+    """Friendly bot name from the User-Agent; 'Unknown bot' as fallback."""
+    ua = user_agent or ""
+    for token, label in _BOT_NAMES:
+        if token.lower() in ua.lower():
+            return label
+    m = re.search(r"([A-Za-z][\w.-]*?(?:bot|crawler|spider|scraper)[\w.-]*)", ua, re.I)
+    if m:
+        return m.group(1)[:64]
+    return "Unknown bot"
+
+
 # ---------------------------------------------------------------------------
 # Device / browser classification from User-Agent
 # ---------------------------------------------------------------------------
@@ -194,7 +235,17 @@ _TRACKED_PREFIXES = ("/tools/", "/editor")
 
 
 def should_track(path: str, user_agent: str) -> bool:
+    """Human page views: /, /editor, /tools/*. Bots go to the bot table."""
     if is_bot(user_agent or ""):
+        return False
+    if path == "/" or path.startswith(_TRACKED_PREFIXES):
+        return True
+    return False
+
+
+def should_track_bot(path: str, user_agent: str) -> bool:
+    """Bot page views on the same tracked paths, logged separately."""
+    if not is_bot(user_agent or ""):
         return False
     if path == "/" or path.startswith(_TRACKED_PREFIXES):
         return True
@@ -231,11 +282,37 @@ def log_visit(db, *, ip: str, user_agent: str, referrer: str, path: str) -> None
             pass
 
 
+def log_bot_visit(db, *, ip: str, user_agent: str, path: str) -> None:
+    """Write one bot visit row (name + country only) + prune. Never raises."""
+    try:
+        from .models import BotVisit
+
+        country, _ = geo_lookup(ip)
+        db.add(
+            BotVisit(
+                id=__import__("uuid").uuid4().hex,
+                name=bot_name(user_agent),
+                country=country,
+                path=path[:256],
+                created_at=datetime.now(timezone.utc).isoformat(),
+            )
+        )
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=RETENTION_DAYS)).isoformat()
+        db.query(BotVisit).filter(BotVisit.created_at < cutoff).delete()
+        db.commit()
+    except Exception as exc:
+        log.warning("bot visit logging failed: %s", exc)
+        try:
+            db.rollback()
+        except Exception:
+            pass
+
+
 def get_analytics(db, days: int = 30) -> dict:
     """Aggregated stats for the admin dashboard. Never raises."""
     from sqlalchemy import func
 
-    from .models import Visit
+    from .models import BotVisit, Visit
 
     try:
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
@@ -243,12 +320,12 @@ def get_analytics(db, days: int = 30) -> dict:
         total = base.count()
         unique = base.with_entities(func.count(func.distinct(Visit.ip_trunc))).scalar() or 0
 
-        def grouped(col, limit=10):
+        def grouped(model, col, limit=10):
             rows = (
-                db.query(col, func.count(Visit.id))
-                .filter(Visit.created_at >= cutoff)
+                db.query(col, func.count(model.id))
+                .filter(model.created_at >= cutoff)
                 .group_by(col)
-                .order_by(func.count(Visit.id).desc())
+                .order_by(func.count(model.id).desc())
                 .limit(limit)
                 .all()
             )
@@ -264,17 +341,18 @@ def get_analytics(db, days: int = 30) -> dict:
         recent = (
             db.query(Visit).order_by(Visit.created_at.desc()).limit(20).all()
         )
+        bot_total = db.query(BotVisit).filter(BotVisit.created_at >= cutoff).count()
         return {
             "total_visits": total,
             "unique_visitors": unique,
             "days": days,
             "retention_days": RETENTION_DAYS,
             "geo_available": GEOIP_PATH.is_file(),
-            "by_country": grouped(Visit.country),
-            "by_city": grouped(Visit.city),
-            "by_device": grouped(Visit.device),
-            "by_browser": grouped(Visit.browser),
-            "by_source": grouped(Visit.source),
+            "by_country": grouped(Visit, Visit.country),
+            "by_city": grouped(Visit, Visit.city),
+            "by_device": grouped(Visit, Visit.device),
+            "by_browser": grouped(Visit, Visit.browser),
+            "by_source": grouped(Visit, Visit.source),
             "by_day": [{"date": r[0], "count": r[1]} for r in by_day],
             "recent": [
                 {
@@ -289,6 +367,11 @@ def get_analytics(db, days: int = 30) -> dict:
                 }
                 for v in recent
             ],
+            "bots": {
+                "total": bot_total,
+                "by_name": grouped(BotVisit, BotVisit.name),
+                "by_country": grouped(BotVisit, BotVisit.country),
+            },
         }
     except Exception as exc:
         log.warning("analytics query failed: %s", exc)
