@@ -65,7 +65,8 @@ COPY --from=editor /build/editor/apps/web/out ./static/editor
 # free, no account needed — https://db-ip.com/db/lite.php). Best-effort:
 # the app runs fine without it (country/city show as "Unknown").
 # Refresh monthly by rebuilding (new file published on the 1st).
-RUN mkdir -p /srv/geoip && \
+RUN apt-get update -qq && apt-get install -y -qq curl ca-certificates && rm -rf /var/lib/apt/lists && \
+    mkdir -p /srv/geoip && \
     (curl -sL --max-time 90 -o /tmp/dbip.mmdb.gz "https://download.db-ip.com/free/dbip-city-lite-$(date +%Y-%m).mmdb.gz" || \
      curl -sL --max-time 90 -o /tmp/dbip.mmdb.gz "https://download.db-ip.com/free/dbip-city-lite-$(date -d 'last month' +%Y-%m).mmdb.gz") && \
     gunzip -c /tmp/dbip.mmdb.gz > /srv/geoip/dbip-city-lite.mmdb && rm -f /tmp/dbip.mmdb.gz && \
