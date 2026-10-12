@@ -81,6 +81,18 @@ def create_app() -> FastAPI:
     app.include_router(public_api.router, prefix="/api/v1", tags=["public"])
     app.include_router(admin_api.router, prefix="/api/v1/admin", tags=["admin"])
 
+    @app.middleware("http")
+    async def security_headers(request, call_next):
+        response = await call_next(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # Render terminates TLS; the site is HTTPS-only.
+        response.headers["Strict-Transport-Security"] = (
+            "max-age=31536000; includeSubDomains"
+        )
+        return response
+
     frontend = Path(settings.frontend_dir)
     if frontend.is_dir():
         app.mount("/_next", StaticFiles(directory=frontend / "_next"), name="next-static")
@@ -100,6 +112,11 @@ def create_app() -> FastAPI:
                 tool_page = frontend / "tools" / path.split("/")[-1] / "index.html"
                 if tool_page.is_file():
                     return FileResponse(tool_page)
+                # Unknown tool slug: real 404 page, not a silent homepage.
+                not_found = frontend / "404" / "index.html"
+                if not_found.is_file():
+                    return FileResponse(not_found, status_code=404)
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
             index = frontend / "index.html"
             if index.is_file():
                 return FileResponse(index)

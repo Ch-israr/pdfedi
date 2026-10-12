@@ -16,27 +16,21 @@ export default function Home() {
       </section>
 
       <section className="mt-4">
-        <div className="mb-4 text-xs font-bold uppercase tracking-widest text-brand-600">
+        <div className="mb-4 text-center text-xs font-bold uppercase tracking-widest text-brand-600">
           Most popular
         </div>
         <Link
           href="/editor"
-          className="group block rounded-2xl bg-white p-5 shadow-sm ring-2 ring-brand-600 transition hover:-translate-y-0.5 hover:shadow-md"
+          className="group mx-auto flex aspect-square w-full max-w-sm flex-col items-center justify-center rounded-3xl bg-gradient-to-br from-brand-600 to-brand-700 p-8 text-center text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
         >
-          <div className="flex items-center gap-4">
-            <div className="text-4xl">✏️</div>
-            <div>
-              <div className="text-lg font-semibold group-hover:text-brand-600">
-                PDF Editor
-              </div>
-              <div className="mt-1 text-sm text-slate-500">
-                Edit text, add images &amp; shapes, sign, redact — right in your
-                browser. Your file never leaves your device.
-              </div>
-            </div>
-            <div className="ml-auto hidden text-sm font-medium text-brand-600 sm:block">
-              Open →
-            </div>
+          <div className="text-6xl">✏️</div>
+          <div className="mt-4 text-2xl font-bold tracking-tight">PDF Editor</div>
+          <div className="mt-2 text-sm leading-relaxed text-blue-100">
+            Edit text, add images &amp; shapes, sign, redact — right in your
+            browser. Your file never leaves your device.
+          </div>
+          <div className="mt-6 rounded-full bg-white px-6 py-2 text-sm font-semibold text-brand-700 shadow-sm transition group-hover:bg-blue-50">
+            Open Editor →
           </div>
         </Link>
       </section>
