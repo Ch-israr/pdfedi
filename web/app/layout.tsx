@@ -10,9 +10,9 @@ export const metadata: Metadata = {
     google: "B8JxEkvHXO4JaUEYYhl6W8nD59onzRApzrSQhN9xMlI",
   },
   icons: {
-    icon: "/icon-v2.png",
-    shortcut: "/favicon-v2.ico",
-    apple: "/apple-touch-icon-v2.png",
+    icon: "/icon-v3.png",
+    shortcut: "/favicon-v3.ico",
+    apple: "/apple-touch-icon-v3.png",
   },
 };
 
