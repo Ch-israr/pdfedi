@@ -419,7 +419,10 @@ function ElementView({
               color: el.color,
               fontWeight: el.bold ? 'bold' : 'normal',
               fontStyle: el.italic ? 'italic' : 'normal',
-              whiteSpace: 'pre-wrap',
+              // Single-line: never wrap. A wrapped longer edit would overflow
+              // upward (bottom-aligned flex) into the line above. Native
+              // fragments are single content-stream runs by definition.
+              whiteSpace: 'nowrap',
               overflow: 'visible',
               // Align text to the original baseline within the cover box
               paddingBottom: toScreen(el.baselineOffset, zoom),
@@ -746,6 +749,13 @@ export function ElementOverlay({ page }: { page: Page }) {
   const nativeEditWarned = useEditor((s) => s.nativeEditWarned);
   const markNativeEditWarned = useEditor((s) => s.markNativeEditWarned);
   const drawRef = useRef<HTMLDivElement>(null);
+  // Persistent hidden file input for the Image tool. A dynamically-created
+  // detached <input type=file> does not reliably open the picker (Chrome
+  // requires the input to be in the DOM), so the input lives here and the
+  // Image tool just clicks it. The click point is stashed in a ref so the
+  // image lands where the user clicked.
+  const imageInputRef = useRef<HTMLInputElement>(null);
+  const imageClickPoint = useRef<{ x: number; y: number; id: string } | null>(null);
 
   const els = Object.values(elements).filter((e) => e.pageId === page.id);
 
@@ -1119,29 +1129,10 @@ export function ElementOverlay({ page }: { page: Page }) {
         // drag is intentionally discarded (no default-size element).
         break;
       case 'image': {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/png,image/jpeg';
-        input.onchange = () => {
-          const f = input.files?.[0];
-          if (!f) return;
-          const url = URL.createObjectURL(f);
-          const img = new Image();
-          img.onload = () => {
-            const maxW = 300;
-            const scale = Math.min(1, maxW / img.width);
-            place(
-              {
-                id, pageId: page.id, kind: 'image', x, y: y - img.height * scale,
-                rotation: 0, src: url, width: img.width * scale,
-                height: img.height * scale, mime: f.type,
-              },
-              'Image Added',
-            );
-          };
-          img.src = url;
-        };
-        input.click();
+        // Stash the click point, then open the persistent hidden picker.
+        // The image is placed in onImageFileSelected once chosen.
+        imageClickPoint.current = { x, y, id };
+        imageInputRef.current?.click();
         break;
       }
       case 'signature': {
@@ -1162,6 +1153,49 @@ export function ElementOverlay({ page }: { page: Page }) {
         select(null);
     }
   };
+
+  // Fires when the user picks a file in the hidden Image-tool picker.
+  // Places the image at the stashed click point (top edge at the click),
+  // or centered on the page if the picker was opened without a point.
+  const onImageFileSelected = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const f = e.target.files?.[0];
+      // Reset so picking the same file twice in a row still fires change.
+      e.target.value = '';
+      if (!f) {
+        imageClickPoint.current = null;
+        return;
+      }
+      const pt = imageClickPoint.current;
+      imageClickPoint.current = null;
+      const url = URL.createObjectURL(f);
+      const img = new Image();
+      img.onload = () => {
+        const maxW = 300;
+        const scale = Math.min(1, maxW / img.width);
+        const w = img.width * scale;
+        const h = img.height * scale;
+        addElement(
+          {
+            id: pt?.id ?? crypto.randomUUID(),
+            pageId: page.id,
+            kind: 'image',
+            x: pt ? pt.x : page.width / 2 - w / 2,
+            y: pt ? pt.y - h : page.height / 2 - h / 2,
+            rotation: 0,
+            src: url,
+            width: w,
+            height: h,
+            mime: f.type,
+          },
+          'Image Added',
+        );
+      };
+      img.onerror = () => URL.revokeObjectURL(url);
+      img.src = url;
+    },
+    [addElement, page.id, page.width, page.height],
+  );
 
   // Drag-to-draw for shapes: press → drag → release defines the geometry.
   // No default-size element is created; a click without drag is discarded.
@@ -1562,6 +1596,17 @@ export function ElementOverlay({ page }: { page: Page }) {
       {showNativeWarning && (
         <NativeEditWarning onClose={() => setShowNativeWarning(false)} />
       )}
+      {/* Hidden file picker for the Image tool — must live in the DOM for
+          the browser to open the file dialog on .click(). */}
+      <input
+        ref={imageInputRef}
+        type="file"
+        accept="image/*"
+        aria-hidden
+        tabIndex={-1}
+        onChange={onImageFileSelected}
+        style={{ display: 'none' }}
+      />
       {/* Smart alignment guides — visual only, never part of the document */}
       {guides.map((g, i) =>
         g.orientation === 'v' ? (
@@ -1827,11 +1872,6 @@ function InlineTextEditor({
     settledRef.current = true;
     onCommit(v);
   };
-  const cancelOnce = () => {
-    if (settledRef.current) return;
-    settledRef.current = true;
-    onCancel();
-  };
 
   useEffect(() => {
     ref.current?.focus();
@@ -1884,8 +1924,11 @@ function InlineTextEditor({
           e.preventDefault();
           commitOnce(value);
         } else if (e.key === 'Escape') {
+          // Escape COMMITS the edit (same as Enter) — discarding a draft
+          // silently was losing user work. To discard, use Undo (Ctrl+Z)
+          // after committing.
           e.preventDefault();
-          cancelOnce();
+          commitOnce(value);
         }
       }}
       placeholder={placeholder ?? 'Type your text'}
@@ -1911,24 +1954,32 @@ function InlineTextEditor({
   );
 }
 
-/** Minimal signature pad dialog (MVP). */
+/** Minimal signature pad dialog (MVP). Renders at 3× backing store so the
+ * exported signature is crisp when placed/scaled in the PDF; the CSS size
+ * stays 400×150. */
 function openSignaturePad(onDone: (dataUrl: string, w: number, h: number) => void) {
+  const SCALE = 3;
+  const CSS_W = 400;
+  const CSS_H = 150;
   const overlay = document.createElement('div');
   overlay.style.cssText =
     'position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;display:flex;align-items:center;justify-content:center;';
   const box = document.createElement('div');
   box.style.cssText = 'background:white;border-radius:12px;padding:16px;';
   const canvas = document.createElement('canvas');
-  canvas.width = 400;
-  canvas.height = 150;
-  canvas.style.cssText = 'border:1px solid #cbd5e1;border-radius:8px;touch-action:none;cursor:crosshair;';
+  canvas.width = CSS_W * SCALE;
+  canvas.height = CSS_H * SCALE;
+  canvas.style.cssText = `width:${CSS_W}px;height:${CSS_H}px;border:1px solid #cbd5e1;border-radius:8px;touch-action:none;cursor:crosshair;`;
   const ctx = canvas.getContext('2d')!;
-  ctx.lineWidth = 2;
+  ctx.lineWidth = 2 * SCALE;
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
   ctx.strokeStyle = '#000';
   let drawing = false;
   const pos = (e: PointerEvent) => {
     const r = canvas.getBoundingClientRect();
-    return { x: e.clientX - r.left, y: e.clientY - r.top };
+    // Map CSS pixels to backing-store pixels
+    return { x: (e.clientX - r.left) * SCALE, y: (e.clientY - r.top) * SCALE };
   };
   canvas.onpointerdown = (e) => {
     drawing = true;

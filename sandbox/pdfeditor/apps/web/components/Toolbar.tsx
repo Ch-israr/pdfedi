@@ -5,6 +5,8 @@ import { useEditor, type ToolId } from '@/store/editor';
 import { HistoryPanel } from './HistoryPanel';
 import { FindReplaceDialog } from './FindReplaceDialog';
 import { RedactConfirmDialog } from './RedactConfirmDialog';
+import { DownloadDialog } from './DownloadDialog';
+import { CloseConfirmDialog } from './CloseConfirmDialog';
 import { ToolIcon } from './ToolIcon';
 import { ShapesDropdown } from './ShapesDropdown';
 import { AnnotateDropdown } from './AnnotateDropdown';
@@ -76,6 +78,8 @@ function PillDivider() {
 export function Toolbar() {
   const [showFindReplace, setShowFindReplace] = useState(false);
   const [showRedactConfirm, setShowRedactConfirm] = useState(false);
+  const [showDownloadDialog, setShowDownloadDialog] = useState(false);
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   const redactCount = useEditor((s) => Object.values(s.elements).filter((e) => e.kind === 'redact').length);
   const tool = useEditor((s) => s.tool);
   const setTool = useEditor((s) => s.setTool);
@@ -83,7 +87,6 @@ export function Toolbar() {
   const redo = useEditor((s) => s.redo);
   const past = useEditor((s) => s.past);
   const future = useEditor((s) => s.future);
-  const download = useEditor((s) => s.download);
   const downloading = useEditor((s) => s.downloading);
   const downloadError = useEditor((s) => s.downloadError);
   const closeDocument = useEditor((s) => s.closeDocument);
@@ -225,7 +228,7 @@ export function Toolbar() {
           type="button"
           onClick={() => {
             if (redactCount > 0) setShowRedactConfirm(true);
-            else void download();
+            else setShowDownloadDialog(true);
           }}
           disabled={downloading}
           title={downloading ? 'Your PDF is being prepared. Please wait...' : 'Download PDF'}
@@ -244,8 +247,14 @@ export function Toolbar() {
         </button>
         <button
           type="button"
-          onClick={closeDocument}
-          title="Close document (discards everything)"
+          onClick={() => {
+            // Only prompt when there are unsaved changes; otherwise close
+            // immediately with no annoyance.
+            const hasChanges = useEditor.getState().past.length > 0;
+            if (hasChanges) setShowCloseConfirm(true);
+            else closeDocument();
+          }}
+          title="Close document"
           className="flex h-9 items-center rounded-lg border border-slate-300 px-3 text-sm text-slate-600 transition-colors hover:bg-slate-50 hover:text-slate-800"
         >
           Close
@@ -258,7 +267,23 @@ export function Toolbar() {
           onCancel={() => setShowRedactConfirm(false)}
           onConfirm={() => {
             setShowRedactConfirm(false);
-            void download();
+            setShowDownloadDialog(true);
+          }}
+        />
+      )}
+      {showDownloadDialog && (
+        <DownloadDialog onClose={() => setShowDownloadDialog(false)} />
+      )}
+      {showCloseConfirm && (
+        <CloseConfirmDialog
+          onCancel={() => setShowCloseConfirm(false)}
+          onDiscard={() => {
+            setShowCloseConfirm(false);
+            closeDocument();
+          }}
+          onSaveDownload={() => {
+            setShowCloseConfirm(false);
+            setShowDownloadDialog(true);
           }}
         />
       )}

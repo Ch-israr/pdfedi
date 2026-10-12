@@ -84,7 +84,11 @@ export function Thumbnails({
             onRotate={() => rotatePage(page.id)}
             onDuplicate={() => duplicatePage(page.id)}
             onDelete={() => {
-              if (pages.length > 1 && window.confirm(`Delete page ${i + 1}?`)) {
+              // Delete immediately — no window.confirm: the synchronous
+              // native dialog blocks the main thread (observed to freeze
+              // the tab under automation and in backgrounded tabs).
+              // Deletion is fully recoverable via Undo (Ctrl+Z).
+              if (pages.length > 1) {
                 deletePage(page.id);
               }
             }}
