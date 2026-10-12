@@ -92,18 +92,63 @@ def _open_reader(data: bytes, filename: str) -> PdfReader:
     return reader
 
 
-def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
-    """Downsample a pypdf image XObject in place. Returns True if modified."""
+def _pil_image_from_xobject(img_obj):
+    """Build a PIL image from a PDF image XObject.
+
+    DCTDecode (JPEG) bytes are opened directly. For anything else
+    (FlateDecode, raw, …) ``get_data()`` returns headerless pixel bytes,
+    so the image is reconstructed with ``Image.frombytes`` from the
+    XObject's /Width, /Height, /ColorSpace and /BitsPerComponent.
+    Returns None when the image can't be decoded (leave untouched).
+    """
     try:
         data = img_obj.get_data()
     except Exception:
-        return False
+        return None
+
+    filt = img_obj.get("/Filter")
+    filters = list(filt) if isinstance(filt, list) else [filt]
+    if NameObject("/DCTDecode") in filters:
+        try:
+            image = Image.open(io.BytesIO(data))
+            image.load()
+            return image
+        except Exception:
+            return None
+
+    # Raw pixel data — reconstruct from the image dictionary.
+    try:
+        width = int(img_obj["/Width"])
+        height = int(img_obj["/Height"])
+        bpc = int(img_obj.get("/BitsPerComponent", 8))
+        cs = img_obj.get("/ColorSpace")
+    except Exception:
+        return None
+    cs_name = str(cs[0]) if isinstance(cs, list) and cs else str(cs or "")
+
+    mode = None
+    if cs_name == "/DeviceRGB" and bpc == 8:
+        mode = "RGB"
+    elif cs_name == "/DeviceGray" and bpc == 8:
+        mode = "L"
+    elif cs_name == "/DeviceGray" and bpc == 1:
+        mode = "1"
+    elif cs_name == "/DeviceCMYK" and bpc == 8:
+        mode = "CMYK"
+    if mode is None:
+        return None  # indexed, ICC-based, … — leave untouched
 
     try:
-        image = Image.open(io.BytesIO(data))
-        image.load()
+        return Image.frombytes(mode, (width, height), data)
     except Exception:
-        return False  # exotic image — leave untouched
+        return None
+
+
+def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
+    """Downsample a pypdf image XObject in place. Returns True if modified."""
+    image = _pil_image_from_xobject(img_obj)
+    if image is None:
+        return False
 
     w, h = image.size
     if max(w, h) > max_dim:
@@ -128,8 +173,13 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     image.save(buf, "JPEG", quality=jpeg_quality, optimize=True)
     jpeg_bytes = buf.getvalue()
 
-    # Only replace if it actually shrinks
-    if len(jpeg_bytes) >= len(data):
+    # Only replace if it actually shrinks. Compare against the true encoded
+    # stream size (_data is never mutated by get_data()); comparing against
+    # decoded pixel bytes would make JPEG almost always "win", even when the
+    # original Flate stream was already smaller.
+    raw = getattr(img_obj, "_data", None)
+    orig_size = len(raw) if raw else w * h * 3
+    if len(jpeg_bytes) >= orig_size:
         return False
 
     # Rebuild the XObject as a proper DCTDecode (JPEG) image
