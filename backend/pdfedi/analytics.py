@@ -312,7 +312,7 @@ def get_analytics(db, days: int = 7) -> dict:
     """Aggregated stats for the admin dashboard. Never raises."""
     from sqlalchemy import func
 
-    from .models import BotVisit, Visit
+    from .models import BotVisit, Job, Visit
 
     try:
         cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
@@ -320,15 +320,11 @@ def get_analytics(db, days: int = 7) -> dict:
         total = base.count()
         unique = base.with_entities(func.count(func.distinct(Visit.ip_trunc))).scalar() or 0
 
-        def grouped(model, col, limit=10):
-            rows = (
-                db.query(col, func.count(model.id))
-                .filter(model.created_at >= cutoff)
-                .group_by(col)
-                .order_by(func.count(model.id).desc())
-                .limit(limit)
-                .all()
-            )
+        def grouped(model, col, limit=10, extra_filter=None):
+            q = db.query(col, func.count(model.id)).filter(model.created_at >= cutoff)
+            if extra_filter is not None:
+                q = q.filter(extra_filter)
+            rows = q.group_by(col).order_by(func.count(model.id).desc()).limit(limit).all()
             return [{"name": (r[0] or "Unknown"), "count": r[1]} for r in rows]
 
         by_day = (
@@ -372,6 +368,22 @@ def get_analytics(db, days: int = 7) -> dict:
                 "total": bot_total,
                 "by_name": grouped(BotVisit, BotVisit.name),
                 "by_country": grouped(BotVisit, BotVisit.country),
+            },
+            "tools": {
+                "completions": grouped(Job, Job.tool, limit=20, extra_filter=(Job.status == "succeeded")),
+                "failures": grouped(Job, Job.tool, limit=20, extra_filter=(Job.status == "failed")),
+                "recent_failures": [
+                    {
+                        "tool": j.tool,
+                        "error": (j.error or "Unknown error")[:200],
+                        "created_at": j.created_at,
+                    }
+                    for j in db.query(Job)
+                    .filter(Job.status == "failed", Job.created_at >= cutoff)
+                    .order_by(Job.created_at.desc())
+                    .limit(10)
+                    .all()
+                ],
             },
         }
     except Exception as exc:

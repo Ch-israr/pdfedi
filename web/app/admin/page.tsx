@@ -292,6 +292,63 @@ export default function AdminPage() {
             IPs are truncated (never stored in full); bots excluded; data auto-deleted after{" "}
             {analytics.retention_days} days. Geolocation by DB-IP (db-ip.com), CC BY 4.0.
           </p>
+
+          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <h3 className="font-bold">Tool completions (7d)</h3>
+              <ul className="mt-2 space-y-1 text-sm">
+                {analytics.tools.completions.map((r) => (
+                  <li key={r.name} className="flex justify-between">
+                    <span className="text-slate-700">{r.name}</span>
+                    <span className="font-semibold">{r.count}</span>
+                  </li>
+                ))}
+                {analytics.tools.completions.length === 0 && (
+                  <li className="text-slate-500">No completed tool runs yet.</li>
+                )}
+              </ul>
+            </div>
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <h3 className="font-bold">Tool failures (7d)</h3>
+              <ul className="mt-2 space-y-1 text-sm">
+                {analytics.tools.failures.map((r) => (
+                  <li key={r.name} className="flex justify-between">
+                    <span className="text-slate-700">{r.name}</span>
+                    <span className="font-semibold text-red-600">{r.count}</span>
+                  </li>
+                ))}
+                {analytics.tools.failures.length === 0 && (
+                  <li className="text-slate-500">No failures — all clean.</li>
+                )}
+              </ul>
+              {analytics.tools.recent_failures.length > 0 && (
+                <div className="mt-3 border-t pt-3">
+                  <h4 className="text-sm font-semibold text-slate-600">Recent errors</h4>
+                  <ul className="mt-1 space-y-1 text-xs text-slate-500">
+                    {analytics.tools.recent_failures.map((f, i) => (
+                      <li key={i} className="break-words">
+                        <span className="font-semibold text-slate-700">{f.tool}</span>
+                        {" — "}
+                        {f.error}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="mt-4 flex flex-wrap gap-2">
+            {(["visits", "bots", "logins", "jobs"] as const).map((t) => (
+              <button
+                key={t}
+                onClick={() => api.adminAnalyticsCsv(t).catch(() => alert("Export failed"))}
+                className="rounded-full bg-slate-200 px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-slate-300"
+              >
+                Export {t} CSV
+              </button>
+            ))}
+          </div>
         </>
       ) : (
         <p className="mt-3 text-sm text-slate-500">Loading analytics…</p>

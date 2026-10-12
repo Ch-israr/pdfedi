@@ -138,6 +138,50 @@ def login_attempts(
     ]
 
 
+@router.get("/analytics/export")
+def export_analytics(
+    table: str = Query("visits", pattern="^(visits|bots|logins|jobs)$"),
+    db: Session = Depends(get_db),
+    _admin=Depends(require_admin),
+):
+    """Download analytics data as CSV (7-day retention window)."""
+    import csv
+    import io
+    from datetime import datetime, timedelta, timezone
+
+    from fastapi.responses import StreamingResponse
+
+    from ..models import AdminLoginAttempt, BotVisit, Job, Visit
+
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    buf = io.StringIO()
+    w = csv.writer(buf)
+
+    if table == "visits":
+        w.writerow(["created_at", "ip_truncated", "country", "city", "device", "browser", "source", "path"])
+        for v in db.query(Visit).filter(Visit.created_at >= cutoff).order_by(Visit.created_at.desc()).all():
+            w.writerow([v.created_at, v.ip_trunc, v.country, v.city, v.device, v.browser, v.source, v.path])
+    elif table == "bots":
+        w.writerow(["created_at", "bot_name", "country", "path"])
+        for b in db.query(BotVisit).filter(BotVisit.created_at >= cutoff).order_by(BotVisit.created_at.desc()).all():
+            w.writerow([b.created_at, b.name, b.country, b.path])
+    elif table == "logins":
+        w.writerow(["created_at", "username", "success"])
+        for a in db.query(AdminLoginAttempt).filter(AdminLoginAttempt.created_at >= cutoff).order_by(AdminLoginAttempt.created_at.desc()).all():
+            w.writerow([a.created_at, a.username, a.success])
+    else:  # jobs
+        w.writerow(["created_at", "tool", "status", "error"])
+        for j in db.query(Job).filter(Job.created_at >= cutoff).order_by(Job.created_at.desc()).all():
+            w.writerow([j.created_at, j.tool, j.status, (j.error or "")[:200]])
+
+    buf.seek(0)
+    return StreamingResponse(
+        iter([buf.getvalue()]),
+        media_type="text/csv",
+        headers={"Content-Disposition": f"attachment; filename=pdfedi-{table}-7d.csv"},
+    )
+
+
 @router.get("/analytics")
 def analytics(
     days: int = 30, admin: AdminUser = Depends(require_admin), db: Session = Depends(get_db)

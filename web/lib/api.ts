@@ -120,6 +120,11 @@ export const api = {
     by_source: Array<{ name: string; count: number }>;
     by_day: Array<{ date: string; count: number }>;
     by_path: Array<{ name: string; count: number }>;
+    tools: {
+      completions: Array<{ name: string; count: number }>;
+      failures: Array<{ name: string; count: number }>;
+      recent_failures: Array<{ tool: string; error: string; created_at: string }>;
+    };
     bots: {
       total: number;
       by_name: Array<{ name: string; count: number }>;
@@ -136,4 +141,22 @@ export const api = {
       path: string;
     }>;
   }> => req("/admin/analytics", { credentials: "same-origin" }),
+  adminAnalyticsCsv: async (
+    table: "visits" | "bots" | "logins" | "jobs",
+  ): Promise<void> => {
+    const res = await fetch(
+      `${BASE}/admin/analytics/export?table=${table}`,
+      { credentials: "same-origin" },
+    );
+    if (!res.ok) throw new Error("Export failed");
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `pdfedi-${table}-7d.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  },
 };
