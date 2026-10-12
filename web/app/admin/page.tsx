@@ -31,18 +31,25 @@ export default function AdminPage() {
   const [error, setError] = useState<string | null>(null);
   const [dash, setDash] = useState<Dashboard | null>(null);
   const [attempts, setAttempts] = useState<LoginAttempt[] | null>(null);
+  const [analytics, setAnalytics] = useState<Awaited<ReturnType<typeof api.adminAnalytics>> | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function load() {
     try {
-      const [d, a] = await Promise.all([api.adminDashboard(), api.adminLoginAttempts()]);
+      const [d, a, an] = await Promise.all([
+        api.adminDashboard(),
+        api.adminLoginAttempts(),
+        api.adminAnalytics(),
+      ]);
       setDash(d);
       setAttempts(a);
+      setAnalytics(an);
       setAuthed(true);
     } catch {
       setAuthed(false);
       setDash(null);
       setAttempts(null);
+      setAnalytics(null);
     }
   }
 
@@ -72,6 +79,7 @@ export default function AdminPage() {
       setAuthed(false);
       setDash(null);
       setAttempts(null);
+      setAnalytics(null);
     }
   }
 
@@ -198,6 +206,76 @@ export default function AdminPage() {
           </div>
         ))}
       </div>
+
+      <h2 className="mt-10 text-lg font-bold">Traffic analytics</h2>
+      {analytics ? (
+        <>
+          <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <div className="text-3xl font-extrabold">{analytics.total_visits}</div>
+              <div className="text-sm text-slate-500">Visits (30d)</div>
+            </div>
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <div className="text-3xl font-extrabold">{analytics.unique_visitors}</div>
+              <div className="text-sm text-slate-500">Unique visitors</div>
+            </div>
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <div className="text-3xl font-extrabold">
+                {analytics.by_country.length > 0 ? analytics.by_country[0].name : "—"}
+              </div>
+              <div className="text-sm text-slate-500">Top country</div>
+            </div>
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <div className="text-3xl font-extrabold">
+                {analytics.by_device.length > 0
+                  ? `${Math.round(
+                      (analytics.by_device.find((d) => d.name === "mobile")?.count || 0) /
+                        Math.max(analytics.total_visits, 1) * 100
+                    )}%`
+                  : "—"}
+              </div>
+              <div className="text-sm text-slate-500">Mobile share</div>
+            </div>
+          </div>
+          {!analytics.geo_available && (
+            <p className="mt-3 text-sm text-amber-700">
+              GeoIP database not installed — country/city show as Unknown.
+            </p>
+          )}
+          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {(
+              [
+                { title: "By country", rows: analytics.by_country },
+                { title: "By city", rows: analytics.by_city },
+                { title: "By device", rows: analytics.by_device },
+                { title: "By browser", rows: analytics.by_browser },
+                { title: "By traffic source", rows: analytics.by_source },
+              ]
+            ).map((section) => (
+              <div key={section.title} className="rounded-2xl bg-white p-5 shadow-sm">
+                <h3 className="font-bold">{section.title}</h3>
+                <ul className="mt-2 space-y-1 text-sm">
+                  {section.rows.map((r) => (
+                    <li key={r.name} className="flex justify-between">
+                      <span className="text-slate-700">{r.name}</span>
+                      <span className="font-semibold">{r.count}</span>
+                    </li>
+                  ))}
+                  {section.rows.length === 0 && (
+                    <li className="text-slate-500">No data yet.</li>
+                  )}
+                </ul>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 text-xs text-slate-400">
+            IPs are truncated (never stored in full); bots excluded; data auto-deleted after{" "}
+            {analytics.retention_days} days. Geolocation by DB-IP (db-ip.com), CC BY 4.0.
+          </p>
+        </>
+      ) : (
+        <p className="mt-3 text-sm text-slate-500">Loading analytics…</p>
+      )}
 
       <h2 className="mt-10 text-lg font-bold">
         Recent login attempts{" "}

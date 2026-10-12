@@ -133,6 +133,16 @@ def login_attempts(
     ]
 
 
+@router.get("/analytics")
+def analytics(
+    days: int = 30, admin: AdminUser = Depends(require_admin), db: Session = Depends(get_db)
+):
+    from ..analytics import get_analytics
+
+    days = max(1, min(days, 90))
+    return get_analytics(db, days=days)
+
+
 @router.get("/dashboard")
 def dashboard(admin: AdminUser = Depends(require_admin), db: Session = Depends(get_db)):
     total_files = db.query(func.count(File.id)).scalar() or 0

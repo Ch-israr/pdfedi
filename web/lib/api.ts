@@ -107,4 +107,27 @@ export const api = {
   adminLoginAttempts: (): Promise<
     Array<{ username: string; ip: string; success: boolean; created_at: string }>
   > => req("/admin/login-attempts", { credentials: "same-origin" }),
+  adminAnalytics: (): Promise<{
+    total_visits: number;
+    unique_visitors: number;
+    days: number;
+    retention_days: number;
+    geo_available: boolean;
+    by_country: Array<{ name: string; count: number }>;
+    by_city: Array<{ name: string; count: number }>;
+    by_device: Array<{ name: string; count: number }>;
+    by_browser: Array<{ name: string; count: number }>;
+    by_source: Array<{ name: string; count: number }>;
+    by_day: Array<{ date: string; count: number }>;
+    recent: Array<{
+      created_at: string;
+      ip: string;
+      country: string;
+      city: string;
+      device: string;
+      browser: string;
+      source: string;
+      path: string;
+    }>;
+  }> => req("/admin/analytics", { credentials: "same-origin" }),
 };

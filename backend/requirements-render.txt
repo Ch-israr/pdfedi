@@ -16,6 +16,11 @@ greenlet==3.1.1
 argon2-cffi==23.1.0
 pyjwt==2.10.1
 
+# --- Analytics (GeoIP, local lookup only) ---
+# geoip2 reads the DB-IP City Lite MMDB (downloaded in the Dockerfile).
+# CC BY 4.0 — attribution shown in the admin dashboard.
+geoip2==4.8.0
+
 # --- PDF processing ---
 # NOTE: PyMuPDF (fitz) is BANNED — AGPL-3.0.
 pypdf==5.1.0

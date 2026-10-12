@@ -93,6 +93,33 @@ def create_app() -> FastAPI:
         )
         return response
 
+    @app.middleware("http")
+    async def visit_tracking(request, call_next):
+        # Privacy-first page-view logging for the admin analytics dashboard.
+        # Runs after the response is built; never breaks a request.
+        response = await call_next(request)
+        try:
+            from pdfedi import analytics as _analytics
+            from pdfedi.db import SessionLocal
+
+            path = request.url.path
+            ua = request.headers.get("user-agent", "")
+            if _analytics.should_track(path, ua):
+                db = SessionLocal()
+                try:
+                    _analytics.log_visit(
+                        db,
+                        ip=_analytics.client_ip_from_headers(request.headers),
+                        user_agent=ua,
+                        referrer=request.headers.get("referer", ""),
+                        path=path,
+                    )
+                finally:
+                    db.close()
+        except Exception:
+            pass
+        return response
+
     frontend = Path(settings.frontend_dir)
     if frontend.is_dir():
         app.mount("/_next", StaticFiles(directory=frontend / "_next"), name="next-static")

@@ -61,5 +61,15 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend ./backend
 COPY --from=web /build/out ./static
 COPY --from=editor /build/editor/apps/web/out ./static/editor
+# GeoIP database for admin traffic analytics (DB-IP City Lite, CC BY 4.0,
+# free, no account needed — https://db-ip.com/db/lite.php). Best-effort:
+# the app runs fine without it (country/city show as "Unknown").
+# Refresh monthly by rebuilding (new file published on the 1st).
+RUN mkdir -p /srv/geoip && \
+    (curl -sL --max-time 90 -o /tmp/dbip.mmdb.gz "https://download.db-ip.com/free/dbip-city-lite-$(date +%Y-%m).mmdb.gz" || \
+     curl -sL --max-time 90 -o /tmp/dbip.mmdb.gz "https://download.db-ip.com/free/dbip-city-lite-$(date -d 'last month' +%Y-%m).mmdb.gz") && \
+    gunzip -c /tmp/dbip.mmdb.gz > /srv/geoip/dbip-city-lite.mmdb && rm -f /tmp/dbip.mmdb.gz && \
+    echo "GeoIP DB installed: $(du -h /srv/geoip/dbip-city-lite.mmdb | cut -f1)" || \
+    echo "WARNING: GeoIP database download failed - country/city analytics will show Unknown"
 EXPOSE 8000
 CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000} --app-dir /srv/backend"]

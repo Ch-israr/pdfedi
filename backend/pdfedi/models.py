@@ -103,6 +103,23 @@ class AdminLoginAttempt(Base):
     created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
 
 
+class Visit(Base):
+    """Privacy-first page-view record. Full IPs are never stored (see
+    analytics.truncate_ip); rows auto-expire after 30 days."""
+
+    __tablename__ = "visits"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    ip_trunc: Mapped[str] = mapped_column(String(64), nullable=False)
+    country: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    city: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    device: Mapped[str] = mapped_column(String(16), nullable=False)
+    browser: Mapped[str] = mapped_column(String(32), nullable=False)
+    source: Mapped[str] = mapped_column(String(64), nullable=False)
+    path: Mapped[str] = mapped_column(String(256), nullable=False)
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
+
+
 class Quota(Base):
     """Per-IP, per-tool, per-hour usage counters (survives restarts)."""
     __tablename__ = "quotas"
