@@ -138,6 +138,67 @@ def login_attempts(
     ]
 
 
+@router.get("/digest")
+def weekly_digest(key: str = Query(""), db: Session = Depends(get_db)):
+    """Private aggregate stats feed for the weekly WhatsApp digest.
+
+    Protected by a 256-bit DIGEST_KEY (query param); returns counts only —
+    no IPs, no personal data. Used by the owner's scheduled digest job.
+    """
+    import os
+    import secrets
+    from datetime import datetime, timedelta, timezone
+
+    from fastapi import HTTPException
+    from sqlalchemy import func
+
+    from ..models import BotVisit, Job, Visit
+
+    expected = os.environ.get("DIGEST_KEY", "")
+    if not expected or not secrets.compare_digest(key, expected):
+        raise HTTPException(status_code=404, detail="Not found")
+
+    cutoff = (datetime.now(timezone.utc) - timedelta(days=7)).isoformat()
+    visits = db.query(Visit).filter(Visit.created_at >= cutoff).count()
+    uniq = db.query(func.count(func.distinct(Visit.ip_trunc))).filter(
+        Visit.created_at >= cutoff
+    ).scalar() or 0
+    bot_hits = db.query(BotVisit).filter(BotVisit.created_at >= cutoff).count()
+    completed = (
+        db.query(Job.tool, func.count(Job.id))
+        .filter(Job.created_at >= cutoff, Job.status == "succeeded")
+        .group_by(Job.tool)
+        .order_by(func.count(Job.id).desc())
+        .limit(5)
+        .all()
+    )
+    failed = (
+        db.query(Job.tool, func.count(Job.id))
+        .filter(Job.created_at >= cutoff, Job.status == "failed")
+        .group_by(Job.tool)
+        .order_by(func.count(Job.id).desc())
+        .limit(5)
+        .all()
+    )
+    countries = (
+        db.query(Visit.country, func.count(Visit.id))
+        .filter(Visit.created_at >= cutoff)
+        .group_by(Visit.country)
+        .order_by(func.count(Visit.id).desc())
+        .limit(5)
+        .all()
+    )
+    return {
+        "days": 7,
+        "visits": visits,
+        "unique_visitors": uniq,
+        "bot_hits": bot_hits,
+        "top_tools": [{"tool": t, "completed": c} for t, c in completed],
+        "failures": [{"tool": t, "count": c} for t, c in failed],
+        "top_countries": [{"country": c or "Unknown", "visits": n} for c, n in countries],
+    }
+
+
 @router.get("/analytics/export")
 def export_analytics(
     table: str = Query("visits", pattern="^(visits|bots|logins|jobs)$"),
