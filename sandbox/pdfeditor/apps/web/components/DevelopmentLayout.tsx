@@ -2,6 +2,7 @@
 
 import { DevHeader } from './DevHeader';
 import { DevFooter } from './DevFooter';
+import { SiteHeader, SiteFooter } from './SiteChrome';
 import { EditorContent } from './EditorContent';
 
 /**
@@ -29,9 +30,15 @@ const DEV_LAYOUT_ENABLED =
 
 export function DevelopmentLayout() {
   if (!DEV_LAYOUT_ENABLED) {
+    // Integrated into the main PDFEDI site: the dummy dev header/footer are
+    // gone — the real site header/footer wrap the editor instead.
     return (
-      <div className="min-h-screen">
-        <EditorContent />
+      <div className="flex min-h-screen flex-col bg-slate-50 text-slate-900 antialiased">
+        <SiteHeader />
+        <div className="flex-1">
+          <EditorContent />
+        </div>
+        <SiteFooter />
       </div>
     );
   }

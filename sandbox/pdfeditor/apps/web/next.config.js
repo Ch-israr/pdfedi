@@ -11,7 +11,14 @@ const nextConfig = {
     : {}),
   ...(basePath ? { basePath } : {}),
   // Inlined into the client bundle so lib code can build base-aware asset URLs.
-  env: { NEXT_BASE_PATH: basePath },
+  // The integrated build also drops the dummy dev header/footer in favour of
+  // the real site chrome (DevelopmentLayout reads NEXT_PUBLIC_DEV_LAYOUT).
+  env: {
+    NEXT_BASE_PATH: basePath,
+    ...(process.env.NEXT_STATIC_EXPORT === '1'
+      ? { NEXT_PUBLIC_DEV_LAYOUT: 'false' }
+      : {}),
+  },
   // Serve the PDF.js worker from /public for reliability (no CDN dependency)
   webpack: (config) => {
     config.resolve.alias.canvas = false;
