@@ -247,9 +247,10 @@ export const useEditor = create<EditorState>()(
         let annotHandled = false;
         if (parsedAnnots) {
           const loaded = await loadPdfDocument(bytes);
-          pages = loaded.pages;
-          pageCount = loaded.pageCount;
-          elements = await bindAnnotationElements(parsedAnnots, pages);
+          try {
+            pages = loaded.pages;
+            pageCount = loaded.pageCount;
+            elements = await bindAnnotationElements(parsedAnnots, pages);
           // Fill originalText for restored native-text elements from the
           // page's own text layer (best-overlap fragment under the mask).
           const nativeEls = Object.values(elements).filter((e) => e.kind === 'native-text');
@@ -289,6 +290,16 @@ export const useEditor = create<EditorState>()(
           } else {
             elements = {};
           }
+        } finally {
+          // The store only needs page metadata + text extraction; the
+          // rendering document is owned by EditorContent. Destroy promptly
+          // — leaked documents wedge the PDF.js worker over time.
+          try {
+            await loaded.doc.destroy();
+          } catch {
+            /* noop */
+          }
+        }
         }
 
         let restoreError: unknown = null;
@@ -333,8 +344,18 @@ export const useEditor = create<EditorState>()(
           };
         } else {
           const loaded = await loadPdfDocument(bytes);
-          pageCount = loaded.pageCount;
-          pages = loaded.pages;
+          try {
+            pageCount = loaded.pageCount;
+            pages = loaded.pages;
+          } finally {
+            // Doc not needed here — EditorContent loads its own for
+            // rendering. Destroy immediately to avoid worker leaks.
+            try {
+              await loaded.doc.destroy();
+            } catch {
+              /* noop */
+            }
+          }
           if (restoreError instanceof RestoreError) {
             // A manifest was present but unusable: open the visible content
             // as a new document and explain clearly. Never invent objects.

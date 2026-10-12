@@ -39,6 +39,14 @@ export function EditorContent() {
       if (!cancelled) {
         docRef.current = loaded.doc as never;
         setDocVersion((v) => v + 1);
+      } else {
+        // Upload superseded while loading — destroy the orphan so it
+        // doesn't leak a worker port.
+        try {
+          await loaded.doc.destroy();
+        } catch {
+          /* noop */
+        }
       }
     })();
     return () => {

@@ -101,7 +101,23 @@ export interface LoadedPdf {
   doc: import('pdfjs-dist').PDFDocumentProxy;
 }
 
-export async function loadPdfDocument(bytes: Uint8Array): Promise<LoadedPdf> {
+export async function loadPdfDocument(
+  bytes: Uint8Array,
+  timeoutMs = 30000,
+): Promise<LoadedPdf> {
+  // Timeout guard: a stalled PDF.js worker must never hang the UI forever.
+  // On timeout the caller gets a clear error; the orphaned worker task is
+  // abandoned (its document is never used).
+  const timeout = new Promise<never>((_, reject) => {
+    setTimeout(
+      () => reject(new Error('PDF loading timed out. Please try again.')),
+      timeoutMs,
+    );
+  });
+  return Promise.race([loadPdfDocumentInner(bytes), timeout]);
+}
+
+async function loadPdfDocumentInner(bytes: Uint8Array): Promise<LoadedPdf> {
   const lib = await getPdfjs();
   const doc = await lib.getDocument({ data: bytes.slice() }).promise;
   const pages: Page[] = [];
