@@ -354,6 +354,7 @@ def get_analytics(db, days: int = 30) -> dict:
             "by_browser": grouped(Visit, Visit.browser),
             "by_source": grouped(Visit, Visit.source),
             "by_day": [{"date": r[0], "count": r[1]} for r in by_day],
+            "by_path": grouped(Visit, Visit.path),
             "recent": [
                 {
                     "created_at": v.created_at,

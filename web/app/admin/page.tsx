@@ -242,6 +242,25 @@ export default function AdminPage() {
               GeoIP database not installed — country/city show as Unknown.
             </p>
           )}
+          {analytics.by_day.length > 0 && (
+            <div className="mt-4 rounded-2xl bg-white p-5 shadow-sm">
+              <h3 className="font-bold">Visits per day</h3>
+              <div className="mt-3 flex h-28 items-end gap-1.5">
+                {analytics.by_day.map((d) => {
+                  const max = Math.max(...analytics.by_day.map((x) => x.count), 1);
+                  return (
+                    <div key={d.date} className="flex flex-1 flex-col items-center gap-1" title={`${d.date}: ${d.count}`}>
+                      <div
+                        className="w-full rounded-t bg-brand-500"
+                        style={{ height: `${Math.max((d.count / max) * 100, 4)}%` }}
+                      />
+                      <span className="text-[10px] text-slate-400">{d.date.slice(5)}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {(
               [
@@ -250,6 +269,7 @@ export default function AdminPage() {
                 { title: "By device", rows: analytics.by_device },
                 { title: "By browser", rows: analytics.by_browser },
                 { title: "By traffic source", rows: analytics.by_source },
+                { title: "Top pages", rows: analytics.by_path },
               ]
             ).map((section) => (
               <div key={section.title} className="rounded-2xl bg-white p-5 shadow-sm">
