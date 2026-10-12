@@ -3,6 +3,10 @@ import { TOOL_SLUGS } from "../lib/tools";
 
 const BASE_URL = "https://pdfedi.onrender.com";
 
+// KEEP THIS UP TO DATE (standing rule): tool pages are automatic via
+// TOOL_SLUGS, but every new top-level route/page (like /editor) must be
+// added here manually — it will NOT appear in sitemap.xml otherwise.
+// Do NOT add /admin or any non-public routes.
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   return [
