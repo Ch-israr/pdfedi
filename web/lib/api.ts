@@ -90,14 +90,21 @@ export const api = {
     req("/limits"),
   downloadUrl: (fileId: string) => `${BASE}/downloads/${fileId}`,
 
-  adminLogin: (username: string, password: string): Promise<{ token: string; username: string }> =>
+  adminLogin: (username: string, password: string): Promise<{ username: string }> =>
     req("/admin/login", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
+      credentials: "same-origin",
       body: JSON.stringify({ username, password }),
     }),
-  adminDashboard: (token: string) =>
-    req("/admin/dashboard", { headers: { Authorization: `Bearer ${token}` } }),
-  adminJobs: (token: string) =>
-    req("/admin/jobs", { headers: { Authorization: `Bearer ${token}` } }),
+  adminLogout: (): Promise<{ logged_out: boolean }> =>
+    req("/admin/logout", { method: "POST", credentials: "same-origin" }),
+  // Admin auth travels in an httpOnly cookie; no token handling needed.
+  adminDashboard: () =>
+    req("/admin/dashboard", { credentials: "same-origin" }),
+  adminJobs: () =>
+    req("/admin/jobs", { credentials: "same-origin" }),
+  adminLoginAttempts: (): Promise<
+    Array<{ username: string; ip: string; success: boolean; created_at: string }>
+  > => req("/admin/login-attempts", { credentials: "same-origin" }),
 };

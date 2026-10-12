@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "../../lib/api";
 
 interface Dashboard {
@@ -16,34 +16,48 @@ interface Dashboard {
   }>;
 }
 
+interface LoginAttempt {
+  username: string;
+  ip: string;
+  success: boolean;
+  created_at: string;
+}
+
 export default function AdminPage() {
-  const [token, setToken] = useState<string | null>(
-    typeof window !== "undefined" ? localStorage.getItem("pdfedi_admin_token") : null
-  );
+  // Auth travels in an httpOnly cookie — nothing is stored in localStorage.
+  const [authed, setAuthed] = useState<boolean | null>(null);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [dash, setDash] = useState<Dashboard | null>(null);
+  const [attempts, setAttempts] = useState<LoginAttempt[] | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function load(t: string) {
+  async function load() {
     try {
-      setDash(await api.adminDashboard(t));
+      const [d, a] = await Promise.all([api.adminDashboard(), api.adminLoginAttempts()]);
+      setDash(d);
+      setAttempts(a);
+      setAuthed(true);
     } catch {
-      setToken(null);
-      localStorage.removeItem("pdfedi_admin_token");
+      setAuthed(false);
+      setDash(null);
+      setAttempts(null);
     }
   }
+
+  useEffect(() => {
+    load();
+  }, []);
 
   async function login(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
     setBusy(true);
     try {
-      const r = await api.adminLogin(username, password);
-      localStorage.setItem("pdfedi_admin_token", r.token);
-      setToken(r.token);
-      await load(r.token);
+      await api.adminLogin(username, password);
+      setPassword("");
+      await load();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -51,13 +65,21 @@ export default function AdminPage() {
     }
   }
 
-  function logout() {
-    localStorage.removeItem("pdfedi_admin_token");
-    setToken(null);
-    setDash(null);
+  async function logout() {
+    try {
+      await api.adminLogout();
+    } finally {
+      setAuthed(false);
+      setDash(null);
+      setAttempts(null);
+    }
   }
 
-  if (!token) {
+  if (authed === null) {
+    return <p className="text-slate-500">Checking session…</p>;
+  }
+
+  if (!authed) {
     return (
       <div className="mx-auto max-w-sm">
         <h1 className="text-2xl font-extrabold">Admin sign in</h1>
@@ -94,9 +116,10 @@ export default function AdminPage() {
   }
 
   if (!dash) {
-    load(token);
     return <p className="text-slate-500">Loading dashboard…</p>;
   }
+
+  const failedRecent = (attempts || []).filter((a) => !a.success).length;
 
   return (
     <div>
@@ -174,6 +197,54 @@ export default function AdminPage() {
             <div className="text-sm text-slate-500">{n} jobs</div>
           </div>
         ))}
+      </div>
+
+      <h2 className="mt-10 text-lg font-bold">
+        Recent login attempts{" "}
+        {failedRecent > 0 && (
+          <span className="ml-2 rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-800">
+            {failedRecent} failed
+          </span>
+        )}
+      </h2>
+      <div className="mt-3 overflow-x-auto rounded-2xl bg-white shadow-sm">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b text-left text-slate-500">
+              <th className="px-4 py-3">Time</th>
+              <th className="px-4 py-3">Username</th>
+              <th className="px-4 py-3">IP</th>
+              <th className="px-4 py-3">Result</th>
+            </tr>
+          </thead>
+          <tbody>
+            {(attempts || []).map((a, i) => (
+              <tr key={i} className="border-b last:border-0">
+                <td className="px-4 py-2.5 text-slate-500">
+                  {a.created_at.slice(0, 19).replace("T", " ")}
+                </td>
+                <td className="px-4 py-2.5 font-medium">{a.username}</td>
+                <td className="px-4 py-2.5 text-slate-500">{a.ip}</td>
+                <td className="px-4 py-2.5">
+                  <span
+                    className={`rounded-full px-2 py-0.5 text-xs font-semibold ${
+                      a.success ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"
+                    }`}
+                  >
+                    {a.success ? "Success" : "Failed"}
+                  </span>
+                </td>
+              </tr>
+            ))}
+            {(attempts || []).length === 0 && (
+              <tr>
+                <td colSpan={4} className="px-4 py-3 text-slate-500">
+                  No login attempts recorded yet.
+                </td>
+              </tr>
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

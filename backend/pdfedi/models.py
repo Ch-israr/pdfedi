@@ -12,7 +12,7 @@ from __future__ import annotations
 
 import enum
 
-from sqlalchemy import Index, String, Integer, Text
+from sqlalchemy import Boolean, Index, String, Integer, Text
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 from .timeutil import utcnow_iso
@@ -88,6 +88,18 @@ class AdminUser(Base):
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     username: Mapped[str] = mapped_column(String(255), unique=True, nullable=False)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)  # argon2
+    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
+
+
+class AdminLoginAttempt(Base):
+    """Audit trail of admin login attempts (success + failure)."""
+
+    __tablename__ = "admin_login_attempts"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    username: Mapped[str] = mapped_column(String(255), nullable=False)
+    ip: Mapped[str] = mapped_column(String(64), nullable=False)
+    success: Mapped[bool] = mapped_column(Boolean, nullable=False)
     created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
 
 

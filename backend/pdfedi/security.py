@@ -10,7 +10,7 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from argon2 import PasswordHasher
 from argon2.exceptions import VerifyMismatchError
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -20,6 +20,9 @@ from .models import AdminUser
 
 _ph = PasswordHasher()
 _bearer = HTTPBearer(auto_error=False)
+
+# httpOnly auth cookie name (primary transport for the /admin UI).
+ADMIN_COOKIE_NAME = "pdfedi_admin_token"
 
 
 def hash_password(password: str) -> str:
@@ -77,18 +80,23 @@ def decode_admin_token(token: str) -> str | None:
 
 
 def require_admin(
+    request: Request,
     creds: HTTPAuthorizationCredentials | None = Depends(_bearer),
     db: Session = Depends(get_db),
 ) -> AdminUser:
-    """FastAPI dependency: valid admin bearer token + existing admin user."""
+    """FastAPI dependency: valid admin bearer token or auth cookie + existing admin user."""
     unauthorized = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Admin authentication required",
         headers={"WWW-Authenticate": "Bearer"},
     )
-    if creds is None or not creds.credentials:
+    token: str | None = creds.credentials if creds and creds.credentials else None
+    if not token:
+        # Fall back to the httpOnly auth cookie set at login.
+        token = request.cookies.get(ADMIN_COOKIE_NAME)
+    if not token:
         raise unauthorized
-    username = decode_admin_token(creds.credentials)
+    username = decode_admin_token(token)
     if not username:
         raise unauthorized
     user = db.query(AdminUser).filter(AdminUser.username == username).first()
