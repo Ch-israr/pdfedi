@@ -21,15 +21,16 @@ export default function Home() {
         </div>
         <Link
           href="/editor"
-          className="group mx-auto flex aspect-square w-full max-w-sm flex-col items-center justify-center rounded-3xl bg-gradient-to-br from-brand-600 to-brand-700 p-8 text-center text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
+          className="group mx-auto flex aspect-[2/1] w-full max-w-sm flex-col items-center justify-center rounded-3xl bg-gradient-to-br from-brand-600 to-brand-700 p-6 text-center text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
         >
-          <div className="text-6xl">✏️</div>
-          <div className="mt-4 text-2xl font-bold tracking-tight">PDF Editor</div>
-          <div className="mt-2 text-sm leading-relaxed text-blue-100">
-            Edit text, add images &amp; shapes, sign, redact — right in your
-            browser. Your file never leaves your device.
+          <div className="flex items-center gap-3">
+            <span className="text-4xl">✏️</span>
+            <span className="text-xl font-bold tracking-tight">PDF Editor</span>
           </div>
-          <div className="mt-6 rounded-full bg-white px-6 py-2 text-sm font-semibold text-brand-700 shadow-sm transition group-hover:bg-blue-50">
+          <p className="mt-2 text-xs leading-relaxed text-blue-100">
+            Edit text, images &amp; shapes, sign, redact — right in your browser.
+          </p>
+          <div className="mt-3 rounded-full bg-white px-5 py-1.5 text-xs font-semibold text-brand-700 shadow-sm transition group-hover:bg-blue-50">
             Open Editor →
           </div>
         </Link>
