@@ -1,0 +1,44 @@
+# Proposed metadata drafts (to be length-verified)
+# Format: slug | proposed title | proposed description
+
+homepage | PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit | Merge, split, compress, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.
+
+editor | Free PDF Editor Online — Edit, Sign & Annotate PDFs | PDFEDI | Edit PDF text, add images and shapes, sign documents and redact sensitive content — all in your browser. Free online PDF editor, no sign-up required.
+
+merge | Merge PDF Files Online Free — Combine PDFs | PDFEDI | Merge PDF files into one document online for free. Combine 2–20 PDFs in any order with original quality preserved. No sign-up, no watermarks, 50MB per file.
+
+split | Split PDF Online Free — Divide into Separate Files | PDFEDI | Split a PDF into separate files online for free. Extract page ranges or split every page into its own PDF. No sign-up, results delivered as a ZIP download.
+
+rotate_pages | Rotate PDF Pages Online Free — Fix Orientation | PDFEDI | Rotate PDF pages 90°, 180° or 270° online for free. Fix sideways or upside-down scans across all pages or selected ranges. No sign-up, quality preserved.
+
+delete_pages | Delete PDF Pages Online Free — Remove Pages | PDFEDI | Delete pages from a PDF online for free. Remove unwanted pages by number or range and download a clean PDF. No sign-up, remaining pages keep original quality.
+
+reorder_pages | Reorder PDF Pages Online Free — Rearrange Page Order | PDFEDI | Rearrange PDF pages into any order online for free. Fix wrong page sequences by entering the new order as numbers. No sign-up, content fully preserved.
+
+extract_text | Extract Text from PDF Online Free — Save as TXT | PDFEDI | Extract text from any text-based PDF online for free and download it as a plain .txt file. Choose all pages or selected ranges. No sign-up required.
+
+pdf_to_images | Convert PDF to Images Online Free — PNG & JPG | PDFEDI | Convert PDF pages to PNG or JPG images online for free. Choose resolution from 72 to 300 DPI, convert all pages or selected ranges. Download as ZIP.
+
+images_to_pdf | Convert Images to PDF Online Free — JPG, PNG to PDF | PDFEDI | Combine JPG, PNG or WebP images into one PDF online for free. Up to 20 images per PDF, each becomes a full page at original quality. No sign-up.
+
+thumbnails | PDF Thumbnails Online Free — Page Contact Sheet | PDFEDI | Generate a thumbnail contact sheet of your PDF pages online for free. Preview all pages at a glance in a single PNG grid image. No sign-up required.
+
+ocr | OCR PDF Online Free — Make Scanned PDFs Searchable | PDFEDI | Run OCR on scanned PDFs online for free. Add a searchable, selectable text layer while pages look exactly the same. Multiple languages, no sign-up.
+
+metadata | View PDF Metadata Online Free — Inspect Document Info | PDFEDI | Inspect a PDF's hidden metadata online for free. See title, author, creation date, page count, producer and encryption status as JSON. No sign-up.
+
+edit_metadata | Edit PDF Metadata Online Free — Update Title & Author | PDFEDI | Edit PDF metadata online for free. Change title, author, subject and keywords that appear in PDF readers and search results. Content untouched, no sign-up.
+
+watermark | Add Watermark to PDF Online Free — Text Stamp | PDFEDI | Stamp a diagonal text watermark across PDF pages online for free. Custom text like DRAFT or CONFIDENTIAL with adjustable opacity. No sign-up.
+
+page_numbers | Add Page Numbers to PDF Online Free — Number Pages | PDFEDI | Number your PDF pages online for free. Choose any position, start number, prefix/suffix text and font size from 6–48pt. Works on all pages or ranges.
+
+compress | Compress PDF Online Free — Reduce File Size | PDFEDI | Reduce PDF file size online for free with three quality levels. Shrink PDFs for email and upload while keeping text sharp. No sign-up, no watermarks.
+
+password_protect | Protect PDF with Password Online Free — Encrypt PDF | PDFEDI | Add password protection to a PDF online for free. Encrypt your document so only people with the password can open it in any reader. No sign-up.
+
+unlock_pdf | Unlock PDF Online Free — Remove Password Protection | PDFEDI | Remove password protection from your own PDF online for free. Enter the correct password and download an unlocked copy. No sign-up, no watermarks.
+
+redact | Redact PDF Online Free — Black Out Sensitive Text | PDFEDI | Permanently redact sensitive text in a PDF online for free. Black out names, emails and IDs by exact text match, multiple terms at once. No sign-up.
+
+flatten | Flatten PDF Online Free — Bake Annotations into Pages | PDFEDI | Flatten a PDF online for free. Bake annotations, comments and filled form fields permanently into pages so appearance is locked. No sign-up.

@@ -35,7 +35,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "merge",
     title: "Merge PDF Files Online Free — Combine PDFs | PDFEDI",
     description:
-      "Merge PDF files into one document online for free. Combine 2–20 PDFs in any order. No sign-up, no watermarks, 50MB limit.",
+      "Merge PDF files into one document online for free. Combine 2–20 PDFs in any order with original quality preserved. No sign-up, no watermarks, 50MB per file.",
     h1: "Merge PDFs",
     intro:
       "Combine multiple PDF files into a single, well-ordered document. Upload 2 to 20 PDFs, arrange them the way you want, and download one clean merged file — perfect for reports, applications, and paperwork that arrives in pieces.",
@@ -84,9 +84,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   split: {
     key: "split",
-    title: "Split PDF Online Free — Divide PDF into Files | PDFEDI",
+    title: "Split PDF Online Free — Divide into Separate Files | PDFEDI",
     description:
-      "Split a PDF into separate files online for free. Extract page ranges or split every page. No sign-up, download as ZIP.",
+      "Split a PDF into separate files online for free. Extract page ranges or split every page into its own PDF. No sign-up, results delivered as a ZIP download.",
     h1: "Split PDF",
     intro:
       "Divide a PDF into multiple smaller files. Extract specific page ranges (for example pages 1–3 and 5) or split every page into its own PDF. Results are delivered as a convenient ZIP download.",
@@ -131,9 +131,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   rotate_pages: {
     key: "rotate_pages",
-    title: "Rotate PDF Pages Online Free | PDFEDI",
+    title: "Rotate PDF Pages Online Free — Fix Orientation | PDFEDI",
     description:
-      "Rotate PDF pages 90°, 180°, or 270° online for free. Fix sideways scans. Apply to all pages or selected ranges.",
+      "Rotate PDF pages 90°, 180° or 270° online for free. Fix sideways or upside-down scans across all pages or selected ranges. No sign-up, quality preserved.",
     h1: "Rotate Pages",
     intro:
       "Fix sideways or upside-down PDF pages. Rotate all pages or just selected page ranges by 90, 180, or 270 degrees — ideal for scanned documents that came out with the wrong orientation.",
@@ -176,7 +176,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "delete_pages",
     title: "Delete PDF Pages Online Free — Remove Pages | PDFEDI",
     description:
-      "Delete pages from a PDF online for free. Remove unwanted pages by range. No sign-up, original quality kept.",
+      "Delete pages from a PDF online for free. Remove unwanted pages by number or range and download a clean PDF. No sign-up, remaining pages keep original quality.",
     h1: "Delete Pages",
     intro:
       "Remove unwanted pages from your PDF. Enter the page ranges to delete — like 2, 5-7 — and download a clean PDF with only the pages you want to keep.",
@@ -215,9 +215,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   reorder_pages: {
     key: "reorder_pages",
-    title: "Reorder PDF Pages Online Free — Rearrange Pages | PDFEDI",
+    title: "Reorder PDF Pages Online Free — Rearrange Page Order | PDFEDI",
     description:
-      "Rearrange PDF pages into any order online for free. Fix page sequence without re-scanning. No sign-up.",
+      "Rearrange PDF pages into any order online for free. Fix wrong page sequences by entering the new order as numbers. No sign-up, content fully preserved.",
     h1: "Reorder Pages",
     intro:
       "Put your PDF pages in the right order. Specify the new page sequence and get a PDF with pages rearranged exactly as you want — no need to re-scan or rebuild the document.",
@@ -256,9 +256,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   extract_text: {
     key: "extract_text",
-    title: "Extract Text from PDF Online Free | PDFEDI",
+    title: "Extract Text from PDF Online Free — Save as TXT | PDFEDI",
     description:
-      "Extract text from a PDF online for free. Get plain .txt output from any text-based PDF, all pages or selected ranges.",
+      "Extract text from any text-based PDF online for free and download it as a plain .txt file. Choose all pages or selected ranges. No sign-up required.",
     h1: "Extract Text",
     intro:
       "Pull the plain text out of any text-based PDF and download it as a .txt file. Choose all pages or specific ranges — handy for quoting, archiving, or feeding text into other tools.",
@@ -299,7 +299,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "pdf_to_images",
     title: "Convert PDF to Images Online Free — PNG & JPG | PDFEDI",
     description:
-      "Convert PDF pages to PNG or JPG images online for free. Choose resolution up to 300 DPI. Download as ZIP.",
+      "Convert PDF pages to PNG or JPG images online for free. Choose resolution from 72 to 300 DPI, convert all pages or selected ranges. Download as ZIP.",
     h1: "PDF to Images",
     intro:
       "Turn every page of your PDF into a high-quality PNG or JPEG image. Pick the output format and resolution (72–300 DPI), select pages or convert them all, and download everything as a ZIP.",
@@ -340,9 +340,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   images_to_pdf: {
     key: "images_to_pdf",
-    title: "Convert Images to PDF Online Free — JPG/PNG to PDF | PDFEDI",
+    title: "Convert Images to PDF Online Free — JPG, PNG to PDF | PDFEDI",
     description:
-      "Combine JPG, PNG, or WebP images into one PDF online for free. Up to 20 images per PDF. No sign-up.",
+      "Combine JPG, PNG or WebP images into one PDF online for free. Up to 20 images per PDF, each becomes a full page at original quality. No sign-up.",
     h1: "Images to PDF",
     intro:
       "Combine up to 20 JPG, PNG, or WebP images into a single PDF document. Each image becomes a page — ideal for turning photo scans, screenshots, or artwork into a shareable PDF.",
@@ -388,7 +388,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "thumbnails",
     title: "PDF Thumbnails Online Free — Page Contact Sheet | PDFEDI",
     description:
-      "Generate a thumbnail contact sheet of PDF pages online for free. Preview all pages in one PNG image.",
+      "Generate a thumbnail contact sheet of your PDF pages online for free. Preview all pages at a glance in a single PNG grid image. No sign-up required.",
     h1: "Page Thumbnails",
     intro:
       "See every page of your PDF at a glance. This tool renders a contact sheet — a single PNG image with small thumbnails of your pages arranged in a grid. Choose the number of columns, thumbnail width, and which pages to include.",
@@ -430,7 +430,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "ocr",
     title: "OCR PDF Online Free — Make Scanned PDFs Searchable | PDFEDI",
     description:
-      "Run OCR on scanned PDFs online for free. Add a searchable, selectable text layer while keeping the original look.",
+      "Run OCR on scanned PDFs online for free. Add a searchable, selectable text layer while pages look exactly the same. Multiple languages, no sign-up.",
     h1: "OCR to Searchable PDF",
     intro:
       "Make scanned PDFs searchable and selectable. Optical character recognition reads the text in your scanned pages and adds an invisible text layer — the pages look identical, but you can now search, select, and copy the text. Pages that already contain text are skipped automatically.",
@@ -479,9 +479,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   metadata: {
     key: "metadata",
-    title: "View PDF Metadata Online Free | PDFEDI",
+    title: "View PDF Metadata Online Free — Inspect Document Info | PDFEDI",
     description:
-      "Inspect a PDF's hidden metadata online for free. See title, author, creation date, page count, and more.",
+      "Inspect a PDF's hidden metadata online for free. See title, author, creation date, page count, producer and encryption status as JSON. No sign-up.",
     h1: "Inspect Metadata",
     intro:
       "See what's hidden inside your PDF. This tool reads the document's metadata — title, author, subject, keywords, creation date, producer software, page count, and encryption status — and shows it as easy-to-read JSON.",
@@ -522,9 +522,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   edit_metadata: {
     key: "edit_metadata",
-    title: "Edit PDF Metadata Online Free | PDFEDI",
+    title: "Edit PDF Metadata Online Free — Update Title & Author | PDFEDI",
     description:
-      "Edit PDF metadata online for free. Change title, author, subject, and keywords without special software.",
+      "Edit PDF metadata online for free. Change title, author, subject and keywords that appear in PDF readers and search results. Content untouched, no sign-up.",
     h1: "Edit Metadata",
     intro:
       "Update your PDF's document info. Change the title, author, subject, and keywords that show up in PDF readers and search results — no desktop software needed.",
@@ -563,9 +563,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   watermark: {
     key: "watermark",
-    title: "Add Watermark to PDF Online Free | PDFEDI",
+    title: "Add Watermark to PDF Online Free — Text Stamp | PDFEDI",
     description:
-      "Stamp a diagonal text watermark across PDF pages online for free. Adjustable opacity. DRAFT, CONFIDENTIAL, and more.",
+      "Stamp a diagonal text watermark across PDF pages online for free. Custom text like DRAFT or CONFIDENTIAL with adjustable opacity. No sign-up.",
     h1: "Add Watermark",
     intro:
       "Stamp text diagonally across every page of your PDF. Add marks like DRAFT, CONFIDENTIAL, or SAMPLE with adjustable opacity — a simple way to label document status.",
@@ -604,9 +604,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   page_numbers: {
     key: "page_numbers",
-    title: "Add Page Numbers to PDF Online Free | PDFEDI",
+    title: "Add Page Numbers to PDF Online Free — Number Pages | PDFEDI",
     description:
-      "Number your PDF pages online for free. Choose position, start number, prefix, suffix, and font size.",
+      "Number your PDF pages online for free. Choose any position, start number, prefix/suffix text and font size from 6–48pt. Works on all pages or ranges.",
     h1: "Add Page Numbers",
     intro:
       "Add page numbers to your PDF exactly where you want them. Choose the corner or edge position, starting number, optional prefix/suffix text, and font size — ideal for reports, ebooks, and print-ready documents.",
@@ -654,7 +654,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "compress",
     title: "Compress PDF Online Free — Reduce File Size | PDFEDI",
     description:
-      "Reduce PDF file size online for free. Three quality levels. Shrink PDFs for email and upload. No sign-up.",
+      "Reduce PDF file size online for free with three quality levels. Shrink PDFs for email and upload while keeping text sharp. No sign-up, no watermarks.",
     h1: "Compress PDF",
     intro:
       "Make your PDF smaller without ruining it. Choose a compression level — low, medium, or high quality — and get a lighter file that's easier to email, upload, and store.",
@@ -698,9 +698,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   password_protect: {
     key: "password_protect",
-    title: "Protect PDF with Password Online Free | PDFEDI",
+    title: "Protect PDF with Password Online Free — Encrypt PDF | PDFEDI",
     description:
-      "Add password protection to a PDF online for free. Encrypt your document so only people with the password can open it.",
+      "Add password protection to a PDF online for free. Encrypt your document so only people with the password can open it in any reader. No sign-up.",
     h1: "Password Protect",
     intro:
       "Lock your PDF with a password. The document is encrypted so it can't be opened without the password you set — simple protection for sensitive files you need to share or store.",
@@ -739,9 +739,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   unlock_pdf: {
     key: "unlock_pdf",
-    title: "Unlock PDF Online Free — Remove Password | PDFEDI",
+    title: "Unlock PDF Online Free — Remove Password Protection | PDFEDI",
     description:
-      "Remove password protection from a PDF online for free. Unlock your own PDFs with the correct password.",
+      "Remove password protection from your own PDF online for free. Enter the correct password and download an unlocked copy. No sign-up, no watermarks.",
     h1: "Unlock PDF",
     intro:
       "Remove the password from a PDF you own. Enter the correct password and download an unlocked copy that's free to open, edit, and process with other tools.",
@@ -782,7 +782,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     key: "redact",
     title: "Redact PDF Online Free — Black Out Sensitive Text | PDFEDI",
     description:
-      "Permanently redact sensitive text in a PDF online for free. Black out names, emails, and IDs. True redaction, not just covering.",
+      "Permanently redact sensitive text in a PDF online for free. Black out names, emails and IDs by exact text match, multiple terms at once. No sign-up.",
     h1: "Redact PDF",
     intro:
       "Permanently black out sensitive text in your PDF. Enter the words or phrases to redact — names, emails, ID numbers — and they're covered with solid black boxes in the output document.",
@@ -825,9 +825,9 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
 
   flatten: {
     key: "flatten",
-    title: "Flatten PDF Online Free | PDFEDI",
+    title: "Flatten PDF Online Free — Bake Annotations into Pages | PDFEDI",
     description:
-      "Flatten a PDF online for free. Bake annotations and form fields permanently into pages. Lock document appearance.",
+      "Flatten a PDF online for free. Bake annotations, comments and filled form fields permanently into pages so appearance is locked. No sign-up.",
     h1: "Flatten PDF",
     intro:
       "Bake annotations and form fields permanently into your PDF's pages. Flattening merges markups, comments, and filled forms into the page content so the document looks the same everywhere and can't be edited further.",

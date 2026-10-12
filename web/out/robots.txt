@@ -3,4 +3,32 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
+User-Agent: OAI-SearchBot
+User-Agent: ChatGPT-User
+User-Agent: Claude-SearchBot
+User-Agent: Claude-User
+User-Agent: PerplexityBot
+User-Agent: Perplexity-User
+User-Agent: Googlebot
+User-Agent: Applebot
+User-Agent: meta-webindexer
+User-Agent: meta-externalfetcher
+User-Agent: DuckAssistBot
+User-Agent: bingbot
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+User-Agent: GPTBot
+User-Agent: ClaudeBot
+User-Agent: CCBot
+User-Agent: meta-externalagent
+Allow: /
+Disallow: /admin
+Disallow: /api/
+
+User-Agent: Google-Extended
+User-Agent: Applebot-Extended
+Allow: /
+
 Sitemap: https://pdfedi.onrender.com/sitemap.xml

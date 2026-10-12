@@ -29,11 +29,13 @@ export function generateMetadata({
       url: canonical,
       type: "website",
       siteName: "PDFEDI",
+      images: [{ url: `${BASE_URL}/logo.png`, width: 512, height: 512, alt: "PDFEDI logo" }],
     },
     twitter: {
       card: "summary",
       title: content.title,
       description: content.description,
+      images: [`${BASE_URL}/logo.png`],
     },
   };
 }
