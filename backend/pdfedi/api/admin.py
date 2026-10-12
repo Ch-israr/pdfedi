@@ -4,7 +4,7 @@ from __future__ import annotations
 import time
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import BaseModel
 from sqlalchemy import func
 from sqlalchemy.orm import Session
