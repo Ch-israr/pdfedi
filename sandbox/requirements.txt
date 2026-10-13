@@ -1,9 +1,0 @@
-# Sandbox-only dependencies.
-#
-# RULE: experimental dependencies go HERE, never in backend/requirements*.txt.
-# The sandbox image also installs ../backend/requirements-render.txt for the
-# shared tool framework and common PDF libraries.
-
-python-docx
-pdfplumber
-pytesseract

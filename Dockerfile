@@ -1,7 +1,7 @@
 # PDFEDI v2 on Render free tier — single Docker image:
 #   Stage 1 builds the static Next.js frontend (web/ -> /build/out).
-#   Stage 1b builds the sandbox PDF editor as a static export
-#     (sandbox/pdfeditor/apps/web/out -> served at /editor).
+#   Stage 1b builds the PDF editor as a static export
+#     (editor/apps/web/out -> served at /editor).
 #   Stage 2 runs FastAPI (API) + serves the exported frontend, one origin.
 
 # ---- Stage 1: build the Next.js frontend ----
@@ -13,7 +13,7 @@ RUN npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
 COPY web ./
 RUN npm run build
 
-# ---- Stage 1b: build the sandbox editor (static export for /editor) ----
+# ---- Stage 1b: build the editor (static export for /editor) ----
 # pnpm/turbo monorepo; NEXT_STATIC_EXPORT=1 + NEXT_BASE_PATH=/editor make the
 # editor's next.config.js emit a base-prefixed static export. The standalone
 # editor service build does not set these and is unaffected.
@@ -23,11 +23,11 @@ ENV NEXT_TELEMETRY_DISABLED=1 \
     NEXT_STATIC_EXPORT=1 \
     NEXT_BASE_PATH=/editor
 WORKDIR /build/editor
-COPY sandbox/pdfeditor/pnpm-workspace.yaml sandbox/pdfeditor/pnpm-lock.yaml \
-     sandbox/pdfeditor/turbo.json sandbox/pdfeditor/package.json \
-     sandbox/pdfeditor/tsconfig.base.json ./
-COPY sandbox/pdfeditor/packages ./packages
-COPY sandbox/pdfeditor/apps ./apps
+COPY editor/pnpm-workspace.yaml editor/pnpm-lock.yaml \
+     editor/turbo.json editor/package.json \
+     editor/tsconfig.base.json ./
+COPY editor/packages ./packages
+COPY editor/apps ./apps
 RUN pnpm install --frozen-lockfile
 RUN pnpm --filter @pdfeditor/shared build \
  && pnpm --filter @pdfeditor/pdf-core build \
