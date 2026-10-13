@@ -66,7 +66,17 @@ def _iter_image_xobjects(reader: PdfReader):
 
 def _pil_from_xobject(img_obj) -> Image.Image | None:
     """Decode an image XObject to a PIL image (JPEG opened directly,
-    raw pixel data reconstructed via frombytes)."""
+    raw pixel data reconstructed via frombytes; /ICCBased scans decoded
+    at full resolution via a row-by-row manual inflate that avoids pypdf's
+    2x decode transient)."""
+    # ICCBased first: it must not go through get_data(), whose transient
+    # (~2.2x the image size) OOMs on full-page scans.
+    from pdfedi.tools._helpers import _decode_iccbased, _iccbased_params
+
+    icc_params = _iccbased_params(img_obj)
+    if icc_params is not None:
+        return _decode_iccbased(img_obj, icc_params)
+
     try:
         data = img_obj.get_data()
     except Exception:
@@ -100,6 +110,29 @@ def _pil_from_xobject(img_obj) -> Image.Image | None:
         mode = "1"
     elif cs_name == "/DeviceCMYK" and bpc == 8:
         mode = "CMYK"
+    if mode is None:
+        # Scanned pages in ICCBased color (the /ColorSpace may be an
+        # IndirectObject to the ICCBased array): decode raw pixels using the
+        # component count declared by the ICC profile stream.
+        from pdfedi.tools._helpers import _icc_image_mode
+
+        icc_mode = _icc_image_mode(img_obj, data)
+        if icc_mode is not None:
+            try:
+                # frombuffer shares the decoded buffer (no 100MB+ copy);
+                # the image keeps the buffer alive exactly as long as it
+                # needs it, so the object's decode cache can be released
+                # right here.
+                image = Image.frombuffer(
+                    icc_mode, (width, height), data, "raw", icc_mode, 0, 1
+                )
+                try:
+                    img_obj.decoded_self = None
+                except Exception:
+                    pass
+                return image
+            except Exception:
+                return None
     if mode is None:
         return None
     try:
@@ -160,6 +193,13 @@ def run(ctx: ToolContext, options: dict) -> Path:
             result = _original_bytes(img_obj)
         except Exception:
             continue
+        finally:
+            # Release pypdf's cached decoded bytes; a full-page scan decodes
+            # to 100MB+ and would otherwise stay resident for the whole run.
+            try:
+                img_obj.decoded_self = None
+            except Exception:
+                pass
         if result is not None:
             images.append(result)
 

@@ -365,6 +365,10 @@ def _decodable(xobj) -> bool:
     into a PIL image. Reading the dict is free; a False result avoids paying
     for a full get_data() decode whose output would be discarded anyway
     (and whose bytes pypdf caches on the object).
+
+    Note: _pil_from_xobject additionally decodes /ICCBased images, which is
+    deliberately NOT mirrored here — Word conversion intentionally skips the
+    full-page scan backgrounds (each would embed as a huge image).
     """
     try:
         filt = xobj.get("/Filter")

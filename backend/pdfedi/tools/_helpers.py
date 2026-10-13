@@ -159,3 +159,172 @@ def page_count_of_pdf(data: bytes) -> int:
         raise ToolError(
             f"Input could not be parsed as a PDF: {exc}", code="invalid_input"
         ) from exc
+
+
+def _inflate_rows(enc: bytes, width: int, height: int, n: int, row_step: int):
+    """Inflate a Flate stream keeping every ``row_step``-th row.
+
+    Returns (bytearray, kept_height) or None. Avoids pypdf get_data()'s
+    ~2.2x transient on 100MB+ images: output is pulled in 1MB slices and
+    only kept rows are stored, so peak ~= (full_size/row_step)*2 + 1MB.
+    Rows must be exactly width*n bytes (PNG predictors are rejected by
+    the caller); total output must equal height*width*n exactly.
+    """
+    import zlib
+
+    row_len = width * n
+    if row_len <= 0 or height <= 0 or row_step < 1:
+        return None
+    try:
+        d = zlib.decompressobj()
+        out = bytearray()
+        carry = b""
+        row_idx = 0
+        total = 0
+        pending = b""
+        i = 0
+        step = 1 << 20
+        guard = 0
+        while True:
+            guard += 1
+            if guard > 40_000_000:
+                return None
+            if not pending:
+                if i >= len(enc):
+                    break
+                pending = enc[i : i + step]
+                i += step
+            chunk = d.decompress(pending, step)
+            pending = d.unconsumed_tail
+            if chunk:
+                total += len(chunk)
+                if total > height * row_len:
+                    return None
+                buf = carry + chunk if carry else chunk
+                nrows = len(buf) // row_len
+                base = row_idx
+                for r in range(nrows):
+                    if (base + r) % row_step == 0:
+                        out += buf[r * row_len : (r + 1) * row_len]
+                row_idx += nrows
+                carry = buf[nrows * row_len :]
+            if d.eof:
+                break
+            if not chunk and not pending and i >= len(enc):
+                break
+        if not d.eof:
+            return None
+        if total != height * row_len or row_idx != height or carry:
+            return None
+        kept_h = (height + row_step - 1) // row_step
+        return (out, kept_h)
+    except Exception:
+        return None
+
+
+def _iccbased_params(img_obj):
+    """Strict dict validation for /ICCBased image XObjects.
+
+    Returns (mode, width, height, ncomp, filter_names) for 8-bits/component
+    images whose ICC profile stream declares /N components
+    (1 -> "L", 3 -> "RGB", 4 -> "CMYK"), else None. PNG predictors are
+    rejected (kept rows must be exactly width*ncomp bytes). No
+    color-profile conversion is attempted — dropping the ICC profile on
+    recompress is acceptable for lossy tool output. The /ColorSpace may be
+    an IndirectObject to the ICCBased array.
+    """
+    from pypdf.generic import ArrayObject
+
+    try:
+        cs = img_obj.get("/ColorSpace")
+        if hasattr(cs, "get_object"):
+            cs = cs.get_object()
+        if not (
+            isinstance(cs, ArrayObject)
+            and len(cs) >= 2
+            and str(cs[0]) == "/ICCBased"
+        ):
+            return None
+        width = int(img_obj["/Width"])
+        height = int(img_obj["/Height"])
+        if width <= 0 or height <= 0:
+            return None
+        if int(img_obj.get("/BitsPerComponent", 8)) != 8:
+            return None
+        dp = img_obj.get("/DecodeParms")
+        if dp is not None:
+            if hasattr(dp, "get_object"):
+                dp = dp.get_object()
+            if isinstance(dp, ArrayObject):
+                return None  # per-filter parms: stay conservative
+            try:
+                pred = dp.get("/Predictor", 1)
+            except Exception:
+                pred = 1
+            if int(pred) != 1:
+                return None
+        profile = cs[1].get_object()
+        n = int(profile.get("/N"))
+        if n == 1:
+            mode = "L"
+        elif n == 3:
+            mode = "RGB"
+        elif n == 4:
+            mode = "CMYK"
+        else:
+            return None
+        filt = img_obj.get("/Filter")
+        filters = list(filt) if isinstance(filt, ArrayObject) else [filt]
+        fnames = [str(f) for f in filters if f]
+        return (mode, width, height, n, fnames)
+    except Exception:
+        return None
+
+
+def _decode_iccbased(img_obj, params, row_step: int = 1):
+    """Decode an /ICCBased image XObject to a PIL image, or None.
+
+    FlateDecode streams use the row-decimated inflater (row_step > 1 keeps
+    every k-th row, so the full 100MB+ buffer is never materialized);
+    unfiltered streams are sliced by row. Decoded length must match
+    width*height*ncomp exactly.
+    """
+    from PIL import Image
+
+    mode, width, height, n, fnames = params
+    row_len = width * n
+    buf = None
+    kept_h = height
+    try:
+        if fnames == ["/FlateDecode"]:
+            enc = bytes(img_obj._data)
+            res = _inflate_rows(enc, width, height, n, row_step)
+            if res is None:
+                return None
+            buf, kept_h = res
+        elif not fnames:
+            enc = img_obj._data
+            if enc is None or len(enc) != height * row_len:
+                return None
+            if row_step > 1:
+                parts = [
+                    enc[r * row_len : (r + 1) * row_len]
+                    for r in range(0, height, row_step)
+                ]
+                acc = bytearray()
+                for part in parts:
+                    acc += part
+                buf = acc
+                kept_h = (height + row_step - 1) // row_step
+            else:
+                buf = bytes(enc)
+        else:
+            return None
+    except Exception:
+        return None
+    if buf is None:
+        return None
+    try:
+        return Image.frombytes(mode, (width, kept_h), buf)
+    except Exception:
+        return None

@@ -123,6 +123,22 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     return True
 
 
+def _drop_decode_cache(img_obj) -> None:
+    """Release pypdf's cached decoded bytes for this image object.
+
+    EncodedStreamObject.get_data() caches the full decoded stream in
+    ``decoded_self`` — 100MB+ for the full-page scans this tool downsamples.
+    Without this the whole run accumulates one cache entry per image
+    (this exact pattern OOM-crashed a production instance). Mirrors
+    pdf_to_word._drop_decode_cache; ``_data`` is deliberately NOT cleared
+    here because compress rewrites it with the replacement JPEG bytes.
+    """
+    try:
+        img_obj.decoded_self = None
+    except Exception:
+        pass
+
+
 def run(ctx: ToolContext, options: dict) -> Path:
     """Compress the single input PDF. ``quality`` trades fidelity for size."""
     if not isinstance(options, dict):
@@ -151,6 +167,9 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if max_dim is not None:
         for img_obj in _iter_image_xobjects(writer):
             _downsample_image_object(img_obj, max_dim, jpeg_quality)
+            # After the replacement is computed, release the decode cache so
+            # the next image's 100MB+ decode does not accumulate.
+            _drop_decode_cache(img_obj)
 
     out = ctx.new_output_path("compressed.pdf").with_suffix(".pdf")
     with out.open("wb") as f:
