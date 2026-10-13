@@ -8,11 +8,12 @@ out approximate. Scanned (image-only) PDFs are refused with a pointer to OCR.
 """
 from __future__ import annotations
 
+import gc
 import io
 from pathlib import Path
 
 from pypdf import PdfReader
-from pypdf.generic import ContentStream
+from pypdf.generic import ArrayObject, ContentStream
 
 from pdfedi.tools.base import (
     ToolContext,
@@ -46,6 +47,12 @@ SPEC = ToolSpec(
 )
 
 _PAGE_CAP = 50
+
+# Memory safety for image handling (the benchmark file has 600-DPI page-scan
+# backgrounds that decode to ~100MB+ each). Images larger than this are never
+# decoded at all; decoded images are downscaled to _MAX_IMAGE_DIM before embed.
+_MAX_IMAGE_MP = 60_000_000
+_MAX_IMAGE_DIM = 1600
 _LINE_TOL_FACTOR = 0.35   # fraction of char height for line grouping
 _PARA_GAP_FACTOR = 1.5    # line-height multiple that starts a new paragraph
 _HEADING_RATIO = 1.25     # size ratio over body that qualifies as a heading
@@ -377,8 +384,54 @@ def _walk_ops(ops, xobjects, ctm, out, seen):
             continue
 
 
+def _decodable(xobj) -> bool:
+    """Dict-only pre-check mirroring _pil_from_xobject's supported formats.
+
+    Returns True only for image XObjects _pil_from_xobject can actually turn
+    into a PIL image. Reading the dict is free; a False result avoids paying
+    for a full get_data() decode whose output would be discarded anyway
+    (and whose bytes pypdf caches on the object).
+    """
+    try:
+        filt = xobj.get("/Filter")
+        filters = list(filt) if isinstance(filt, ArrayObject) else [filt]
+        if any(str(f) == "/DCTDecode" for f in filters):
+            return True
+        bpc = int(xobj.get("/BitsPerComponent", 8))
+        cs = xobj.get("/ColorSpace")
+        cs_name = str(cs[0]) if isinstance(cs, ArrayObject) and cs else str(cs or "")
+        return (
+            (cs_name == "/DeviceRGB" and bpc == 8)
+            or (cs_name == "/DeviceGray" and bpc in (1, 8))
+            or (cs_name == "/DeviceCMYK" and bpc == 8)
+        )
+    except Exception:
+        return False
+
+
+def _drop_decode_cache(xobj) -> None:
+    """Release pypdf's cached decoded bytes for this object.
+
+    get_data() caches the full decoded stream on the object; without this a
+    100MB+ decode stays resident for the whole run.
+    """
+    try:
+        if getattr(xobj, "_data", None) is not None:
+            xobj._data = None
+    except Exception:
+        pass
+
+
 def _image_placements(page, reader) -> list[tuple[float, bytes]]:
-    """Return (y_top_pt, png_bytes) for image XObjects via a CTM walk."""
+    """Return (y_top_pt, img_bytes) for image XObjects via a CTM walk.
+
+    Memory-safe: dimensions are read from the XObject dict (free) and images
+    over _MAX_IMAGE_MP megapixels are never decoded. Decoded images are
+    downscaled to _MAX_IMAGE_DIM px max dimension immediately, encoded as
+    JPEG (opaque) or PNG (real alpha), and the full-size PIL image is freed
+    before the next placement is processed.
+    """
+    from PIL import Image as PILImage
     try:
         resources = page.get("/Resources") or {}
         xobjects = resources.get("/XObject")
@@ -394,25 +447,69 @@ def _image_placements(page, reader) -> list[tuple[float, bytes]]:
     )
     placements: list[tuple[float, bytes]] = []
     for y_top, xobj in found:
-        pil_img = _pil_from_xobject(xobj)
-        if pil_img is None:
-            continue
-        buf = io.BytesIO()
+        # Pre-decode gate: dimensions are free; never decode huge images.
         try:
-            pil_img.convert("RGB").save(buf, format="PNG")
+            w = int(xobj.get("/Width") or 0)
+            h = int(xobj.get("/Height") or 0)
+        except Exception:
+            w = h = 0
+        if w > 0 and h > 0 and w * h > _MAX_IMAGE_MP:
+            continue
+        # Dict-only support check first: _pil_from_xobject would return None
+        # for anything else, so skip before paying for a full decode (pypdf
+        # also caches decoded bytes on the object, permanently).
+        if not _decodable(xobj):
+            continue
+        try:
+            pil_img = _pil_from_xobject(xobj)
         except Exception:
             continue
-        placements.append((y_top, buf.getvalue()))
+        if pil_img is None:
+            _drop_decode_cache(xobj)
+            continue
+        try:
+            if max(pil_img.width, pil_img.height) > _MAX_IMAGE_DIM:
+                pil_img.thumbnail((_MAX_IMAGE_DIM, _MAX_IMAGE_DIM), PILImage.LANCZOS)
+            has_alpha = pil_img.mode in ("RGBA", "LA")
+            if not has_alpha:
+                try:
+                    has_alpha = _resolve(xobj.get("/SMask")) is not None
+                except Exception:
+                    has_alpha = False
+            buf = io.BytesIO()
+            if has_alpha:
+                if pil_img.mode not in ("RGBA", "LA"):
+                    pil_img = pil_img.convert("RGBA")
+                pil_img.save(buf, format="PNG")
+            else:
+                if pil_img.mode == "CMYK":
+                    pil_img = pil_img.convert("RGB")
+                elif pil_img.mode not in ("RGB", "L"):
+                    pil_img = pil_img.convert("RGB")
+                pil_img.save(buf, format="JPEG", quality=80)
+            placements.append((y_top, buf.getvalue()))
+        except Exception:
+            continue
+        finally:
+            # Free the full-size image and pypdf's cached decoded bytes NOW,
+            # before the next placement is processed.
+            _drop_decode_cache(xobj)
+            try:
+                pil_img.close()
+            except Exception:
+                pass
+            del pil_img
+    gc.collect()
     return placements
 
 
 
-def _extract_page_blocks(data: bytes, page_index: int, page) -> tuple[list, bool]:
+def _extract_page_blocks(data: bytes, page_index: int, page, include_images: bool = True) -> tuple[list, bool]:
     """Extract text blocks and images from one page.
 
     Returns (blocks, has_text) where blocks are dicts:
     {"y": y_top, "kind": "para", "text": str, "runs": [(text, bold)], "size": float}
-    or {"y": y_top, "kind": "image", "png": bytes}.
+    or {"y": y_top, "kind": "image", "img": bytes}.
     """
     import pypdfium2 as pdfium
     import pypdfium2.raw as raw
@@ -536,13 +633,16 @@ def _extract_page_blocks(data: bytes, page_index: int, page) -> tuple[list, bool
     finally:
         doc.close()
 
-    # Images with positions from the pypdf content stream.
-    try:
-        reader = PdfReader(io.BytesIO(data))
-        for y_top, png in _image_placements(page, reader):
-            blocks.append({"y": y_top, "kind": "image", "png": png})
-    except Exception:
-        pass
+    # Images with positions from the pypdf content stream. Skipped in the
+    # text-only first pass so image bytes are never held across pages.
+    if include_images:
+        try:
+            reader = PdfReader(io.BytesIO(data))
+            for y_top, img in _image_placements(page, reader):
+                blocks.append({"y": y_top, "kind": "image", "img": img})
+        except Exception:
+            pass
+        gc.collect()
 
     blocks.sort(key=lambda b: -b["y"])
     return blocks, has_text
@@ -585,12 +685,14 @@ def run(ctx: ToolContext, options: dict) -> Path:
             code="too_many_pages",
         )
 
-    # First pass: collect per-line sizes to identify heading sizes.
-    page_blocks: list[list] = []
+    # First pass (text only, low memory): collect per-line sizes to identify
+    # heading sizes. Images are extracted per page in the second pass so at
+    # most one page's image bytes are held at a time.
+    page_text_blocks: list[list] = []
     any_text = False
     for i, page in enumerate(reader.pages):
-        blocks, has_text = _extract_page_blocks(data, i, page)
-        page_blocks.append(blocks)
+        blocks, has_text = _extract_page_blocks(data, i, page, include_images=False)
+        page_text_blocks.append(blocks)
         any_text = any_text or has_text
 
     if not any_text:
@@ -600,26 +702,37 @@ def run(ctx: ToolContext, options: dict) -> Path:
             code="no_text",
         )
 
-    sizes = sorted({round(b["size"], 1) for blocks in page_blocks for b in blocks
+    sizes = sorted({round(b["size"], 1) for blocks in page_text_blocks for b in blocks
                     if b["kind"] == "para" and b["size"] > 0}, reverse=True)
     # Body size = the most common line size; headings = distinctly larger sizes.
     from collections import Counter
-    size_counts = Counter(round(b["size"], 1) for blocks in page_blocks for b in blocks
+    size_counts = Counter(round(b["size"], 1) for blocks in page_text_blocks for b in blocks
                           if b["kind"] == "para" and b["size"] > 0)
     body_size = size_counts.most_common(1)[0][0] if size_counts else 0.0
     heading_sizes = [s for s in sizes if s >= body_size * _HEADING_RATIO]
 
     doc = Document()
-    for pi, blocks in enumerate(page_blocks):
+    for pi, text_blocks in enumerate(page_text_blocks):
+        # Second pass, one page at a time: extract that page's images and
+        # assemble it into the document, then release everything before
+        # moving to the next page.
+        img_blocks = [
+            {"y": y_top, "kind": "image", "img": img}
+            for y_top, img in _image_placements(reader.pages[pi], reader)
+        ]
+        blocks = sorted(text_blocks + img_blocks, key=lambda b: -b["y"])
         if pi > 0 and blocks:
             doc.add_page_break()
         for b in blocks:
             if b["kind"] == "image":
                 try:
                     from PIL import Image as PILImage
-                    img = PILImage.open(io.BytesIO(b["png"]))
-                    w_in = min(6.0, max(1.0, img.width / 150.0))
-                    doc.add_picture(io.BytesIO(b["png"]), width=Inches(w_in))
+                    img = PILImage.open(io.BytesIO(b["img"]))
+                    try:
+                        w_in = min(6.0, max(1.0, img.width / 150.0))
+                    finally:
+                        img.close()
+                    doc.add_picture(io.BytesIO(b["img"]), width=Inches(w_in))
                 except Exception:
                     continue
             else:
@@ -635,6 +748,10 @@ def run(ctx: ToolContext, options: dict) -> Path:
                         run_ = p.add_run(text)
                         if bold:
                             run_.bold = True
+        # Release this page's blocks before the next page.
+        page_text_blocks[pi] = []
+        del blocks, img_blocks
+        gc.collect()
 
     out = ctx.new_output_path("document.docx").with_suffix(".docx")
     doc.save(str(out))
