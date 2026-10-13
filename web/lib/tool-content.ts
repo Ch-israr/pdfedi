@@ -863,4 +863,217 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     ],
     related: ["password_protect", "watermark", "page_numbers", "redact"],
   },
+
+  crop: {
+    key: "crop",
+    title: "Crop PDF Online Free — Trim Margins & Cut Pages | PDFEDI",
+    description:
+      "Crop PDF pages online for free. Trim white margins or cut pages by exact point amounts from the top, bottom, left and right. No sign-up, files stay private.",
+    h1: "Crop PDF",
+    intro:
+      "Remove excess white space or unwanted edges from your PDF pages. Enter how many points to trim from each side — apply it to every page or only the page ranges you choose.",
+    howTo: [
+      "Upload your PDF file (up to 50MB).",
+      "Enter the trim amounts in points for the top, bottom, left and right edges (72 points = 1 inch).",
+      "Optionally limit cropping to specific pages (e.g. 1-3,5). Leave empty for all pages.",
+      "Click Crop and download the trimmed PDF.",
+    ],
+    features: [
+      "Trim each edge independently, in points",
+      "Apply to all pages or selected page ranges",
+      "Original content quality fully preserved",
+      "Free with no sign-up",
+    ],
+    useCases: [
+      "Remove wide white margins before printing to save paper",
+      "Cut scanner edge shadows and borders from scanned pages",
+      "Tighten pages for easier reading on phones and e-readers",
+      "Trim letterhead or footer areas from generated reports",
+    ],
+    faqs: [
+      {
+        q: "How much can I crop from a PDF page?",
+        a: "As much as you like, as long as some of the page remains. If the trim amounts would remove the entire page width or height, the tool stops with an error instead of producing an empty page.",
+      },
+      {
+        q: "What unit are the crop amounts in?",
+        a: "Points — the standard PDF unit. 72 points equal 1 inch, so trimming 36 points removes half an inch from that edge.",
+      },
+      {
+        q: "Does cropping delete the trimmed content permanently?",
+        a: "Cropping adjusts each page's visible crop box. The hidden content is not rewritten, so for permanent removal of sensitive content use the Redact tool instead.",
+      },
+    ],
+    related: ["resize_pages", "delete_pages", "rotate_pages", "n_up"],
+  },
+
+  extract_images: {
+    key: "extract_images",
+    title: "Extract Images from PDF Online Free — Save as ZIP | PDFEDI",
+    description:
+      "Extract all images embedded in a PDF online for free. Original JPEGs are kept as-is, other formats export as PNG, delivered in one ZIP file. No sign-up needed.",
+    h1: "Extract Images",
+    intro:
+      "Pull every picture embedded in a PDF out into individual image files. Photos and graphics are collected across all pages, duplicates are removed, and everything arrives in a single ZIP download.",
+    howTo: [
+      "Upload your PDF file (up to 50MB).",
+      "Click Extract — the tool scans every page for embedded images.",
+      "Download the ZIP and unzip it to get your image files.",
+    ],
+    features: [
+      "Extracts images from every page at original quality",
+      "JPEG images kept in their original format",
+      "Duplicate images included only once",
+      "All images delivered in one ZIP file",
+    ],
+    useCases: [
+      "Recover photos from a PDF report or catalogue",
+      "Reuse charts and diagrams in a presentation",
+      "Get product images out of a supplier's PDF",
+      "Save scanned artwork embedded in a portfolio PDF",
+    ],
+    faqs: [
+      {
+        q: "What image formats will I get?",
+        a: "Images stored as JPEG in the PDF are extracted byte-for-byte as .jpg files. Other embedded formats are converted to PNG so nothing is lost.",
+      },
+      {
+        q: "Why did the tool say no images were found?",
+        a: "Some PDFs contain no embedded images — for example, text-only documents, or scanned pages saved as one full-page picture per page is actually an embedded image and will be extracted. If a page was rendered from vector shapes, there is no image to extract; use PDF to Images to render pages as pictures instead.",
+      },
+      {
+        q: "Will the extracted images be full quality?",
+        a: "Yes — images are taken from the PDF exactly as stored, at their original resolution, with no recompression for JPEGs.",
+      },
+    ],
+    related: ["pdf_to_images", "compress", "images_to_pdf", "thumbnails"],
+  },
+
+  resize_pages: {
+    key: "resize_pages",
+    title: "Resize PDF Pages Online Free — A4, A5, Letter, Legal | PDFEDI",
+    description:
+      "Resize PDF pages to A4, A5, Letter or Legal online for free. Fit content proportionally or stretch to fill the new page size. No sign-up, quality preserved.",
+    h1: "Resize Pages",
+    intro:
+      "Change the page size of your whole PDF in one go — turn a Letter document into A4 for European printing, or shrink pages to A5 for booklets. Your content is scaled to fit the new size.",
+    howTo: [
+      "Upload your PDF file (up to 50MB).",
+      "Choose the target page size: A4, A5, Letter or Legal.",
+      "Pick Fit to scale content proportionally, or Stretch to fill the page.",
+      "Click Resize and download the converted PDF.",
+    ],
+    features: [
+      "Standard sizes: A4, A5, Letter and Legal",
+      "Fit mode preserves proportions — no distorted text",
+      "Stretch mode fills the entire page",
+      "Applied to every page in one run",
+    ],
+    useCases: [
+      "Convert US Letter documents to A4 before printing abroad",
+      "Shrink A4 pages to A5 for booklet printing",
+      "Standardize mixed-size PDFs into one uniform size",
+      "Prepare documents for a printer that requires a specific size",
+    ],
+    faqs: [
+      {
+        q: "What is the difference between Fit and Stretch?",
+        a: "Fit scales your content proportionally so nothing is distorted, adding margins if the aspect ratio differs. Stretch scales horizontally and vertically independently to fill the whole page, which can distort content.",
+      },
+      {
+        q: "Will resizing reduce the quality of my PDF?",
+        a: "No. Your pages are placed onto the new size as vector content — text stays sharp and selectable, images keep their resolution.",
+      },
+      {
+        q: "Can I resize to a custom size?",
+        a: "This tool covers the four standard sizes most printing and sharing workflows need: A4 (595×842pt), A5 (420×595pt), Letter (612×792pt) and Legal (612×1008pt).",
+      },
+    ],
+    related: ["crop", "n_up", "merge", "rotate_pages"],
+  },
+
+  grayscale: {
+    key: "grayscale",
+    title: "Convert PDF to Grayscale Online Free — Black & White | PDFEDI",
+    description:
+      "Convert a colour PDF to grayscale online for free. Cheaper printing and smaller files at up to 600 DPI. Pages are rendered as images — note text is no longer selectable.",
+    h1: "Grayscale PDF",
+    intro:
+      "Turn a colour PDF into a clean black-and-white version that's cheaper to print and often smaller. Choose the rendering quality from 72 to 600 DPI — pages are converted to grayscale images, so text is no longer selectable afterwards.",
+    howTo: [
+      "Upload your PDF file (up to 50MB).",
+      "Set the DPI — 200 is a good balance of quality and file size; use 300+ for printing.",
+      "Click Convert and download your grayscale PDF.",
+    ],
+    features: [
+      "True grayscale conversion at 72–600 DPI",
+      "Keeps original page sizes and page count",
+      "High-quality JPEG-encoded pages keep files compact",
+      "Free with no sign-up",
+    ],
+    useCases: [
+      "Cut colour printing costs for handouts and drafts",
+      "Prepare documents for black-and-white only printers",
+      "Make colour-heavy slides readable when printed in mono",
+      "Reduce file size of image-heavy colour PDFs",
+    ],
+    faqs: [
+      {
+        q: "Why is the text in my grayscale PDF not selectable?",
+        a: "To guarantee a true grayscale result, each page is rendered as a grayscale image. That means text becomes part of the picture — it prints identically but can no longer be selected or searched. Keep a copy of the original if you need the text layer.",
+      },
+      {
+        q: "Which DPI should I choose?",
+        a: "150 DPI is fine for on-screen reading, 200 DPI balances size and clarity, and 300 DPI or more is best for printing. Higher DPI means larger files.",
+      },
+      {
+        q: "Will grayscale make my PDF smaller?",
+        a: "Usually yes for colour, image-heavy documents, because colour information is dropped. Text-only PDFs may grow slightly because pages become images — the Compress tool is better for those.",
+      },
+    ],
+    related: ["compress", "pdf_to_images", "ocr", "resize_pages"],
+  },
+
+  n_up: {
+    key: "n_up",
+    title: "N-Up PDF Online Free — Multiple Pages Per Sheet | PDFEDI",
+    description:
+      "Combine 2, 4, 6 or 9 PDF pages onto one sheet online for free. A4 or Letter sheets, portrait or landscape. Perfect for handouts, slides and booklets. No sign-up.",
+    h1: "N-Up PDF",
+    intro:
+      "Print more, waste less: place 2, 4, 6 or 9 pages of your PDF onto a single sheet. Ideal for lecture slides, handouts and draft reviews where full-size pages are overkill.",
+    howTo: [
+      "Upload your PDF file (up to 50MB).",
+      "Choose how many pages per sheet: 2, 4, 6 or 9.",
+      "Pick the sheet size (A4 or Letter) and orientation (portrait or landscape).",
+      "Click Create and download your combined sheets.",
+    ],
+    features: [
+      "2, 4, 6 or 9 pages per sheet",
+      "Grid adjusts automatically to orientation",
+      "Content scaled proportionally — never distorted",
+      "A4 and Letter sheet sizes",
+    ],
+    useCases: [
+      "Print lecture slides as compact handouts",
+      "Review long documents using a fraction of the paper",
+      "Create booklet-style proof sheets",
+      "Fit a whole presentation on a few pages for travel",
+    ],
+    faqs: [
+      {
+        q: "How many output sheets will I get?",
+        a: "Your page count divided by the layout, rounded up. For example, a 10-page PDF at 4-up produces 3 sheets — the last sheet simply has empty slots.",
+      },
+      {
+        q: "Does N-Up reduce quality?",
+        a: "No. Pages are placed onto the sheet as vector content at a smaller scale — text and images stay sharp, just physically smaller when printed.",
+      },
+      {
+        q: "Which layout should I pick for slides?",
+        a: "4-up in landscape works well for most slide decks. Use 2-up if you need to read annotations, and 6 or 9-up only for overviews — text gets small.",
+      },
+    ],
+    related: ["resize_pages", "crop", "merge", "split"],
+  },
 };
