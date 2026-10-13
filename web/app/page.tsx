@@ -19,7 +19,12 @@ export default function Home() {
         <div className="mb-4 text-center text-xs font-bold uppercase tracking-widest text-brand-600">
           Most popular
         </div>
-        <Link
+        {/* The editor is a separate Next app served at /editor — a plain
+            anchor (full document load) is required here. A next/link would
+            prefetch /editor as an internal route, read the editor app's
+            RSC payload, and try to load its chunks from this app's
+            /_next path, producing 404 ChunkLoadErrors in the console. */}
+        <a
           href="/editor"
           className="group mx-auto block w-full max-w-xl rounded-2xl border border-slate-200/70 bg-white p-6 text-left shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-lg"
         >
@@ -38,7 +43,7 @@ export default function Home() {
           <div className="mt-4 text-sm font-semibold text-brand-600">
             Open Editor →
           </div>
-        </Link>
+        </a>
       </section>
 
       {CATEGORIES.map((cat) => {
