@@ -6,6 +6,7 @@ and for shrinking colour-heavy documents.
 """
 from __future__ import annotations
 
+import gc
 import io
 from pathlib import Path
 
@@ -99,7 +100,11 @@ def run(ctx: ToolContext, options: dict) -> Path:
     from reportlab.pdfgen import canvas
 
     scale = dpi / 72.0
-    pages: list[tuple[float, float, bytes]] = []  # (w_pt, h_pt, jpeg_bytes)
+    out = ctx.new_output_path("grayscale.pdf").with_suffix(".pdf")
+    pdf = canvas.Canvas(str(out))
+    # Render and write one page at a time: the PIL bitmap and JPEG bytes are
+    # released per page instead of accumulated in a list (30 pages at 300 DPI
+    # previously peaked at ~450 MB).
     try:
         doc = pdfium.PdfDocument(data)
         try:
@@ -112,7 +117,23 @@ def run(ctx: ToolContext, options: dict) -> Path:
                     page.close()
                 buf = io.BytesIO()
                 pil_image.save(buf, "JPEG", quality=85, optimize=True)
-                pages.append((w_pt, h_pt, buf.getvalue()))
+                jpeg_bytes = buf.getvalue()
+                buf.close()
+                pil_image.close()
+                del buf, pil_image
+                pdf.setPageSize((w_pt, h_pt))
+                pdf.drawImage(
+                    ImageReader(io.BytesIO(jpeg_bytes)),
+                    0,
+                    0,
+                    width=w_pt,
+                    height=h_pt,
+                    preserveAspectRatio=True,
+                    anchor="c",
+                )
+                pdf.showPage()
+                del jpeg_bytes
+                gc.collect()
         finally:
             doc.close()
     except ToolError:
@@ -121,22 +142,5 @@ def run(ctx: ToolContext, options: dict) -> Path:
         raise ToolError(
             f"Could not render '{tool_input.filename}': {exc}", code="invalid_input"
         ) from exc
-
-    out = ctx.new_output_path("grayscale.pdf").with_suffix(".pdf")
-    pdf = canvas.Canvas(str(out))
-    try:
-        for w_pt, h_pt, jpeg_bytes in pages:
-            pdf.setPageSize((w_pt, h_pt))
-            pdf.drawImage(
-                ImageReader(io.BytesIO(jpeg_bytes)),
-                0,
-                0,
-                width=w_pt,
-                height=h_pt,
-                preserveAspectRatio=True,
-                anchor="c",
-            )
-            pdf.showPage()
-    finally:
-        pdf.save()
+    pdf.save()
     return out

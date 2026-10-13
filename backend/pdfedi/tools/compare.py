@@ -7,6 +7,7 @@ identical, a clean ``no_differences`` error is raised instead of a document.
 """
 from __future__ import annotations
 
+import gc
 import io
 from pathlib import Path
 
@@ -15,6 +16,7 @@ from pypdf import PdfReader
 from reportlab.lib.utils import ImageReader
 from reportlab.pdfgen import canvas
 
+from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -51,33 +53,6 @@ _PIXEL_THRESHOLD = 28      # per-channel difference that counts as changed
 _GRID_COLS = 60            # diff-mask clustering grid width
 _RED = (220, 38, 38)
 _RED_PIL = (220, 38, 38)
-
-
-def _open_reader(data: bytes, filename: str) -> PdfReader:
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError(
-            f"'{filename}' is not a valid PDF file.", code="invalid_input"
-        )
-    try:
-        reader = PdfReader(io.BytesIO(data))
-    except Exception as exc:
-        raise ToolError(
-            f"'{filename}' could not be parsed as a PDF: {exc}", code="invalid_input"
-        ) from exc
-    if getattr(reader, "is_encrypted", False):
-        raise ToolError(
-            f"'{filename}' is password-protected; encrypted PDFs are not supported.",
-            code="encrypted_pdf",
-        )
-    try:
-        count = len(reader.pages)
-    except Exception as exc:
-        raise ToolError(
-            f"Could not read the pages of '{filename}': {exc}", code="invalid_input"
-        ) from exc
-    if count == 0:
-        raise ToolError(f"'{filename}' contains no pages.", code="invalid_input")
-    return reader
 
 
 def _render_one(data: bytes, index: int) -> tuple[Image.Image, float, float]:
@@ -179,6 +154,17 @@ def _label_page(img: Image.Image, label: str) -> Image.Image:
     return img
 
 
+def _write_page(c: canvas.Canvas, img: Image.Image, w_pt: float, h_pt: float) -> None:
+    """Draw one rendered page onto the output canvas, then release it."""
+    c.setPageSize((w_pt, h_pt))
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", quality=88)
+    buf.seek(0)
+    c.drawImage(ImageReader(buf), 0, 0, width=w_pt, height=h_pt)
+    c.showPage()
+    img.close()
+
+
 def run(ctx: ToolContext, options: dict) -> Path:
     """Diff two PDFs; the second input is treated as the revised version."""
     if not isinstance(options, dict):
@@ -194,8 +180,8 @@ def run(ctx: ToolContext, options: dict) -> Path:
     rev = ctx.inputs[1]
     orig_data = orig.path.read_bytes()
     rev_data = rev.path.read_bytes()
-    orig_reader = _open_reader(orig_data, orig.filename)
-    rev_reader = _open_reader(rev_data, rev.filename)
+    orig_reader = open_pdf_reader(orig_data, orig.filename)
+    rev_reader = open_pdf_reader(rev_data, rev.filename)
     orig_n, rev_n = len(orig_reader.pages), len(rev_reader.pages)
     if orig_n > _PAGE_CAP or rev_n > _PAGE_CAP:
         raise ToolError(
@@ -203,8 +189,12 @@ def run(ctx: ToolContext, options: dict) -> Path:
             code="too_many_pages",
         )
 
-    # Render and diff one page pair at a time to bound memory.
-    sheets: list[tuple[Image.Image, float, float]] = []
+    # Render, diff, and write one page pair at a time. Pages are written to
+    # the output canvas immediately and the PIL images released per page —
+    # nothing rendered accumulates in memory (a 50-page job previously
+    # peaked at ~590 MB from the accumulated "sheets" list).
+    out = ctx.new_output_path("compared.pdf").with_suffix(".pdf")
+    c = canvas.Canvas(str(out))
     any_diff = False
     max_n = max(orig_n, rev_n)
     for i in range(max_n):
@@ -219,15 +209,18 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 lw = max(3, r_img.width // 400)
                 for (x0, y0, x1, y1) in boxes:
                     draw.rectangle([x0, y0, x1, y1], outline=_RED_PIL, width=lw)
-            sheets.append((r_img, rw, rh))
+            _write_page(c, r_img, rw, rh)
+            gc.collect()
         elif i < rev_n:
             r_img, rw, rh = _render_one(rev_data, i)
             any_diff = True
-            sheets.append((_label_page(r_img, "Page added"), rw, rh))
+            _write_page(c, _label_page(r_img, "Page added"), rw, rh)
+            gc.collect()
         else:
             o_img, ow, oh = _render_one(orig_data, i)
             any_diff = True
-            sheets.append((_label_page(o_img, "Page removed"), ow, oh))
+            _write_page(c, _label_page(o_img, "Page removed"), ow, oh)
+            gc.collect()
 
     if not any_diff:
         raise ToolError(
@@ -235,15 +228,5 @@ def run(ctx: ToolContext, options: dict) -> Path:
             code="no_differences",
         )
 
-    out = ctx.new_output_path("compared.pdf").with_suffix(".pdf")
-    c = canvas.Canvas(str(out))
-    for img, w_pt, h_pt in sheets:
-        c.setPageSize((w_pt, h_pt))
-        buf = io.BytesIO()
-        img.save(buf, format="JPEG", quality=88)
-        buf.seek(0)
-        c.drawImage(ImageReader(buf), 0, 0, width=w_pt, height=h_pt)
-        c.showPage()
-        img.close()
     c.save()
     return out
