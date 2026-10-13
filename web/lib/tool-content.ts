@@ -1076,4 +1076,131 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     ],
     related: ["resize_pages", "crop", "merge", "split"],
   },
+
+  repair: {
+    key: "repair",
+    title: "Repair Corrupted PDF Online Free — Fix Damaged Files | PDFEDI",
+    description:
+      "Repair a corrupted PDF online for free. Rebuild broken cross-reference tables, truncated downloads and malformed objects. If a file can't be saved, you get an honest error.",
+    h1: "Repair PDF",
+    intro:
+      "Get your damaged PDF working again. Upload the broken file and the repair engine rebuilds its internal structure — broken cross-references, truncated downloads and malformed objects are fixed where physically possible.",
+    howTo: [
+      "Upload the damaged PDF file (up to 50MB).",
+      "Click Repair — the file's structure is analyzed and rebuilt.",
+      "Download the repaired PDF and check your content is intact.",
+    ],
+    features: [
+      "Rebuilds broken cross-reference tables",
+      "Recovers truncated and partially downloaded files",
+      "Repairs malformed object streams",
+      "Honest result — unfixable files report an error, not a fake repair",
+    ],
+    useCases: [
+      "Open a PDF that shows 'file is damaged' errors",
+      "Recover documents from interrupted downloads",
+      "Fix PDFs corrupted by faulty USB transfers or email attachments",
+      "Salvage old archived PDFs that no longer open",
+    ],
+    faqs: [
+      {
+        q: "What kinds of damage can be repaired?",
+        a: "Broken or missing cross-reference tables, wrong object offsets, truncated files and malformed stream lengths are the most common fixable problems. If the actual content bytes are gone, no tool can recreate them.",
+      },
+      {
+        q: "What if my file can't be repaired?",
+        a: "You get a clear 'unrepairable' error explaining the file is too damaged — never a silently broken download. Try opening it in another reader to confirm, then re-obtain the file from its source if possible.",
+      },
+      {
+        q: "My PDF is password-protected. Can I repair it?",
+        a: "Not directly — repair can't work on encrypted files. Use the Unlock PDF tool with your password first, then repair the unlocked file.",
+      },
+    ],
+    related: ["unlock_pdf", "compress", "merge", "metadata"],
+  },
+
+  compare: {
+    key: "compare",
+    title: "Compare Two PDFs Online Free — Highlight Differences | PDFEDI",
+    description:
+      "Compare two PDFs online for free. Changed regions are boxed in red, added or removed pages are marked. Identical files are reported honestly instead of a useless diff.",
+    h1: "Compare PDF",
+    intro:
+      "See exactly what changed between two versions of a document. Upload the original and the revised file — every changed region is boxed in red on the revised pages, and added or removed pages are clearly marked.",
+    howTo: [
+      "Upload the original PDF as the first file (up to 50MB).",
+      "Upload the revised PDF as the second file.",
+      "Click Compare — pages are rendered and differenced one by one.",
+      "Download the annotated diff document with red change boxes.",
+    ],
+    features: [
+      "Changed regions boxed in red on revised pages",
+      "Added and removed pages clearly marked",
+      "Pixel-level comparison with noise filtering",
+      "Honest 'identical' result instead of a useless diff",
+    ],
+    useCases: [
+      "Review contract revisions before signing",
+      "Check what changed between document drafts",
+      "Audit invoice or report versions for tampering",
+      "Verify a regenerated PDF matches the approved original",
+    ],
+    faqs: [
+      {
+        q: "What happens if the two PDFs are identical?",
+        a: "You get a clean message saying no differences were found — instead of a pointless diff document. It's the fastest way to confirm two files match.",
+      },
+      {
+        q: "Can I compare PDFs with different page counts?",
+        a: "Yes. Pages present in only one file are included in the output with a red border and an 'added' or 'removed' label, so nothing slips past review.",
+      },
+      {
+        q: "How sensitive is the comparison?",
+        a: "Pages are rendered at 150 DPI and compared pixel by pixel with a noise threshold, so font rendering differences and invisible metadata changes don't trigger false positives. Each file can have up to 50 pages.",
+      },
+    ],
+    related: ["merge", "split", "reorder_pages", "extract_text"],
+  },
+
+  pdf_to_word: {
+    key: "pdf_to_word",
+    title: "PDF to Word Online Free — Convert PDF to DOCX | PDFEDI",
+    description:
+      "Convert PDF to an editable Word document online for free. Real paragraphs, heading styles and embedded images. Best for text documents — complex tables are approximate.",
+    h1: "PDF to Word",
+    intro:
+      "Turn your PDF into a Word document you can actually edit. Text is rebuilt into real paragraphs with proper heading styles, and embedded images are placed in reading order. Works best on text-based documents — complex tables and multi-column layouts come out approximate.",
+    howTo: [
+      "Upload your PDF file (up to 50MB, 50 pages max).",
+      "Click Convert — text is extracted with its layout and rebuilt as a Word document.",
+      "Download the .docx and edit it in Word, Google Docs or LibreOffice.",
+    ],
+    features: [
+      "True editable paragraphs — not images of text",
+      "Heading styles detected from type sizes",
+      "Bold formatting preserved where detected",
+      "Embedded images placed in reading order",
+    ],
+    useCases: [
+      "Edit a PDF report you only have as a file",
+      "Reuse PDF content in a proposal or presentation",
+      "Extract structured text into a document you can revise",
+      "Convert archived PDFs into working Word files",
+    ],
+    faqs: [
+      {
+        q: "Will my document look exactly like the PDF?",
+        a: "Close for text documents, approximate for complex ones. Paragraphs, headings and images transfer well; intricate tables and multi-column magazine layouts are rebuilt as best as possible but won't be pixel-perfect. The goal is an editable document, not a visual clone.",
+      },
+      {
+        q: "My PDF is a scan with no selectable text. What happens?",
+        a: "You'll get a clear error pointing you to the OCR tool. Run OCR first to make the scan searchable, then convert the OCR'd result to Word.",
+      },
+      {
+        q: "What program opens the downloaded file?",
+        a: "The download is a standard .docx file — it opens in Microsoft Word, Google Docs, LibreOffice Writer and Apple Pages.",
+      },
+    ],
+    related: ["ocr", "extract_text", "images_to_pdf", "edit_metadata"],
+  },
 };

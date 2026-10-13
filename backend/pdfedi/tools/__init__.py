@@ -13,14 +13,17 @@ from . import (
     flatten,
     grayscale,
     images_to_pdf,
+    compare,
     merge,
     metadata,
     n_up,
     ocr,
+    pdf_to_word,
     page_numbers,
     password_protect,
     pdf_to_images,
     redact,
+    repair,
     reorder_pages,
     resize_pages,
     rotate_pages,
@@ -33,10 +36,11 @@ from .base import ToolSpec
 
 _MODULES = [
     compress, merge, split, rotate_pages, delete_pages, reorder_pages,
-    resize_pages, n_up,
+    resize_pages, n_up, repair,
     extract_text, pdf_to_images, images_to_pdf, thumbnails, extract_images,
     ocr, metadata, edit_metadata, watermark, page_numbers, crop,
-    grayscale, password_protect, unlock_pdf, redact, flatten,
+    grayscale, password_protect, unlock_pdf, redact, flatten, compare,
+    pdf_to_word,
 ]
 
 TOOLS: dict[str, Any] = {}
