@@ -21,16 +21,21 @@ export default function Home() {
         </div>
         <Link
           href="/editor"
-          className="group mx-auto flex aspect-[2/1] w-full max-w-sm flex-col items-center justify-center rounded-3xl bg-gradient-to-br from-brand-600 to-brand-700 p-6 text-center text-white shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
+          className="group mx-auto block w-full max-w-xl rounded-2xl border border-slate-200/70 bg-white p-6 text-left shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-lg"
         >
-          <div className="flex items-center gap-3">
-            <span className="text-4xl">✏️</span>
-            <span className="text-xl font-bold tracking-tight">PDF Editor</span>
+          <div className="flex items-center gap-3.5">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[20px]">
+              ✏️
+            </span>
+            <span className="text-[17px] font-bold tracking-tight text-slate-800 group-hover:text-brand-600">
+              PDF Editor
+            </span>
           </div>
-          <p className="mt-2 text-xs leading-relaxed text-blue-100">
-            Edit text, images &amp; shapes, sign, redact — right in your browser.
+          <p className="mt-3.5 text-sm leading-relaxed text-slate-500">
+            Edit PDF files for free. Fill &amp; sign PDF. Add text, links, images
+            and shapes. Edit existing PDF text. Annotate PDF.
           </p>
-          <div className="mt-3 rounded-full bg-white px-5 py-1.5 text-xs font-semibold text-brand-700 shadow-sm transition group-hover:bg-blue-50">
+          <div className="mt-4 text-sm font-semibold text-brand-600">
             Open Editor →
           </div>
         </Link>
@@ -53,11 +58,19 @@ export default function Home() {
                 <Link
                   key={t.key}
                   href={`/tools/${t.key}`}
-                  className="group rounded-2xl bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+                  className="group rounded-2xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-lg"
                 >
-                  <div className="text-3xl">{t.icon}</div>
-                  <div className="mt-3 font-semibold group-hover:text-brand-600">{t.name}</div>
-                  <div className="mt-1 text-sm text-slate-500">{t.tagline}</div>
+                  <div className="flex items-center gap-3.5">
+                    <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[20px]">
+                      {t.icon}
+                    </span>
+                    <span className="text-[17px] font-bold tracking-tight text-slate-800 group-hover:text-brand-600">
+                      {t.name}
+                    </span>
+                  </div>
+                  <p className="mt-3.5 text-sm leading-relaxed text-slate-500">
+                    {t.tagline}
+                  </p>
                 </Link>
               ))}
             </div>
