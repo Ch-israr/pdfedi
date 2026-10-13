@@ -49,6 +49,212 @@ _PAGE_CAP = 50
 _LINE_TOL_FACTOR = 0.35   # fraction of char height for line grouping
 _PARA_GAP_FACTOR = 1.5    # line-height multiple that starts a new paragraph
 _HEADING_RATIO = 1.25     # size ratio over body that qualifies as a heading
+_SPACE_EXTRA_FACTOR = 0.55  # extra advance (multiple of the estimated space
+                            # width) that implies a word space
+_GUTTER_FACTOR = 2.75     # gap multiple of the estimated space width that
+                          # marks a column gutter (segment break)
+_SPACE_WIDTH_RATIO = 0.32 # fallback space width as a fraction of font size
+
+# Helvetica/Arial advance widths (fraction of em) used as a sane prior for
+# per-character advances. Observed data refines them (see _estimate_advances);
+# the table keeps rarely-seen or space-inflated characters honest.
+_WIDTHS = {
+    ' ': 0.278, '!': 0.278, '"': 0.355, '#': 0.556, '$': 0.556, '%': 0.889,
+    '&': 0.667, "'": 0.191, '(': 0.333, ')': 0.333, '*': 0.389, '+': 0.584,
+    ',': 0.278, '-': 0.333, '.': 0.278, '/': 0.278,
+    '0': 0.556, '1': 0.556, '2': 0.556, '3': 0.556, '4': 0.556,
+    '5': 0.556, '6': 0.556, '7': 0.556, '8': 0.556, '9': 0.556,
+    ':': 0.278, ';': 0.278, '<': 0.584, '=': 0.584, '>': 0.584, '?': 0.556,
+    '@': 0.833,
+    'A': 0.667, 'B': 0.667, 'C': 0.722, 'D': 0.722, 'E': 0.667, 'F': 0.611,
+    'G': 0.778, 'H': 0.722, 'I': 0.278, 'J': 0.500, 'K': 0.667, 'L': 0.556,
+    'M': 0.833, 'N': 0.722, 'O': 0.778, 'P': 0.667, 'Q': 0.778, 'R': 0.722,
+    'S': 0.667, 'T': 0.611, 'U': 0.722, 'V': 0.667, 'W': 0.944, 'X': 0.667,
+    'Y': 0.667, 'Z': 0.611,
+    '[': 0.278, ']': 0.278, '^': 0.469, '_': 0.556, '`': 0.278,
+    'a': 0.556, 'b': 0.556, 'c': 0.500, 'd': 0.556, 'e': 0.556, 'f': 0.333,
+    'g': 0.556, 'h': 0.556, 'i': 0.222, 'j': 0.222, 'k': 0.500, 'l': 0.222,
+    'm': 0.833, 'n': 0.556, 'o': 0.556, 'p': 0.556, 'q': 0.556, 'r': 0.333,
+    's': 0.500, 't': 0.278, 'u': 0.556, 'v': 0.500, 'w': 0.944, 'x': 0.500,
+    'y': 0.500, 'z': 0.500,
+    '{': 0.334, '|': 0.260, '}': 0.334, '~': 0.584,
+}
+
+
+def _table_ratio(ch: str) -> float:
+    """Helvetica/Arial advance width as a fraction of em (font size)."""
+    r = _WIDTHS.get(ch)
+    if r is None:
+        if ch.isdigit():
+            r = 0.556
+        elif ch.isupper():
+            r = 0.70
+        elif ch.islower():
+            r = 0.50
+        else:
+            r = 0.45
+    return r
+
+
+def _estimate_advances(all_lines) -> dict:
+    """Estimate each character's advance as a fraction of em (font size).
+
+    Advances are normalized by the character's own font size so estimates
+    work across mixed sizes (e.g. a 24pt heading and 12pt body). For a
+    character, the typical x0-step to its visual successor is used; a low
+    percentile keeps real spaces and column gutters (which inflate some
+    steps) from skewing it. This is what lets the spacing test tell a narrow
+    glyph's side bearings ("1" followed by "9") apart from a genuine word
+    space. A font-model table caps characters that are (almost) always
+    followed by a space, whose observed steps would otherwise absorb it.
+    """
+    diffs: dict[str, list[float]] = {}
+    for ln in all_lines:
+        ordered = sorted(ln, key=lambda c: c["x0"])
+        for a, b in zip(ordered, ordered[1:]):
+            if a["size"] <= 0 or a["ch"] == " ":
+                continue
+            d = (b["x0"] - a["x0"]) / a["size"]
+            if d > 0:
+                diffs.setdefault(a["ch"], []).append(d)
+    adv: dict[str, float] = {}
+    for ch, ds in diffs.items():
+        ds.sort()
+        tval = _table_ratio(ch)
+        ds = [d for d in ds if d >= 0.5 * tval]  # drop overlaps/degenerate
+        if not ds:
+            adv[ch] = tval
+            continue
+        m = ds[min(1, len(ds) // 4)] if len(ds) >= 2 else ds[0]
+        # Observed steps dominate, but the table wins when the data is
+        # space-inflated (character almost always followed by a space).
+        adv[ch] = m if m < tval else tval
+    return adv
+
+
+def _reattach_tiny_glyphs(lines):
+    """Move tiny glyphs ('-', '.', ':', ...) stranded in a neighboring line
+    back to the line where they fill a glyph-sized gap between normal chars.
+
+    Dense forms often set punctuation on a slightly different baseline than
+    the surrounding text, which fools pure y-distance grouping; without this,
+    e.g. the '.' of "gmail.com" ends up orphaned and its gap reads as a
+    word space.
+    """
+    heights = sorted(c["y1"] - c["y0"] for ln in lines for c in ln
+                     if c["y1"] > c["y0"] and c["ch"] != " ")
+    if not heights:
+        return lines
+    med_h = heights[len(heights) // 2]
+
+    def line_yc(ln):
+        return sum((c["y0"] + c["y1"]) / 2 for c in ln) / len(ln)
+
+    def fills_interior_gap(c, ln):
+        ordered = [x for x in sorted(ln, key=lambda x: x["x0"]) if x is not c]
+        for a, b in zip(ordered, ordered[1:]):
+            if (a["y1"] - a["y0"]) < 0.45 * med_h:
+                continue
+            if (b["y1"] - b["y0"]) < 0.45 * med_h:
+                continue
+            if (a["x1"] <= c["x0"] <= b["x0"]
+                    and (b["x0"] - a["x1"]) < 2.0 * med_h):
+                return True
+        return False
+
+    for li in range(len(lines)):
+        for c in list(lines[li]):
+            if (c["y1"] - c["y0"]) >= 0.45 * med_h or c["ch"] == " ":
+                continue
+            if fills_interior_gap(c, lines[li]):
+                continue  # already home
+            cy = (c["y0"] + c["y1"]) / 2
+            cands = []
+            for lj, other in enumerate(lines):
+                if lj == li or not other:
+                    continue
+                d = abs(cy - line_yc(other))
+                if d > med_h:
+                    continue
+                if fills_interior_gap(c, other):
+                    cands.append((d, other))
+            if cands:
+                cands.sort(key=lambda t: t[0])
+                lines[li].remove(c)
+                cands[0][1].append(c)
+    lines = [ln for ln in lines if ln]
+    for ln in lines:
+        ln.sort(key=lambda c: c["x0"])
+    lines.sort(key=lambda ln: -sum((c["y0"] + c["y1"]) / 2 for c in ln) / len(ln))
+    return lines
+
+
+def _estimate_space_width(line_chars) -> float:
+    """Estimate a real word-space width for one line of chars.
+
+    Uses actual space characters when present (their advance between the
+    neighboring glyphs); otherwise falls back to a fraction of the median
+    font size. Deliberately NOT a fraction of median ink width: pdfium
+    charboxes are ink boxes, so narrow glyphs (1, i, -, .) leave phantom
+    gaps that a ink-width-relative threshold mistakes for spaces.
+    """
+    widths: list[float] = []
+    for i, c in enumerate(line_chars):
+        if c["ch"] != " ":
+            continue
+        prev = next((line_chars[j] for j in range(i - 1, -1, -1)
+                     if line_chars[j]["ch"] != " "), None)
+        nxt = next((line_chars[j] for j in range(i + 1, len(line_chars))
+                    if line_chars[j]["ch"] != " "), None)
+        if prev is None or nxt is None:
+            continue
+        w = nxt["x0"] - prev["x1"]
+        size = c["size"] or 10.0
+        if 0 < w < 10 * size:
+            widths.append(w)
+    if widths:
+        widths.sort()
+        return widths[len(widths) // 2]
+    sizes = [c["size"] for c in line_chars if c["size"] > 0]
+    med_size = sorted(sizes)[len(sizes) // 2] if sizes else 10.0
+    return _SPACE_WIDTH_RATIO * med_size
+
+
+def _line_tokens(line_chars, advances: dict) -> list[tuple]:
+    """Build ("text", str, bold) / ("tab",) tokens for one x-sorted line.
+
+    A word space is *extra* advance beyond the previous glyph's own advance:
+    ``(curr.x0 - prev.x0) - advance(prev)``. This distinguishes a narrow
+    glyph's side bearings ("1" followed by "9") from a genuine word space,
+    which ink-box gaps alone cannot. Gaps wider than _GUTTER_FACTOR become
+    column-gutter tabs, so side-by-side columns don't interleave.
+    """
+    line = sorted(line_chars, key=lambda c: c["x0"])
+    space_w = _estimate_space_width(line)
+    tokens: list[tuple] = []
+    prev = None
+    prev_was_space = False
+    for c in line:
+        if c["ch"] == " ":
+            tokens.append(("text", " ", c["bold"]))
+            prev_was_space = True
+            continue
+        if prev is not None and prev["x1"] > prev["x0"]:
+            gap = c["x0"] - prev["x1"]
+            if gap > _GUTTER_FACTOR * space_w:
+                tokens.append(("tab",))
+            elif not prev_was_space:
+                ratio = advances.get(prev["ch"])
+                if ratio is None:
+                    ratio = _table_ratio(prev["ch"])
+                adv = ratio * (prev["size"] or 10.0)
+                extra = (c["x0"] - prev["x0"]) - adv
+                if extra > _SPACE_EXTRA_FACTOR * space_w:
+                    tokens.append(("text", " ", c["bold"]))
+        tokens.append(("text", c["ch"], c["bold"]))
+        prev = c
+        prev_was_space = False
+    return tokens
 
 
 def _open_reader(data: bytes, filename: str) -> PdfReader:
@@ -238,22 +444,29 @@ def _extract_page_blocks(data: bytes, page_index: int, page) -> tuple[list, bool
                     "ch": ch, "x0": x0, "y0": y0, "x1": x1, "y1": y1,
                     "size": size, "bold": weight >= 600,
                 })
-            # Group chars into lines by vertical proximity.
+            # Group chars into lines by vertical proximity, best-match on the
+            # running mean y-center (not greedy first-match): on dense forms,
+            # nearby rows otherwise steal each other's glyphs, and tiny
+            # glyphs like '-' get stranded in neighboring lines.
             chars.sort(key=lambda c: (-(c["y0"] + c["y1"]) / 2, c["x0"]))
-            lines: list[list] = []
+            line_objs: list[dict] = []
             for ch in chars:
                 cy = (ch["y0"] + ch["y1"]) / 2
                 ch_h = max(1.0, ch["y1"] - ch["y0"])
-                placed = False
-                for line in lines:
-                    ly = (line[0]["y0"] + line[0]["y1"]) / 2
-                    lh = max(1.0, line[0]["y1"] - line[0]["y0"])
-                    if abs(cy - ly) <= _LINE_TOL_FACTOR * max(ch_h, lh):
-                        line.append(ch)
-                        placed = True
-                        break
-                if not placed:
-                    lines.append([ch])
+                best = None
+                best_d = None
+                for ln in line_objs:
+                    tol = _LINE_TOL_FACTOR * max(ch_h, ln["h"])
+                    d = abs(cy - ln["yc"])
+                    if d <= tol and (best_d is None or d < best_d):
+                        best, best_d = ln, d
+                if best is None:
+                    line_objs.append({"chars": [ch], "yc": cy, "h": ch_h})
+                else:
+                    best["chars"].append(ch)
+                    n_ln = len(best["chars"])
+                    best["yc"] += (cy - best["yc"]) / n_ln
+            lines = [ln["chars"] for ln in line_objs]
             # Sort lines top-down, chars left-to-right; merge into paragraphs.
             for line in lines:
                 line.sort(key=lambda c: c["x0"])
@@ -262,57 +475,60 @@ def _extract_page_blocks(data: bytes, page_index: int, page) -> tuple[list, bool
             def line_height(ln):
                 return sum(c["y1"] - c["y0"] for c in ln) / len(ln)
 
-            # Insert spaces from horizontal gaps (pdfium often omits space
-            # chars; wide gaps between words imply them).
-            spaced_lines: list[list] = []
-            for line in lines:
-                widths = [c["x1"] - c["x0"] for c in line if c["x1"] > c["x0"]]
-                med_w = sorted(widths)[len(widths) // 2] if widths else 4.0
-                out_line: list = []
-                for c in line:
-                    if out_line:
-                        gap = c["x0"] - out_line[-1]["x1"]
-                        if gap > 0.45 * med_w:
-                            out_line.append({
-                                "ch": " ", "x0": out_line[-1]["x1"],
-                                "x1": c["x0"], "y0": c["y0"], "y1": c["y1"],
-                                "size": c["size"], "bold": c["bold"],
-                            })
-                    out_line.append(c)
-                spaced_lines.append(out_line)
-            lines = spaced_lines
+            # Per-character advances for the spacing test, then per-line
+            # tokens: word spaces from extra advance, column gutters as tabs.
+            # Tiny glyphs stranded in neighboring lines are reattached first.
+            lines = _reattach_tiny_glyphs(lines)
+            advances = _estimate_advances(lines)
+            line_items = [(ln, _line_tokens(ln, advances)) for ln in lines]
 
-            paragraphs: list[list] = []
+            paragraphs: list[list] = []  # list of (chars, tokens) line pairs
             prev_bottom = None
             prev_h = 0.0
-            for line in lines:
-                top = max(c["y1"] for c in line)
-                bottom = min(c["y0"] for c in line)
-                h = line_height(line)
+            for ln, toks in line_items:
+                top = max(c["y1"] for c in ln)
+                bottom = min(c["y0"] for c in ln)
+                h = line_height(ln)
                 gap = (prev_bottom - top) if prev_bottom is not None else 0.0
                 if paragraphs and gap > _PARA_GAP_FACTOR * min(h, prev_h or h):
                     paragraphs.append([])
                 if not paragraphs:
                     paragraphs.append([])
-                paragraphs[-1].extend(line)
+                paragraphs[-1].append((ln, toks))
                 prev_bottom = bottom
                 prev_h = h
 
-            for para_chars in paragraphs:
-                text = "".join(c["ch"] for c in para_chars).strip()
+            for para_lines in paragraphs:
+                para_chars = [c for ln, _ in para_lines for c in ln]
+                # Join wrapped lines with a space so words don't merge;
+                # column segments are already separated by tabs.
+                para_tokens: list[tuple] = []
+                for i, (_, toks) in enumerate(para_lines):
+                    if i > 0 and toks and para_tokens:
+                        para_tokens.append(("text", " ", False))
+                    para_tokens.extend(toks)
+                # Bold runs, trimming edge whitespace so runs/text agree.
+                runs: list[tuple[str, bool]] = []
+                for tok in para_tokens:
+                    t, b = ("\t", False) if tok[0] == "tab" else (tok[1], tok[2])
+                    if runs and runs[-1][1] == b:
+                        runs[-1] = (runs[-1][0] + t, b)
+                    else:
+                        runs.append((t, b))
+                while runs and not runs[0][0].strip():
+                    runs.pop(0)
+                while runs and not runs[-1][0].strip():
+                    runs.pop()
+                if runs:
+                    runs[0] = (runs[0][0].lstrip(), runs[0][1])
+                    runs[-1] = (runs[-1][0].rstrip(), runs[-1][1])
+                text = "".join(t for t, _ in runs)
                 if not text:
                     continue
                 has_text = True
                 sizes = [c["size"] for c in para_chars if c["size"] > 0]
                 med_size = sorted(sizes)[len(sizes) // 2] if sizes else 0.0
                 y_top = max(c["y1"] for c in para_chars)
-                # Bold runs.
-                runs: list[tuple[str, bool]] = []
-                for c in para_chars:
-                    if runs and runs[-1][1] == c["bold"]:
-                        runs[-1] = (runs[-1][0] + c["ch"], c["bold"])
-                    else:
-                        runs.append((c["ch"], c["bold"]))
                 blocks.append({
                     "y": y_top, "kind": "para", "text": text,
                     "runs": runs, "size": med_size,
