@@ -92,15 +92,32 @@ def _open_reader(data: bytes, filename: str) -> PdfReader:
     return reader
 
 
-def _pil_image_from_xobject(img_obj):
+def _pil_image_from_xobject(img_obj, max_dim=None):
     """Build a PIL image from a PDF image XObject.
 
     DCTDecode (JPEG) bytes are opened directly. For anything else
     (FlateDecode, raw, …) ``get_data()`` returns headerless pixel bytes,
     so the image is reconstructed with ``Image.frombytes`` from the
     XObject's /Width, /Height, /ColorSpace and /BitsPerComponent.
-    Returns None when the image can't be decoded (leave untouched).
+/ICCBased images whose profile stream declares a component count are
+    decoded first via a row-decimated manual inflate (avoids pypdf
+    get_data()'s ~2.2x transient on 100MB+ scans); when ``max_dim`` is
+    given, only every k-th row is kept so the kept image stays >= 2x the
+    downsample target. The ICC profile is dropped on recompress. Returns
+    None when the image can't be decoded (leave untouched).
     """
+    # ICCBased first: it must not go through get_data(), whose transient
+    # (~2.2x the image size) OOMs on full-page scans.
+    from pdfedi.tools._helpers import _decode_iccbased, _iccbased_params
+
+    icc_params = _iccbased_params(img_obj)
+    if icc_params is not None:
+        _mode, _w, _h, _n, _f = icc_params
+        row_step = 1
+        if max_dim:
+            row_step = max(1, max(_w, _h) // (max_dim * 2))
+        return _decode_iccbased(img_obj, icc_params, row_step=row_step)
+
     try:
         data = img_obj.get_data()
     except Exception:
@@ -136,7 +153,7 @@ def _pil_image_from_xobject(img_obj):
     elif cs_name == "/DeviceCMYK" and bpc == 8:
         mode = "CMYK"
     if mode is None:
-        return None  # indexed, ICC-based, … — leave untouched
+        return None  # indexed, … — leave untouched
 
     try:
         return Image.frombytes(mode, (width, height), data)
@@ -146,7 +163,7 @@ def _pil_image_from_xobject(img_obj):
 
 def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     """Downsample a pypdf image XObject in place. Returns True if modified."""
-    image = _pil_image_from_xobject(img_obj)
+    image = _pil_image_from_xobject(img_obj, max_dim=max_dim)
     if image is None:
         return False
 
@@ -196,6 +213,22 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     for key in ("/DecodeParms", "/Interpolate", "/SMask", "/Mask"):
         img_obj.pop(NameObject(key), None)
     return True
+
+
+def _drop_decode_cache(img_obj) -> None:
+    """Release pypdf's cached decoded bytes for this image object.
+
+    EncodedStreamObject.get_data() caches the full decoded stream in
+    ``decoded_self`` — 100MB+ for the full-page scans this tool downsamples.
+    Without this the whole run accumulates one cache entry per image
+    (this exact pattern OOM-crashed a production instance). Mirrors
+    pdf_to_word._drop_decode_cache; ``_data`` is deliberately NOT cleared
+    here because compress rewrites it with the replacement JPEG bytes.
+    """
+    try:
+        img_obj.decoded_self = None
+    except Exception:
+        pass
 
 
 def _iter_image_xobjects(writer: PdfWriter):
@@ -250,6 +283,9 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if max_dim is not None:
         for img_obj in _iter_image_xobjects(writer):
             _downsample_image_object(img_obj, max_dim, jpeg_quality)
+            # After the replacement is computed, release the decode cache so
+            # the next image's 100MB+ decode does not accumulate.
+            _drop_decode_cache(img_obj)
 
     out = ctx.new_output_path("compressed.pdf").with_suffix(".pdf")
     with out.open("wb") as f:
