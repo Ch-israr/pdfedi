@@ -10,6 +10,7 @@ from pathlib import Path
 
 from pypdf import PdfReader, PdfWriter
 
+from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -44,33 +45,6 @@ SPEC = ToolSpec(
     output_mime="application/pdf",
     category="organize",
 )
-
-
-def _open_reader(data: bytes, filename: str) -> PdfReader:
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError(
-            f"'{filename}' is not a valid PDF file.", code="invalid_input"
-        )
-    try:
-        reader = PdfReader(io.BytesIO(data))
-    except Exception as exc:
-        raise ToolError(
-            f"'{filename}' could not be parsed as a PDF: {exc}", code="invalid_input"
-        ) from exc
-    if getattr(reader, "is_encrypted", False):
-        raise ToolError(
-            f"'{filename}' is password-protected; encrypted PDFs are not supported.",
-            code="encrypted_pdf",
-        )
-    try:
-        count = len(reader.pages)
-    except Exception as exc:
-        raise ToolError(
-            f"Could not read the pages of '{filename}': {exc}", code="invalid_input"
-        ) from exc
-    if count == 0:
-        raise ToolError(f"'{filename}' contains no pages.", code="invalid_input")
-    return reader
 
 
 def _parse_order(raw) -> list[int]:
@@ -119,7 +93,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
     order = _parse_order(require_option(options, SPEC, "order"))
     tool_input = ctx.inputs[0]
-    reader = _open_reader(tool_input.path.read_bytes(), tool_input.filename)
+    reader = open_pdf_reader(tool_input.path.read_bytes(), tool_input.filename)
     page_count = len(reader.pages)
 
     if sorted(order) != list(range(1, page_count + 1)):

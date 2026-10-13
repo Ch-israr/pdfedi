@@ -174,4 +174,14 @@ def run_migrations(engine) -> list[int]:
             applied.append(version)
     # Keep SQLAlchemy's metadata aware of the tables for the ORM.
     Base.metadata.create_all(engine, checkfirst=True)
+    # Index for the analytics retention prune (log_visit deletes rows older
+    # than RETENTION_DAYS on every tracked page view). index=True on the
+    # Visit model covers create_all, but existing databases need the index
+    # added explicitly — IF NOT EXISTS makes this idempotent. Works on
+    # SQLite and Turso/libSQL.
+    with engine.begin() as conn:
+        conn.execute(text(
+            "CREATE INDEX IF NOT EXISTS ix_visits_created_at "
+            "ON visits (created_at)"
+        ))
     return applied

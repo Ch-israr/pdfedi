@@ -6,6 +6,7 @@ from pathlib import Path
 
 from pypdf import PdfReader, PdfWriter, Transformation
 
+from pdfedi.tools._helpers import PAGE_SIZES_PT, open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -53,40 +54,6 @@ SPEC = ToolSpec(
     category="organize",
 )
 
-_SIZES: dict[str, tuple[float, float]] = {
-    "a4": (595.0, 842.0),
-    "a5": (420.0, 595.0),
-    "letter": (612.0, 792.0),
-    "legal": (612.0, 1008.0),
-}
-
-
-def _open_reader(data: bytes, filename: str) -> PdfReader:
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError(
-            f"'{filename}' is not a valid PDF file.", code="invalid_input"
-        )
-    try:
-        reader = PdfReader(io.BytesIO(data))
-    except Exception as exc:
-        raise ToolError(
-            f"'{filename}' could not be parsed as a PDF: {exc}", code="invalid_input"
-        ) from exc
-    if getattr(reader, "is_encrypted", False):
-        raise ToolError(
-            f"'{filename}' is password-protected; encrypted PDFs are not supported.",
-            code="encrypted_pdf",
-        )
-    try:
-        count = len(reader.pages)
-    except Exception as exc:
-        raise ToolError(
-            f"Could not read the pages of '{filename}': {exc}", code="invalid_input"
-        ) from exc
-    if count == 0:
-        raise ToolError(f"'{filename}' contains no pages.", code="invalid_input")
-    return reader
-
 
 def run(ctx: ToolContext, options: dict) -> Path:
     """Resize every page to the target size, scaling content accordingly."""
@@ -100,12 +67,12 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
     raw_size = get_option(options, SPEC, "size")
     size_key = str(raw_size).strip().lower() if raw_size is not None else ""
-    if size_key not in _SIZES:
+    if size_key not in PAGE_SIZES_PT:
         raise ToolError(
             "Option 'size' must be one of: a4, a5, letter, legal.",
             code="bad_option",
         )
-    tw, th = _SIZES[size_key]
+    tw, th = PAGE_SIZES_PT[size_key]
 
     mode = get_option(options, SPEC, "mode")
     if mode not in ("fit", "stretch"):
@@ -114,7 +81,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         )
 
     tool_input = ctx.inputs[0]
-    reader = _open_reader(tool_input.path.read_bytes(), tool_input.filename)
+    reader = open_pdf_reader(tool_input.path.read_bytes(), tool_input.filename)
 
     writer = PdfWriter()
     for page in reader.pages:

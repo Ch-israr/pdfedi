@@ -7,6 +7,7 @@ from pathlib import Path
 
 from pypdf import PdfReader, PdfWriter, Transformation
 
+from pdfedi.tools._helpers import PAGE_SIZES_PT, open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -62,11 +63,6 @@ SPEC = ToolSpec(
     category="organize",
 )
 
-_SHEET_SIZES: dict[str, tuple[float, float]] = {
-    "a4": (595.0, 842.0),
-    "letter": (612.0, 792.0),
-}
-
 _MARGIN = 18.0  # points around the sheet
 _GAP = 12.0  # points between cells
 
@@ -80,33 +76,6 @@ def _grid(layout: int, landscape: bool) -> tuple[int, int]:
     if layout == 6:
         return (3, 2) if landscape else (2, 3)
     return (3, 3)
-
-
-def _open_reader(data: bytes, filename: str) -> PdfReader:
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError(
-            f"'{filename}' is not a valid PDF file.", code="invalid_input"
-        )
-    try:
-        reader = PdfReader(io.BytesIO(data))
-    except Exception as exc:
-        raise ToolError(
-            f"'{filename}' could not be parsed as a PDF: {exc}", code="invalid_input"
-        ) from exc
-    if getattr(reader, "is_encrypted", False):
-        raise ToolError(
-            f"'{filename}' is password-protected; encrypted PDFs are not supported.",
-            code="encrypted_pdf",
-        )
-    try:
-        count = len(reader.pages)
-    except Exception as exc:
-        raise ToolError(
-            f"Could not read the pages of '{filename}': {exc}", code="invalid_input"
-        ) from exc
-    if count == 0:
-        raise ToolError(f"'{filename}' contains no pages.", code="invalid_input")
-    return reader
 
 
 def run(ctx: ToolContext, options: dict) -> Path:
@@ -132,7 +101,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         )
 
     sheet = get_option(options, SPEC, "sheet")
-    if sheet not in _SHEET_SIZES:
+    if sheet not in PAGE_SIZES_PT:
         raise ToolError(
             "Option 'sheet' must be 'a4' or 'letter'.", code="bad_option"
         )
@@ -143,14 +112,14 @@ def run(ctx: ToolContext, options: dict) -> Path:
             code="bad_option",
         )
 
-    sw, sh = _SHEET_SIZES[sheet]
+    sw, sh = PAGE_SIZES_PT[sheet]
     landscape = orientation == "landscape"
     if landscape:
         sw, sh = sh, sw
     cols, rows = _grid(layout, landscape)
 
     tool_input = ctx.inputs[0]
-    reader = _open_reader(tool_input.path.read_bytes(), tool_input.filename)
+    reader = open_pdf_reader(tool_input.path.read_bytes(), tool_input.filename)
     pages = list(reader.pages)
 
     cell_w = (sw - 2 * _MARGIN - (cols - 1) * _GAP) / cols

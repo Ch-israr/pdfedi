@@ -18,6 +18,7 @@ from pypdf.generic import ArrayObject, DecodedStreamObject, NameObject
 from reportlab.lib.colors import black
 from reportlab.pdfgen import canvas
 
+from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -190,12 +191,9 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if not ctx.inputs:
         raise ToolError("No input file provided.", code="missing_input")
     data = ctx.inputs[0].path.read_bytes()
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError("Input is not a valid PDF file.", code="invalid_input")
-
-    reader = PdfReader(io.BytesIO(data))
-    if reader.is_encrypted:
-        raise ToolError("Input PDF is encrypted.", code="invalid_input")
+    reader = open_pdf_reader(
+        data, ctx.inputs[0].filename, encrypted_code="invalid_input"
+    )
 
     # --- Step 1: locate matches ---
     rects_by_page = _find_rects(data, literals)

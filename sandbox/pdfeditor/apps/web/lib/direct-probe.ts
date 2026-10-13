@@ -4,7 +4,9 @@
  * real text — no mask). Wraps pdf-core's probeDirectTextEdit with a
  * per-fragment result cache so repeated clicks are instant.
  */
-import { probeDirectTextEdit } from '@pdfeditor/pdf-core';
+// NOTE: pdf-core is imported lazily inside probeDirectEdit (it pulls in
+// pdf-lib, ~478 KB); probing only happens when the user clicks a text
+// fragment, never at initial page load.
 import type { NativeTextItem } from '@pdfeditor/shared';
 
 export interface DirectProbeResult {
@@ -37,10 +39,24 @@ export function probeDirectEdit(
   if (hit) return hit;
   const baselineX = item.x;
   const baselineY = item.y + item.baselineOffset;
-  const p = probeDirectTextEdit(pdfBytes, pageIndex, { text: item.text, baselineX, baselineY }).then(
-    (r) => ({ editable: r.editable, colorHex: r.colorHex, reason: r.reason }),
-    () => ({ editable: false, reason: 'The document could not be inspected for direct editing.' }),
-  );
+  // Narrowed once for the async closure below (params don't narrow in closures).
+  const bytes: Uint8Array = pdfBytes;
+  const p = (async (): Promise<DirectProbeResult> => {
+    try {
+      const { probeDirectTextEdit } = await import('@pdfeditor/pdf-core');
+      const r = await probeDirectTextEdit(bytes, pageIndex, {
+        text: item.text,
+        baselineX,
+        baselineY,
+      });
+      return { editable: r.editable, colorHex: r.colorHex, reason: r.reason };
+    } catch {
+      return {
+        editable: false,
+        reason: 'The document could not be inspected for direct editing.',
+      };
+    }
+  })();
   cache.set(key, p);
   return p;
 }

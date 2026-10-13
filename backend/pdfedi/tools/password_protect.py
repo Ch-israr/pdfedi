@@ -1,11 +1,11 @@
 """Password-protect a PDF with 128-bit encryption (pypdf)."""
 from __future__ import annotations
 
-import io
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 
+from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -55,14 +55,9 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if not ctx.inputs:
         raise ToolError("No input file provided.", code="missing_input")
     data = ctx.inputs[0].path.read_bytes()
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError("Input is not a valid PDF file.", code="invalid_input")
-
-    reader = PdfReader(io.BytesIO(data))
-    if reader.is_encrypted:
-        raise ToolError(
-            "Input PDF is already encrypted.", code="invalid_input"
-        )
+    reader = open_pdf_reader(
+        data, ctx.inputs[0].filename, encrypted_code="invalid_input"
+    )
 
     writer = PdfWriter()
     for page in reader.pages:

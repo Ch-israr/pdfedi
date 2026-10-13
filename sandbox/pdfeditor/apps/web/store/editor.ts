@@ -10,12 +10,16 @@
 
 import { create } from 'zustand';
 import { immer } from 'zustand/middleware/immer';
-import {
-  deletePage as coreDeletePage,
-  duplicatePage as coreDuplicatePage,
-  reorderPage as coreReorderPage,
-  rotatePage as coreRotatePage,
-} from '@pdfeditor/pdf-core';
+// @pdfeditor/pdf-core (and its pdf-lib dependency, ~478 KB) is loaded lazily.
+// Page operations, annotation probing and export are the only consumers, and
+// all of them are interaction-time — never initial render. Keeping the static
+// import would bundle pdf-lib into the upfront /editor chunk, so every
+// consumer goes through this cached dynamic import instead.
+let corePromise: Promise<typeof import('@pdfeditor/pdf-core')> | null = null;
+function loadPdfCore() {
+  if (!corePromise) corePromise = import('@pdfeditor/pdf-core');
+  return corePromise;
+}
 import type {
   EditorElement,
   HistoryCommand,
@@ -94,11 +98,11 @@ interface EditorState {
   deleteElement: (id: string) => void;
   duplicateElement: (id: string) => void;
   select: (id: string | null) => void;
-  rotatePage: (pageId: string) => void;
-  deletePage: (pageId: string) => void;
-  duplicatePage: (pageId: string) => void;
-  insertBlankPage: (afterPageId?: string | null) => void;
-  reorderPage: (pageId: string, toIndex: number) => void;
+  rotatePage: (pageId: string) => Promise<void>;
+  deletePage: (pageId: string) => Promise<void>;
+  duplicatePage: (pageId: string) => Promise<void>;
+  insertBlankPage: (afterPageId?: string | null) => Promise<void>;
+  reorderPage: (pageId: string, toIndex: number) => Promise<void>;
   undo: () => void;
   redo: () => void;
   exportBytes: () => Promise<Uint8Array>;
@@ -609,12 +613,13 @@ export const useEditor = create<EditorState>()(
       });
     },
 
-    rotatePage: (pageId) => {
+    rotatePage: async (pageId) => {
+      const core = await loadPdfCore();
       set((s) => {
         const idx = s.pages.findIndex((p) => p.id === pageId);
         if (idx === -1) return;
         const before = s.pages[idx];
-        const after = coreRotatePage(before);
+        const after = core.rotatePage(before);
         s.pages[idx] = after;
         pushHistory(s, {
           label: 'Rotate page',
@@ -634,7 +639,8 @@ export const useEditor = create<EditorState>()(
       });
     },
 
-    deletePage: (pageId) => {
+    deletePage: async (pageId) => {
+      const core = await loadPdfCore();
       const state = get();
       const idx = state.pages.findIndex((p) => p.id === pageId);
       if (idx === -1 || state.pages.length <= 1) return;
@@ -643,7 +649,7 @@ export const useEditor = create<EditorState>()(
         (e) => e.pageId === pageId,
       );
       set((s) => {
-        s.pages = coreDeletePage(s.pages, pageId);
+        s.pages = core.deletePage(s.pages, pageId);
         for (const e of removedElements) delete s.elements[e.id];
         if (s.activePageId === pageId) s.activePageId = s.pages[0]?.id ?? null;
         if (removedElements.some((e) => e.id === s.selectedId)) s.selectedId = null;
@@ -657,7 +663,7 @@ export const useEditor = create<EditorState>()(
           },
           redo: () => {
             useEditor.setState((st) => {
-              st.pages = coreDeletePage(st.pages, pageId);
+              st.pages = core.deletePage(st.pages, pageId);
               for (const e of removedElements) delete st.elements[e.id];
             });
           },
@@ -665,11 +671,12 @@ export const useEditor = create<EditorState>()(
       });
     },
 
-    duplicatePage: (pageId) => {
+    duplicatePage: async (pageId) => {
+      const core = await loadPdfCore();
       const state = get();
       const idx = state.pages.findIndex((p) => p.id === pageId);
       if (idx === -1) return;
-      const copy = coreDuplicatePage(state.pages[idx]);
+      const copy = core.duplicatePage(state.pages[idx]);
       // Duplicate elements onto the new page with fresh ids
       const elCopies: EditorElement[] = Object.values(state.elements)
         .filter((e) => e.pageId === pageId)
@@ -681,7 +688,7 @@ export const useEditor = create<EditorState>()(
           label: 'Duplicate page',
           undo: () => {
             useEditor.setState((st) => {
-              st.pages = coreDeletePage(st.pages, copy.id);
+              st.pages = core.deletePage(st.pages, copy.id);
               for (const e of elCopies) delete st.elements[e.id];
             });
           },
@@ -696,7 +703,8 @@ export const useEditor = create<EditorState>()(
       });
     },
 
-    insertBlankPage: (afterPageId) => {
+    insertBlankPage: async (afterPageId) => {
+      const core = await loadPdfCore();
       const state = get();
       if (state.pages.length === 0) return;
       // Reference page selection (in priority order):
@@ -736,7 +744,7 @@ export const useEditor = create<EditorState>()(
           label: 'Insert blank page',
           undo: () => {
             useEditor.setState((st) => {
-              st.pages = coreDeletePage(st.pages, blank.id);
+              st.pages = core.deletePage(st.pages, blank.id);
               st.pageCount = st.pages.length;
             });
           },
@@ -753,10 +761,11 @@ export const useEditor = create<EditorState>()(
       });
     },
 
-    reorderPage: (pageId, toIndex) => {
+    reorderPage: async (pageId, toIndex) => {
+      const core = await loadPdfCore();
       const before = get().pages;
       set((s) => {
-        s.pages = coreReorderPage(s.pages, pageId, toIndex);
+        s.pages = core.reorderPage(s.pages, pageId, toIndex);
         const after = s.pages;
         pushHistory(s, {
           label: 'Reorder page',
@@ -817,7 +826,7 @@ export const useEditor = create<EditorState>()(
       // embedded source PDF — re-editability comes from the PDF's own
       // annotation layer, and file size grows only by the annotations
       // themselves (~1 KB per object, not a second copy of the document).
-      const { exportAnnotatedPdf } = await import('@pdfeditor/pdf-core');
+      const { exportAnnotatedPdf } = await loadPdfCore();
       return exportAnnotatedPdf({
         srcBytes: s.pdfBytes,
         pages: s.pages,
