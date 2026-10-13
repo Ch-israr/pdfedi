@@ -89,8 +89,12 @@ def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
                 page_count = None
             else:
                 page_count = len(reader.pages)
-        except Exception as e:
-            raise UploadError(f"Could not parse PDF: {e}", status_code=422) from e
+        except Exception:
+            # Damaged PDF: allowed through with unknown page count so the
+            # Repair tool can attempt recovery. Every other tool validates
+            # its input in run() and fails with a clean ToolError, so this
+            # does not weaken validation elsewhere.
+            page_count = None
         mime = PDF_MIME
     elif not is_image:
         raise UploadError("Unsupported file type. Upload a PDF or an image.", status_code=422)
