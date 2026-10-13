@@ -424,6 +424,12 @@ export const useEditor = create<EditorState>()(
         s.nativeText = {};
         s.nativeEditWarned = false;
       });
+      // The user explicitly abandoned this document — clear the IndexedDB
+      // recovery snapshot too, or the next editor visit would wrongly offer
+      // to "recover" work they already discarded.
+      void import('@/lib/persistence').then(({ clearDocument }) =>
+        clearDocument(),
+      );
     },
 
     setTool: (tool) => set((s) => { s.tool = tool; }),
@@ -842,6 +848,13 @@ export const useEditor = create<EditorState>()(
         a.remove();
         // Privacy: revoke immediately after the download starts
         setTimeout(() => URL.revokeObjectURL(url), 10_000);
+        // The work is now safe in the downloaded file — drop the stale
+        // IndexedDB recovery snapshot so the next visit doesn't offer to
+        // "recover" a document that was already downloaded. If the user
+        // keeps editing, the debounced autosave writes a fresh snapshot.
+        void import('@/lib/persistence').then(({ clearDocument }) =>
+          clearDocument(),
+        );
       } catch (e) {
         const msg = e instanceof Error ? e.message : 'Failed to prepare PDF for download.';
         set((s) => {

@@ -101,6 +101,13 @@ export function DownloadDialog({ onClose }: { onClose: () => void }) {
     a.click();
     a.remove();
     setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    // The work is now safe in the downloaded file — drop the stale IndexedDB
+    // recovery snapshot so the next visit doesn't offer to "recover" a
+    // document that was already downloaded. If the user keeps editing, the
+    // debounced autosave writes a fresh snapshot.
+    void import('@/lib/persistence').then(({ clearDocument }) =>
+      clearDocument(),
+    );
     onClose();
   };
 
