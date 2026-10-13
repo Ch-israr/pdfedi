@@ -63,7 +63,9 @@ class File(Base):
     kind: Mapped[str] = mapped_column(String(16), nullable=False, default=FileKind.INPUT.value)
     status: Mapped[str] = mapped_column(String(16), nullable=False, default=FileStatus.UPLOADED.value)
     page_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
+    created_at: Mapped[str] = mapped_column(
+        String(32), nullable=False, default=utcnow_iso
+    )
 
     __table_args__ = (Index("ix_files_storage_key", "storage_key"),)
 
@@ -117,7 +119,9 @@ class Visit(Base):
     browser: Mapped[str] = mapped_column(String(32), nullable=False)
     source: Mapped[str] = mapped_column(String(64), nullable=False)
     path: Mapped[str] = mapped_column(String(256), nullable=False)
-    created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
+    created_at: Mapped[str] = mapped_column(
+        String(32), nullable=False, default=utcnow_iso, index=True
+    )
 
 
 class BotVisit(Base):

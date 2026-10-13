@@ -5,6 +5,7 @@ Next.js frontend served from FRONTEND_DIR (one origin, no CORS needed).
 """
 from __future__ import annotations
 
+import asyncio
 import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -21,6 +22,7 @@ import structlog
 from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
+from starlette.concurrency import run_in_threadpool
 
 from pdfedi.api import admin as admin_api
 from pdfedi.api import health as health_api
@@ -72,6 +74,84 @@ async def lifespan(app: FastAPI):
     yield
 
 
+def _log_visit_sync(
+    path: str, user_agent: str, referer: str, headers: dict, is_bot: bool
+) -> None:
+    """Sync analytics DB write for the visit-tracking middleware.
+
+    Runs in Starlette's threadpool via a fire-and-forget task so the
+    synchronous SQLAlchemy/Turso round trips never block the event loop.
+    Records exactly what the old inline middleware recorded (humans and
+    bots, same fields, same retention pruning). Never raises — analytics
+    must never break a request.
+    """
+    from pdfedi import analytics as _analytics
+    from pdfedi.db import SessionLocal
+
+    try:
+        db = SessionLocal()
+        try:
+            ip = _analytics.client_ip_from_headers(headers)
+            if is_bot:
+                _analytics.log_bot_visit(
+                    db, ip=ip, user_agent=user_agent, path=path
+                )
+            else:
+                _analytics.log_visit(
+                    db,
+                    ip=ip,
+                    user_agent=user_agent,
+                    referrer=referer,
+                    path=path,
+                )
+        finally:
+            db.close()
+    except Exception:
+        pass
+
+
+class _ImmutableNextStatic(StaticFiles):
+    """StaticFiles for /_next that marks content-hashed build output immutable.
+
+    Only paths under /_next/static/ (hash-fingerprinted chunks, CSS, media)
+    get the long-lived immutable header; anything else keeps default behavior.
+    """
+
+    async def get_response(self, path: str, scope):
+        response = await super().get_response(path, scope)
+        if isinstance(response, FileResponse) and "/_next/static/" in (
+            scope.get("path") or ""
+        ):
+            response.headers["Cache-Control"] = (
+                "public, max-age=31536000, immutable"
+            )
+        return response
+
+
+def _frontend_cache_headers(path: str) -> dict | None:
+    """Cache policy for frontend-served static paths.
+
+    - /_next/static/* and /editor/_next/static/*: content-hashed build
+      output -> immutable for a year.
+    - HTML pages (and the root/404 fallbacks): no caching — deploys
+      replace them and the browser must always revalidate.
+    - Other static assets (icons, logo, llms.txt, sitemap.xml): 1 day.
+    API routes and download responses are never touched by this.
+    """
+    if "/_next/static/" in path:
+        return {"Cache-Control": "public, max-age=31536000, immutable"}
+    if path == "" or path.endswith("/") or path.endswith(".html"):
+        return None
+    return {"Cache-Control": "public, max-age=86400"}
+
+
+def _frontend_file(path: str, candidate: Path) -> FileResponse:
+    headers = _frontend_cache_headers(path)
+    if headers:
+        return FileResponse(candidate, headers=headers)
+    return FileResponse(candidate)
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="PDFEDI", version="2.0.0", lifespan=lifespan,
@@ -97,38 +177,39 @@ def create_app() -> FastAPI:
     async def visit_tracking(request, call_next):
         # Privacy-first page-view logging for the admin analytics dashboard.
         # Humans -> visits table; bots -> separate bot_visits table (name +
-        # country only). Runs after the response is built; never breaks a request.
+        # country only). Runs after the response is built and never blocks it:
+        # the sync DB write is dispatched fire-and-forget into Starlette's
+        # threadpool, so the event loop stays free for other requests.
         response = await call_next(request)
         try:
             from pdfedi import analytics as _analytics
-            from pdfedi.db import SessionLocal
 
             path = request.url.path
             ua = request.headers.get("user-agent", "")
             is_bot = _analytics.is_bot(ua)
-            if _analytics.should_track(path, ua) or _analytics.should_track_bot(path, ua):
-                db = SessionLocal()
-                try:
-                    ip = _analytics.client_ip_from_headers(request.headers)
-                    if is_bot:
-                        _analytics.log_bot_visit(db, ip=ip, user_agent=ua, path=path)
-                    else:
-                        _analytics.log_visit(
-                            db,
-                            ip=ip,
-                            user_agent=ua,
-                            referrer=request.headers.get("referer", ""),
-                            path=path,
-                        )
-                finally:
-                    db.close()
+            if _analytics.should_track(path, ua) or _analytics.should_track_bot(
+                path, ua
+            ):
+                # Capture plain values now; the request scope may be gone
+                # by the time the background write runs.
+                headers = dict(request.headers)
+                referer = request.headers.get("referer", "")
+                asyncio.get_running_loop().create_task(
+                    run_in_threadpool(
+                        _log_visit_sync, path, ua, referer, headers, is_bot
+                    )
+                )
         except Exception:
             pass
         return response
 
     frontend = Path(settings.frontend_dir)
     if frontend.is_dir():
-        app.mount("/_next", StaticFiles(directory=frontend / "_next"), name="next-static")
+        app.mount(
+            "/_next",
+            _ImmutableNextStatic(directory=frontend / "_next"),
+            name="next-static",
+        )
 
         @app.get("/{path:path}")
         def serve_frontend(path: str):
@@ -138,7 +219,7 @@ def create_app() -> FastAPI:
             # API routes are matched before this catch-all.
             candidate = frontend / path
             if path and candidate.is_file():
-                return FileResponse(candidate)
+                return _frontend_file(path, candidate)
             if (frontend / path / "index.html").is_file():
                 return FileResponse(frontend / path / "index.html")
             if path.startswith("tools/"):
