@@ -40,8 +40,11 @@ _OCR_UNAVAILABLE = "OCR is not available on this server."
 # Tesseract (a subprocess) allocated its own copy, pushing RSS over the limit
 # and getting the container OOM-killed mid-job.
 _DPI = 200
-# Tesseract config: legacy OCR engine, fully automatic page segmentation.
-_TESSERACT_CONFIG = "--oem 0"
+# Tesseract config: LSTM OCR engine (oem 1), fully automatic page segmentation.
+# The legacy engine (--oem 0) was removed because stock LSTM-only traineddata
+# (tessdata) ships no legacy components, so --oem 0 exits 1 on every page
+# ("Tesseract (legacy) engine requested, but components are not present").
+_TESSERACT_CONFIG = "--oem 1"
 # Per-page recognition timeout (seconds): fail gracefully, never hang forever.
 _PAGE_TIMEOUT = 600
 _MIN_CONFIDENCE = 30
@@ -249,8 +252,11 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 ocr_idx += 1
             else:
                 writer.add_page(page)
-        # Write to a new file, then replace.
-        final_path = ctx.new_output_path("ocr").with_suffix(".pdf")
+        # Write to a distinct file, then drop the OCR-only intermediate.
+        # (new_output_path("ocr") always returns workdir/"output_ocr", so
+        # reusing it here would make final_path == out_path and the unlink
+        # below would delete the finished file.)
+        final_path = ctx.new_output_path("ocr_final").with_suffix(".pdf")
         with open(final_path, "wb") as f:
             writer.write(f)
         out_path.unlink(missing_ok=True)
