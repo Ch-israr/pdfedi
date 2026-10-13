@@ -14,11 +14,15 @@ from pypdf import PdfReader, PdfWriter
 from pypdf.generic import (
     DecodedStreamObject,
     EncodedStreamObject,
-    IndirectObject,
     NameObject,
     NumberObject,
 )
 
+from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools.extract_images import (
+    _iter_image_xobjects,
+    _pil_from_xobject,
+)
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -65,88 +69,9 @@ _QUALITY_SETTINGS: dict[str, tuple[int | None, int]] = {
 }
 
 
-def _open_reader(data: bytes, filename: str) -> PdfReader:
-    if not data.lstrip().startswith(b"%PDF-"):
-        raise ToolError(
-            f"'{filename}' is not a valid PDF file.", code="invalid_input"
-        )
-    try:
-        reader = PdfReader(io.BytesIO(data))
-    except Exception as exc:
-        raise ToolError(
-            f"'{filename}' could not be parsed as a PDF: {exc}", code="invalid_input"
-        ) from exc
-    if getattr(reader, "is_encrypted", False):
-        raise ToolError(
-            f"'{filename}' is password-protected; encrypted PDFs are not supported.",
-            code="encrypted_pdf",
-        )
-    try:
-        count = len(reader.pages)
-    except Exception as exc:
-        raise ToolError(
-            f"Could not read the pages of '{filename}': {exc}", code="invalid_input"
-        ) from exc
-    if count == 0:
-        raise ToolError(f"'{filename}' contains no pages.", code="invalid_input")
-    return reader
-
-
-def _pil_image_from_xobject(img_obj):
-    """Build a PIL image from a PDF image XObject.
-
-    DCTDecode (JPEG) bytes are opened directly. For anything else
-    (FlateDecode, raw, …) ``get_data()`` returns headerless pixel bytes,
-    so the image is reconstructed with ``Image.frombytes`` from the
-    XObject's /Width, /Height, /ColorSpace and /BitsPerComponent.
-    Returns None when the image can't be decoded (leave untouched).
-    """
-    try:
-        data = img_obj.get_data()
-    except Exception:
-        return None
-
-    filt = img_obj.get("/Filter")
-    filters = list(filt) if isinstance(filt, list) else [filt]
-    if NameObject("/DCTDecode") in filters:
-        try:
-            image = Image.open(io.BytesIO(data))
-            image.load()
-            return image
-        except Exception:
-            return None
-
-    # Raw pixel data — reconstruct from the image dictionary.
-    try:
-        width = int(img_obj["/Width"])
-        height = int(img_obj["/Height"])
-        bpc = int(img_obj.get("/BitsPerComponent", 8))
-        cs = img_obj.get("/ColorSpace")
-    except Exception:
-        return None
-    cs_name = str(cs[0]) if isinstance(cs, list) and cs else str(cs or "")
-
-    mode = None
-    if cs_name == "/DeviceRGB" and bpc == 8:
-        mode = "RGB"
-    elif cs_name == "/DeviceGray" and bpc == 8:
-        mode = "L"
-    elif cs_name == "/DeviceGray" and bpc == 1:
-        mode = "1"
-    elif cs_name == "/DeviceCMYK" and bpc == 8:
-        mode = "CMYK"
-    if mode is None:
-        return None  # indexed, ICC-based, … — leave untouched
-
-    try:
-        return Image.frombytes(mode, (width, height), data)
-    except Exception:
-        return None
-
-
 def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     """Downsample a pypdf image XObject in place. Returns True if modified."""
-    image = _pil_image_from_xobject(img_obj)
+    image = _pil_from_xobject(img_obj)
     if image is None:
         return False
 
@@ -198,30 +123,6 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     return True
 
 
-def _iter_image_xobjects(writer: PdfWriter):
-    """Yield each unique image XObject in the writer's pages."""
-    seen: set[int] = set()
-    for page in writer.pages:
-        try:
-            resources = page["/Resources"]
-            xobjects = resources.get("/XObject")
-            if xobjects is None:
-                continue
-            if isinstance(xobjects, IndirectObject):
-                xobjects = xobjects.get_object()
-            for name in list(xobjects.keys()):
-                obj = xobjects[name]
-                if isinstance(obj, IndirectObject):
-                    if obj.idnum in seen:
-                        continue
-                    seen.add(obj.idnum)
-                    obj = obj.get_object()
-                if obj.get("/Subtype") == "/Image":
-                    yield obj
-        except (KeyError, AttributeError, TypeError):
-            continue
-
-
 def run(ctx: ToolContext, options: dict) -> Path:
     """Compress the single input PDF. ``quality`` trades fidelity for size."""
     if not isinstance(options, dict):
@@ -240,7 +141,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         )
 
     tool_input = ctx.inputs[0]
-    reader = _open_reader(tool_input.path.read_bytes(), tool_input.filename)
+    reader = open_pdf_reader(tool_input.path.read_bytes(), tool_input.filename)
 
     writer = PdfWriter()
     for page in reader.pages:

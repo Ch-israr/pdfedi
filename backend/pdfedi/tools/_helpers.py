@@ -7,6 +7,15 @@ from pdfedi.tools.base import ToolError
 
 _RANGE_TOKEN_RE = re.compile(r"^\s*(\d+)\s*(?:-\s*(\d+)\s*)?$")
 
+# Page sizes in PDF points (1/72 inch), shared by tools that offer them.
+# Superset of n_up's _SHEET_SIZES and resize_pages' _SIZES (values identical).
+PAGE_SIZES_PT: dict[str, tuple[float, float]] = {
+    "a4": (595.0, 842.0),
+    "a5": (420.0, 595.0),
+    "letter": (612.0, 792.0),
+    "legal": (612.0, 1008.0),
+}
+
 
 def parse_page_ranges(spec: str) -> list[int]:
     """Parse a 1-based inclusive page-range string like ``"1-3,5,8-10"``.
@@ -68,6 +77,60 @@ def read_input_bytes(ctx_inputs_path) -> bytes:
         raise ToolError(
             f"Could not read input file: {exc}", code="invalid_input"
         ) from exc
+
+
+def open_pdf_reader(
+    data: bytes, filename: str, *, encrypted_code: str = "encrypted_pdf"
+):
+    """Parse and validate PDF bytes, returning a pypdf PdfReader.
+
+    Shared replacement for the identical ``_open_reader`` previously copied
+    into 12 tools (compare, compress, crop, delete_pages, extract_images,
+    merge, n_up, pdf_to_word, reorder_pages, resize_pages, rotate_pages,
+    split) and for 5 same-shape inline validation sites (watermark,
+    page_numbers, flatten, password_protect, redact).
+
+    ``encrypted_code`` preserves each tool's observable error code:
+    most tools use ``"encrypted_pdf"``; the 5 inline sites use
+    ``"invalid_input"`` for encrypted inputs.
+
+    DELIBERATE CONSISTENCY FIX (see audit-2026-10-13/CHANGELOG.md): parse
+    failures are mapped to ``ToolError(code="invalid_input")`` everywhere.
+    The 5 inline sites previously let a corrupt-PDF parse failure propagate
+    as a raw pypdf exception; they now raise a clean ToolError like the
+    other tools. The unlock_pdf / metadata / edit_metadata / ocr sites are
+    genuinely different and intentionally left untouched.
+    """
+    from io import BytesIO
+
+    from pypdf import PdfReader
+
+    if not data.lstrip().startswith(b"%PDF-"):
+        raise ToolError(
+            f"'{filename}' is not a valid PDF file.", code="invalid_input"
+        )
+    try:
+        reader = PdfReader(BytesIO(data))
+    except Exception as exc:
+        raise ToolError(
+            f"'{filename}' could not be parsed as a PDF: {exc}",
+            code="invalid_input",
+        ) from exc
+    if getattr(reader, "is_encrypted", False):
+        raise ToolError(
+            f"'{filename}' is password-protected; encrypted PDFs are not supported.",
+            code=encrypted_code,
+        )
+    try:
+        count = len(reader.pages)
+    except Exception as exc:
+        raise ToolError(
+            f"Could not read the pages of '{filename}': {exc}",
+            code="invalid_input",
+        ) from exc
+    if count == 0:
+        raise ToolError(f"'{filename}' contains no pages.", code="invalid_input")
+    return reader
 
 
 def page_count_of_pdf(data: bytes) -> int:
