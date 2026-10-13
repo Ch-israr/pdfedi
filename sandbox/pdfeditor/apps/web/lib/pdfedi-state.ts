@@ -13,7 +13,8 @@ import {
   type Page,
   type PdfediManifest,
 } from '@pdfeditor/shared';
-import { sha256Hex } from '@pdfeditor/pdf-core';
+// NOTE: pdf-core is imported lazily at the call site (it pulls in pdf-lib,
+// ~478 KB); hashing only happens during snapshot restore, never at page load.
 
 /**
  * Measure text width in PDF points using a canvas. Used to compute accurate
@@ -275,6 +276,7 @@ async function restoreFromAttachments(
     ),
   );
 
+  const { sha256Hex } = await import('@pdfeditor/pdf-core');
   const actualHash = await sha256Hex(sourceBytes);
   if (actualHash !== manifest.sourceHash) {
     throw new RestoreError(
