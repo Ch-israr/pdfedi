@@ -5,19 +5,24 @@ from typing import Any
 
 from . import (
     compress,
+    crop,
     delete_pages,
     edit_metadata,
+    extract_images,
     extract_text,
     flatten,
+    grayscale,
     images_to_pdf,
     merge,
     metadata,
+    n_up,
     ocr,
     page_numbers,
     password_protect,
     pdf_to_images,
     redact,
     reorder_pages,
+    resize_pages,
     rotate_pages,
     split,
     thumbnails,
@@ -28,9 +33,10 @@ from .base import ToolSpec
 
 _MODULES = [
     compress, merge, split, rotate_pages, delete_pages, reorder_pages,
-    extract_text, pdf_to_images, images_to_pdf, thumbnails, metadata,
-    edit_metadata, password_protect, unlock_pdf, watermark, page_numbers,
-    redact, flatten, ocr,
+    resize_pages, n_up,
+    extract_text, pdf_to_images, images_to_pdf, thumbnails, extract_images,
+    ocr, metadata, edit_metadata, watermark, page_numbers, crop,
+    grayscale, password_protect, unlock_pdf, redact, flatten,
 ]
 
 TOOLS: dict[str, Any] = {}
