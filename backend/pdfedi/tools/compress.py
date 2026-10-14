@@ -1,8 +1,9 @@
-"""Compress a PDF: structural cleanup + image downsampling (pypdf + PIL).
+"""Compress a PDF: structural cleanup + DPI-aware image recompression.
 
 No PyMuPDF (AGPL, banned). Image replacement rebuilds the XObject with the
 correct /Filter (DCTDecode for JPEG), avoiding stream/filter mismatch
-corruption.
+corruption. Recompression is budgeted by EFFECTIVE DPI so scanned pages
+keep readable resolution (see _QUALITY_SETTINGS).
 """
 from __future__ import annotations
 
@@ -19,10 +20,7 @@ from pypdf.generic import (
 )
 
 from pdfedi.tools._helpers import open_pdf_reader
-from pdfedi.tools.extract_images import (
-    _iter_image_xobjects,
-    _pil_from_xobject,
-)
+from pdfedi.tools.extract_images import _pil_from_xobject
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -36,7 +34,8 @@ SPEC = ToolSpec(
     name="Compress PDF",
     tagline="Reduce PDF file size",
     description=(
-        "Reduce PDF file size with structural cleanup and image downsampling. "
+        "Reduce PDF file size with structural cleanup and resolution-aware "
+        "image optimization that preserves scanned-document readability. "
         "Choose a quality level to trade image fidelity for smaller files."
     ),
     input_kinds=["pdf"],
@@ -50,7 +49,8 @@ SPEC = ToolSpec(
             required=False,
             default="medium",
             choices=["low", "medium", "high"],
-            help="'low'/'medium' downsample images; 'high' keeps images intact "
+            help="'medium' caps image resolution at 300 DPI, 'low' at "
+            "200 DPI (readable but smaller); 'high' keeps images intact "
             "(structural compression only).",
         ),
     ],
@@ -61,27 +61,118 @@ SPEC = ToolSpec(
     category="optimize",
 )
 
-# quality -> (max image dimension in px or None, JPEG quality)
+# quality -> (target effective DPI or None, JPEG quality)
+#
+# The caps are EFFECTIVE DPI (image pixels per inch at its displayed size),
+# not absolute pixel counts. The previous absolute caps (800px/q40 low,
+# 1400px/q60 medium) crushed a full-page 600-DPI scan to 68/120 DPI and
+# destroyed small print, signatures and stamps. 200 DPI is the readability
+# floor for scanned text; 300 DPI is print grade. 'high' never recompresses.
 _QUALITY_SETTINGS: dict[str, tuple[int | None, int]] = {
-    "low": (800, 40),
-    "medium": (1400, 60),
-    "high": (None, 0),  # structural compression only, no downsampling
+    "low": (200, 75),
+    "medium": (300, 85),
+    "high": (None, 0),  # structural compression only, images untouched
 }
 
 
-def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
-    """Downsample a pypdf image XObject in place. Returns True if modified."""
+def _iter_page_image_xobjects(writer):
+    """Yield (image XObject, page width pt, page height pt) per unique image.
+
+    The page dimensions give the largest area the image can be displayed at
+    (visible content cannot exceed the page), so pixels-per-inch computed
+    against the page is a LOWER bound of the true effective DPI: capping on
+    it can never push an image below the target DPI at its real display
+    size. An image shared by several pages is processed once, against the
+    largest referencing page (the most conservative choice).
+    """
+    from pypdf.generic import IndirectObject
+
+    best: dict[int, tuple] = {}
+    for page in writer.pages:
+        try:
+            page_w = float(page.mediabox.width)
+            page_h = float(page.mediabox.height)
+            resources = page["/Resources"]
+            xobjects = resources.get("/XObject")
+            if xobjects is None:
+                continue
+            if isinstance(xobjects, IndirectObject):
+                xobjects = xobjects.get_object()
+            for name in list(xobjects.keys()):
+                obj = xobjects[name]
+                idnum = None
+                if isinstance(obj, IndirectObject):
+                    idnum = obj.idnum
+                    obj = obj.get_object()
+                if obj.get("/Subtype") != "/Image":
+                    continue
+                key = idnum if idnum is not None else id(obj)
+                prev = best.get(key)
+                if prev is None or page_w * page_h > prev[1] * prev[2]:
+                    best[key] = (obj, page_w, page_h)
+        except (KeyError, AttributeError, TypeError, ValueError):
+            continue
+    yield from best.values()
+
+
+def _is_jpeg(img_obj) -> bool:
+    from pypdf.generic import ArrayObject
+
+    filt = img_obj.get("/Filter")
+    filters = list(filt) if isinstance(filt, ArrayObject) else [filt]
+    return NameObject("/DCTDecode") in filters
+
+
+def _process_image_object(
+    img_obj, page_w_pt: float, page_h_pt: float, target_dpi: int, jpeg_quality: int
+) -> bool:
+    """Re-encode one image XObject within the preset's DPI/quality budget.
+
+    Returns True if the image was replaced. Quality safeguards:
+    - never reduces an image below ``target_dpi`` at page size;
+    - at fidelity-oriented presets, an already-JPEG image at or under the
+      DPI cap is left byte-identical (re-encoding = pure generation loss);
+      the 'low' preset may re-encode it in place at q75, never resizing it
+      below the cap;
+    - grayscale stays grayscale (no forced RGB upconversion);
+    - the replacement is kept only if it is actually smaller than the
+      original encoded stream.
+    """
+    try:
+        src_w = int(img_obj["/Width"])
+        src_h = int(img_obj["/Height"])
+    except (KeyError, TypeError, ValueError):
+        return False
+    if src_w <= 0 or src_h <= 0:
+        return False
+
+    scale = min(
+        1.0,
+        target_dpi * (page_w_pt / 72.0) / src_w,
+        target_dpi * (page_h_pt / 72.0) / src_h,
+    )
+    if scale >= 1.0 and _is_jpeg(img_obj) and jpeg_quality >= 80:
+        # Already JPEG and no downsample needed: at fidelity-oriented
+        # presets, re-encoding would be pure generation loss. The stronger
+        # 'low' preset (q75) may still re-encode in place — bounded quality
+        # trade, no resolution loss, and the smaller-only guard below
+        # still applies.
+        return False
+
     image = _pil_from_xobject(img_obj)
     if image is None:
         return False
 
+    if scale < 1.0:
+        image = image.resize(
+            (max(1, round(src_w * scale)), max(1, round(src_h * scale))),
+            Image.LANCZOS,
+        )
     w, h = image.size
-    if max(w, h) > max_dim:
-        scale = max_dim / max(w, h)
-        image = image.resize((int(w * scale), int(h * scale)), Image.LANCZOS)
-        w, h = image.size
 
-    if image.mode in ("RGBA", "LA", "PA", "P"):
+    if image.mode == "L":
+        out_mode = "L"  # grayscale JPEG: no chroma data to invent
+    elif image.mode in ("RGBA", "LA", "PA", "P"):
         # JPEG has no alpha; composite onto white
         bg = Image.new("RGB", image.size, (255, 255, 255))
         if image.mode == "P":
@@ -91,8 +182,12 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
             mask=image.split()[-1] if image.mode in ("RGBA", "LA") else None,
         )
         image = bg
+        out_mode = "RGB"
     elif image.mode != "RGB":
         image = image.convert("RGB")
+        out_mode = "RGB"
+    else:
+        out_mode = "RGB"
 
     buf = io.BytesIO()
     image.save(buf, "JPEG", quality=jpeg_quality, optimize=True)
@@ -103,7 +198,7 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     # decoded pixel bytes would make JPEG almost always "win", even when the
     # original Flate stream was already smaller.
     raw = getattr(img_obj, "_data", None)
-    orig_size = len(raw) if raw else w * h * 3
+    orig_size = len(raw) if raw else src_w * src_h * 3
     if len(jpeg_bytes) >= orig_size:
         return False
 
@@ -115,7 +210,9 @@ def _downsample_image_object(img_obj, max_dim: int, jpeg_quality: int) -> bool:
     img_obj[NameObject("/Filter")] = NameObject("/DCTDecode")
     img_obj[NameObject("/Width")] = NumberObject(w)
     img_obj[NameObject("/Height")] = NumberObject(h)
-    img_obj[NameObject("/ColorSpace")] = NameObject("/DeviceRGB")
+    img_obj[NameObject("/ColorSpace")] = NameObject(
+        "/DeviceGray" if out_mode == "L" else "/DeviceRGB"
+    )
     img_obj[NameObject("/BitsPerComponent")] = NumberObject(8)
     # Remove keys that don't apply to DCTDecode
     for key in ("/DecodeParms", "/Interpolate", "/SMask", "/Mask"):
@@ -163,10 +260,12 @@ def run(ctx: ToolContext, options: dict) -> Path:
     for page in reader.pages:
         writer.add_page(page)
 
-    max_dim, jpeg_quality = _QUALITY_SETTINGS[quality]
-    if max_dim is not None:
-        for img_obj in _iter_image_xobjects(writer):
-            _downsample_image_object(img_obj, max_dim, jpeg_quality)
+    target_dpi, jpeg_quality = _QUALITY_SETTINGS[quality]
+    if target_dpi is not None:
+        for img_obj, page_w_pt, page_h_pt in _iter_page_image_xobjects(writer):
+            _process_image_object(
+                img_obj, page_w_pt, page_h_pt, target_dpi, jpeg_quality
+            )
             # After the replacement is computed, release the decode cache so
             # the next image's 100MB+ decode does not accumulate.
             _drop_decode_cache(img_obj)
