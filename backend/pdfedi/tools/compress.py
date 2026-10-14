@@ -49,9 +49,10 @@ SPEC = ToolSpec(
             required=False,
             default="medium",
             choices=["low", "medium", "high"],
-            help="'medium' caps image resolution at 300 DPI, 'low' at "
-            "200 DPI (readable but smaller); 'high' keeps images intact "
-            "(structural compression only).",
+            help="'high' preserves full resolution (near-lossless, only "
+            "recompresses when the saving is significant); 'medium' caps "
+            "image resolution at 300 DPI; 'low' at 200 DPI (readable but "
+            "smaller).",
         ),
     ],
     output_kind="pdf",
@@ -63,15 +64,26 @@ SPEC = ToolSpec(
 
 # quality -> (target effective DPI or None, JPEG quality)
 #
+# Chroma subsampling is deliberately left at Pillow's default: explicit
+# subsampling (4:2:2 / 4:4:4) combined with optimize=True crashes this
+# Pillow/libjpeg build on some real images ("Suspension not allowed
+# here" -> OSError, reproduced on a photo PDF at medium), while the
+# measured fidelity gain was marginal. Reliability wins.
+#
 # The caps are EFFECTIVE DPI (image pixels per inch at its displayed size),
 # not absolute pixel counts. The previous absolute caps (800px/q40 low,
 # 1400px/q60 medium) crushed a full-page 600-DPI scan to 68/120 DPI and
 # destroyed small print, signatures and stamps. 200 DPI is the readability
-# floor for scanned text; 300 DPI is print grade. 'high' never recompresses.
+# floor for scanned text; 300 DPI is print grade.
+#
+# 'high' has NO DPI cap: full resolution is preserved, already-JPEG images
+# are never re-encoded, and losslessly stored images are recompressed
+# (q92) only when that saves at least 20% — otherwise the original
+# stream is kept byte-identical.
 _QUALITY_SETTINGS: dict[str, tuple[int | None, int]] = {
-    "low": (200, 75),
-    "medium": (300, 85),
-    "high": (None, 0),  # structural compression only, images untouched
+    "low": (200, 80),
+    "medium": (300, 88),
+    "high": (None, 92),
 }
 
 
@@ -124,19 +136,29 @@ def _is_jpeg(img_obj) -> bool:
 
 
 def _process_image_object(
-    img_obj, page_w_pt: float, page_h_pt: float, target_dpi: int, jpeg_quality: int
+    img_obj,
+    page_w_pt: float,
+    page_h_pt: float,
+    target_dpi: int | None,
+    jpeg_quality: int,
+    *,
+    allow_inplace_jpeg: bool,
+    min_saving: float,
 ) -> bool:
-    """Re-encode one image XObject within the preset's DPI/quality budget.
+    """Re-encode one image XObject within the preset's fidelity budget.
 
     Returns True if the image was replaced. Quality safeguards:
-    - never reduces an image below ``target_dpi`` at page size;
-    - at fidelity-oriented presets, an already-JPEG image at or under the
-      DPI cap is left byte-identical (re-encoding = pure generation loss);
-      the 'low' preset may re-encode it in place at q75, never resizing it
-      below the cap;
-    - grayscale stays grayscale (no forced RGB upconversion);
-    - the replacement is kept only if it is actually smaller than the
-      original encoded stream.
+    - resolution is never reduced below ``target_dpi`` at page size
+      (and not at all when ``target_dpi`` is None);
+    - an already-JPEG image is re-encoded in place ONLY at the 'low'
+      preset (bounded trade, no resolution loss); at 'medium'/'high' it
+      is left byte-identical unless it is being downsampled to the cap;
+    - a no-resize recompression must save at least ``min_saving`` of the
+      original stream (the 'high' preset's worthwhile threshold), and
+      every replacement must be smaller than the original stream;
+    - the source ICC profile is preserved when it matches the output's
+      channel count, so color interpretation does not change;
+    - grayscale stays grayscale (no forced RGB upconversion).
     """
     try:
         src_w = int(img_obj["/Width"])
@@ -146,17 +168,16 @@ def _process_image_object(
     if src_w <= 0 or src_h <= 0:
         return False
 
-    scale = min(
-        1.0,
-        target_dpi * (page_w_pt / 72.0) / src_w,
-        target_dpi * (page_h_pt / 72.0) / src_h,
-    )
-    if scale >= 1.0 and _is_jpeg(img_obj) and jpeg_quality >= 80:
-        # Already JPEG and no downsample needed: at fidelity-oriented
-        # presets, re-encoding would be pure generation loss. The stronger
-        # 'low' preset (q75) may still re-encode in place — bounded quality
-        # trade, no resolution loss, and the smaller-only guard below
-        # still applies.
+    if target_dpi is None:
+        scale = 1.0
+    else:
+        scale = min(
+            1.0,
+            target_dpi * (page_w_pt / 72.0) / src_w,
+            target_dpi * (page_h_pt / 72.0) / src_h,
+        )
+    src_is_jpeg = _is_jpeg(img_obj)
+    if scale >= 1.0 and src_is_jpeg and not allow_inplace_jpeg:
         return False
 
     image = _pil_from_xobject(img_obj)
@@ -196,11 +217,35 @@ def _process_image_object(
     # Only replace if it actually shrinks. Compare against the true encoded
     # stream size (_data is never mutated by get_data()); comparing against
     # decoded pixel bytes would make JPEG almost always "win", even when the
-    # original Flate stream was already smaller.
+    # original Flate stream was already smaller. A no-resize recompression
+    # must additionally clear the preset's worthwhile-saving threshold.
     raw = getattr(img_obj, "_data", None)
     orig_size = len(raw) if raw else src_w * src_h * 3
     if len(jpeg_bytes) >= orig_size:
         return False
+    if scale >= 1.0 and min_saving > 0 and len(jpeg_bytes) > orig_size * (1 - min_saving):
+        return False
+
+    # Preserve the source ICC profile when it matches the output's channel
+    # count: the decoded pixel values live in that profile's space (no
+    # color conversion is performed), so keeping the profile keeps the
+    # rendered colors identical in ICC-aware viewers.
+    keep_cs = None
+    try:
+        from pypdf.generic import ArrayObject
+
+        cs = img_obj.get("/ColorSpace")
+        if hasattr(cs, "get_object"):
+            cs = cs.get_object()
+        if (
+            isinstance(cs, ArrayObject)
+            and len(cs) >= 2
+            and str(cs[0]) == "/ICCBased"
+            and int(cs[1].get_object().get("/N")) == (1 if out_mode == "L" else 3)
+        ):
+            keep_cs = cs
+    except Exception:
+        keep_cs = None
 
     # Rebuild the XObject as a proper DCTDecode (JPEG) image
     if isinstance(img_obj, (DecodedStreamObject, EncodedStreamObject)):
@@ -210,9 +255,12 @@ def _process_image_object(
     img_obj[NameObject("/Filter")] = NameObject("/DCTDecode")
     img_obj[NameObject("/Width")] = NumberObject(w)
     img_obj[NameObject("/Height")] = NumberObject(h)
-    img_obj[NameObject("/ColorSpace")] = NameObject(
-        "/DeviceGray" if out_mode == "L" else "/DeviceRGB"
-    )
+    if keep_cs is not None:
+        img_obj[NameObject("/ColorSpace")] = keep_cs
+    else:
+        img_obj[NameObject("/ColorSpace")] = NameObject(
+            "/DeviceGray" if out_mode == "L" else "/DeviceRGB"
+        )
     img_obj[NameObject("/BitsPerComponent")] = NumberObject(8)
     # Remove keys that don't apply to DCTDecode
     for key in ("/DecodeParms", "/Interpolate", "/SMask", "/Mask"):
@@ -261,14 +309,19 @@ def run(ctx: ToolContext, options: dict) -> Path:
         writer.add_page(page)
 
     target_dpi, jpeg_quality = _QUALITY_SETTINGS[quality]
-    if target_dpi is not None:
-        for img_obj, page_w_pt, page_h_pt in _iter_page_image_xobjects(writer):
-            _process_image_object(
-                img_obj, page_w_pt, page_h_pt, target_dpi, jpeg_quality
-            )
-            # After the replacement is computed, release the decode cache so
-            # the next image's 100MB+ decode does not accumulate.
-            _drop_decode_cache(img_obj)
+    for img_obj, page_w_pt, page_h_pt in _iter_page_image_xobjects(writer):
+        _process_image_object(
+            img_obj,
+            page_w_pt,
+            page_h_pt,
+            target_dpi,
+            jpeg_quality,
+            allow_inplace_jpeg=(quality == "low"),
+            min_saving=0.20 if quality == "high" else 0.0,
+        )
+        # After the replacement is computed, release the decode cache so
+        # the next image's 100MB+ decode does not accumulate.
+        _drop_decode_cache(img_obj)
 
     out = ctx.new_output_path("compressed.pdf").with_suffix(".pdf")
     with out.open("wb") as f:

@@ -227,11 +227,13 @@ def _iccbased_params(img_obj):
 
     Returns (mode, width, height, ncomp, filter_names) for 8-bits/component
     images whose ICC profile stream declares /N components
-    (1 -> "L", 3 -> "RGB", 4 -> "CMYK"), else None. PNG predictors are
-    rejected (kept rows must be exactly width*ncomp bytes). No
-    color-profile conversion is attempted — dropping the ICC profile on
-    recompress is acceptable for lossy tool output. The /ColorSpace may be
-    an IndirectObject to the ICCBased array.
+    (1 -> "L", 3 -> "RGB", 4 -> "CMYK"), else None. Only FlateDecode or
+    unfiltered streams qualify — the manual inflater cannot handle other
+    filters (see the gate at the end). PNG predictors are rejected (kept
+    rows must be exactly width*ncomp bytes). No color-profile conversion
+    is attempted; whether the profile is preserved on output is the
+    caller's decision. The /ColorSpace may be an IndirectObject to the
+    ICCBased array.
     """
     from pypdf.generic import ArrayObject
 
@@ -276,6 +278,14 @@ def _iccbased_params(img_obj):
         filt = img_obj.get("/Filter")
         filters = list(filt) if isinstance(filt, ArrayObject) else [filt]
         fnames = [str(f) for f in filters if f]
+        if fnames not in ([], ["/FlateDecode"]):
+            # The manual inflater below only handles Flate/raw data. Any
+            # other filter — notably DCTDecode, i.e. JPEG scans carrying an
+            # ICC profile (the standard output of most MFP scanners) — must
+            # NOT be claimed here: _decode_iccbased would return None and
+            # callers would silently skip the image. Returning None lets
+            # _pil_from_xobject use its generic decode path instead.
+            return None
         return (mode, width, height, n, fnames)
     except Exception:
         return None
