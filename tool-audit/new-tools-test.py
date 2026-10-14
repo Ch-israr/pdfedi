@@ -103,7 +103,7 @@ NOT_PDF = b"this is not a pdf at all"
 # ---- registry sanity ----
 def t_registry():
     specs = list_specs()
-    assert len(specs) == 27, f"{len(specs)} tools"
+    assert len(specs) == 26, f"{len(specs)} tools"
     keys = [s.key for s in specs]
     assert len(set(keys)) == len(keys), "duplicate keys"
     for k in ("crop", "extract_images", "resize_pages", "grayscale", "n_up"):
@@ -111,7 +111,7 @@ def t_registry():
     ts = Path("/home/hatch/workspace/pdfedi/web/lib/tools.ts").read_text()
     for k in ("crop", "extract_images", "resize_pages", "grayscale", "n_up"):
         assert f'key: "{k}"' in ts, f"tools.ts missing {k}"
-check("registry: 27 tools, no dupes, tools.ts entries", t_registry)
+check("registry: 26 tools, no dupes, tools.ts entries", t_registry)
 
 
 # ---- crop ----

@@ -79,7 +79,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: `Yes. Merging PDFs on PDFEDI is completely free with no watermarks and no sign-up. ${PRIVACY_LINE}`,
       },
     ],
-    related: ["split", "reorder_pages", "delete_pages", "compress"],
+    related: ["split", "reorder_pages", "delete_pages"],
   },
 
   split: {
@@ -126,7 +126,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "There's no fixed page limit, but the 50MB upload cap applies. Very large PDFs are processed page by page to stay within server memory.",
       },
     ],
-    related: ["merge", "delete_pages", "extract_text", "compress"],
+    related: ["merge", "delete_pages", "extract_text"],
   },
 
   rotate_pages: {
@@ -335,7 +335,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Yes — enter page ranges like 1-3,5 and only those pages are converted.",
       },
     ],
-    related: ["images_to_pdf", "thumbnails", "extract_text", "compress"],
+    related: ["images_to_pdf", "thumbnails", "extract_text"],
   },
 
   images_to_pdf: {
@@ -381,7 +381,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Images are embedded at their original resolution — nothing is downsampled during conversion.",
       },
     ],
-    related: ["pdf_to_images", "ocr", "merge", "compress"],
+    related: ["pdf_to_images", "ocr", "merge"],
   },
 
   thumbnails: {
@@ -423,7 +423,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Yes — enter page ranges like 1-10, or leave empty to include all pages.",
       },
     ],
-    related: ["pdf_to_images", "split", "metadata", "compress"],
+    related: ["pdf_to_images", "split", "metadata"],
   },
 
   ocr: {
@@ -474,7 +474,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "No — pages with a usable text layer are detected and copied through unchanged. Only image-only pages go through recognition.",
       },
     ],
-    related: ["extract_text", "images_to_pdf", "pdf_to_images", "compress"],
+    related: ["extract_text", "images_to_pdf", "pdf_to_images"],
   },
 
   metadata: {
@@ -558,7 +558,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "PDF readers and search engines display the title and author. Correct metadata makes your documents look professional and easier to find.",
       },
     ],
-    related: ["metadata", "watermark", "page_numbers", "compress"],
+    related: ["metadata", "watermark", "page_numbers"],
   },
 
   watermark: {
@@ -650,51 +650,6 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     related: ["watermark", "edit_metadata", "merge", "flatten"],
   },
 
-  compress: {
-    key: "compress",
-    title: "Compress PDF Online Free — Reduce File Size | PDFEDI",
-    description:
-      "Reduce PDF file size online for free with three quality levels. Shrink PDFs for email and upload while keeping text sharp. No sign-up, no watermarks.",
-    h1: "Compress PDF",
-    intro:
-      "Make your PDF smaller without ruining it. Choose a compression level — low, medium, or high quality — and get a lighter file that's easier to email, upload, and store.",
-    howTo: [
-      "Upload your PDF file (up to 50MB).",
-      "Pick a quality level: low, medium, or high.",
-      "Click Compress and download the smaller PDF.",
-    ],
-    features: [
-      "Three quality levels (low / medium / high)",
-      "Image downsampling at lower levels",
-      "Structural compression that preserves layout",
-      "Free with no watermarks",
-    ],
-    useCases: [
-      "Shrink a PDF to fit email attachment limits",
-      "Reduce upload size for forms and portals",
-      "Save storage space on large document archives",
-      "Make scanned PDFs lighter",
-    ],
-    faqs: [
-      {
-        q: "How do I reduce a PDF's file size?",
-        a: "Upload your PDF, choose a quality level, and click Compress. Lower quality gives smaller files; 'high' keeps images intact and only applies structural compression.",
-      },
-      {
-        q: "What's the difference between the quality levels?",
-        a: "'Low' and 'medium' downsample images for maximum size reduction. 'High' keeps images at full quality and only compresses the PDF structure — best when quality matters most.",
-      },
-      {
-        q: "How much smaller will my PDF get?",
-        a: "It depends on the content — image-heavy PDFs shrink the most, often by 50–80% at lower quality settings. Text-only PDFs are already small and compress less.",
-      },
-      {
-        q: "Will compression hurt readability?",
-        a: "Text stays sharp at all levels since only images are downsampled. At 'low' quality, photos may look softer — preview the result and re-run at a higher setting if needed.",
-      },
-    ],
-    related: ["ocr", "pdf_to_images", "merge", "split"],
-  },
 
   password_protect: {
     key: "password_protect",
@@ -946,7 +901,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Yes — images are taken from the PDF exactly as stored, at their original resolution, with no recompression for JPEGs.",
       },
     ],
-    related: ["pdf_to_images", "compress", "images_to_pdf", "thumbnails"],
+    related: ["pdf_to_images", "images_to_pdf", "thumbnails"],
   },
 
   resize_pages: {
@@ -1031,7 +986,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Usually yes for colour, image-heavy documents, because colour information is dropped. Text-only PDFs may grow slightly because pages become images — the Compress tool is better for those.",
       },
     ],
-    related: ["compress", "pdf_to_images", "ocr", "resize_pages"],
+    related: ["pdf_to_images", "ocr", "resize_pages"],
   },
 
   n_up: {
@@ -1116,7 +1071,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Not directly — repair can't work on encrypted files. Use the Unlock PDF tool with your password first, then repair the unlocked file.",
       },
     ],
-    related: ["unlock_pdf", "compress", "merge", "metadata"],
+    related: ["unlock_pdf", "merge", "metadata"],
   },
 
   compare: {

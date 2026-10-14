@@ -44,7 +44,6 @@ export const TOOL_CARDS: ToolCard[] = [
   { key: "page_numbers", name: "Page Numbers", tagline: "Add page numbers", icon: "🔢", category: "edit" },
   { key: "crop", name: "Crop PDF", tagline: "Trim margins from pages", icon: "🔲", category: "edit" },
   { key: "compare", name: "Compare PDF", tagline: "Show differences between two PDFs", icon: "🆚", category: "edit" },
-  { key: "compress", name: "Compress PDF", tagline: "Reduce PDF file size", icon: "🗜️", category: "optimize" },
   { key: "grayscale", name: "Grayscale PDF", tagline: "Convert pages to black and white", icon: "🩶", category: "optimize" },
   { key: "repair", name: "Repair PDF", tagline: "Fix corrupted or unreadable PDFs", icon: "🛠️", category: "optimize" },
   { key: "password_protect", name: "Protect PDF", tagline: "Add a password to a PDF", icon: "🔒", category: "security" },

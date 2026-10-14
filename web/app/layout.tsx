@@ -7,7 +7,7 @@ const BASE_URL = "https://pdfedi.onrender.com";
 export const metadata: Metadata = {
   title: "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
   description:
-    "Merge, split, compress, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.",
+    "Merge, split, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.",
   verification: {
     google: "B8JxEkvHXO4JaUEYYhl6W8nD59onzRApzrSQhN9xMlI",
   },
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
     description:
-      "Merge, split, compress, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.",
+      "Merge, split, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.",
     url: BASE_URL,
     type: "website",
     siteName: "PDFEDI",
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
     description:
-      "Merge, split, compress, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.",
+      "Merge, split, convert and protect PDFs free online. 19 PDF tools plus a full in-browser PDF editor — no sign-up, no watermarks, private by design.",
     images: [`${BASE_URL}/logo.png`],
   },
 };
@@ -43,7 +43,7 @@ const siteJsonLd = {
       name: "PDFEDI",
       url: BASE_URL,
       description:
-        "Free online PDF tools: merge, split, compress, convert, protect PDFs, plus a full in-browser PDF editor.",
+        "Free online PDF tools: merge, split, convert, protect PDFs, plus a full in-browser PDF editor.",
     },
     {
       "@type": "Organization",

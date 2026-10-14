@@ -1,4 +1,4 @@
-"""Mix-tools test suite: repair, compare, pdf_to_word (27 tools total).
+"""Mix-tools test suite: repair, compare, pdf_to_word (26 tools total).
 
 Fixtures are built with reportlab/pypdf (NO PyMuPDF — AGPL-banned). Run:
     python3 tool-audit/mix-tools-test.py
@@ -301,9 +301,9 @@ check("word: encrypted -> clean ToolError", t_word_encrypted)
 
 def t_registry():
     specs = list_specs()
-    assert len(specs) == 27, f"expected 27 specs, got {len(specs)}"
+    assert len(specs) == 26, f"expected 26 specs, got {len(specs)}"
     keys = [s.key for s in specs]
-    assert len(set(keys)) == 27, "duplicate keys"
+    assert len(set(keys)) == 26, "duplicate keys"
     for k in ("repair", "compare", "pdf_to_word"):
         assert k in keys, f"{k} missing from registry"
 
@@ -325,7 +325,7 @@ def t_frontend_entries():
             assert rk in keys, f"related key {rk!r} in {k} is not a real tool"
 
 
-check("registry: 27 specs, no dupes", t_registry)
+check("registry: 26 specs, no dupes", t_registry)
 check("frontend: entries + valid related keys", t_frontend_entries)
 
 print(f"\n==== RESULT: {passed} passed, {failed} failed ====")

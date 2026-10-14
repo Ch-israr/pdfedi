@@ -4,7 +4,6 @@ from __future__ import annotations
 from typing import Any
 
 from . import (
-    compress,
     crop,
     delete_pages,
     edit_metadata,
@@ -35,7 +34,7 @@ from . import (
 from .base import ToolSpec
 
 _MODULES = [
-    compress, merge, split, rotate_pages, delete_pages, reorder_pages,
+    merge, split, rotate_pages, delete_pages, reorder_pages,
     resize_pages, n_up, repair,
     extract_text, pdf_to_images, images_to_pdf, thumbnails, extract_images,
     ocr, metadata, edit_metadata, watermark, page_numbers, crop,

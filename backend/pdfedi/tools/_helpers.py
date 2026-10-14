@@ -85,7 +85,7 @@ def open_pdf_reader(
     """Parse and validate PDF bytes, returning a pypdf PdfReader.
 
     Shared replacement for the identical ``_open_reader`` previously copied
-    into 12 tools (compare, compress, crop, delete_pages, extract_images,
+    into 12 tools (compare, crop, delete_pages, extract_images,
     merge, n_up, pdf_to_word, reorder_pages, resize_pages, rotate_pages,
     split) and for 5 same-shape inline validation sites (watermark,
     page_numbers, flatten, password_protect, redact).

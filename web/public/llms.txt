@@ -33,7 +33,6 @@
 
 ## Optimize
 
-- [Compress PDF](https://pdfedi.onrender.com/tools/compress): Reduce PDF file size with three quality levels.
 
 ## Security
 

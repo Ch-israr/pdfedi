@@ -10,7 +10,7 @@ export default function Home() {
           <span className="text-brand-600"> Free.</span>
         </h1>
         <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">
-          Merge, split, compress, convert, protect and more — right in your browser.
+          Merge, split, convert, protect and more — right in your browser.
           No sign-up, no watermarks.
         </p>
       </section>
