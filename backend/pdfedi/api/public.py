@@ -2,6 +2,11 @@
 from __future__ import annotations
 
 import json
+import re
+import shutil
+import time
+import uuid
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, File as FastAPIFile, HTTPException, Request, UploadFile
 from fastapi.responses import FileResponse
@@ -13,7 +18,7 @@ from ..config import get_settings
 from ..db import get_db
 from ..models import File, Job, enum_value
 from ..models import JobStatus
-from ..storage import get_object_path
+from ..storage import get_object_path, storage_dir
 from ..tools import list_specs
 
 router = APIRouter()
@@ -128,6 +133,126 @@ async def upload_file(
     except jobs.UploadError as e:
         raise _as_http_error(e)
     return file_to_dict(record)
+
+
+# ---------------------------------------------------------------------------
+# Chunked uploads: parts stream to disk (bounded memory on small hosts) and
+# each part can be retried independently, so a flaky connection never
+# restarts a large upload from zero. Assembly reuses jobs.ingest_upload, so
+# validation and limits stay identical to the single-shot /uploads path.
+# ---------------------------------------------------------------------------
+CHUNK_BYTES = 4 * 1024 * 1024
+CHUNK_MAX_PARTS = 32  # 32 x 4 MB = 128 MB ceiling, above the 50 MB cap
+CHUNK_TTL_SECONDS = 2 * 3600
+_UPLOAD_ID_RE = re.compile(r"^[0-9a-f]{32}$")
+
+
+def _chunks_root() -> Path:
+    root = storage_dir() / "chunks"
+    root.mkdir(parents=True, exist_ok=True)
+    return root
+
+
+def _chunk_session_dir(upload_id: str) -> Path:
+    if not _UPLOAD_ID_RE.match(upload_id or ""):
+        raise HTTPException(status_code=404, detail="Unknown upload session")
+    return _chunks_root() / upload_id
+
+
+def _sweep_stale_chunk_sessions() -> None:
+    cutoff = time.time() - CHUNK_TTL_SECONDS
+    for child in _chunks_root().iterdir():
+        try:
+            if child.is_dir() and child.stat().st_mtime < cutoff:
+                shutil.rmtree(child, ignore_errors=True)
+        except OSError:
+            pass
+
+
+class ChunkInit(BaseModel):
+    filename: str
+    size: int
+    content_type: str = ""
+
+
+@router.post("/uploads/chunked/init")
+def chunked_upload_init(payload: ChunkInit):
+    settings = get_settings()
+    if payload.size > settings.max_upload_bytes:
+        raise HTTPException(
+            status_code=413,
+            detail=f"File exceeds the {settings.max_upload_mb} MB upload limit.",
+        )
+    if payload.size <= 0:
+        raise HTTPException(status_code=422, detail="Empty file.")
+    _sweep_stale_chunk_sessions()
+    upload_id = uuid.uuid4().hex
+    session = _chunks_root() / upload_id
+    session.mkdir(parents=True)
+    (session / "meta.json").write_text(json.dumps({
+        "filename": payload.filename or "upload",
+        "size": payload.size,
+        "mime": payload.content_type or "",
+    }))
+    return {"upload_id": upload_id, "chunk_bytes": CHUNK_BYTES}
+
+
+@router.put("/uploads/chunked/{upload_id}/parts/{index}")
+async def chunked_upload_part(upload_id: str, index: int, request: Request):
+    session = _chunk_session_dir(upload_id)
+    if not (session / "meta.json").exists():
+        raise HTTPException(status_code=404, detail="Unknown upload session")
+    if index < 0 or index >= CHUNK_MAX_PARTS:
+        raise HTTPException(status_code=422, detail="Invalid part index")
+    part_path = session / f"{index:05d}.part"
+    written = 0
+    oversized = False
+    with open(part_path, "wb") as fh:
+        async for chunk in request.stream():
+            written += len(chunk)
+            if written > CHUNK_BYTES:
+                oversized = True
+                break
+            fh.write(chunk)
+    if oversized:
+        part_path.unlink(missing_ok=True)
+        raise HTTPException(status_code=422, detail="Part exceeds the chunk size")
+    return {"index": index, "size": written}
+
+
+@router.post("/uploads/chunked/{upload_id}/complete")
+def chunked_upload_complete(upload_id: str, db: Session = Depends(get_db)):
+    session = _chunk_session_dir(upload_id)
+    meta_path = session / "meta.json"
+    if not meta_path.exists():
+        raise HTTPException(status_code=404, detail="Unknown upload session")
+    meta = json.loads(meta_path.read_text())
+    size = int(meta["size"])
+    n_parts = (size + CHUNK_BYTES - 1) // CHUNK_BYTES
+    blobs: list[bytes] = []
+    for i in range(n_parts):
+        part = session / f"{i:05d}.part"
+        if not part.exists():
+            raise HTTPException(status_code=422, detail=f"Missing part {i}")
+        expected = CHUNK_BYTES if i < n_parts - 1 else size - CHUNK_BYTES * (n_parts - 1)
+        if part.stat().st_size != expected:
+            raise HTTPException(status_code=422, detail=f"Part {i} has the wrong size")
+        blobs.append(part.read_bytes())
+    data = b"".join(blobs)
+    try:
+        record = jobs.ingest_upload(db, meta["filename"], data, meta["mime"])
+    except jobs.UploadError as e:
+        shutil.rmtree(session, ignore_errors=True)
+        raise _as_http_error(e)
+    shutil.rmtree(session, ignore_errors=True)
+    return file_to_dict(record)
+
+
+@router.delete("/uploads/chunked/{upload_id}")
+def chunked_upload_abort(upload_id: str):
+    session = _chunk_session_dir(upload_id)
+    shutil.rmtree(session, ignore_errors=True)
+    return {"deleted": True, "id": upload_id}
 
 
 @router.get("/files/{file_id}")

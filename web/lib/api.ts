@@ -69,9 +69,56 @@ export const api = {
   tools: (): Promise<ToolSpec[]> => req("/tools"),
   tool: (key: string): Promise<ToolSpec> => req(`/tools/${key}`),
   upload: async (file: File): Promise<UploadedFile> => {
-    const form = new FormData();
-    form.append("file", file);
-    return req("/uploads", { method: "POST", body: form });
+    const DIRECT_MAX = 8 * 1024 * 1024;
+    if (file.size <= DIRECT_MAX) {
+      const form = new FormData();
+      form.append("file", file);
+      return req("/uploads", { method: "POST", body: form });
+    }
+    // Chunked upload for large files: 4 MB parts, each retried independently
+    // so a dropped connection never restarts the whole upload. The server
+    // streams parts to disk and assembles them through the same validated
+    // ingest path as a single-shot upload.
+    const CHUNK = 4 * 1024 * 1024;
+    const init = await req("/uploads/chunked/init", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        filename: file.name,
+        size: file.size,
+        content_type: file.type || "",
+      }),
+    });
+    const uploadId: string = init.upload_id;
+    try {
+      const parts = Math.ceil(file.size / CHUNK);
+      for (let i = 0; i < parts; i++) {
+        const blob = file.slice(i * CHUNK, Math.min(file.size, (i + 1) * CHUNK));
+        let lastError: unknown = null;
+        for (let attempt = 0; attempt < 3; attempt++) {
+          try {
+            const res = await fetch(`${BASE}/uploads/chunked/${uploadId}/parts/${i}`, {
+              method: "PUT",
+              body: blob,
+            });
+            if (!res.ok) throw new Error(`Part ${i} failed with ${res.status}`);
+            lastError = null;
+            break;
+          } catch (e) {
+            lastError = e;
+          }
+        }
+        if (lastError) throw lastError;
+      }
+      return req(`/uploads/chunked/${uploadId}/complete`, { method: "POST" });
+    } catch (e) {
+      try {
+        await fetch(`${BASE}/uploads/chunked/${uploadId}`, { method: "DELETE" });
+      } catch {
+        /* best-effort cleanup */
+      }
+      throw e;
+    }
   },
   createJob: (tool_key: string, file_ids: string[], config: Record<string, unknown>): Promise<Job> =>
     req("/jobs", {
