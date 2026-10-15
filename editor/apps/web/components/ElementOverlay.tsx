@@ -746,7 +746,13 @@ function FormFieldInput({
     background: '#ffffff',
     color: '#0f172a',
     fontSize: toScreen(el.fontSize, zoom),
-    padding: '1px 4px',
+    // Zero internal spacing: the exported appearance insets text by the
+    // field's own 1px border alone (pdf-lib uses borderWidth + 1pt), and
+    // its line height is fontSize * 1.2 — matching both keeps the on-screen
+    // text exactly where the exported text lands.
+    padding: 0,
+    margin: 0,
+    lineHeight: 1.2,
     cursor: el.fieldType === 'checkbox' || el.fieldType === 'radio' ? 'pointer' : 'text',
     userSelect: 'auto',
     WebkitUserSelect: 'auto',
