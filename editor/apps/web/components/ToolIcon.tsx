@@ -118,6 +118,30 @@ export function ToolIcon({ id }: { id: ToolId }) {
           <rect x="4" y="6" width="16" height="12" rx="1" fill="#fff" stroke="currentColor" strokeWidth={1.5} strokeDasharray="3 2" />
         </svg>
       );
+    case 'form-text':
+      // Single-line text input box
+      return (
+        <svg {...base()}>
+          <rect x="3" y="7" width="18" height="10" rx="1" />
+          <path d="M6.5 12h8" />
+        </svg>
+      );
+    case 'form-multiline':
+      // Multi-line textarea box
+      return (
+        <svg {...base()}>
+          <rect x="3" y="5" width="18" height="14" rx="1" />
+          <path d="M6.5 9.5h11M6.5 12.5h11M6.5 15.5h7" />
+        </svg>
+      );
+    case 'form-checkbox':
+      // Checkbox square with check
+      return (
+        <svg {...base()}>
+          <rect x="4" y="4" width="16" height="16" rx="2" />
+          <path d="M8.5 12.5l2.5 2.5 4.5-5.5" />
+        </svg>
+      );
     default:
       return null;
   }

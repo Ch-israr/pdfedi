@@ -19,6 +19,17 @@ interface StoredDocument {
   savedAt: number;
 }
 
+/**
+ * Local-save time-to-live: recovery snapshots older than this are treated
+ * as expired and deleted, Sejda-style. Exported for unit testing.
+ */
+export const LOCAL_SAVE_TTL_MS = 30 * 60 * 1000;
+
+/** Pure predicate so the expiry rule is unit-testable without IndexedDB. */
+export function isSaveExpired(savedAt: number, now: number = Date.now()): boolean {
+  return now - savedAt > LOCAL_SAVE_TTL_MS;
+}
+
 function openDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
     const req = indexedDB.open(DB_NAME, DB_VERSION);
@@ -52,7 +63,7 @@ export async function saveDocument(doc: Omit<StoredDocument, 'id' | 'savedAt'>):
 export async function loadDocument(): Promise<StoredDocument | null> {
   try {
     const db = await openDb();
-    return new Promise((resolve, reject) => {
+    const doc = await new Promise<StoredDocument | null>((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, 'readonly');
       const store = tx.objectStore(STORE_NAME);
       const req = store.get('current');
@@ -60,6 +71,14 @@ export async function loadDocument(): Promise<StoredDocument | null> {
       req.onerror = () => reject(req.error);
       tx.oncomplete = () => db.close();
     });
+    if (!doc) return null;
+    // Expired local saves are deleted and never reach the recovery prompt
+    // (or recoverDocument) — the user is not offered stale work.
+    if (isSaveExpired(doc.savedAt)) {
+      await clearDocument();
+      return null;
+    }
+    return doc;
   } catch {
     return null;
   }

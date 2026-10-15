@@ -51,6 +51,7 @@ import type { EditorElement, Page } from '@pdfeditor/shared';
 import { createDrawContext, drawElement, type DrawContext } from './index.js';
 import { findDirectRun, rewritePageContent, moveRunRaw, type TextRun } from './direct-text.js';
 import { applyRedactions, type RedactRect } from './redact.js';
+import { addCreatedFormFields, attachCopiedFormFields } from './forms.js';
 
 export const PDFEDI_NM_PREFIX = 'pdfedi-';
 
@@ -773,9 +774,22 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
         case 'signature':
           await addStampAnnotation(out, ctx, pdfPage, el, imageCache);
           break;
+        case 'form-field':
+          // Handled in the dedicated pass below (needs all pages present).
+          break;
       }
     }
   }
+  // FORM FIELDS — created (Phase B): write editor-created fields as real
+  // AcroForm fields on the output pages, in creation order. Bound fields
+  // (boundField set) are skipped here — their values were applied to the
+  // source document's own form before this pipeline ran, and their widgets
+  // came along with the copied pages.
+  const createdNames = await addCreatedFormFields(out, src, input.pages, input.elements);
+  // FORM FIELDS — existing (Phase A): copyPages() carries the widgets
+  // (values + appearances) but not the /AcroForm catalog — rebuild it so
+  // the filled form stays interactive in the output.
+  attachCopiedFormFields(out, new Set(createdNames));
   return out;
 }
 

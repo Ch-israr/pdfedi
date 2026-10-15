@@ -51,6 +51,7 @@ export const ElementKindSchema = z.enum([
   'shape',
   'whiteout',
   'native-text',
+  'form-field',
 ]);
 export type ElementKind = z.infer<typeof ElementKindSchema>;
 
@@ -160,6 +161,44 @@ export const NativeTextElementSchema = BaseElementSchema.extend({
 });
 
 /**
+ * An interactive form field. Created fields (boundField absent) are written
+ * as real AcroForm fields on export; bound fields reference a pre-existing
+ * AcroForm field in the source PDF and only carry a fill value.
+ *
+ * Editor geometry: x/y is the field's bottom-left in PDF points (same
+ * convention as all other elements); width/height is the widget rectangle.
+ * fieldOrder is the creation index and drives keyboard tab order.
+ */
+export const FormFieldTypeSchema = z.enum(['text', 'multiline', 'checkbox', 'radio', 'dropdown']);
+export type FormFieldType = z.infer<typeof FormFieldTypeSchema>;
+
+export const FormFieldElementSchema = BaseElementSchema.extend({
+  kind: z.literal('form-field'),
+  /** Only 'text' | 'multiline' | 'checkbox' can be created; 'radio' | 'dropdown' come from detection. */
+  fieldType: FormFieldTypeSchema.default('text'),
+  /** Unique within the document. Defaults field1, field2, … in creation order. */
+  name: z.string().min(1).max(128),
+  /** Text value for text/multiline/radio/dropdown fields. */
+  value: z.string().default(''),
+  /** Checked state for checkbox fields. */
+  checked: z.boolean().default(false),
+  required: z.boolean().default(false),
+  /** Null = no limit. */
+  maxLength: z.number().int().positive().nullable().default(null),
+  fontSize: z.number().positive().default(12),
+  width: z.number().positive(),
+  height: z.number().positive(),
+  fieldOrder: z.number().int().nonnegative().default(0),
+  /** Name of the pre-existing AcroForm field this element fills (fill mode). */
+  boundField: z.string().min(1).max(256).optional(),
+  /** For bound radio widgets: the option this widget represents. */
+  radioOption: z.string().max(128).optional(),
+  /** For bound dropdown fields: the available options. */
+  options: z.array(z.string().max(128)).max(500).optional(),
+});
+export type FormFieldElement = z.infer<typeof FormFieldElementSchema>;
+
+/**
  * A clickable hyperlink region: drag-drawn rectangle carrying a URL.
  * Exports as a standard /Link annotation (invisible in print); the
  * editor shows a dashed outline. http/https only.
@@ -191,6 +230,7 @@ export const EditorElementSchema = z.discriminatedUnion('kind', [
   ShapeElementSchema,
   WhiteoutElementSchema,
   NativeTextElementSchema,
+  FormFieldElementSchema,
   LinkElementSchema,
   RedactElementSchema,
 ]);

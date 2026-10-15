@@ -1,8 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { useEditor } from '@/store/editor';
 import type { EditorElement } from '@pdfeditor/shared';
 import { normalizeUrl } from '@/lib/url';
+import { isFieldNameUnique } from '@/lib/form-fields';
 
 /**
  * Right sidebar: properties of the selected element.
@@ -251,7 +253,215 @@ export function PropertiesPanel() {
             </p>
           </section>
         )}
+        {el.kind === 'form-field' && <FormFieldSection />}
       </div>
     </aside>
+  );
+}
+
+function FormFieldSection() {
+  const selectedId = useEditor((s) => s.selectedId);
+  const elements = useEditor((s) => s.elements);
+  const updateElement = useEditor((s) => s.updateElement);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const el = selectedId ? elements[selectedId] : undefined;
+  if (!el || el.kind !== 'form-field') return null;
+  const bound = !!el.boundField;
+
+  const commitName = (raw: string) => {
+    const name = raw.trim();
+    if (!name) {
+      setNameError('Name cannot be empty.');
+      return;
+    }
+    if (name !== el.name && !isFieldNameUnique(elements, name, el.id)) {
+      setNameError(`Name "${name}" is already used by another field.`);
+      return;
+    }
+    setNameError(null);
+    if (name !== el.name) updateElement(el.id, { name }, 'Rename field');
+  };
+
+  const toggle = (
+    label: string,
+    value: boolean,
+    onChange: (v: boolean) => void,
+  ) => (
+    <label className="flex cursor-pointer items-center justify-between gap-2">
+      <span className="text-xs font-medium text-slate-500">{label}</span>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={value}
+        aria-label={label}
+        onClick={() => onChange(!value)}
+        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors ${
+          value ? 'bg-brand-500' : 'bg-slate-300'
+        }`}
+      >
+        <span
+          aria-hidden
+          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all ${
+            value ? 'left-[22px]' : 'left-0.5'
+          }`}
+        />
+      </button>
+    </label>
+  );
+
+  return (
+    <section className="space-y-2 border-t border-slate-100 pt-4">
+      <h3 className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+        Form field
+      </h3>
+      <p className="text-xs text-slate-500">
+        Type: <span className="font-medium capitalize text-slate-700">{el.fieldType}</span>
+        {bound && (
+          <span className="ml-1 text-slate-400">(bound to the PDF&apos;s own field)</span>
+        )}
+      </p>
+      {bound ? (
+        <p className="text-xs text-slate-500">
+          Name: <span className="font-mono font-medium text-slate-700">{el.name}</span>
+        </p>
+      ) : (
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Name</span>
+          <input
+            type="text"
+            key={`${el.id}:${el.name}`}
+            defaultValue={el.name}
+            maxLength={128}
+            onBlur={(e) => commitName(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+            }}
+            className={`w-full rounded-lg border px-2.5 py-1.5 font-mono text-sm transition-colors focus:outline-none focus:ring-1 ${
+              nameError
+                ? 'border-red-400 focus:border-red-500 focus:ring-red-500'
+                : 'border-slate-300 focus:border-brand-500 focus:ring-brand-500'
+            }`}
+          />
+          {nameError && <span className="mt-1 block text-xs text-red-600">{nameError}</span>}
+        </label>
+      )}
+      {el.fieldType === 'checkbox' ? (
+        <div className="rounded-lg border border-slate-200 p-2">
+          {toggle('Checked', el.checked, (v) =>
+            updateElement(el.id, { checked: v }, v ? 'Check field' : 'Uncheck field'),
+          )}
+        </div>
+      ) : el.fieldType === 'dropdown' ? (
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Value</span>
+          <select
+            value={el.value}
+            onChange={(e) => updateElement(el.id, { value: e.target.value }, 'Edit field value')}
+            className="w-full rounded-lg border border-slate-300 px-2 py-1.5 text-sm"
+          >
+            <option value="">—</option>
+            {(el.options ?? []).map((o) => (
+              <option key={o} value={o}>
+                {o}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : el.fieldType === 'radio' ? (
+        <p className="text-xs text-slate-500">
+          Represents option <span className="font-medium text-slate-700">{el.radioOption || '—'}</span> of
+          the radio group <span className="font-mono">{el.boundField ?? el.name}</span>. Click the
+          control on the page to select it.
+        </p>
+      ) : (
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Value</span>
+          {el.fieldType === 'multiline' ? (
+            <textarea
+              value={el.value}
+              rows={3}
+              maxLength={el.maxLength ?? undefined}
+              onChange={(e) => updateElement(el.id, { value: e.target.value }, 'Edit field value')}
+              className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+          ) : (
+            <input
+              type="text"
+              value={el.value}
+              maxLength={el.maxLength ?? undefined}
+              onChange={(e) => updateElement(el.id, { value: e.target.value }, 'Edit field value')}
+              className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+            />
+          )}
+        </label>
+      )}
+      {!bound && (
+        <>
+          <div className="rounded-lg border border-slate-200 p-2">
+            {toggle('Required', el.required, (v) =>
+              updateElement(el.id, { required: v }, 'Toggle field required'),
+            )}
+          </div>
+          {(el.fieldType === 'text' || el.fieldType === 'multiline') && (
+            <div className="grid grid-cols-2 gap-2">
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-slate-500">Max length</span>
+                <input
+                  type="number"
+                  min={1}
+                  placeholder="—"
+                  value={el.maxLength ?? ''}
+                  onChange={(e) => {
+                    const v = e.target.value === '' ? null : Math.max(1, Math.floor(Number(e.target.value)));
+                    updateElement(el.id, { maxLength: Number.isNaN(v as number) ? null : v }, 'Edit max length');
+                  }}
+                  className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm tabular-nums transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+              </label>
+              <label className="block">
+                <span className="mb-1 block text-xs font-medium text-slate-500">Font size</span>
+                <input
+                  type="number"
+                  min={4}
+                  max={200}
+                  value={Math.round(el.fontSize * 100) / 100}
+                  onChange={(e) => updateElement(el.id, { fontSize: Math.max(1, Number(e.target.value)) }, 'Edit field font size')}
+                  className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm tabular-nums transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+                />
+              </label>
+            </div>
+          )}
+        </>
+      )}
+      {bound && (el.fieldType === 'text' || el.fieldType === 'multiline') && (
+        <p className="text-xs leading-relaxed text-slate-500">
+          {el.required ? 'Required. ' : ''}
+          {el.maxLength ? `Max length ${el.maxLength}. ` : ''}Font size {Math.round(el.fontSize * 100) / 100}.
+          These come from the PDF&apos;s own field and are read-only here.
+        </p>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Width</span>
+          <input
+            type="number"
+            min={1}
+            value={Math.round(el.width * 100) / 100}
+            onChange={(e) => updateElement(el.id, { width: Math.max(1, Number(e.target.value)) })}
+            className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm tabular-nums transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          />
+        </label>
+        <label className="block">
+          <span className="mb-1 block text-xs font-medium text-slate-500">Height</span>
+          <input
+            type="number"
+            min={1}
+            value={Math.round(el.height * 100) / 100}
+            onChange={(e) => updateElement(el.id, { height: Math.max(1, Number(e.target.value)) })}
+            className="w-full rounded-lg border border-slate-300 px-2.5 py-1.5 text-sm tabular-nums transition-colors focus:border-brand-500 focus:outline-none focus:ring-1 focus:ring-brand-500"
+          />
+        </label>
+      </div>
+    </section>
   );
 }

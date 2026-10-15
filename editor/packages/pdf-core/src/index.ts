@@ -62,6 +62,14 @@ export {
   type RedactRect,
 } from './redact.js';
 
+export {
+  detectFormFields,
+  applyFormFills,
+  addCreatedFormFields,
+  attachCopiedFormFields,
+  type DetectSummary,
+} from './forms.js';
+
 // ---------------------------------------------------------------------------
 // Page operations (pure — return new arrays, never mutate)
 // ---------------------------------------------------------------------------

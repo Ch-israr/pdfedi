@@ -31,6 +31,7 @@ import { ResizeHandles } from './ResizeHandles';
 import { LineEndpoints } from './LineEndpoints';
 import { probeDirectEdit } from '@/lib/direct-probe';
 import { computeEditorSize } from '@/lib/text-editor-size';
+import { FORM_FIELD_DEFAULTS, nextFieldName, nextFieldOrder, type FormToolId } from '@/lib/form-fields';
 
 /** Screen px per PDF point at current zoom */
 function toScreen(v: number, zoom: number) {
@@ -640,6 +641,24 @@ function ElementView({
           {selected && <ResizeHandles el={el} zoom={zoom} />}
         </div>
       );
+    case 'form-field': {
+      const ff = el as Extract<EditorElement, { kind: 'form-field' }>;
+      return (
+        <div
+          {...common}
+          style={{
+            ...style,
+            width: toScreen(ff.width, zoom),
+            height: toScreen(ff.height, zoom),
+          }}
+          data-el-id={el.id}
+          title={ff.boundField ? `Form field "${ff.name}" (bound to PDF field)` : `Form field "${ff.name}"`}
+        >
+          <FormFieldInput el={ff} zoom={zoom} />
+          {selected && <ResizeHandles el={el} zoom={zoom} />}
+        </div>
+      );
+    }
     case 'image':
     case 'signature':
       return (
@@ -686,6 +705,143 @@ function ResizableImage({
       />
       {selected && <ResizeHandles el={el} zoom={zoom} lockAspect cornersOnly />}
     </div>
+  );
+}
+
+/**
+ * A real form control inside the element frame. The control handles its own
+ * pointer events (so typing/toggling never starts a drag — the frame border
+ * is the drag surface, like text elements separate editing from dragging);
+ * focusing the control selects the element.
+ */
+function FormFieldInput({
+  el,
+  zoom,
+}: {
+  el: Extract<EditorElement, { kind: 'form-field' }>;
+  zoom: number;
+}) {
+  const updateElement = useEditor((s) => s.updateElement);
+  const select = useEditor((s) => s.select);
+  // One typing session = one undo step: keystrokes share a merge key that
+  // resets on blur.
+  const typeKey = useRef<string | null>(null);
+  const commitText = (v: string) => {
+    if (!typeKey.current) typeKey.current = crypto.randomUUID();
+    updateElement(
+      el.id,
+      { value: v } as Partial<EditorElement>,
+      'Edit field value',
+      { mergeKey: typeKey.current },
+    );
+  };
+  const stop = (e: React.SyntheticEvent) => e.stopPropagation();
+  const baseStyle: React.CSSProperties = {
+    width: '100%',
+    height: '100%',
+    display: 'block',
+    boxSizing: 'border-box',
+    border: '1px solid #94a3b8',
+    borderRadius: 2,
+    background: '#ffffff',
+    color: '#0f172a',
+    fontSize: toScreen(el.fontSize, zoom),
+    padding: '1px 4px',
+    cursor: el.fieldType === 'checkbox' || el.fieldType === 'radio' ? 'pointer' : 'text',
+    userSelect: 'auto',
+    WebkitUserSelect: 'auto',
+  };
+  const shared = {
+    name: el.name,
+    required: el.required,
+    tabIndex: el.fieldOrder,
+    'aria-label': el.name,
+    onPointerDown: stop,
+    onClick: stop,
+    onDoubleClick: stop,
+    onFocus: () => select(el.id),
+  };
+  if (el.fieldType === 'checkbox') {
+    return (
+      <input
+        {...shared}
+        type="checkbox"
+        checked={el.checked}
+        onChange={(e) =>
+          updateElement(
+            el.id,
+            { checked: e.target.checked } as Partial<EditorElement>,
+            e.target.checked ? 'Check field' : 'Uncheck field',
+          )
+        }
+        style={{ ...baseStyle, padding: 0, accentColor: '#2f6bff' }}
+      />
+    );
+  }
+  if (el.fieldType === 'radio') {
+    return (
+      <input
+        {...shared}
+        type="radio"
+        checked={!!el.value && el.value === el.radioOption}
+        onChange={() =>
+          updateElement(
+            el.id,
+            { value: el.radioOption ?? '' } as Partial<EditorElement>,
+            'Select radio option',
+          )
+        }
+        style={{ ...baseStyle, padding: 0, borderRadius: '50%', accentColor: '#2f6bff' }}
+      />
+    );
+  }
+  if (el.fieldType === 'dropdown') {
+    return (
+      <select
+        {...shared}
+        value={el.value}
+        onChange={(e) => commitText(e.target.value)}
+        onBlur={() => {
+          typeKey.current = null;
+        }}
+        style={baseStyle}
+      >
+        <option value="">—</option>
+        {(el.options ?? []).map((o) => (
+          <option key={o} value={o}>
+            {o}
+          </option>
+        ))}
+      </select>
+    );
+  }
+  if (el.fieldType === 'multiline') {
+    return (
+      <textarea
+        {...shared}
+        value={el.value}
+        maxLength={el.maxLength ?? undefined}
+        rows={3}
+        onChange={(e) => commitText(e.target.value)}
+        onBlur={() => {
+          typeKey.current = null;
+        }}
+        style={{ ...baseStyle, resize: 'none', whiteSpace: 'pre-wrap' }}
+      />
+    );
+  }
+  return (
+    <input
+      {...shared}
+      type="text"
+      value={el.value}
+      maxLength={el.maxLength ?? undefined}
+      onChange={(e) => commitText(e.target.value)}
+      onBlur={() => {
+        typeKey.current = null;
+      }}
+      style={baseStyle}
+    />
   );
 }
 
@@ -1147,6 +1303,36 @@ export function ElementOverlay({ page }: { page: Page }) {
             'Signature Added',
           );
         });
+        break;
+      }
+      case 'form-text':
+      case 'form-multiline':
+      case 'form-checkbox': {
+        // Click-to-place: the field's top edge lands at the click point.
+        // The tool stays active so several fields can be placed in a row.
+        const def = FORM_FIELD_DEFAULTS[tool as FormToolId];
+        const st = useEditor.getState();
+        place(
+          {
+            id,
+            pageId: page.id,
+            kind: 'form-field',
+            x,
+            y: y - def.height,
+            rotation: 0,
+            fieldType: def.fieldType,
+            name: nextFieldName(st.elements),
+            value: '',
+            checked: false,
+            required: false,
+            maxLength: null,
+            fontSize: 12,
+            width: def.width,
+            height: def.height,
+            fieldOrder: nextFieldOrder(st.elements),
+          },
+          `${def.label} added`,
+        );
         break;
       }
       default:

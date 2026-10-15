@@ -10,6 +10,7 @@ import { CloseConfirmDialog } from './CloseConfirmDialog';
 import { ToolIcon } from './ToolIcon';
 import { ShapesDropdown } from './ShapesDropdown';
 import { AnnotateDropdown } from './AnnotateDropdown';
+import { FormsDropdown } from './FormsDropdown';
 
 function SaveStatus() {
   const saveStatus = useEditor((s) => s.saveStatus);
@@ -28,8 +29,8 @@ function SaveStatus() {
   );
 }
 
-// Tools inside the grouped pill, in reference order. (Forms does not exist
-// in this editor and is not shown.)
+// Tools inside the grouped pill, in reference order. Forms fields live in
+// the separate Forms dropdown below.
 const PILL_TOOLS: { id: ToolId; label: string; shortcut?: string }[] = [
   { id: 'text', label: 'Text', shortcut: 'T' },
   { id: 'image', label: 'Image' },
@@ -134,6 +135,7 @@ export function Toolbar() {
           <PillDivider />
           <AnnotateDropdown inPill />
           <ShapesDropdown inPill />
+          <FormsDropdown inPill />
           <PillDivider />
           <button
             type="button"

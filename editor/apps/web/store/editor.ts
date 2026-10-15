@@ -43,7 +43,10 @@ export type ToolId =
   | 'shape-arrow'
   | 'whiteout'
   | 'link'
-  | 'redact';
+  | 'redact'
+  | 'form-text'
+  | 'form-multiline'
+  | 'form-checkbox';
 
 interface EditorState {
   // Document (memory only)
@@ -401,6 +404,38 @@ export const useEditor = create<EditorState>()(
           s.nativeText = {};
           s.nativeEditWarned = false;
         });
+
+        // FORM FIELDS — fill existing (Phase A): bind the source PDF's own
+        // AcroForm fields as editable elements. Runs after all restore
+        // paths so page ids are final. Best-effort: an unreadable form
+        // must never block opening the document.
+        try {
+          const core = await loadPdfCore();
+          const { bound, skipped } = await core.detectFormFields(pdfBytes, pages);
+          if (bound.length > 0 || skipped > 0) {
+            set((s) => {
+              let order = -1;
+              for (const el of Object.values(s.elements)) {
+                if (el.kind === 'form-field') order = Math.max(order, el.fieldOrder);
+              }
+              for (const el of bound) {
+                order += 1;
+                el.fieldOrder = order;
+                s.elements[el.id] = el;
+              }
+              if (bound.length > 0 && !s.notice) {
+                s.notice = {
+                  kind: 'info',
+                  message:
+                    `Detected ${bound.length} form field${bound.length === 1 ? '' : 's'} in this PDF — ` +
+                    'click a field to fill it.',
+                };
+              }
+            });
+          }
+        } catch {
+          // Detection is best-effort; the document opens regardless.
+        }
       } catch (e) {
         set((s) => {
           s.loading = false;
@@ -826,9 +861,17 @@ export const useEditor = create<EditorState>()(
       // embedded source PDF — re-editability comes from the PDF's own
       // annotation layer, and file size grows only by the annotations
       // themselves (~1 KB per object, not a second copy of the document).
-      const { exportAnnotatedPdf } = await loadPdfCore();
+      const { exportAnnotatedPdf, applyFormFills } = await loadPdfCore();
+      // FORM FIELDS — fill existing (Phase A): write bound field values
+      // onto the source document's own AcroForm FIRST, then run the
+      // export pipeline on the resulting bytes. The pipeline's page
+      // copying carries the widgets (values + appearance streams) into
+      // the output, and the /AcroForm catalog is rebuilt there so the
+      // form stays interactive. applyFormFills is a no-op passthrough
+      // when no bound fields exist.
+      const baseBytes = await applyFormFills(s.pdfBytes, s.elements);
       return exportAnnotatedPdf({
-        srcBytes: s.pdfBytes,
+        srcBytes: baseBytes,
         pages: s.pages,
         elements: s.elements,
       });
