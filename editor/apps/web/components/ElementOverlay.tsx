@@ -27,6 +27,7 @@ import { LinkUrlEditor } from './LinkUrlEditor';
 import { NativeEditWarning } from './NativeEditWarning';
 import { FloatingShapeToolbar } from './FloatingShapeToolbar';
 import { FloatingImageToolbar } from './FloatingImageToolbar';
+import { FloatingFormFieldToolbar } from './FloatingFormFieldToolbar';
 import { ResizeHandles } from './ResizeHandles';
 import { LineEndpoints } from './LineEndpoints';
 import { probeDirectEdit } from '@/lib/direct-probe';
@@ -1780,6 +1781,21 @@ export function ElementOverlay({ page }: { page: Page }) {
               screenHeight={h}
               zoom={zoom}
               duplicateElement={duplicateElement}
+            />
+          );
+        }
+        if (sel.kind === 'form-field' && !sel.boundField) {
+          // Created fields get the floating properties editor (name,
+          // required, max length, font size). Bound fields take those
+          // from the source PDF, so they show no editor.
+          const { sx, top, h } = elScreen(sel);
+          return (
+            <FloatingFormFieldToolbar
+              el={sel}
+              screenX={sx}
+              screenTop={top}
+              screenHeight={h}
+              zoom={zoom}
             />
           );
         }
