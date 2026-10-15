@@ -48,6 +48,7 @@ import {
   type PDFPage,
 } from 'pdf-lib';
 import type { EditorElement, Page } from '@pdfeditor/shared';
+import { findUnencodableChars } from '@pdfeditor/shared';
 import { createDrawContext, drawElement, type DrawContext } from './index.js';
 import { findDirectRun, rewritePageContent, moveRunRaw, type TextRun } from './direct-text.js';
 import { applyRedactions, type RedactRect } from './redact.js';
@@ -205,6 +206,25 @@ export interface AnnotatedExportInput {
   srcBytes: Uint8Array;
   pages: Page[];
   elements: Record<string, EditorElement>;
+}
+
+/**
+ * A native-text edit that was NOT applied at export because its
+ * replacement text contains characters the standard fonts cannot write.
+ * The original run is preserved untouched in the output — an edit must
+ * never be reported as applied when its replacement could not be drawn.
+ */
+export interface FailedNativeEdit {
+  elementId: string;
+  /** 0-based index of the source page the edit belongs to. */
+  sourcePageIndex: number;
+  originalText: string;
+  /** Distinct characters of the replacement that cannot be written. */
+  unsupportedChars: string[];
+}
+
+export interface AnnotatedExportReport {
+  failedNativeEdits: FailedNativeEdit[];
 }
 
 interface TextBox {
@@ -569,7 +589,10 @@ async function addStampAnnotation(
  * No file attachments are added: the output carries no PDFEDI_STATE.json
  * and no embedded source PDF.
  */
-export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Promise<PDFDocument> {
+export async function buildAnnotatedPdfDocument(
+  input: AnnotatedExportInput,
+  report?: AnnotatedExportReport,
+): Promise<PDFDocument> {
   const src = await PDFDocument.load(input.srcBytes, { ignoreEncryption: false });
   // Strip our annotations from the SOURCE pages before copying: pdf-lib's
   // copier walks the page's object graph, so annotations still referenced
@@ -593,6 +616,11 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
   // keep the annotation-pair fallback so their edit is never lost.
   const directHandled = new Set<string>();
   const directDraw = new Set<string>(); // handled directly, replacement drawn post-copy
+  // Edits whose replacement text cannot be written with the standard
+  // fonts: their original runs are NOT removed and the elements are
+  // skipped entirely, so the output keeps the original text (P0: a
+  // replacement that cannot be drawn must never destroy the original).
+  const directFailed = new Set<string>();
   {
     const rewrites = new Map<number, { removals: TextRun[]; appends: string[] }>();
     const claimed = new Map<number, Set<string>>();
@@ -614,6 +642,28 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
           baselineY: originY + el.baselineOffset,
         });
         if (res.status !== 'ok') continue;
+        // VALIDATE BEFORE ANY DESTRUCTIVE CHANGE: a changed replacement
+        // is drawn with a standard (WinAnsi) font after the original run
+        // is removed. If the replacement contains characters that font
+        // cannot write, drawing it would fail silently AFTER the removal
+        // — the exact silent-loss defect this guard exists to prevent.
+        // Such an edit is skipped whole: the original stays in the
+        // output and the failure is reported to the caller. Deletions
+        // (empty text) and verbatim moves (unchanged text) write nothing
+        // new and are always safe.
+        if (el.text && el.text !== el.originalText) {
+          const unsupported = findUnencodableChars(el.text);
+          if (unsupported.length > 0) {
+            directFailed.add(el.id);
+            report?.failedNativeEdits.push({
+              elementId: el.id,
+              sourcePageIndex: srcIdx,
+              originalText: el.originalText,
+              unsupportedChars: unsupported,
+            });
+            continue;
+          }
+        }
         const pageClaimed = claimed.get(srcIdx) ?? new Set<string>();
         const runKey = res.run.spans.map(([a, b]) => `${a}-${b}`).join(',');
         if (pageClaimed.has(runKey)) continue; // two elements, one run — first wins
@@ -722,6 +772,12 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
           if (el.link) await addTextLinkAnnotation(out, pdfPage, el, fontCache);
           break;
         case 'native-text':
+          if (directFailed.has(el.id)) {
+            // Replacement could not be validated for writing: the
+            // original run was left untouched in the copied content —
+            // draw nothing and add no mask/annotation for this element.
+            break;
+          }
           if (directHandled.has(el.id)) {
             // Original run already removed from the content stream in
             // the planning pass. Draw the replacement into the content
@@ -796,6 +852,21 @@ export async function buildAnnotatedPdfDocument(input: AnnotatedExportInput): Pr
 export async function exportAnnotatedPdf(input: AnnotatedExportInput): Promise<Uint8Array> {
   const doc = await buildAnnotatedPdfDocument(input);
   return doc.save();
+}
+
+/**
+ * Export with a report of the native-text edits that were NOT applied
+ * (their replacement text cannot be written with the standard fonts).
+ * For those edits the output preserves the original text untouched —
+ * the caller must surface them instead of presenting the export as a
+ * complete success.
+ */
+export async function exportAnnotatedPdfWithReport(
+  input: AnnotatedExportInput,
+): Promise<{ bytes: Uint8Array; report: AnnotatedExportReport }> {
+  const report: AnnotatedExportReport = { failedNativeEdits: [] };
+  const doc = await buildAnnotatedPdfDocument(input, report);
+  return { bytes: await doc.save(), report };
 }
 
 // ---------------------------------------------------------------------------

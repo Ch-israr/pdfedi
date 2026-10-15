@@ -300,6 +300,8 @@ export interface TextRun {
   originX: number;
   originY: number;
   fontResource: string;
+  /** The run font's /BaseFont (e.g. "BCDHEE+Cambria-Bold"), when resolvable. */
+  fontBaseName?: string;
   fontSize: number;
   colorHex: string;
   /** Whether the block can be re-emitted verbatim at a new position. */
@@ -313,6 +315,7 @@ interface ShowInfo {
   originX: number;
   originY: number;
   fontResource: string;
+  fontBaseName?: string;
   fontSize: number;
   colorHex: string;
   /** Byte span of the show operation itself (operands + operator). */
@@ -365,11 +368,55 @@ function pageContentText(doc: PDFDocument, pageDict: PDFDict): string | null {
 }
 
 /** Parse a page's content stream and return its text blocks. */
+/** Resolve each font resource name on the page to its /BaseFont string. */
+function fontBaseNames(doc: PDFDocument, pageDict: PDFDict): Map<string, string> {
+  const out = new Map<string, string>();
+  try {
+    const resources = doc.context.lookup(pageDict.get(PDFName.of('Resources'))) as PDFDict;
+    const fonts = resources ? (doc.context.lookup(resources.get(PDFName.of('Font'))) as PDFDict) : null;
+    if (!fonts) return out;
+    for (const [nameObj, ref] of fonts.entries()) {
+      const fontDict = doc.context.lookup(ref) as PDFDict;
+      if (!(fontDict instanceof PDFDict)) continue;
+      const base = fontDict.get(PDFName.of('BaseFont'))?.toString() ?? '';
+      if (base) out.set(nameObj.toString().slice(1), base.slice(1));
+    }
+  } catch {
+    // Unresolvable fonts simply carry no base name.
+  }
+  return out;
+}
+
+/**
+ * Map an embedded PDF font's /BaseFont to the closest editor font — the
+ * documented fallback used when a native-text edit is rewritten with one
+ * of the 14 standard fonts (the original embedded font program cannot be
+ * reused for new text with pdf-lib). Family CLASS, weight and style are
+ * preserved: Times/Cambria/Georgia-style serifs map to a serif standard
+ * font, sans fonts to Helvetica (seeded as "Arial", the toolbar's name
+ * for it), monospace to Courier. Bold/italic come from the font name.
+ */
+export function editorFontForPdfFont(baseName: string | undefined): {
+  fontFamily: string;
+  bold: boolean;
+  italic: boolean;
+} {
+  const clean = (baseName ?? '').replace(/^[A-Z]{6}\+/, '').toLowerCase();
+  const bold = /bold|black|heavy|demi|semibold/.test(clean);
+  const italic = /italic|oblique/.test(clean);
+  let fontFamily = 'Arial';
+  if (/georgia/.test(clean)) fontFamily = 'Georgia';
+  else if (/times|cambria|garamond|palatino|book antiqua|serif/.test(clean)) fontFamily = 'Times New Roman';
+  else if (/courier|consolas|menlo|mono/.test(clean)) fontFamily = 'Courier New';
+  return { fontFamily, bold, italic };
+}
+
 export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { content: string; blocks: BlockInfo[] } | null {
   const page = doc.getPage(pageIndex);
   const content = pageContentText(doc, page.node);
   if (content === null) return null;
   const decoders = fontDecoders(doc, page.node);
+  const baseNames = fontBaseNames(doc, page.node);
   const tokens = tokenize(content);
   const blocks: BlockInfo[] = [];
 
@@ -507,6 +554,7 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
             originX: tm[4],
             originY: tm[5],
             fontResource: fontName,
+            fontBaseName: baseNames.get(fontName),
             fontSize,
             colorHex: color,
             span: [strTok.start, tok.end],
@@ -532,6 +580,7 @@ export function collectTextBlocks(doc: PDFDocument, pageIndex: number): { conten
             originX: tm[4],
             originY: tm[5],
             fontResource: fontName,
+            fontBaseName: baseNames.get(fontName),
             fontSize,
             colorHex: color,
             span: [arrTok.start, tok.end],
@@ -575,6 +624,7 @@ function blockToRun(content: string, block: BlockInfo): TextRun {
     originX: show.originX,
     originY: show.originY,
     fontResource: show.fontResource,
+    fontBaseName: show.fontBaseName,
     fontSize: show.fontSize,
     colorHex: show.colorHex,
     movable,
@@ -613,6 +663,7 @@ function multiShowToRun(content: string, shows: ShowInfo[]): TextRun {
     originX: first.originX,
     originY: first.originY,
     fontResource: first.fontResource,
+    fontBaseName: first.fontBaseName,
     fontSize: first.fontSize,
     colorHex: first.colorHex,
     movable: false,
@@ -730,12 +781,32 @@ export async function probeDirectTextEdit(
   bytes: Uint8Array,
   pageIndex: number,
   query: DirectRunQuery,
-): Promise<{ editable: boolean; colorHex?: string; fontSize?: number; reason?: string }> {
+): Promise<{
+  editable: boolean;
+  colorHex?: string;
+  fontSize?: number;
+  /** The run font's /BaseFont, e.g. "BCDHEE+Cambria-Bold". */
+  fontBaseName?: string;
+  /** Closest editor font for the run (documented standard-font fallback). */
+  fontFamily?: string;
+  bold?: boolean;
+  italic?: boolean;
+  reason?: string;
+}> {
   try {
     const doc = await PDFDocument.load(bytes, { ignoreEncryption: false });
     const result = findDirectRun(doc, pageIndex, query);
     if (result.status === 'ok') {
-      return { editable: true, colorHex: result.run.colorHex, fontSize: result.run.fontSize };
+      const mapped = editorFontForPdfFont(result.run.fontBaseName);
+      return {
+        editable: true,
+        colorHex: result.run.colorHex,
+        fontSize: result.run.fontSize,
+        fontBaseName: result.run.fontBaseName,
+        fontFamily: mapped.fontFamily,
+        bold: mapped.bold,
+        italic: mapped.italic,
+      };
     }
     return { editable: false, reason: result.reason };
   } catch {

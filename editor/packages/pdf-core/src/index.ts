@@ -38,15 +38,19 @@ export {
 export {
   buildAnnotatedPdfDocument,
   exportAnnotatedPdf,
+  exportAnnotatedPdfWithReport,
   parsePdfediAnnotations,
   PDFEDI_NM_PREFIX,
   type AnnotatedExportInput,
+  type AnnotatedExportReport,
+  type FailedNativeEdit,
   type ParsedAnnotationElement,
   type ParsedImageData,
 } from './annotations.js';
 
 export {
   collectTextBlocks,
+  editorFontForPdfFont,
   findDirectRun,
   moveRunRaw,
   probeDirectTextEdit,
@@ -55,6 +59,8 @@ export {
   type DirectRunResult,
   type TextRun,
 } from './direct-text.js';
+
+export { findUnencodableChars, isWinAnsiEncodable } from '@pdfeditor/shared';
 
 export {
   applyRedactions,

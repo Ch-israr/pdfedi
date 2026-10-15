@@ -433,3 +433,5 @@ export interface HistoryRecord {
   /** Index in the past[] array this record corresponds to */
   commandIndex: number;
 }
+
+export { findUnencodableChars, isWinAnsiEncodable } from "./winansi.js";
