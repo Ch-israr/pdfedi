@@ -1,6 +1,6 @@
 """Visitor analytics for the admin dashboard — privacy-first.
 
-What is captured per page view (/, /editor, /tools/* only):
+What is captured per page view (/ and /tools/* only):
   timestamp, truncated IP (/24 for IPv4, /48 for IPv6 — full IPs are NEVER
   stored), country + city (local DB-IP City Lite MMDB lookup, CC BY 4.0 —
   no third-party APIs), device class, browser, traffic source, path.
@@ -231,11 +231,11 @@ def geo_lookup(ip: str) -> tuple[str | None, str | None]:
 # ---------------------------------------------------------------------------
 # Visit logging
 # ---------------------------------------------------------------------------
-_TRACKED_PREFIXES = ("/tools/", "/editor")
+_TRACKED_PREFIXES = ("/tools/",)
 
 
 def should_track(path: str, user_agent: str) -> bool:
-    """Human page views: /, /editor, /tools/*. Bots go to the bot table."""
+    """Human page views: / and /tools/*. Bots go to the bot table."""
     if is_bot(user_agent or ""):
         return False
     if path == "/" or path.startswith(_TRACKED_PREFIXES):

@@ -1,7 +1,5 @@
 # PDFEDI v2 on Render free tier — single Docker image:
 #   Stage 1 builds the static Next.js frontend (web/ -> /build/out).
-#   Stage 1b builds the PDF editor as a static export
-#     (editor/apps/web/out -> served at /editor).
 #   Stage 2 runs FastAPI (API) + serves the exported frontend, one origin.
 
 # ---- Stage 1: build the Next.js frontend ----
@@ -12,45 +10,6 @@ COPY web/package.json web/package-lock.json* ./
 RUN npm ci --no-audit --no-fund 2>/dev/null || npm install --no-audit --no-fund
 COPY web ./
 RUN npm run build
-
-# ---- Stage 1b: build the editor (static export for /editor) ----
-# pnpm/turbo monorepo; NEXT_STATIC_EXPORT=1 + NEXT_BASE_PATH=/editor make the
-# editor's next.config.js emit a base-prefixed static export. The standalone
-# editor service build does not set these and is unaffected.
-FROM node:20-slim AS editor
-RUN corepack enable && corepack prepare pnpm@10.34.6 --activate
-ENV NEXT_TELEMETRY_DISABLED=1 \
-    NEXT_STATIC_EXPORT=1 \
-    NEXT_BASE_PATH=/editor
-WORKDIR /build/editor
-COPY editor/pnpm-workspace.yaml editor/pnpm-lock.yaml \
-     editor/turbo.json editor/package.json \
-     editor/tsconfig.base.json ./
-COPY editor/packages ./packages
-COPY editor/apps ./apps
-RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @pdfeditor/shared build \
- && pnpm --filter @pdfeditor/pdf-core build \
- && pnpm --filter @pdfeditor/web build
-
-# Obfuscate the shipped editor JS (user order 2026-10-15): string-array +
-# base64 + split-strings only — no control-flow flattening, self-defending or
-# debug protection, so runtime behaviour is unchanged. Settings were proven
-# against the production bundle locally (every file still parses and the
-# editor passes a full open/edit/export smoke test). Reverting = delete this
-# step and redeploy.
-RUN cd /build/editor/apps/web/out \
- && find . -name '*.js' -type f | while read -r f; do \
-      npx -y javascript-obfuscator@4 "$f" --output obf-tmp \
-        --compact true --string-array true --string-array-encoding base64 \
-        --string-array-threshold 0.75 --string-array-rotate true \
-        --string-array-shuffle true --split-strings true \
-        --split-strings-chunk-length 10 --control-flow-flattening false \
-        --dead-code-injection false --self-defending false \
-        --debug-protection false --rename-globals false \
-      && mv "obf-tmp/$(basename "$f")" "$f" && rmdir obf-tmp; \
-    done \
- && find . -name '*.js' -type f | wc -l
 
 # ---- Stage 2: Python runtime ----
 FROM python:3.12-slim
@@ -79,7 +38,6 @@ COPY backend/requirements-render.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend ./backend
 COPY --from=web /build/out ./static
-COPY --from=editor /build/editor/apps/web/out ./static/editor
 # GeoIP database for admin traffic analytics (DB-IP City Lite, CC BY 4.0,
 # free, no account needed — https://db-ip.com/db/lite.php). Best-effort:
 # the app runs fine without it (country/city show as "Unknown").

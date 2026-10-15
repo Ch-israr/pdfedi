@@ -15,36 +15,6 @@ export default function Home() {
         </p>
       </section>
 
-      <section className="mt-4">
-        <div className="mb-4 text-center text-xs font-bold uppercase tracking-widest text-brand-600">
-          Most popular
-        </div>
-        {/* The editor is a separate Next app served at /editor — a plain
-            anchor (full document load) is required here. A next/link would
-            prefetch /editor as an internal route, read the editor app's
-            RSC payload, and try to load its chunks from this app's
-            /_next path, producing 404 ChunkLoadErrors in the console. */}
-        <a
-          href="/editor"
-          className="group mx-auto block w-full max-w-xl rounded-2xl border border-slate-200/70 bg-white p-6 text-left shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-lg"
-        >
-          <div className="flex items-center gap-3.5">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-brand-50 text-[20px]">
-              ✏️
-            </span>
-            <span className="text-[17px] font-bold tracking-tight text-slate-800 group-hover:text-brand-600">
-              PDF Editor
-            </span>
-          </div>
-          <p className="mt-3.5 text-sm leading-relaxed text-slate-500">
-            Edit PDF files for free. Fill &amp; sign PDF. Add text, links, images
-            and shapes. Edit existing PDF text. Annotate PDF.
-          </p>
-          <div className="mt-4 text-sm font-semibold text-brand-600">
-            Open Editor →
-          </div>
-        </a>
-      </section>
 
       {CATEGORIES.map((cat) => {
         const tools = TOOL_CARDS.filter((t) => t.category === cat.key);

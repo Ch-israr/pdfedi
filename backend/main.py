@@ -131,8 +131,7 @@ class _ImmutableNextStatic(StaticFiles):
 def _frontend_cache_headers(path: str) -> dict | None:
     """Cache policy for frontend-served static paths.
 
-    - /_next/static/* and /editor/_next/static/*: content-hashed build
-      output -> immutable for a year.
+    - /_next/static/*: content-hashed build output -> immutable for a year.
     - HTML pages (and the root/404 fallbacks): no caching — deploys
       replace them and the browser must always revalidate.
     - Other static assets (icons, logo, llms.txt, sitemap.xml): 1 day.
@@ -215,6 +214,13 @@ def create_app() -> FastAPI:
         def serve_frontend(path: str):
             # Unknown API routes are real 404s (JSON), not the SPA fallback.
             if path == "api" or path.startswith("api/"):
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
+            # The PDF editor was removed (2026-10-15): its old route must
+            # be a real 404, not the SPA fallback serving the homepage.
+            if path == "editor" or path.startswith("editor/"):
+                not_found = frontend / "404" / "index.html"
+                if not_found.is_file():
+                    return FileResponse(not_found, status_code=404)
                 return JSONResponse(status_code=404, content={"detail": "Not found"})
             # API routes are matched before this catch-all.
             candidate = frontend / path

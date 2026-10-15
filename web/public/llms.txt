@@ -6,7 +6,6 @@
 
 ## PDF Editor
 
-- [PDF Editor](https://pdfedi.onrender.com/editor): Edit PDF text directly, add images and shapes, sign documents, redact content — all in the browser. Files stay on the device.
 
 ## Organize
 
