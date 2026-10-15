@@ -170,6 +170,19 @@ describe('exportAnnotatedPdf with form fields', () => {
     assert.ok(Math.abs(w.width - 180) < 2 && Math.abs(w.height - 24) < 2);
   });
 
+  it('exports a created field with the chosen font size in its DA string', async () => {
+    const el = createdField({ name: 'field1', value: 'big text', fontSize: 18 });
+    const out = await exportAnnotatedPdf({
+      srcBytes: new Uint8Array(FIX('flat-form.pdf')),
+      pages: [page()],
+      elements: { [el.id]: el },
+    });
+    const doc = await PDFDocument.load(out);
+    const da = doc.getForm().getTextField('field1').acroField.getDefaultAppearance();
+    assert.ok(da, 'field has a DA entry');
+    assert.match(da, /18\s+Tf/, `DA string: ${da}`);
+  });
+
   it('suffixes created names that collide with existing source fields', async () => {
     const elements: Record<string, EditorElement> = {};
     const clash = createdField({ name: 'FullName', value: 'new' });
