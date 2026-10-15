@@ -12,7 +12,8 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { PDFDocument, PDFName } from 'pdf-lib';
+import { PDFDocument, PDFName, PDFDict, PDFRawStream } from 'pdf-lib';
+import zlib from 'node:zlib';
 import {
   detectFormFields,
   applyFormFills,
@@ -181,6 +182,39 @@ describe('exportAnnotatedPdf with form fields', () => {
     const da = doc.getForm().getTextField('field1').acroField.getDefaultAppearance();
     assert.ok(da, 'field has a DA entry');
     assert.match(da, /18\s+Tf/, `DA string: ${da}`);
+  });
+
+  it('positions exported field text at the appearance inset with a centred baseline', async () => {
+    // Canonical case: 180x24pt field at (100,600), 12pt font, value "Ada".
+    // pdf-lib draws the widget box expanded 0.5pt per side, then insets the
+    // text area by borderWidth (1) + padding (1) = 2 in appearance-local
+    // coordinates, and centres the single line (lineHeight = 12 * 1.2 =
+    // 14.4 within the 21pt-high text area), which puts the baseline at
+    // y = 8.192. The editor's overlay input mirrors this with zero
+    // padding/margin and lineHeight 1.2 (apps/web ElementOverlay), so any
+    // change to the exporter's text placement must break this test loudly
+    // rather than silently shifting text in exported PDFs.
+    const el = createdField({ name: 'field1', value: 'Ada', fontSize: 12 });
+    const out = await exportAnnotatedPdf({
+      srcBytes: new Uint8Array(FIX('flat-form.pdf')),
+      pages: [page()],
+      elements: { [el.id]: el },
+    });
+    const doc = await PDFDocument.load(out);
+    const field = doc.getForm().getTextField('field1');
+    const widget = field.acroField.getWidgets()[0];
+    const rect = widget.getRectangle();
+    assert.ok(Math.abs(rect.x - 99.5) < 0.6 && Math.abs(rect.y - 599.5) < 0.6, JSON.stringify(rect));
+    assert.ok(Math.abs(rect.width - 181) < 0.6 && Math.abs(rect.height - 25) < 0.6, JSON.stringify(rect));
+    const ap = widget.dict.lookup(PDFName.of('AP')) as PDFDict;
+    const normal = ap.lookup(PDFName.of('N')) as PDFRawStream;
+    const content = new TextDecoder('latin1').decode(zlib.inflateSync(normal.getContents()));
+    const m = /1 0 0 1 ([\d.]+) ([\d.]+) Tm\s*<416461> Tj/.exec(content);
+    assert.ok(m, `text op for "Ada" not found in appearance stream:\n${content}`);
+    const tx = parseFloat(m[1]);
+    const ty = parseFloat(m[2]);
+    assert.ok(Math.abs(tx - 2) < 0.001, `text x inset = ${tx}, expected 2 (border 1 + padding 1)`);
+    assert.ok(Math.abs(ty - 8.192) < 0.01, `text baseline y = ${ty}, expected 8.192 (centred line)`);
   });
 
   it('suffixes created names that collide with existing source fields', async () => {
