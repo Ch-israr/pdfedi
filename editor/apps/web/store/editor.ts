@@ -423,13 +423,24 @@ export const useEditor = create<EditorState>()(
                 el.fieldOrder = order;
                 s.elements[el.id] = el;
               }
-              if (bound.length > 0 && !s.notice) {
-                s.notice = {
-                  kind: 'info',
-                  message:
-                    `Detected ${bound.length} form field${bound.length === 1 ? '' : 's'} in this PDF — ` +
-                    'click a field to fill it.',
-                };
+              if (!s.notice) {
+                if (bound.length > 0) {
+                  s.notice = {
+                    kind: 'info',
+                    message:
+                      `Detected ${bound.length} form field${bound.length === 1 ? '' : 's'} in this PDF — ` +
+                      'click a field to fill it.' +
+                      (skipped > 0
+                        ? ` ${skipped} field${skipped === 1 ? '' : 's'} couldn't be made fillable (unsupported type).`
+                        : ''),
+                  };
+                } else if (skipped > 0) {
+                  s.notice = {
+                    kind: 'info',
+                    message:
+                      `This PDF has ${skipped} form field${skipped === 1 ? '' : 's'} that can't be filled in the editor (unsupported type).`,
+                  };
+                }
               }
             });
           }
