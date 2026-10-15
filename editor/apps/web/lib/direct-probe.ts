@@ -12,6 +12,14 @@ import type { NativeTextItem } from '@pdfeditor/shared';
 export interface DirectProbeResult {
   editable: boolean;
   colorHex?: string;
+  /** Exact (unrounded) font size of the matched run. */
+  fontSize?: number;
+  /** The run font's /BaseFont, e.g. "BCDHEE+Cambria-Bold". */
+  fontBaseName?: string;
+  /** Closest editor font for the run (standard-font fallback mapping). */
+  fontFamily?: string;
+  bold?: boolean;
+  italic?: boolean;
   reason?: string;
 }
 
@@ -49,7 +57,16 @@ export function probeDirectEdit(
         baselineX,
         baselineY,
       });
-      return { editable: r.editable, colorHex: r.colorHex, reason: r.reason };
+      return {
+        editable: r.editable,
+        colorHex: r.colorHex,
+        fontSize: r.fontSize,
+        fontBaseName: r.fontBaseName,
+        fontFamily: r.fontFamily,
+        bold: r.bold,
+        italic: r.italic,
+        reason: r.reason,
+      };
     } catch {
       return {
         editable: false,

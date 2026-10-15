@@ -2,6 +2,7 @@
 
 import { useRef, useState, useCallback, useEffect } from 'react';
 import type { EditorElement, NativeTextItem, Page } from '@pdfeditor/shared';
+import { findUnencodableChars } from '@pdfeditor/shared';
 import { useEditor, type ToolId } from '@/store/editor';
 import { calcGuides, type Guide } from '@/lib/smart-guides';
 import {
@@ -884,6 +885,12 @@ export function ElementOverlay({ page }: { page: Page }) {
         initialText: string;
         /** Fill colour captured from the fragment's content-stream run */
         probeColor?: string;
+        /** Exact font size of the fragment's run (unrounded, from the probe) */
+        probeFontSize?: number;
+        /** Closest editor font for the run's embedded font (probe-mapped) */
+        probeFontFamily?: string;
+        probeBold?: boolean;
+        probeItalic?: boolean;
       }
     | null
   >(null);
@@ -931,6 +938,26 @@ export function ElementOverlay({ page }: { page: Page }) {
     (text: string) => {
       if (!editingText) return;
       const et = editingText;
+      // WRITABILITY GATE (P0): replacement and added text are written
+      // with the standard PDF fonts (WinAnsi). Characters outside that
+      // set cannot be drawn at all — committing them would produce an
+      // edit that exports invisibly or, for native text, destroys the
+      // original run while its replacement never appears. Refuse the
+      // commit BEFORE anything changes, explain why, and keep the
+      // editor open so the text can be fixed or cancelled (Escape).
+      // Unchanged text (a no-op open/close) and deletions are exempt.
+      const isUnchanged = et.mode !== 'new' && text === et.initialText;
+      if (!isUnchanged && text.trim()) {
+        const bad = findUnencodableChars(text);
+        if (bad.length > 0) {
+          const shown = bad.slice(0, 6).join(' ');
+          useEditor.getState().showNotice({
+            kind: 'warning',
+            message: `Some characters can't be written with the editor's built-in fonts yet (${shown}). The change was not applied — the original text is unchanged. Latin-based alphabets, accented letters and common punctuation are supported.`,
+          });
+          return;
+        }
+      }
       lastTextCommitAt.current = Date.now();
       setEditingText(null);
       if (et.mode === 'edit') {
@@ -977,13 +1004,20 @@ export function ElementOverlay({ page }: { page: Page }) {
               width: item.width,
               height: item.height,
               baselineOffset: item.baselineOffset,
-              fontSize: item.fontSize,
-              fontFamily: item.fontFamily,
+              // Seed the replacement's font from the probe's reading of
+              // the actual content-stream run — its exact (unrounded)
+              // size and the documented closest standard family with the
+              // run's weight/style — not from the PDF.js text item,
+              // whose font name is an opaque internal id for many
+              // producers, which silently degraded every edit to plain
+              // Helvetica regular.
+              fontSize: et.probeFontSize ?? item.fontSize,
+              fontFamily: et.probeFontFamily ?? item.fontFamily,
               // Preserve the original run's colour (captured by the probe);
               // previously this was always black.
               color: et.probeColor ?? '#000000',
-              bold: item.bold,
-              italic: item.italic,
+              bold: et.probeBold ?? item.bold,
+              italic: et.probeItalic ?? item.italic,
               // Pin the original fragment position: the element's x/y may
               // be moved afterwards; export matches the ORIGINAL run
               // against this anchor, so moving never resurrects the text.
@@ -1250,6 +1284,10 @@ export function ElementOverlay({ page }: { page: Page }) {
             fontSize: hit.fontSize,
             initialText: hit.text,
             probeColor: probe.colorHex,
+            probeFontSize: probe.fontSize,
+            probeFontFamily: probe.fontFamily,
+            probeBold: probe.bold,
+            probeItalic: probe.italic,
           });
           return;
         }

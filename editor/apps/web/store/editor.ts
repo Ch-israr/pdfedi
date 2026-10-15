@@ -69,6 +69,12 @@ interface EditorState {
   downloading: boolean;
   /** Error message from a failed download (shown to user, cleared on next attempt) */
   downloadError: string | null;
+  /**
+   * Native-text edits the last export could NOT apply (replacement text
+   * unwritable with the standard fonts). Their original text was kept in
+   * the output; download() surfaces them instead of claiming full success.
+   */
+  lastExportFailures: Array<{ originalText: string; unsupportedChars: string[] }>;
   error: string | null;
   /** Dismissible informational banner (restore status, scanned notice, …) */
   notice: { kind: 'info' | 'success' | 'warning'; message: string } | null;
@@ -202,6 +208,7 @@ export const useEditor = create<EditorState>()(
     loading: false,
     downloading: false,
     downloadError: null,
+    lastExportFailures: [],
     error: null,
     notice: null,
     nativeText: {},
@@ -863,6 +870,9 @@ export const useEditor = create<EditorState>()(
         s.pages.some((p, i) => p.sourceIndex !== i + 1 || (p.rotation ?? 0) !== 0);
       const untouched = s.past.length === 0 && s.future.length === 0;
       if (!hasElements && !pagesModified && untouched) {
+        set((st) => {
+          st.lastExportFailures = [];
+        });
         return s.pdfBytes;
       }
 
@@ -872,7 +882,7 @@ export const useEditor = create<EditorState>()(
       // embedded source PDF — re-editability comes from the PDF's own
       // annotation layer, and file size grows only by the annotations
       // themselves (~1 KB per object, not a second copy of the document).
-      const { exportAnnotatedPdf, applyFormFills } = await loadPdfCore();
+      const { exportAnnotatedPdfWithReport, applyFormFills } = await loadPdfCore();
       // FORM FIELDS — fill existing (Phase A): write bound field values
       // onto the source document's own AcroForm FIRST, then run the
       // export pipeline on the resulting bytes. The pipeline's page
@@ -881,11 +891,21 @@ export const useEditor = create<EditorState>()(
       // form stays interactive. applyFormFills is a no-op passthrough
       // when no bound fields exist.
       const baseBytes = await applyFormFills(s.pdfBytes, s.elements);
-      return exportAnnotatedPdf({
+      const { bytes, report } = await exportAnnotatedPdfWithReport({
         srcBytes: baseBytes,
         pages: s.pages,
         elements: s.elements,
       });
+      // Remember any native-text edits that could not be applied (their
+      // originals were preserved in the output) so download() can warn
+      // instead of presenting the export as a complete success.
+      set((st) => {
+        st.lastExportFailures = report.failedNativeEdits.map((f) => ({
+          originalText: f.originalText,
+          unsupportedChars: f.unsupportedChars,
+        }));
+      });
+      return bytes;
     },
 
     download: async () => {
@@ -900,6 +920,20 @@ export const useEditor = create<EditorState>()(
       });
       try {
         const bytes = await get().exportBytes();
+        // Surface any native-text edits the export could not apply
+        // (unwritable characters): they were left as the original text
+        // in the file — never present that as a fully successful edit.
+        const failures = get().lastExportFailures;
+        if (failures.length > 0) {
+          const first = failures[0];
+          get().showNotice({
+            kind: 'warning',
+            message:
+              failures.length === 1
+                ? `One text edit ("${first.originalText}") couldn't be written with the editor's built-in fonts, so its original text was kept in the downloaded file.`
+                : `${failures.length} text edits couldn't be written with the editor's built-in fonts, so their original text was kept in the downloaded file.`,
+          });
+        }
         const blob = new Blob([bytes as unknown as BlobPart], { type: 'application/pdf' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
