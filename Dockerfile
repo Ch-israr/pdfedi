@@ -33,6 +33,25 @@ RUN pnpm --filter @pdfeditor/shared build \
  && pnpm --filter @pdfeditor/pdf-core build \
  && pnpm --filter @pdfeditor/web build
 
+# Obfuscate the shipped editor JS (user order 2026-10-15): string-array +
+# base64 + split-strings only — no control-flow flattening, self-defending or
+# debug protection, so runtime behaviour is unchanged. Settings were proven
+# against the production bundle locally (every file still parses and the
+# editor passes a full open/edit/export smoke test). Reverting = delete this
+# step and redeploy.
+RUN cd /build/editor/apps/web/out \
+ && find . -name '*.js' -type f | while read -r f; do \
+      npx -y javascript-obfuscator@4 "$f" --output obf-tmp \
+        --compact true --string-array true --string-array-encoding base64 \
+        --string-array-threshold 0.75 --string-array-rotate true \
+        --string-array-shuffle true --split-strings true \
+        --split-strings-chunk-length 10 --control-flow-flattening false \
+        --dead-code-injection false --self-defending false \
+        --debug-protection false --rename-globals false \
+      && mv "obf-tmp/$(basename "$f")" "$f" && rmdir obf-tmp; \
+    done \
+ && find . -name '*.js' -type f | wc -l
+
 # ---- Stage 2: Python runtime ----
 FROM python:3.12-slim
 # tesseract-ocr powers the OCR tool (pytesseract). The stock Ubuntu
