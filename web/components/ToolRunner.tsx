@@ -20,6 +20,14 @@ const ACTIVITY_LABEL: Record<string, string> = {
   optimizing: "Optimizing",
 };
 
+// The server resets quota windows on the clock hour. Render the upcoming
+// reset in local 24h time, e.g. "14:00".
+function quotaResetTime(): string {
+  const d = new Date();
+  d.setHours(d.getHours() + 1, 0, 0, 0);
+  return `${String(d.getHours()).padStart(2, "0")}:00`;
+}
+
 export function ToolRunner({ toolKey }: { toolKey: string }) {
   const [spec, setSpec] = useState<ToolSpec | null>(null);
   const [files, setFiles] = useState<UploadedFile[]>([]);
@@ -162,6 +170,9 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       await pollJob(j.id);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e));
+      // A 429 here means the quota is spent — refresh so the reset-time
+      // display and the disabled run state show up immediately.
+      api.quota(toolKey).then(setQuota).catch(() => {});
       setPhase("options");
     } finally {
       setBusy(false);
@@ -244,6 +255,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       {quota && (
         <p className="mt-2 text-xs text-slate-500">
           {quota.remaining} of {quota.limit} free uses left this hour
+          {quota.remaining === 0 && <> · Resets at {quotaResetTime()}</>}
         </p>
       )}
 
@@ -380,7 +392,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
             </div>
           ))}
           <button
-            disabled={busy}
+            disabled={busy || quota?.remaining === 0}
             onClick={() => startJob(files, options)}
             className="w-full rounded-xl bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
           >
