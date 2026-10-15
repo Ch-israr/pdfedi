@@ -8,7 +8,7 @@ import time
 import uuid
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File as FastAPIFile, HTTPException, Request, UploadFile
+from fastapi import APIRouter, Depends, File as FastAPIFile, HTTPException, Request, Response, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -282,7 +282,7 @@ class JobCreate(BaseModel):
 
 
 @router.post("/jobs", status_code=202)
-def create_job(payload: JobCreate, request: Request, db: Session = Depends(get_db)):
+def create_job(payload: JobCreate, request: Request, response: Response, db: Session = Depends(get_db)):
     """Create a job and start it in the background.
 
     Returns 202 immediately with status `queued`. Poll GET /jobs/{id} for
@@ -292,10 +292,27 @@ def create_job(payload: JobCreate, request: Request, db: Session = Depends(get_d
     try:
         job = jobs.create_job(db, payload.tool_key, payload.file_ids, payload.config or {}, ip)
     except jobs.UploadError as e:
+        if e.status_code == 429:
+            # Quota exhausted: same error body as before, plus Sejda-style
+            # rate-limit headers so clients need no extra call.
+            raise HTTPException(status_code=429, detail=str(e), headers=_ratelimit_headers(db, ip, payload.tool_key))
         raise _as_http_error(e)
     jobs.enqueue_job(job.id, ip)
     db.refresh(job)
+    # Sejda-style rate-limit headers on the success response, re-queried after
+    # creation so they reflect the current quota state. Bodies/statuses unchanged.
+    response.headers.update(_ratelimit_headers(db, ip, payload.tool_key))
     return job_to_dict(job)
+
+
+def _ratelimit_headers(db: Session, ip: str, tool_key: str) -> dict:
+    from .. import quotas as quota_mod
+
+    _, used, limit = quota_mod.check_quota(db, ip, tool_key)
+    return {
+        "X-RateLimit-Limit": str(limit),
+        "X-RateLimit-Remaining": str(max(0, limit - used)),
+    }
 
 
 @router.get("/jobs/{job_id}")
