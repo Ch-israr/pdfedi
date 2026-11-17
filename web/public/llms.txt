@@ -1,6 +1,6 @@
 # PDFEDI
 
-> PDFEDI is a free online PDF toolkit. 22 PDF tools plus a full in-browser PDF editor.
+> PDFEDI is a free online PDF toolkit. 26 PDF tools plus a full in-browser PDF editor.
 > No sign-up, no watermarks. Files are processed securely and deleted automatically.
 > Each tool is free up to 5 times per hour; max file size 50MB.
 
@@ -31,6 +31,7 @@
 
 ## Optimize
 
+- [Compress PDF](https://pdfedi.onrender.com/tools/compress): Shrink a PDF to a target size (2–50 MB), e.g. a court e-filing limit. Batch up to 10 files, ZIP download with a size report.
 
 ## Security
 
@@ -38,6 +39,13 @@
 - [Unlock PDF](https://pdfedi.onrender.com/tools/unlock_pdf): Remove password protection with the correct password.
 - [Redact](https://pdfedi.onrender.com/tools/redact): Permanently black out sensitive text by exact match.
 - [Flatten PDF](https://pdfedi.onrender.com/tools/flatten): Bake annotations and form fields permanently into pages.
+- [Strip Image Metadata](https://pdfedi.onrender.com/tools/strip_image_metadata): Remove EXIF and GPS metadata from JPG, PNG and WebP images, with a before/after report.
+
+## For Lawyers
+
+- [Lawyers](https://pdfedi.onrender.com/lawyers): PDF tools for lawyers — 12 short guides for filing work.
+- [Combine Exhibits](https://pdfedi.onrender.com/tools/exhibit_combine): Combine 2–20 PDFs into one filing-ready document with slip sheets and Bates numbers.
+- [Strip Metadata](https://pdfedi.onrender.com/tools/strip_metadata): Remove all document metadata from a PDF in one click, with a before/after report.
 
 ## Privacy
 
