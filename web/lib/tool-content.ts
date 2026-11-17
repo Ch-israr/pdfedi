@@ -335,7 +335,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Yes — enter page ranges like 1-3,5 and only those pages are converted.",
       },
     ],
-    related: ["images_to_pdf", "thumbnails", "extract_text"],
+    related: ["images_to_pdf", "extract_text"],
   },
 
   images_to_pdf: {
@@ -382,48 +382,6 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
       },
     ],
     related: ["pdf_to_images", "ocr", "merge"],
-  },
-
-  thumbnails: {
-    key: "thumbnails",
-    title: "PDF Thumbnails Online Free — Page Contact Sheet | PDFEDI",
-    description:
-      "Generate a thumbnail contact sheet of your PDF pages online for free. Preview all pages at a glance in a single PNG grid image. No sign-up required.",
-    h1: "Page Thumbnails",
-    intro:
-      "See every page of your PDF at a glance. This tool renders a contact sheet — a single PNG image with small thumbnails of your pages arranged in a grid. Choose the number of columns, thumbnail width, and which pages to include.",
-    howTo: [
-      "Upload your PDF file (up to 50MB).",
-      "Set the number of columns, thumbnail width, and page ranges (optional).",
-      "Click Generate and download the PNG contact sheet.",
-    ],
-    features: [
-      "Contact sheet of all or selected pages",
-      "Adjustable columns and thumbnail width",
-      "Single PNG output",
-      "Up to 50 thumbnails per sheet",
-    ],
-    useCases: [
-      "Preview a long document's layout at a glance",
-      "Check scan quality across all pages",
-      "Create a visual index of a PDF",
-      "Spot blank or damaged pages quickly",
-    ],
-    faqs: [
-      {
-        q: "What is a PDF thumbnail contact sheet?",
-        a: "A single image showing small previews of many PDF pages arranged in a grid — like a photographer's contact sheet. It lets you scan a whole document visually in seconds.",
-      },
-      {
-        q: "How many thumbnails can I generate?",
-        a: "Up to 50 thumbnails per contact sheet.",
-      },
-      {
-        q: "Can I choose which pages appear?",
-        a: "Yes — enter page ranges like 1-10, or leave empty to include all pages.",
-      },
-    ],
-    related: ["pdf_to_images", "split", "metadata"],
   },
 
   ocr: {
@@ -517,7 +475,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "It reflects what the PDF's creator stored in the file. Some PDFs have empty or generic metadata if the authoring software didn't fill it in.",
       },
     ],
-    related: ["edit_metadata", "extract_text", "thumbnails", "unlock_pdf"],
+    related: ["edit_metadata", "extract_text", "unlock_pdf"],
   },
 
   edit_metadata: {
@@ -859,92 +817,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Cropping adjusts each page's visible crop box. The hidden content is not rewritten, so for permanent removal of sensitive content use the Redact tool instead.",
       },
     ],
-    related: ["resize_pages", "delete_pages", "rotate_pages", "n_up"],
-  },
-
-  extract_images: {
-    key: "extract_images",
-    title: "Extract Images from PDF Online Free — Save as ZIP | PDFEDI",
-    description:
-      "Extract all images embedded in a PDF online for free. Original JPEGs are kept as-is, other formats export as PNG, delivered in one ZIP file. No sign-up needed.",
-    h1: "Extract Images",
-    intro:
-      "Pull every picture embedded in a PDF out into individual image files. Photos and graphics are collected across all pages, duplicates are removed, and everything arrives in a single ZIP download.",
-    howTo: [
-      "Upload your PDF file (up to 50MB).",
-      "Click Extract — the tool scans every page for embedded images.",
-      "Download the ZIP and unzip it to get your image files.",
-    ],
-    features: [
-      "Extracts images from every page at original quality",
-      "JPEG images kept in their original format",
-      "Duplicate images included only once",
-      "All images delivered in one ZIP file",
-    ],
-    useCases: [
-      "Recover photos from a PDF report or catalogue",
-      "Reuse charts and diagrams in a presentation",
-      "Get product images out of a supplier's PDF",
-      "Save scanned artwork embedded in a portfolio PDF",
-    ],
-    faqs: [
-      {
-        q: "What image formats will I get?",
-        a: "Images stored as JPEG in the PDF are extracted byte-for-byte as .jpg files. Other embedded formats are converted to PNG so nothing is lost.",
-      },
-      {
-        q: "Why did the tool say no images were found?",
-        a: "Some PDFs contain no embedded images — for example, text-only documents, or scanned pages saved as one full-page picture per page is actually an embedded image and will be extracted. If a page was rendered from vector shapes, there is no image to extract; use PDF to Images to render pages as pictures instead.",
-      },
-      {
-        q: "Will the extracted images be full quality?",
-        a: "Yes — images are taken from the PDF exactly as stored, at their original resolution, with no recompression for JPEGs.",
-      },
-    ],
-    related: ["pdf_to_images", "images_to_pdf", "thumbnails"],
-  },
-
-  resize_pages: {
-    key: "resize_pages",
-    title: "Resize PDF Pages Online Free — A4, A5, Letter, Legal | PDFEDI",
-    description:
-      "Resize PDF pages to A4, A5, Letter or Legal online for free. Fit content proportionally or stretch to fill the new page size. No sign-up, quality preserved.",
-    h1: "Resize Pages",
-    intro:
-      "Change the page size of your whole PDF in one go — turn a Letter document into A4 for European printing, or shrink pages to A5 for booklets. Your content is scaled to fit the new size.",
-    howTo: [
-      "Upload your PDF file (up to 50MB).",
-      "Choose the target page size: A4, A5, Letter or Legal.",
-      "Pick Fit to scale content proportionally, or Stretch to fill the page.",
-      "Click Resize and download the converted PDF.",
-    ],
-    features: [
-      "Standard sizes: A4, A5, Letter and Legal",
-      "Fit mode preserves proportions — no distorted text",
-      "Stretch mode fills the entire page",
-      "Applied to every page in one run",
-    ],
-    useCases: [
-      "Convert US Letter documents to A4 before printing abroad",
-      "Shrink A4 pages to A5 for booklet printing",
-      "Standardize mixed-size PDFs into one uniform size",
-      "Prepare documents for a printer that requires a specific size",
-    ],
-    faqs: [
-      {
-        q: "What is the difference between Fit and Stretch?",
-        a: "Fit scales your content proportionally so nothing is distorted, adding margins if the aspect ratio differs. Stretch scales horizontally and vertically independently to fill the whole page, which can distort content.",
-      },
-      {
-        q: "Will resizing reduce the quality of my PDF?",
-        a: "No. Your pages are placed onto the new size as vector content — text stays sharp and selectable, images keep their resolution.",
-      },
-      {
-        q: "Can I resize to a custom size?",
-        a: "This tool covers the four standard sizes most printing and sharing workflows need: A4 (595×842pt), A5 (420×595pt), Letter (612×792pt) and Legal (612×1008pt).",
-      },
-    ],
-    related: ["crop", "n_up", "merge", "rotate_pages"],
+    related: ["delete_pages", "rotate_pages", "n_up"],
   },
 
   grayscale: {
@@ -986,7 +859,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "Usually yes for colour, image-heavy documents, because colour information is dropped. Text-only PDFs may grow slightly because pages become images — the Compress tool is better for those.",
       },
     ],
-    related: ["pdf_to_images", "ocr", "resize_pages"],
+    related: ["pdf_to_images", "ocr"],
   },
 
   n_up: {
@@ -1029,7 +902,7 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
         a: "4-up in landscape works well for most slide decks. Use 2-up if you need to read annotations, and 6 or 9-up only for overviews — text gets small.",
       },
     ],
-    related: ["resize_pages", "crop", "merge", "split"],
+    related: ["crop", "merge", "split"],
   },
 
   repair: {
@@ -1072,49 +945,6 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
       },
     ],
     related: ["unlock_pdf", "merge", "metadata"],
-  },
-
-  compare: {
-    key: "compare",
-    title: "Compare Two PDFs Online Free — Highlight Differences | PDFEDI",
-    description:
-      "Compare two PDFs online for free. Changed regions are boxed in red, added or removed pages are marked. Identical files are reported honestly instead of a useless diff.",
-    h1: "Compare PDF",
-    intro:
-      "See exactly what changed between two versions of a document. Upload the original and the revised file — every changed region is boxed in red on the revised pages, and added or removed pages are clearly marked.",
-    howTo: [
-      "Upload the original PDF as the first file (up to 50MB).",
-      "Upload the revised PDF as the second file.",
-      "Click Compare — pages are rendered and differenced one by one.",
-      "Download the annotated diff document with red change boxes.",
-    ],
-    features: [
-      "Changed regions boxed in red on revised pages",
-      "Added and removed pages clearly marked",
-      "Pixel-level comparison with noise filtering",
-      "Honest 'identical' result instead of a useless diff",
-    ],
-    useCases: [
-      "Review contract revisions before signing",
-      "Check what changed between document drafts",
-      "Audit invoice or report versions for tampering",
-      "Verify a regenerated PDF matches the approved original",
-    ],
-    faqs: [
-      {
-        q: "What happens if the two PDFs are identical?",
-        a: "You get a clean message saying no differences were found — instead of a pointless diff document. It's the fastest way to confirm two files match.",
-      },
-      {
-        q: "Can I compare PDFs with different page counts?",
-        a: "Yes. Pages present in only one file are included in the output with a red border and an 'added' or 'removed' label, so nothing slips past review.",
-      },
-      {
-        q: "How sensitive is the comparison?",
-        a: "Pages are rendered at 150 DPI and compared pixel by pixel with a noise threshold, so font rendering differences and invisible metadata changes don't trigger false positives. Each file can have up to 50 pages.",
-      },
-    ],
-    related: ["merge", "split", "reorder_pages", "extract_text"],
   },
 
   pdf_to_word: {
