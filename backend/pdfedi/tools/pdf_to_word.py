@@ -15,7 +15,7 @@ from pathlib import Path
 from pypdf import PdfReader
 from pypdf.generic import ArrayObject, ContentStream
 
-from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._helpers import _pil_from_xobject, open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -23,7 +23,6 @@ from pdfedi.tools.base import (
     ToolSpec,
     get_option,
 )
-from pdfedi.tools.extract_images import _pil_from_xobject
 
 SPEC = ToolSpec(
     key="pdf_to_word",
