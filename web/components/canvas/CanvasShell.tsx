@@ -1,0 +1,252 @@
+// Canvas shell — the shared frame for the five organizer tools.
+//
+// Top bar (tool name, file name, reset), centre workspace (the tool's
+// toolbar + thumbnail grid, passed as children), sticky bottom action
+// bar (what-will-happen summary, the exact job payload in a
+// collapsible "What will be sent", and the Process button), plus the
+// upload dropzone and the processing/completed/failed views. Tier 0
+// tools keep the existing ToolRunner; this replaces its `max-w-2xl`
+// single column for canvas tools only.
+"use client";
+
+import { useRef, useState, type ReactNode } from "react";
+import type { CanvasPhase } from "./useOrganizerJob";
+
+interface CanvasShellProps {
+  toolName: string;
+  description: string;
+  fileLabel: string;
+  quota: { used: number; limit: number; remaining: number } | null;
+  maxFiles: number;
+  maxUploadMb: number;
+  phase: CanvasPhase;
+  busy: boolean;
+  uploadPending: boolean;
+  totalPages: number;
+  summary: string;
+  payload: unknown;
+  payloadError: string | null;
+  processLabel: string;
+  canProcess: boolean;
+  onProcess: () => void;
+  onPick: (files: File[]) => void;
+  onReset: () => void;
+  onBackToOrganize: () => void;
+  onDownload: () => void;
+  downloadPct: number | null;
+  activityLabel: string;
+  error: string | null;
+  children: ReactNode;
+}
+
+export function CanvasShell({
+  toolName,
+  description,
+  fileLabel,
+  quota,
+  maxFiles,
+  maxUploadMb,
+  phase,
+  busy,
+  uploadPending,
+  totalPages,
+  summary,
+  payload,
+  payloadError,
+  processLabel,
+  canProcess,
+  onProcess,
+  onPick,
+  onReset,
+  onBackToOrganize,
+  onDownload,
+  downloadPct,
+  activityLabel,
+  error,
+  children,
+}: CanvasShellProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  const showDropzone = phase === "pick" || phase === "uploading";
+  const showWorkspace = phase === "organize" || phase === "processing" || phase === "completed" || phase === "failed";
+
+  return (
+    <div className="mx-auto max-w-6xl">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <h1 className="text-2xl font-extrabold tracking-tight sm:text-3xl">{toolName}</h1>
+          <p className="mt-1 text-sm text-slate-600">{description}</p>
+        </div>
+        {phase !== "pick" && (
+          <button
+            onClick={onReset}
+            className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:border-brand-600 hover:text-brand-600"
+          >
+            Start over
+          </button>
+        )}
+      </div>
+      {quota && (
+        <p className="mt-2 text-xs text-slate-500">
+          {quota.remaining} of {quota.limit} free uses left this hour
+          {uploadPending && <> · Uploading to server…</>}
+        </p>
+      )}
+
+      {error && phase !== "failed" && (
+        <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
+      {totalPages > 200 && showWorkspace && (
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          Large document ({totalPages} pages). Thumbnails load as you scroll; Split
+          produces at most 200 output files per job.
+        </div>
+      )}
+      {totalPages > 50 && totalPages <= 200 && showWorkspace && (
+        <p className="mt-3 text-xs text-slate-500">
+          {totalPages} pages — thumbnails load as you scroll.
+        </p>
+      )}
+
+      {showDropzone && (
+        <div
+          role="button"
+          tabIndex={0}
+          aria-label={`Choose PDF file${maxFiles > 1 ? "s" : ""}`}
+          className={`mt-6 cursor-pointer rounded-2xl border-2 border-dashed px-6 py-14 text-center ${
+            dragOver || phase === "uploading"
+              ? "border-brand-500 bg-brand-50"
+              : "border-slate-300 bg-white hover:border-brand-500"
+          }`}
+          onClick={() => phase === "pick" && inputRef.current?.click()}
+          onKeyDown={(e) => {
+            if (e.key === "Enter" && phase === "pick") inputRef.current?.click();
+          }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragOver(true);
+          }}
+          onDragLeave={() => setDragOver(false)}
+          onDrop={(e) => {
+            e.preventDefault();
+            setDragOver(false);
+            if (phase !== "pick") return;
+            const dropped = Array.from(e.dataTransfer.files).filter((f) =>
+              f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf"),
+            );
+            if (dropped.length > 0) onPick(dropped.slice(0, maxFiles));
+          }}
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="application/pdf,.pdf"
+            multiple={maxFiles > 1}
+            className="hidden"
+            onChange={(e) => {
+              const list = e.target.files ? Array.from(e.target.files) : [];
+              e.target.value = "";
+              if (list.length > 0) onPick(list.slice(0, maxFiles));
+            }}
+          />
+          <p className="text-lg font-semibold">
+            {phase === "uploading" ? "Uploading…" : "Drop PDF file(s) here or click to choose"}
+          </p>
+          <p className="mt-1 text-sm text-slate-500">
+            Up to {maxFiles} file(s), {maxUploadMb}&nbsp;MB each. No sign-up needed.
+            Files are processed on our server — previews below are rendered in your browser.
+          </p>
+        </div>
+      )}
+
+      {showWorkspace && (
+        <>
+          <p className="mt-4 text-sm text-slate-600">
+            <span className="font-semibold">{fileLabel}</span>
+            {totalPages > 0 && <> · {totalPages} page{totalPages === 1 ? "" : "s"}</>}
+          </p>
+          {children}
+        </>
+      )}
+
+      {phase === "organize" && (
+        <div className="sticky bottom-0 mt-6 rounded-t-2xl border-t border-slate-200 bg-white/95 px-4 py-4 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur">
+          <p className="text-sm font-semibold text-slate-800">{summary}</p>
+          {payloadError && (
+            <p className="mt-1 text-sm text-red-700">{payloadError}</p>
+          )}
+          <details className="mt-2 text-xs text-slate-500">
+            <summary className="cursor-pointer font-medium text-slate-600">
+              What will be sent
+            </summary>
+            <pre
+              data-testid="job-payload"
+              className="mt-2 overflow-auto rounded-lg bg-slate-100 p-3 text-[11px] leading-relaxed"
+            >
+              {JSON.stringify(payload, null, 2)}
+            </pre>
+          </details>
+          <button
+            data-testid="process-button"
+            disabled={busy || !canProcess || uploadPending}
+            onClick={onProcess}
+            className="mt-3 w-full rounded-xl bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+          >
+            {busy
+              ? "Starting…"
+              : uploadPending
+                ? "Uploading to server…"
+                : processLabel}
+          </button>
+        </div>
+      )}
+
+      {phase === "processing" && (
+        <div className="mt-6 rounded-2xl bg-white p-8 text-center shadow-sm">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-brand-600" />
+          <p className="mt-4 font-semibold">{activityLabel}…</p>
+          <p className="mt-1 text-sm text-slate-500">This usually takes a few seconds.</p>
+        </div>
+      )}
+
+      {phase === "failed" && (
+        <div className="mt-6 rounded-2xl border border-red-200 bg-white p-6 text-center shadow-sm">
+          <p className="text-lg font-semibold text-red-700">Failed</p>
+          <p className="mt-2 text-sm text-slate-600">{error || "Something went wrong."}</p>
+          <button
+            onClick={onBackToOrganize}
+            className="mt-4 rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700"
+          >
+            Back to editor
+          </button>
+        </div>
+      )}
+
+      {phase === "completed" && (
+        <div className="mt-6 rounded-2xl bg-white p-6 text-center shadow-sm">
+          <p className="text-lg font-semibold text-green-700">Completed</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Your file was processed on our server and is deleted automatically.
+            Files are never kept or shared.{" "}
+            <a href="/how-we-handle-files" className="font-semibold text-brand-600 hover:text-brand-700">
+              How we handle your files →
+            </a>
+          </p>
+          <button
+            onClick={onDownload}
+            className="mt-4 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
+          >
+            {downloadPct !== null && downloadPct > 0 ? `Downloading… ${downloadPct}%` : "Download result"}
+          </button>
+          <button onClick={onReset} className="mt-4 block w-full text-sm text-slate-500 hover:text-brand-600">
+            Start over
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
