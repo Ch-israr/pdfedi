@@ -5,7 +5,7 @@ export interface ToolCard {
   name: string;
   tagline: string;
   icon: string;
-  category: string; // organize | convert | edit | optimize | security
+  category: string; // organize | convert | edit | optimize | security | legal
 }
 
 export interface Category {
@@ -21,6 +21,7 @@ export const CATEGORIES: Category[] = [
   { key: "edit", name: "Edit", tagline: "Tweak content and document info", icon: "✏️" },
   { key: "optimize", name: "Optimize", tagline: "Make files smaller and faster", icon: "🗜️" },
   { key: "security", name: "Security", tagline: "Protect, unlock and finalize documents", icon: "🔒" },
+  { key: "legal", name: "For Lawyers", tagline: "Filing-ready redaction, exhibits and court-size files", icon: "⚖️" },
 ];
 
 export const TOOL_CARDS: ToolCard[] = [
@@ -41,11 +42,15 @@ export const TOOL_CARDS: ToolCard[] = [
   { key: "page_numbers", name: "Page Numbers", tagline: "Add page numbers", icon: "🔢", category: "edit" },
   { key: "crop", name: "Crop PDF", tagline: "Trim margins from pages", icon: "🔲", category: "edit" },
   { key: "grayscale", name: "Grayscale PDF", tagline: "Convert pages to black and white", icon: "🩶", category: "optimize" },
+  { key: "compress", name: "Compress PDF", tagline: "Shrink a PDF to a target size for filing", icon: "🗜️", category: "optimize" },
   { key: "repair", name: "Repair PDF", tagline: "Fix corrupted or unreadable PDFs", icon: "🛠️", category: "optimize" },
   { key: "password_protect", name: "Protect PDF", tagline: "Add a password to a PDF", icon: "🔒", category: "security" },
   { key: "unlock_pdf", name: "Unlock PDF", tagline: "Remove password protection", icon: "🔓", category: "security" },
   { key: "redact", name: "Redact", tagline: "Permanently black out text", icon: "⬛", category: "security" },
   { key: "flatten", name: "Flatten PDF", tagline: "Bake annotations into pages", icon: "🧱", category: "security" },
+  { key: "strip_image_metadata", name: "Strip Image Metadata", tagline: "Remove EXIF and GPS from photos", icon: "📸", category: "security" },
+  { key: "exhibit_combine", name: "Combine Exhibits", tagline: "Filing-ready PDF with slip sheets and Bates numbers", icon: "⚖️", category: "legal" },
+  { key: "strip_metadata", name: "Strip Metadata", tagline: "Remove hidden metadata, with a report", icon: "🧹", category: "legal" },
 ];
 
 export const TOOL_SLUGS = TOOL_CARDS.map((t) => t.key);
