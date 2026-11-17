@@ -7,12 +7,10 @@ from . import (
     crop,
     delete_pages,
     edit_metadata,
-    extract_images,
     extract_text,
     flatten,
     grayscale,
     images_to_pdf,
-    compare,
     merge,
     metadata,
     n_up,
@@ -24,10 +22,8 @@ from . import (
     redact,
     repair,
     reorder_pages,
-    resize_pages,
     rotate_pages,
     split,
-    thumbnails,
     unlock_pdf,
     watermark,
 )
@@ -35,10 +31,10 @@ from .base import ToolSpec
 
 _MODULES = [
     merge, split, rotate_pages, delete_pages, reorder_pages,
-    resize_pages, n_up, repair,
-    extract_text, pdf_to_images, images_to_pdf, thumbnails, extract_images,
+    n_up, repair,
+    extract_text, pdf_to_images, images_to_pdf,
     ocr, metadata, edit_metadata, watermark, page_numbers, crop,
-    grayscale, password_protect, unlock_pdf, redact, flatten, compare,
+    grayscale, password_protect, unlock_pdf, redact, flatten,
     pdf_to_word,
 ]
 
