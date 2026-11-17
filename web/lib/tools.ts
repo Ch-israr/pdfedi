@@ -54,3 +54,15 @@ export const TOOL_CARDS: ToolCard[] = [
 ];
 
 export const TOOL_SLUGS = TOOL_CARDS.map((t) => t.key);
+
+// Phase 1 organizer canvases (thumbnail-first workspaces). These slugs
+// render OrganizerTool instead of the generic ToolRunner. Kept here
+// (not in the client component) so the server tool page can branch on
+// it — importing a value out of a "use client" module is not allowed.
+export const ORGANIZER_TOOL_SLUGS = [
+  "merge",
+  "split",
+  "rotate_pages",
+  "delete_pages",
+  "reorder_pages",
+] as const;
