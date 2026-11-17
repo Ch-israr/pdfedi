@@ -57,8 +57,26 @@ export default function Home() {
         <h2 className="text-xl font-bold text-slate-800">Private by design</h2>
         <p className="mt-2">
           Files are processed on our servers and deleted automatically. We never ask for
-          an account — just pick a tool and go.
+          an account — just pick a tool and go.{" "}
+          <Link href="/how-we-handle-files" className="font-semibold text-brand-600 hover:text-brand-700">
+            How we handle your files →
+          </Link>
         </p>
+      </section>
+
+      <section className="mx-auto mt-10 max-w-3xl rounded-2xl bg-white p-6 text-center shadow-sm">
+        <h2 className="text-xl font-bold text-slate-800">⚖️ For lawyers</h2>
+        <p className="mt-2 text-sm text-slate-500">
+          True redaction, metadata stripping, court-size compression and
+          exhibit combining with Bates numbers — plus 12 short guides for
+          filing work.
+        </p>
+        <Link
+          href="/lawyers"
+          className="mt-4 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
+        >
+          See the lawyer tools →
+        </Link>
       </section>
     </div>
   );
