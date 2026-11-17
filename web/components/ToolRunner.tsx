@@ -440,6 +440,13 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       {(phase === "completed" || phase === "downloading") && (
         <div className="mt-6 rounded-2xl bg-white p-6 text-center shadow-sm">
           <p className="text-lg font-semibold text-green-700">Completed</p>
+          <p className="mt-2 text-xs text-slate-500">
+            Your file was processed on our server and is deleted automatically.
+            Files are never kept or shared.{" "}
+            <a href="/how-we-handle-files" className="font-semibold text-brand-600 hover:text-brand-700">
+              How we handle your files →
+            </a>
+          </p>
           <button
             onClick={download}
             disabled={phase === "downloading"}
