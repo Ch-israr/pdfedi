@@ -24,6 +24,7 @@ from pdfedi.tools.base import (
     ToolError,
     ToolOption,
     ToolSpec,
+    get_option,
     require_option,
 )
 
@@ -36,7 +37,10 @@ SPEC = ToolSpec(
     description=(
         "Permanently removes sensitive text from a PDF: the text is deleted "
         "from the page content, covered with black rectangles, and the output "
-        "is verified so the redacted text can no longer be extracted."
+        "is re-checked so the redacted text can no longer be extracted. "
+        "Turn on Rasterise pages for maximum certainty: every page is "
+        "rendered to an image, so no text layer survives at all (output "
+        "text is no longer selectable)."
     ),
     input_kinds=["pdf"],
     min_files=1,
@@ -48,6 +52,14 @@ SPEC = ToolSpec(
             label="Text to redact",
             required=True,
             help="Comma-separated literal strings to black out, e.g. 'SSN, john@example.com'.",
+        ),
+        ToolOption(
+            name="rasterise",
+            kind="boolean",
+            label="Rasterise pages (strongest redaction)",
+            required=False,
+            default=False,
+            help="Render every page to an image after redacting, so no text layer survives anywhere in the file. Text in the output is no longer selectable or searchable.",
         ),
     ],
     output_kind="pdf",
@@ -235,6 +247,58 @@ def run(ctx: ToolContext, options: dict) -> Path:
     # --- Step 3: verify ---
     _verify_removed(out_bytes, literals)
 
+    # --- Step 4 (optional): rasterise — render every page to an image so
+    # no text layer survives anywhere in the file, then verify again.
+    if get_option(options, SPEC, "rasterise"):
+        out_bytes = _rasterise_pdf(out_bytes)
+        _verify_removed(out_bytes, literals)
+
     out_path = ctx.new_output_path("redacted.pdf")
     out_path.write_bytes(out_bytes)
     return out_path
+
+
+def _rasterise_pdf(pdf_bytes: bytes, dpi: int = 150) -> bytes:
+    """Render every page to a JPEG image and rebuild the PDF (no text layer)."""
+    import gc
+
+    import pypdfium2 as pdfium
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas as rl_canvas
+
+    scale = dpi / 72.0
+    out = io.BytesIO()
+    pdf = rl_canvas.Canvas(out)
+    try:
+        doc = pdfium.PdfDocument(pdf_bytes)
+        try:
+            for i in range(len(doc)):
+                page = doc[i]
+                w_pt, h_pt = page.get_size()
+                try:
+                    pil_image = page.render(scale=scale).to_pil().convert("RGB")
+                finally:
+                    page.close()
+                buf = io.BytesIO()
+                pil_image.save(buf, "JPEG", quality=90, optimize=True)
+                jpeg_bytes = buf.getvalue()
+                buf.close()
+                pil_image.close()
+                del buf, pil_image
+                pdf.setPageSize((w_pt, h_pt))
+                pdf.drawImage(
+                    ImageReader(io.BytesIO(jpeg_bytes)),
+                    0, 0, width=w_pt, height=h_pt,
+                    preserveAspectRatio=True, anchor="c",
+                )
+                pdf.showPage()
+                del jpeg_bytes
+                gc.collect()
+        finally:
+            doc.close()
+    except Exception as exc:
+        raise ToolError(
+            f"Could not rasterise the redacted PDF: {exc}", code="tool_error"
+        ) from exc
+    pdf.save()
+    return out.getvalue()
