@@ -988,4 +988,192 @@ export const TOOL_CONTENT: Record<string, ToolContent> = {
     ],
     related: ["ocr", "extract_text", "images_to_pdf", "edit_metadata"],
   },
+
+  compress: {
+    key: "compress",
+    title: "Compress PDF Online Free — Shrink to a Target Size | PDFEDI",
+    description:
+      "Compress a PDF to a target size online for free. Pick a limit — e.g. 25 MB, the most common court e-filing limit — and images are downscaled until it fits. Batch up to 10 files, ZIP download.",
+    h1: "Compress PDF",
+    intro:
+      "Shrink a PDF down to a size you choose. Pick a target — 25 MB is the most common court e-filing (CM/ECF) limit, but limits vary by court from about 3 to 200 MB, so check your court's local rule first. The tool rebuilds the file and downscales embedded images until it fits, and the ZIP includes a report showing the size before and after for each file.",
+    howTo: [
+      "Upload 1 to 10 PDF files (up to 50MB each).",
+      "Choose a target size, for example 25 MB.",
+      "Click Compress and download the ZIP.",
+      "Check compression_report.txt in the ZIP — it says for each file whether the target was met.",
+    ],
+    features: [
+      "Compress to a target size: 2, 5, 10, 25 or 50 MB",
+      "Batch up to 10 PDFs, results as a ZIP",
+      "Per-file report with before/after sizes and target status",
+      "Honest result — if a target can't be reached, the report says so",
+    ],
+    useCases: [
+      "Shrink a brief under your court's e-filing size limit",
+      "Compress scanned exhibits so they can be filed or emailed",
+      "Reduce a large PDF before sending it to a client or colleague",
+      "Batch-compress a set of documents in one job",
+    ],
+    faqs: [
+      {
+        q: "What target size should I pick for court filing?",
+        a: "It depends on your court — CM/ECF limits vary from about 3 MB to 200 MB by court, and 25 MB is the most common. Check your court's local rule or e-filing guide, then pick that size here.",
+      },
+      {
+        q: "What if my PDF can't be compressed to the target?",
+        a: "You still get the smallest version the tool could make, and compression_report.txt in the ZIP says the target was missed and by how much. Try a larger target, or split the document first.",
+      },
+      {
+        q: "Will compression change how my document looks?",
+        a: "Text and layout are preserved. Embedded images are downscaled and re-encoded as JPEG, so very large photos get softer — that is where the size saving comes from. Text-only PDFs barely shrink, because there are no images to downscale.",
+      },
+      {
+        q: "Can I compress several PDFs at once?",
+        a: `Yes — upload up to 10 PDFs in one job. The results come back as a ZIP with one compressed PDF per file plus a report. ${PRIVACY_LINE}`,
+      },
+    ],
+    related: ["exhibit_combine", "strip_metadata", "split", "grayscale"],
+  },
+
+  strip_metadata: {
+    key: "strip_metadata",
+    title: "Remove PDF Metadata Online Free — Strip Hidden Info | PDFEDI",
+    description:
+      "Strip hidden metadata from a PDF online for free. Removes title, author, dates, creator and producer in one click, with a before/after report. Batch up to 10 files.",
+    h1: "Strip Metadata",
+    intro:
+      "Remove the hidden information stored inside a PDF — title, author, creation and modification dates, creator and producer software, and the XMP metadata packet — in one click. You get the cleaned PDF plus a before/after report showing exactly what was in the file and what was removed, so you can prove it before sending the file on.",
+    howTo: [
+      "Upload 1 to 10 PDF files (up to 50MB each).",
+      "Click Strip Metadata — no options to set.",
+      "Download the ZIP with cleaned PDFs and metadata_report.json.",
+      "Open the report to see what was removed from each file.",
+    ],
+    features: [
+      "One-click removal of all document metadata",
+      "Before/after report for every file (JSON)",
+      "Removes XMP metadata packets too",
+      "Batch up to 10 PDFs, results as a ZIP",
+    ],
+    useCases: [
+      "Clean a brief or exhibit before filing or sharing it",
+      "Remove author and creation details from a document sent to the other side",
+      "Strip metadata from a batch of client files before disclosure",
+      "Check what metadata a PDF you received actually contains",
+    ],
+    faqs: [
+      {
+        q: "What metadata is removed?",
+        a: "Title, author, subject, keywords, creator, producer, creation and modification dates, and the XMP metadata packet. The report lists every field before and after, so you can see exactly what changed.",
+      },
+      {
+        q: "How is this different from Edit Metadata?",
+        a: "Edit Metadata changes fields one by one — you set a new title or author. Strip Metadata removes everything in one click and proves it with a before/after report. Use Strip when the file is leaving your office; use Edit when you want to correct a field.",
+      },
+      {
+        q: "Does the cleaned PDF still have any metadata?",
+        a: "The report shows what remains. The PDF writer stamps its own producer value when the cleaned file is written — that is listed as remaining in the report, not hidden. No information from your original file survives.",
+      },
+      {
+        q: "Is it free?",
+        a: `Yes. Stripping metadata on PDFEDI is completely free with no sign-up. ${PRIVACY_LINE}`,
+      },
+    ],
+    related: ["metadata", "edit_metadata", "redact", "strip_image_metadata"],
+  },
+
+  exhibit_combine: {
+    key: "exhibit_combine",
+    title: "Combine PDF Exhibits Online Free — Slip Sheets & Bates | PDFEDI",
+    description:
+      "Combine PDF exhibits into one filing-ready document online for free. Slip sheets before each exhibit and continuous Bates-style page numbers. 2–20 PDFs, no sign-up.",
+    h1: "Combine Exhibits",
+    intro:
+      "Turn a set of PDFs into one filing-ready document. Each exhibit gets a slip sheet (Exhibit A, Exhibit B, and so on, with its filename and page count) and every exhibit page is stamped with a Bates-style number — BATES-000001, BATES-000002 — counting continuously across exhibits. Upload your exhibits in order and download a single PDF ready to file.",
+    howTo: [
+      "Upload 2 to 20 PDF files in exhibit order (up to 50MB each).",
+      "Set the exhibit label, Bates prefix and first Bates number if you want different ones.",
+      "Click Combine Exhibits and download the single PDF.",
+      "Check the slip sheets and Bates numbers on the first pages before filing.",
+    ],
+    features: [
+      "Slip sheet before each exhibit with label, filename and page count",
+      "Continuous Bates-style numbering across all exhibits",
+      "Custom exhibit label, Bates prefix and starting number",
+      "Combine 2–20 PDFs into one filing-ready file",
+    ],
+    useCases: [
+      "Assemble exhibits for a court filing in one document",
+      "Build a deposition exhibit set with Bates numbers for reference",
+      "Combine supporting documents into a single indexed bundle",
+      "Prepare a hearing binder as one PDF instead of many files",
+    ],
+    faqs: [
+      {
+        q: "What is a Bates number?",
+        a: "A Bates number is a unique sequential number stamped on every page of a document set (for example BATES-000001, BATES-000002), used so everyone in a case can refer to the same page. This tool stamps them continuously across all your exhibits.",
+      },
+      {
+        q: "What is on a slip sheet?",
+        a: "One page before each exhibit, showing the exhibit label (Exhibit A, B, C…), the original filename and how many pages that exhibit has. Slip sheets are not Bates-numbered. You can turn them off if you don't want them.",
+      },
+      {
+        q: "Can I start Bates numbering at a number other than 1?",
+        a: "Yes — set the first Bates number to continue a set you already started, for example 501 to pick up where an earlier production left off.",
+      },
+      {
+        q: "What order do the exhibits go in?",
+        a: `The order you upload them in. Upload Exhibit A first, then B, then C. ${PRIVACY_LINE}`,
+      },
+    ],
+    related: ["merge", "page_numbers", "compress", "redact"],
+  },
+
+  strip_image_metadata: {
+    key: "strip_image_metadata",
+    title: "Remove Image Metadata Online Free — Strip EXIF & GPS | PDFEDI",
+    description:
+      "Strip EXIF and GPS metadata from photos online for free. Removes camera, date and location data from JPG, PNG and WebP images, with a before/after report. Batch up to 10 images.",
+    h1: "Strip Image Metadata",
+    intro:
+      "Photos carry hidden data: camera make and model, the date they were taken, and often GPS coordinates showing exactly where. This tool lists that metadata for each image, removes it, and gives you a before/after report showing what was taken out — so you can share photos without sharing where and when they were taken.",
+    howTo: [
+      "Upload 1 to 10 JPG, PNG or WebP images.",
+      "Click Strip Image Metadata — no options to set.",
+      "Download the ZIP with cleaned images and metadata_report.json.",
+      "Open the report to see what was removed from each image.",
+    ],
+    features: [
+      "Removes EXIF data: camera, date, software",
+      "Removes GPS location data from photos",
+      "Before/after report for every image (JSON)",
+      "Batch up to 10 images, results as a ZIP",
+    ],
+    useCases: [
+      "Remove location data from photos before sharing them",
+      "Clean client or case photos before disclosure",
+      "Strip camera and date details from images for a website",
+      "Check what metadata your phone's photos actually contain",
+    ],
+    faqs: [
+      {
+        q: "What metadata is removed from my photos?",
+        a: "EXIF data including camera make and model, date taken, software, and GPS coordinates, plus XMP data where present. The report lists every field found before cleaning and confirms it is gone after.",
+      },
+      {
+        q: "Does this remove C2PA or AI-generation markers?",
+        a: "No — this tool removes standard EXIF/XMP/GPS metadata only, and it does not verify removal of C2PA or AI-generation markers. For C2PA/SynthID cleaning, use ClearMark, which is built for that job.",
+      },
+      {
+        q: "Will my photos look different after cleaning?",
+        a: "No. Only the hidden metadata is removed — the image itself is re-saved at high quality (JPEG quality 95) and looks the same.",
+      },
+      {
+        q: "Is it free?",
+        a: `Yes. Stripping image metadata on PDFEDI is completely free with no sign-up. ${PRIVACY_LINE}`,
+      },
+    ],
+    related: ["strip_metadata", "metadata", "images_to_pdf", "redact"],
+  },
 };
