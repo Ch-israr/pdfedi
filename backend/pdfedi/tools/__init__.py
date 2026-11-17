@@ -4,9 +4,11 @@ from __future__ import annotations
 from typing import Any
 
 from . import (
+    compress,
     crop,
     delete_pages,
     edit_metadata,
+    exhibit_combine,
     extract_text,
     flatten,
     grayscale,
@@ -24,6 +26,8 @@ from . import (
     reorder_pages,
     rotate_pages,
     split,
+    strip_image_metadata,
+    strip_metadata,
     unlock_pdf,
     watermark,
 )
@@ -36,6 +40,7 @@ _MODULES = [
     ocr, metadata, edit_metadata, watermark, page_numbers, crop,
     grayscale, password_protect, unlock_pdf, redact, flatten,
     pdf_to_word,
+    compress, strip_metadata, exhibit_combine, strip_image_metadata,
 ]
 
 TOOLS: dict[str, Any] = {}
