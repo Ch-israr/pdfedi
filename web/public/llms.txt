@@ -1,6 +1,6 @@
 # PDFEDI
 
-> PDFEDI is a free online PDF toolkit. 19 PDF tools plus a full in-browser PDF editor.
+> PDFEDI is a free online PDF toolkit. 22 PDF tools plus a full in-browser PDF editor.
 > No sign-up, no watermarks. Files are processed securely and deleted automatically.
 > Each tool is free up to 5 times per hour; max file size 50MB.
 
@@ -20,7 +20,6 @@
 - [Extract Text](https://pdfedi.onrender.com/tools/extract_text): Extract text from a PDF to a .txt file.
 - [PDF to Images](https://pdfedi.onrender.com/tools/pdf_to_images): Convert PDF pages to PNG or JPG (72–300 DPI, ZIP download).
 - [Images to PDF](https://pdfedi.onrender.com/tools/images_to_pdf): Combine JPG, PNG or WebP images into one PDF.
-- [Thumbnails](https://pdfedi.onrender.com/tools/thumbnails): Page thumbnail contact sheet as a PNG image.
 - [OCR](https://pdfedi.onrender.com/tools/ocr): Make scanned PDFs searchable with an invisible text layer.
 
 ## Edit
