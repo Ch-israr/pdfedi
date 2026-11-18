@@ -1,56 +1,54 @@
-// Static tool catalog for landing page cards and static route generation.
+// Static tool catalog for route generation and page structure.
+// Display strings (names, taglines) live in the messages dictionaries
+// (tools/categories namespaces) so every locale renders them translated.
 // Full specs (options etc.) come from the API at runtime.
 export interface ToolCard {
   key: string;
-  name: string;
-  tagline: string;
   icon: string;
   category: string; // organize | convert | edit | optimize | security | legal
 }
 
 export interface Category {
   key: string;
-  name: string;
-  tagline: string;
   icon: string;
 }
 
 export const CATEGORIES: Category[] = [
-  { key: "organize", name: "Organize", tagline: "Merge, split and rearrange pages", icon: "📑" },
-  { key: "convert", name: "Convert", tagline: "Turn PDFs into other formats and back", icon: "🔄" },
-  { key: "edit", name: "Edit", tagline: "Tweak content and document info", icon: "✏️" },
-  { key: "optimize", name: "Optimize", tagline: "Make files smaller and faster", icon: "🗜️" },
-  { key: "security", name: "Security", tagline: "Protect, unlock and finalize documents", icon: "🔒" },
-  { key: "legal", name: "For Lawyers", tagline: "Filing-ready redaction, exhibits and court-size files", icon: "⚖️" },
+  { key: "organize", icon: "📑" },
+  { key: "convert", icon: "🔄" },
+  { key: "edit", icon: "✏️" },
+  { key: "optimize", icon: "🗜️" },
+  { key: "security", icon: "🔒" },
+  { key: "legal", icon: "⚖️" },
 ];
 
 export const TOOL_CARDS: ToolCard[] = [
-  { key: "merge", name: "Merge PDF", tagline: "Combine multiple PDFs into one", icon: "📚", category: "organize" },
-  { key: "split", name: "Split PDF", tagline: "Split a PDF into separate files", icon: "✂️", category: "organize" },
-  { key: "rotate_pages", name: "Rotate Pages", tagline: "Rotate PDF pages", icon: "🔄", category: "organize" },
-  { key: "delete_pages", name: "Delete Pages", tagline: "Remove pages from a PDF", icon: "🗑️", category: "organize" },
-  { key: "reorder_pages", name: "Reorder Pages", tagline: "Rearrange page order", icon: "🔀", category: "organize" },
-  { key: "n_up", name: "N-Up PDF", tagline: "Print multiple pages per sheet", icon: "🗂️", category: "organize" },
-  { key: "extract_text", name: "Extract Text", tagline: "Get text out of a PDF", icon: "📝", category: "convert" },
-  { key: "pdf_to_images", name: "PDF to Images", tagline: "Convert pages to images", icon: "🖼️", category: "convert" },
-  { key: "images_to_pdf", name: "Images to PDF", tagline: "Make a PDF from images", icon: "📷", category: "convert" },
-  { key: "ocr", name: "OCR", tagline: "Make scanned PDFs searchable", icon: "👁️", category: "convert" },
-  { key: "pdf_to_word", name: "PDF to Word", tagline: "Convert PDF to editable Word document", icon: "📘", category: "convert" },
-  { key: "metadata", name: "View Metadata", tagline: "Inspect PDF metadata", icon: "🔍", category: "edit" },
-  { key: "edit_metadata", name: "Edit Metadata", tagline: "Update title, author and more", icon: "✏️", category: "edit" },
-  { key: "watermark", name: "Watermark", tagline: "Stamp text on every page", icon: "💧", category: "edit" },
-  { key: "page_numbers", name: "Page Numbers", tagline: "Add page numbers", icon: "🔢", category: "edit" },
-  { key: "crop", name: "Crop PDF", tagline: "Trim margins from pages", icon: "🔲", category: "edit" },
-  { key: "grayscale", name: "Grayscale PDF", tagline: "Convert pages to black and white", icon: "🩶", category: "optimize" },
-  { key: "compress", name: "Compress PDF", tagline: "Shrink a PDF to a target size for filing", icon: "🗜️", category: "optimize" },
-  { key: "repair", name: "Repair PDF", tagline: "Fix corrupted or unreadable PDFs", icon: "🛠️", category: "optimize" },
-  { key: "password_protect", name: "Protect PDF", tagline: "Add a password to a PDF", icon: "🔒", category: "security" },
-  { key: "unlock_pdf", name: "Unlock PDF", tagline: "Remove password protection", icon: "🔓", category: "security" },
-  { key: "redact", name: "Redact", tagline: "Permanently black out text", icon: "⬛", category: "security" },
-  { key: "flatten", name: "Flatten PDF", tagline: "Bake annotations into pages", icon: "🧱", category: "security" },
-  { key: "strip_image_metadata", name: "Strip Image Metadata", tagline: "Remove EXIF and GPS from photos", icon: "📸", category: "security" },
-  { key: "exhibit_combine", name: "Combine Exhibits", tagline: "Filing-ready PDF with slip sheets and Bates numbers", icon: "⚖️", category: "legal" },
-  { key: "strip_metadata", name: "Strip Metadata", tagline: "Remove hidden metadata, with a report", icon: "🧹", category: "legal" },
+  { key: "merge", icon: "📚", category: "organize" },
+  { key: "split", icon: "✂️", category: "organize" },
+  { key: "rotate_pages", icon: "🔄", category: "organize" },
+  { key: "delete_pages", icon: "🗑️", category: "organize" },
+  { key: "reorder_pages", icon: "🔀", category: "organize" },
+  { key: "n_up", icon: "🗂️", category: "organize" },
+  { key: "extract_text", icon: "📝", category: "convert" },
+  { key: "pdf_to_images", icon: "🖼️", category: "convert" },
+  { key: "images_to_pdf", icon: "📷", category: "convert" },
+  { key: "ocr", icon: "👁️", category: "convert" },
+  { key: "pdf_to_word", icon: "📘", category: "convert" },
+  { key: "metadata", icon: "🔍", category: "edit" },
+  { key: "edit_metadata", icon: "✏️", category: "edit" },
+  { key: "watermark", icon: "💧", category: "edit" },
+  { key: "page_numbers", icon: "🔢", category: "edit" },
+  { key: "crop", icon: "🔲", category: "edit" },
+  { key: "grayscale", icon: "🩶", category: "optimize" },
+  { key: "compress", icon: "🗜️", category: "optimize" },
+  { key: "repair", icon: "🛠️", category: "optimize" },
+  { key: "password_protect", icon: "🔒", category: "security" },
+  { key: "unlock_pdf", icon: "🔓", category: "security" },
+  { key: "redact", icon: "⬛", category: "security" },
+  { key: "flatten", icon: "🧱", category: "security" },
+  { key: "strip_image_metadata", icon: "📸", category: "security" },
+  { key: "exhibit_combine", icon: "⚖️", category: "legal" },
+  { key: "strip_metadata", icon: "🧹", category: "legal" },
 ];
 
 export const TOOL_SLUGS = TOOL_CARDS.map((t) => t.key);
