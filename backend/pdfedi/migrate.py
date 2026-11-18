@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     options TEXT NOT NULL DEFAULT '{}',
     output_file_id VARCHAR(36),
     error TEXT,
+    error_code VARCHAR(32),
     created_at VARCHAR(32) NOT NULL,
     updated_at VARCHAR(32) NOT NULL
 );
@@ -69,7 +70,7 @@ V2_TABLES: dict[str, set[str]] = {
     "files": {"id", "sha256", "filename", "size_bytes", "mime", "storage_key",
               "kind", "status", "page_count", "created_at"},
     "jobs": {"id", "tool", "status", "file_ids", "options", "output_file_id",
-             "error", "created_at", "updated_at"},
+             "error", "error_code", "created_at", "updated_at"},
     "admin_users": {"id", "username", "password_hash", "created_at"},
     "quotas": {"id", "count", "window_start", "updated_at"},
     "schema_migrations": {"version", "applied_at"},
@@ -139,8 +140,22 @@ def _migrate_v1_initial_schema(conn) -> None:
 
 MigrationBody = str | Callable[[Any], None]
 
+def _migrate_v2_job_error_code(conn) -> None:
+    """Add jobs.error_code (migration 2).
+
+    ALTER TABLE ... ADD COLUMN is not guarded by IF NOT EXISTS on
+    SQLite, so check the columns first. Idempotent: a re-run after a
+    partial apply is a no-op. Fresh databases already get the column
+    from V1_SQL.
+    """
+    if "error_code" not in _table_columns(conn, "jobs"):
+        log.info("migration 2: adding jobs.error_code")
+        conn.execute(text("ALTER TABLE jobs ADD COLUMN error_code VARCHAR(32)"))
+
+
 MIGRATIONS: list[tuple[int, MigrationBody]] = [
     (1, _migrate_v1_initial_schema),
+    (2, _migrate_v2_job_error_code),
 ]
 
 
