@@ -21,9 +21,14 @@ import { useOrganizer } from "../../../hooks/useOrganizer";
 import { CanvasShell } from "../CanvasShell";
 import { ThumbnailGrid, type GridCell } from "../ThumbnailGrid";
 import { PagePreviewModal, thumbLoaderFor } from "../canvasUtils";
-import { ToolButton, useUndoKeys, type ToolCanvasProps } from "./common";
+import { useLocale, useTranslations } from "next-intl";
+import { ToolButton, translatePayloadError, useUndoKeys, type ToolCanvasProps } from "./common";
 
 export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) {
+  const locale = useLocale();
+  const t = useTranslations("canvas");
+  const tTools = useTranslations("tools");
+  const tContent = useTranslations("toolContent");
   const initialItems = useMemo<OrganizerItem[]>(
     () =>
       pdfs.flatMap((pdf, fi) =>
@@ -72,16 +77,21 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
   const removedCount = doc.items.length - totalPages;
   const summary =
     includedFileOrder.length >= 2
-      ? `Merging ${includedFileOrder.length} files · ${totalPages} pages` +
-        (removedCount > 0 ? ` · ${removedCount} removed` : "") +
-        ` → one PDF`
-      : "Add at least 2 PDF files to merge.";
+      ? t("merge.summary", {
+          files: includedFileOrder.length,
+          pages: totalPages,
+          removed:
+            removedCount > 0
+              ? t("merge.summaryRemoved", { count: removedCount })
+              : "",
+        })
+      : t("merge.addAtLeast2");
 
   const cells: GridCell[] = useMemo(
     () =>
       doc.items.map((it) => ({
         id: it.id,
-        label: `Page ${it.page}`,
+        label: t("pageLabel", { n: it.page }),
         sublabel: it.fileName,
         removed: it.removed,
       })),
@@ -126,8 +136,8 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
 
   return (
     <CanvasShell
-      toolName={job.spec?.name ?? "Merge PDF"}
-      description={job.spec?.description ?? ""}
+      toolName={tTools("merge.name")}
+      description={tContent("merge.description")}
       fileLabel={localFiles.map((f) => f.name).join(", ")}
       quota={job.quota}
       maxFiles={job.spec?.max_files ?? 20}
@@ -139,7 +149,7 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
       summary={summary}
       payload={{ tool_key: "merge", file_ids: payload.fileIds, config: payload.config }}
       payloadError={payload.error}
-      processLabel="Merge now"
+      processLabel={t("merge.processLabel")}
       canProcess={payload.error === null && payload.fileIds.length >= 2}
       onProcess={() => {
         const ordered = payload.fileIds
@@ -152,7 +162,8 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
       onBackToOrganize={() => job.setPhase("organize")}
       onDownload={job.download}
       downloadPct={job.downloadPct}
-      activityLabel="Merging"
+      locale={locale}
+      activityLabel={t("merge.activity")}
       error={job.error}
     >
       <div className="mt-4 flex flex-col gap-4 lg:flex-row">
@@ -163,22 +174,22 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
               <div key={fi} className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white p-2 shadow-sm">
                 <button
                   className="h-12 w-10 shrink-0 overflow-hidden rounded bg-slate-100"
-                  onClick={() => setPreview({ pdfIndex: fi, page: 1, label: `${pdf.fileName} — page 1` })}
-                  title="Preview first page"
+                  onClick={() => setPreview({ pdfIndex: fi, page: 1, label: t("filePageLabel", { name: pdf.fileName, n: 1 }) })}
+                  title={t("merge.previewFirstPage")}
                 >
                   <FirstPageThumb pdf={pdf} />
                 </button>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-xs font-semibold">{pdf.fileName}</p>
-                  <p className="text-[11px] text-slate-500">{count} page{count === 1 ? "" : "s"}</p>
+                  <p className="text-[11px] text-slate-500">{t("merge.filePages", { count })}</p>
                 </div>
                 <div className="flex shrink-0 flex-col gap-0.5">
                   <button
                     disabled={pos === 0}
                     onClick={() => moveFileBlock(fi, -1)}
                     className="rounded border border-slate-300 px-1.5 text-xs disabled:opacity-30"
-                    title="Move file up"
-                    aria-label={`Move ${pdf.fileName} up`}
+                    title={t("merge.moveFileUp")}
+                    aria-label={t("merge.moveFileUpAria", { name: pdf.fileName })}
                   >
                     ↑
                   </button>
@@ -186,8 +197,8 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                     disabled={pos === includedFileOrder.length - 1}
                     onClick={() => moveFileBlock(fi, 1)}
                     className="rounded border border-slate-300 px-1.5 text-xs disabled:opacity-30"
-                    title="Move file down"
-                    aria-label={`Move ${pdf.fileName} down`}
+                    title={t("merge.moveFileDown")}
+                    aria-label={t("merge.moveFileDownAria", { name: pdf.fileName })}
                   >
                     ↓
                   </button>
@@ -200,8 +211,8 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                     })
                   }
                   className="shrink-0 rounded border border-slate-300 px-1.5 py-1 text-xs text-red-600 hover:border-red-500"
-                  title="Remove file from merge"
-                  aria-label={`Remove ${pdf.fileName} from merge`}
+                  title={t("merge.removeFileTitle")}
+                  aria-label={t("merge.removeFileFromMerge", { name: pdf.fileName })}
                 >
                   ✕
                 </button>
@@ -209,7 +220,7 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
             ))}
             {removedFiles.map(({ fi, pdf }) => (
               <div key={fi} className="flex items-center justify-between rounded-xl border border-dashed border-slate-300 bg-slate-50 p-2 opacity-70">
-                <p className="truncate text-xs text-slate-500">{pdf.fileName} (removed)</p>
+                <p className="truncate text-xs text-slate-500">{t("merge.removedFileLabel", { name: pdf.fileName })}</p>
                 <button
                   onClick={() =>
                     dispatch({
@@ -219,12 +230,12 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                   }
                   className="shrink-0 rounded border border-slate-300 px-2 py-0.5 text-xs hover:border-brand-600 hover:text-brand-600"
                 >
-                  Restore
+                  {t("merge.restore")}
                 </button>
               </div>
             ))}
             <label className="block cursor-pointer rounded-xl border-2 border-dashed border-slate-300 bg-white p-3 text-center text-sm font-medium text-slate-600 hover:border-brand-500 hover:text-brand-600">
-              + Add files
+              + {t("merge.addFilesLabel")}
               <input
                 type="file"
                 accept="application/pdf,.pdf"
@@ -243,12 +254,12 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
         {/* Grid */}
         <div className="min-w-0 flex-1">
           <div className="mb-3 flex flex-wrap items-center gap-2">
-            <ToolButton onClick={org.undo} disabled={!org.canUndo} title="Undo (Ctrl+Z)">↩ Undo</ToolButton>
-            <ToolButton onClick={org.redo} disabled={!org.canRedo} title="Redo (Ctrl+Y)">↪ Redo</ToolButton>
-            <ToolButton onClick={() => org.selectAll(allIds)}>Select all</ToolButton>
-            <ToolButton onClick={org.clearSelection} disabled={org.selected.length === 0}>Clear selection</ToolButton>
-            <ToolButton onClick={removeSelected} disabled={selectedItems.length === 0} title="Remove selected pages from the merge (Delete key)">
-              Remove selected ({selectedItems.length})
+            <ToolButton onClick={org.undo} disabled={!org.canUndo} title={t("undoTitle")}>↩ {t("undo")}</ToolButton>
+            <ToolButton onClick={org.redo} disabled={!org.canRedo} title={t("redoTitle")}>↪ {t("redo")}</ToolButton>
+            <ToolButton onClick={() => org.selectAll(allIds)}>{t("selectAll")}</ToolButton>
+            <ToolButton onClick={org.clearSelection} disabled={org.selected.length === 0}>{t("clearSelection")}</ToolButton>
+            <ToolButton onClick={removeSelected} disabled={selectedItems.length === 0} title={t("merge.removeSelectedTitle")}>
+              {t("merge.removeSelectedCount", { count: selectedItems.length })}
             </ToolButton>
             {removedCount > 0 && (
               <ToolButton
@@ -256,7 +267,7 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                   dispatch({ type: "restoreItems", ids: doc.items.filter((it) => it.removed).map((it) => it.id) })
                 }
               >
-                Restore all removed
+                {t("merge.restoreAllRemoved")}
               </ToolButton>
             )}
           </div>
@@ -269,15 +280,11 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
             onDeleteKey={removeSelected}
             onPreview={(cell) => {
               const [fi, pg] = cell.id.split(":").map(Number);
-              setPreview({ pdfIndex: fi, page: pg, label: `${pdfs[fi]?.fileName ?? ""} — page ${pg}` });
+              setPreview({ pdfIndex: fi, page: pg, label: t("filePageLabel", { name: pdfs[fi]?.fileName ?? "", n: pg }) });
             }}
-            ariaLabel="Pages to merge, in merge order"
+            ariaLabel={t("merge.gridAriaOrder")}
           />
-          <p className="mt-2 text-xs text-slate-500">
-            Drag pages to reorder (across files too) · Click to select, Shift-click for a range ·
-            Delete key removes selected pages · Double-click a page for a large preview ·
-            Arrow keys move the selection, Ctrl+Z / Ctrl+Y undo and redo.
-          </p>
+          <p className="mt-2 text-xs text-slate-500">{t("merge.gridHint")}</p>
         </div>
       </div>
       {preview && pdfs[preview.pdfIndex] && (
