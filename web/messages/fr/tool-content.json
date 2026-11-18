@@ -1,0 +1,1160 @@
+{
+  "merge": {
+    "title": "Fusionner des PDF en ligne gratuitement — Combiner des PDF | PDFEDI",
+    "description": "Fusionnez des fichiers PDF en un seul document en ligne gratuitement. Combinez 2 à 20 PDF dans n'importe quel ordre avec la qualité d'origine préservée. Sans inscription, sans filigrane, 50 Mo par fichier.",
+    "h1": "Fusionner des PDF",
+    "intro": "Combinez plusieurs fichiers PDF en un seul document bien ordonné. Envoyez de 2 à 20 PDF, disposez-les comme vous le souhaitez et téléchargez un seul fichier fusionné propre — parfait pour les rapports, les candidatures et les documents qui arrivent en morceaux.",
+    "howTo": [
+      "Envoyez de 2 à 20 fichiers PDF (jusqu'à 50 Mo chacun).",
+      "Les fichiers sont fusionnés dans l'ordre d'envoi.",
+      "Cliquez sur Fusionner et attendez la fin du traitement.",
+      "Téléchargez votre PDF combiné."
+    ],
+    "features": [
+      "Combiner 2 à 20 fichiers PDF en un seul",
+      "Préserve la qualité et la mise en forme d'origine des pages",
+      "Gratuit et sans filigrane",
+      "Fonctionne sur ordinateur, tablette et mobile"
+    ],
+    "useCases": [
+      "Combiner des chapitres ou des sections en un rapport terminé",
+      "Fusionner des factures ou des reçus en un seul fichier pour la comptabilité",
+      "Joindre des documents de candidature (CV, lettre de motivation, certificats) en un seul PDF",
+      "Regrouper des pages numérisées en un seul document"
+    ],
+    "faqs": [
+      {
+        "q": "Comment fusionner plusieurs fichiers PDF ?",
+        "a": "Envoyez de 2 à 20 fichiers PDF dans l'outil Fusionner des PDF, puis cliquez sur Fusionner. Vos fichiers sont combinés en un seul PDF dans l'ordre d'envoi, prêt à télécharger."
+      },
+      {
+        "q": "Combien de fichiers PDF puis-je fusionner à la fois ?",
+        "a": "Vous pouvez fusionner de 2 à 20 fichiers PDF en une seule tâche. Chaque fichier peut peser jusqu'à 50 Mo."
+      },
+      {
+        "q": "La fusion de PDF réduira-t-elle leur qualité ?",
+        "a": "Non. La fusion ne fait que réorganiser les pages en un seul fichier — le contenu, les images et le texte de chaque PDF sont préservés exactement tels qu'ils étaient."
+      },
+      {
+        "q": "Puis-je fusionner un PDF protégé par mot de passe ?",
+        "a": "Les PDF protégés par mot de passe doivent d'abord être déverrouillés. Utilisez l'outil Déverrouiller un PDF avec le mot de passe correct, puis fusionnez le fichier déverrouillé."
+      },
+      {
+        "q": "Est-ce gratuit de fusionner des PDF en ligne ?",
+        "a": "Oui. La fusion de PDF sur PDFEDI est entièrement gratuite, sans filigrane et sans inscription. Les fichiers sont traités en toute sécurité et supprimés automatiquement. Aucune inscription requise."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "delete_pages"
+    ]
+  },
+  "split": {
+    "title": "Diviser un PDF en ligne gratuitement — Séparer en fichiers distincts | PDFEDI",
+    "description": "Divisez un PDF en fichiers séparés en ligne gratuitement. Extrayez des plages de pages ou divisez chaque page en son propre PDF. Sans inscription, résultats livrés en téléchargement ZIP.",
+    "h1": "Diviser un PDF",
+    "intro": "Divisez un PDF en plusieurs fichiers plus petits. Extrayez des plages de pages précises (par exemple les pages 1–3 et 5) ou divisez chaque page en son propre PDF. Les résultats sont livrés dans un téléchargement ZIP pratique.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez un mode : plages de pages (par ex. 1-3,5) ou chaque page séparément.",
+      "Si vous utilisez les plages, saisissez-les comme 1-3,5.",
+      "Cliquez sur Diviser et téléchargez le ZIP contenant vos fichiers."
+    ],
+    "features": [
+      "Diviser par plages de pages personnalisées (par ex. 1-3,5)",
+      "Diviser chaque page en son propre PDF",
+      "Résultats livrés dans une archive ZIP",
+      "Qualité d'origine préservée"
+    ],
+    "useCases": [
+      "Extraire un chapitre d'un livre numérique",
+      "Séparer un lot numérisé en documents individuels",
+      "Extraire des pages précises à partager ou à imprimer",
+      "Découper un gros PDF en morceaux envoyables par e-mail"
+    ],
+    "faqs": [
+      {
+        "q": "Comment diviser un PDF en fichiers séparés ?",
+        "a": "Envoyez votre PDF, choisissez le mode « plages » et saisissez des plages de pages comme 1-3,5, ou choisissez « chaque page » pour que chaque page devienne son propre fichier. Cliquez sur Diviser et téléchargez le ZIP."
+      },
+      {
+        "q": "Quel format de plage de pages dois-je utiliser ?",
+        "a": "Utilisez des numéros de page à base 1 avec des virgules et des tirets, par exemple 1-3,5,8-10. Cela extrait les pages 1, 2, 3, 5, 8, 9 et 10."
+      },
+      {
+        "q": "Puis-je diviser un PDF en pages individuelles ?",
+        "a": "Oui. Sélectionnez le mode « chaque page » et chaque page de votre PDF devient un fichier PDF distinct dans le téléchargement ZIP."
+      },
+      {
+        "q": "Y a-t-il une limite de pages pour la division ?",
+        "a": "Il n'y a pas de limite fixe de pages, mais la limite d'envoi de 50 Mo s'applique. Les très gros PDF sont traités page par page pour rester dans la mémoire du serveur."
+      }
+    ],
+    "related": [
+      "merge",
+      "delete_pages",
+      "extract_text"
+    ]
+  },
+  "rotate_pages": {
+    "title": "Faire pivoter les pages d'un PDF en ligne gratuitement — Corriger l'orientation | PDFEDI",
+    "description": "Faites pivoter les pages d'un PDF de 90°, 180° ou 270° en ligne gratuitement. Corrigez les scans de travers ou à l'envers sur toutes les pages ou sur des plages sélectionnées. Sans inscription, qualité préservée.",
+    "h1": "Faire pivoter les pages",
+    "intro": "Corrigez les pages de PDF de travers ou à l'envers. Faites pivoter toutes les pages ou seulement des plages de pages sélectionnées de 90, 180 ou 270 degrés — idéal pour les documents numérisés sortis dans le mauvais sens.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez l'angle de rotation : 90°, 180° ou 270°.",
+      "Limitez éventuellement la rotation à des pages précises (par ex. 1-3,5). Laissez vide pour toutes les pages.",
+      "Cliquez sur Faire pivoter et téléchargez le PDF corrigé."
+    ],
+    "features": [
+      "Rotation de 90°, 180° ou 270°",
+      "S'applique à toutes les pages ou à des plages de pages sélectionnées",
+      "Corrige les documents numérisés de travers",
+      "Aucune perte de qualité"
+    ],
+    "useCases": [
+      "Corriger des pages numérisées en paysage au lieu de portrait",
+      "Corriger des pages à l'envers dans un lot numérisé",
+      "Faire pivoter une seule page de travers sans toucher aux autres",
+      "Uniformiser l'orientation avant de fusionner des documents"
+    ],
+    "faqs": [
+      {
+        "q": "Comment faire pivoter une page de PDF ?",
+        "a": "Envoyez votre PDF, choisissez 90°, 180° ou 270°, saisissez éventuellement des plages de pages comme 2-4, puis cliquez sur Faire pivoter. Laissez le champ des pages vide pour faire pivoter toutes les pages."
+      },
+      {
+        "q": "Puis-je faire pivoter seulement certaines pages d'un PDF ?",
+        "a": "Oui. Saisissez des plages de pages à base 1 comme 1-3,5 et seules ces pages sont pivotées. Toutes les autres pages restent telles quelles."
+      },
+      {
+        "q": "La rotation réduira-t-elle la qualité du PDF ?",
+        "a": "Non. La rotation modifie les métadonnées d'orientation de la page et la position du contenu — votre texte et vos images conservent leur qualité d'origine."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "reorder_pages",
+      "merge",
+      "split"
+    ]
+  },
+  "delete_pages": {
+    "title": "Supprimer des pages d'un PDF en ligne gratuitement — Retirer des pages | PDFEDI",
+    "description": "Supprimez des pages d'un PDF en ligne gratuitement. Retirez les pages indésirables par numéro ou par plage et téléchargez un PDF propre. Sans inscription, les pages restantes conservent leur qualité d'origine.",
+    "h1": "Supprimer des pages",
+    "intro": "Supprimez les pages indésirables de votre PDF. Saisissez les plages de pages à supprimer — comme 2, 5-7 — et téléchargez un PDF propre contenant uniquement les pages que vous souhaitez conserver.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez les pages à supprimer en utilisant des plages comme 1-3,5.",
+      "Cliquez sur Supprimer les pages et téléchargez le résultat."
+    ],
+    "features": [
+      "Supprimer des pages par plage (par ex. 1-3,5)",
+      "Les pages restantes conservent leur qualité et leur ordre d'origine",
+      "Gratuit et sans filigrane"
+    ],
+    "useCases": [
+      "Supprimer les pages vides ou en double d'un scan",
+      "Retirer les pages de publicité d'un document téléchargé",
+      "Réduire un rapport aux sections pertinentes",
+      "Nettoyer un PDF avant de le partager ou de l'imprimer"
+    ],
+    "faqs": [
+      {
+        "q": "Comment supprimer des pages d'un PDF ?",
+        "a": "Envoyez votre PDF, saisissez les numéros ou plages de pages à base 1 à retirer (par exemple 2,5-7), puis cliquez sur Supprimer les pages. Les pages restantes sont enregistrées dans leur ordre d'origine."
+      },
+      {
+        "q": "Puis-je supprimer plusieurs pages non consécutives ?",
+        "a": "Oui. Séparez les pages et les plages par des virgules, comme 1,3,5-8, pour les supprimer toutes en une fois."
+      },
+      {
+        "q": "La suppression de pages affecte-t-elle le reste du document ?",
+        "a": "Non. Les pages que vous conservez sont intactes — même contenu, même ordre, même qualité."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "rotate_pages",
+      "merge"
+    ]
+  },
+  "reorder_pages": {
+    "title": "Réorganiser les pages d'un PDF en ligne gratuitement — Réarranger l'ordre des pages | PDFEDI",
+    "description": "Réorganisez les pages d'un PDF dans n'importe quel ordre en ligne gratuitement. Corrigez les séquences de pages erronées en saisissant le nouvel ordre sous forme de numéros. Sans inscription, contenu entièrement préservé.",
+    "h1": "Réorganiser les pages",
+    "intro": "Mettez les pages de votre PDF dans le bon ordre. Indiquez la nouvelle séquence de pages et obtenez un PDF dont les pages sont réorganisées exactement comme vous le souhaitez — sans renumériser ni reconstruire le document.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez le nouvel ordre des pages sous forme de numéros séparés par des virgules (par ex. 3,1,2,4).",
+      "Cliquez sur Réorganiser et téléchargez le PDF réarrangé."
+    ],
+    "features": [
+      "Réorganiser les pages dans n'importe quelle séquence",
+      "Saisie simple de l'ordre des pages séparé par des virgules",
+      "Contenu et qualité entièrement préservés"
+    ],
+    "useCases": [
+      "Corriger des pages numérisées dans le mauvais ordre",
+      "Déplacer la table des matières ou la couverture au début",
+      "Réorganiser les sections d'un rapport",
+      "Corriger la séquence des pages avant l'impression"
+    ],
+    "faqs": [
+      {
+        "q": "Comment réarranger les pages d'un PDF ?",
+        "a": "Envoyez votre PDF et saisissez l'ordre des pages souhaité sous forme de numéros séparés par des virgules — par exemple 3,1,2,4 met l'ancienne page 3 en premier. Cliquez sur Réorganiser pour télécharger."
+      },
+      {
+        "q": "Dois-je lister toutes les pages ?",
+        "a": "Saisissez la séquence complète des pages que vous voulez dans le résultat. Les pages non listées ne sont pas incluses, alors listez toutes les pages que vous souhaitez conserver."
+      },
+      {
+        "q": "La réorganisation modifiera-t-elle la qualité de mon PDF ?",
+        "a": "Non. Les pages sont réarrangées sans toucher à leur contenu, donc la qualité est identique."
+      }
+    ],
+    "related": [
+      "merge",
+      "split",
+      "delete_pages",
+      "rotate_pages"
+    ]
+  },
+  "extract_text": {
+    "title": "Extraire le texte d'un PDF en ligne gratuitement — Enregistrer en TXT | PDFEDI",
+    "description": "Extrayez le texte de n'importe quel PDF textuel en ligne gratuitement et téléchargez-le sous forme de fichier .txt brut. Choisissez toutes les pages ou des plages sélectionnées. Sans inscription.",
+    "h1": "Extraire le texte",
+    "intro": "Extrayez le texte brut de n'importe quel PDF textuel et téléchargez-le sous forme de fichier .txt. Choisissez toutes les pages ou des plages précises — pratique pour citer, archiver ou injecter du texte dans d'autres outils.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez éventuellement des plages de pages (par ex. 1-3,5). Laissez vide pour toutes les pages.",
+      "Cliquez sur Extraire et téléchargez le fichier .txt."
+    ],
+    "features": [
+      "Extraire le texte au format .txt brut",
+      "Toutes les pages ou des plages de pages sélectionnées",
+      "Rapide — pas besoin d'OCR pour les PDF textuels"
+    ],
+    "useCases": [
+      "Copier le texte d'un article pour le citer",
+      "Archiver le texte d'un contrat dans un format consultable",
+      "Injecter le contenu d'un PDF dans des outils de traduction",
+      "Vérifier rapidement ce que contient un long PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Comment extraire le texte d'un PDF ?",
+        "a": "Envoyez votre PDF et cliquez sur Extraire. Vous obtiendrez un fichier .txt contenant le texte du document. Limitez éventuellement l'extraction à des plages de pages comme 1-3,5."
+      },
+      {
+        "q": "Cela fonctionne-t-il sur les PDF numérisés ?",
+        "a": "L'extraction de texte lit la couche de texte intégrée au PDF, donc elle fonctionne sur les PDF textuels. Pour les PDF numérisés composés uniquement d'images, utilisez d'abord l'outil OCR pour ajouter une couche de texte consultable, puis extrayez."
+      },
+      {
+        "q": "Quel est le format du texte extrait ?",
+        "a": "Du texte brut (.txt), qui s'ouvre dans n'importe quel éditeur de texte et fonctionne partout."
+      }
+    ],
+    "related": [
+      "ocr",
+      "split",
+      "metadata",
+      "pdf_to_images"
+    ]
+  },
+  "pdf_to_images": {
+    "title": "Convertir un PDF en images en ligne gratuitement — PNG et JPG | PDFEDI",
+    "description": "Convertissez les pages d'un PDF en images PNG ou JPG en ligne gratuitement. Choisissez une résolution de 72 à 300 PPP, convertissez toutes les pages ou des plages sélectionnées. Téléchargement en ZIP.",
+    "h1": "PDF vers images",
+    "intro": "Transformez chaque page de votre PDF en une image PNG ou JPEG de haute qualité. Choisissez le format de sortie et la résolution (72–300 PPP), sélectionnez des pages ou convertissez-les toutes, et téléchargez le tout dans un ZIP.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez une sortie PNG ou JPEG et une résolution de 72 à 300 PPP.",
+      "Sélectionnez éventuellement des plages de pages (par ex. 1-3,5). Laissez vide pour toutes les pages.",
+      "Cliquez sur Convertir et téléchargez le ZIP d'images."
+    ],
+    "features": [
+      "Sortie PNG ou JPEG",
+      "Résolution réglable : 72–300 PPP",
+      "Convertir toutes les pages ou des plages sélectionnées",
+      "Téléchargement ZIP avec une image par page"
+    ],
+    "useCases": [
+      "Créer des images de diapositives à partir d'une présentation PDF",
+      "Extraire des figures ou des schémas sous forme d'images",
+      "Créer des miniatures ou des aperçus de documents",
+      "Partager des pages PDF sur des plateformes qui n'acceptent que les images"
+    ],
+    "faqs": [
+      {
+        "q": "Comment convertir un PDF en JPG ou PNG ?",
+        "a": "Envoyez votre PDF, choisissez JPEG ou PNG, définissez la résolution souhaitée (plus elle est élevée, plus l'image est nette), puis cliquez sur Convertir. Vous obtenez un ZIP avec une image par page."
+      },
+      {
+        "q": "Quelle résolution (PPP) dois-je choisir ?",
+        "a": "72–100 PPP suffisent pour l'affichage à l'écran, 150 PPP est un bon compromis, et 300 PPP donne des images de qualité d'impression (avec des fichiers plus volumineux)."
+      },
+      {
+        "q": "Puis-je convertir seulement certaines pages en images ?",
+        "a": "Oui — saisissez des plages de pages comme 1-3,5 et seules ces pages sont converties."
+      }
+    ],
+    "related": [
+      "images_to_pdf",
+      "extract_text"
+    ]
+  },
+  "images_to_pdf": {
+    "title": "Convertir des images en PDF en ligne gratuitement — JPG, PNG vers PDF | PDFEDI",
+    "description": "Combinez des images JPG, PNG ou WebP en un seul PDF en ligne gratuitement. Jusqu'à 20 images par PDF, chacune devient une page entière en qualité d'origine. Sans inscription.",
+    "h1": "Images vers PDF",
+    "intro": "Combinez jusqu'à 20 images JPG, PNG ou WebP en un seul document PDF. Chaque image devient une page — idéal pour transformer des scans de photos, des captures d'écran ou des œuvres d'art en un PDF partageable.",
+    "howTo": [
+      "Envoyez de 1 à 20 images (JPG, PNG ou WebP, jusqu'à 50 Mo au total).",
+      "Les images deviennent des pages dans l'ordre d'envoi.",
+      "Cliquez sur Convertir et téléchargez votre PDF."
+    ],
+    "features": [
+      "Entrée JPG, PNG et WebP",
+      "Jusqu'à 20 images par PDF",
+      "Chaque image devient une page entière",
+      "Gratuit et sans filigrane"
+    ],
+    "useCases": [
+      "Transformer des photos de documents prises au téléphone en PDF",
+      "Combiner des captures d'écran en un seul fichier",
+      "Créer un portfolio PDF à partir d'œuvres d'art",
+      "Archiver des photos de tableau blanc sous forme de document"
+    ],
+    "faqs": [
+      {
+        "q": "Comment convertir un JPG en PDF ?",
+        "a": "Envoyez vos images JPG (jusqu'à 20), puis cliquez sur Convertir. Chaque image devient une page du PDF obtenu, dans l'ordre d'envoi."
+      },
+      {
+        "q": "Quels formats d'image sont pris en charge ?",
+        "a": "Les images JPG/JPEG, PNG et WebP sont prises en charge."
+      },
+      {
+        "q": "Combien d'images puis-je combiner ?",
+        "a": "De 1 à 20 images par PDF."
+      },
+      {
+        "q": "Mes images perdront-elles en qualité ?",
+        "a": "Les images sont intégrées à leur résolution d'origine — rien n'est sous-échantillonné pendant la conversion."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr",
+      "merge"
+    ]
+  },
+  "ocr": {
+    "title": "OCR de PDF en ligne gratuitement — Rendre les PDF numérisés consultables | PDFEDI",
+    "description": "Effectuez l'OCR de PDF numérisés en ligne gratuitement. Ajoutez une couche de texte consultable et sélectionnable tandis que les pages ont exactement la même apparence. Plusieurs langues, sans inscription.",
+    "h1": "OCR vers PDF consultable",
+    "intro": "Rendez les PDF numérisés consultables et sélectionnables. La reconnaissance optique de caractères lit le texte de vos pages numérisées et ajoute une couche de texte invisible — les pages ont un aspect identique, mais vous pouvez désormais rechercher, sélectionner et copier le texte. Les pages qui contiennent déjà du texte sont ignorées automatiquement.",
+    "howTo": [
+      "Envoyez votre PDF numérisé (jusqu'à 50 Mo).",
+      "Choisissez la langue du document (par ex. eng, eng+deu).",
+      "Cliquez sur Lancer l'OCR et attendez — les pages numérisées sont traitées une par une.",
+      "Téléchargez votre PDF consultable."
+    ],
+    "features": [
+      "Couche de texte consultable et sélectionnable sur les pages numérisées",
+      "Images de pages d'origine préservées exactement",
+      "Les pages contenant déjà du texte sont ignorées automatiquement",
+      "Plusieurs langues d'OCR prises en charge"
+    ],
+    "useCases": [
+      "Rendre des contrats numérisés consultables",
+      "Numériser des archives papier en PDF consultables",
+      "Activer la sélection de texte dans des livres numérisés",
+      "Préparer des scans pour l'extraction de texte ou l'indexation"
+    ],
+    "faqs": [
+      {
+        "q": "Que fait l'OCR à un PDF ?",
+        "a": "L'OCR (reconnaissance optique de caractères) analyse les images d'un PDF numérisé, reconnaît le texte et intègre une couche de texte invisible. Les pages ont la même apparence, mais le texte devient consultable et sélectionnable."
+      },
+      {
+        "q": "Combien de temps prend l'OCR ?",
+        "a": "Cela dépend du nombre de pages et du contenu — les pages numérisées sont traitées individuellement. Les pages qui ont déjà du texte sont ignorées instantanément, donc les documents mixtes se terminent beaucoup plus vite."
+      },
+      {
+        "q": "Quelles langues sont prises en charge ?",
+        "a": "Définissez l'option de langue avec un code de langue Tesseract comme eng pour l'anglais ou eng+deu pour l'anglais et l'allemand combinés."
+      },
+      {
+        "q": "L'OCR modifiera-t-il l'apparence de mes pages ?",
+        "a": "Non. Les images numérisées d'origine sont conservées comme pages visibles ; seule une couche de texte invisible est ajoutée en dessous."
+      },
+      {
+        "q": "Mon PDF contient déjà du texte. Sera-t-il soumis à l'OCR ?",
+        "a": "Non — les pages dotées d'une couche de texte utilisable sont détectées et recopiées telles quelles. Seules les pages composées uniquement d'images passent par la reconnaissance."
+      }
+    ],
+    "related": [
+      "extract_text",
+      "images_to_pdf",
+      "pdf_to_images"
+    ]
+  },
+  "metadata": {
+    "title": "Afficher les métadonnées d'un PDF en ligne gratuitement — Inspecter les infos du document | PDFEDI",
+    "description": "Inspectez les métadonnées cachées d'un PDF en ligne gratuitement. Consultez le titre, l'auteur, la date de création, le nombre de pages, le producteur et le statut de chiffrement en JSON. Sans inscription.",
+    "h1": "Inspecter les métadonnées",
+    "intro": "Voyez ce qui se cache dans votre PDF. Cet outil lit les métadonnées du document — titre, auteur, sujet, mots-clés, date de création, logiciel producteur, nombre de pages et statut de chiffrement — et les affiche en JSON facile à lire.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Cliquez sur Afficher les métadonnées.",
+      "Lisez les informations du document affichées en JSON."
+    ],
+    "features": [
+      "Titre, auteur, sujet, mots-clés",
+      "Dates de création et de modification",
+      "Nombre de pages et informations sur le producteur",
+      "Statut de chiffrement",
+      "Sortie JSON"
+    ],
+    "useCases": [
+      "Vérifier l'auteur et la date de création d'un PDF",
+      "Vérifier les propriétés d'un document avant publication",
+      "Auditer des fichiers pour détecter des métadonnées restantes",
+      "Déboguer des problèmes de traitement de PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Que sont les métadonnées d'un PDF ?",
+        "a": "Les métadonnées sont des informations cachées stockées dans le PDF : titre, auteur, sujet, mots-clés, date de création, logiciel qui l'a créé, nombre de pages et chiffrement éventuel."
+      },
+      {
+        "q": "Puis-je voir si un PDF est protégé par mot de passe ?",
+        "a": "Oui — l'affichage des métadonnées inclut le statut de chiffrement du document."
+      },
+      {
+        "q": "Les métadonnées sont-elles toujours exactes ?",
+        "a": "Elles reflètent ce que le créateur du PDF a stocké dans le fichier. Certains PDF ont des métadonnées vides ou génériques si le logiciel de création ne les a pas remplies."
+      }
+    ],
+    "related": [
+      "edit_metadata",
+      "extract_text",
+      "unlock_pdf"
+    ]
+  },
+  "edit_metadata": {
+    "title": "Modifier les métadonnées d'un PDF en ligne gratuitement — Mettre à jour le titre et l'auteur | PDFEDI",
+    "description": "Modifiez les métadonnées d'un PDF en ligne gratuitement. Changez le titre, l'auteur, le sujet et les mots-clés qui apparaissent dans les lecteurs PDF et les résultats de recherche. Contenu intact, sans inscription.",
+    "h1": "Modifier les métadonnées",
+    "intro": "Mettez à jour les informations de votre PDF. Modifiez le titre, l'auteur, le sujet et les mots-clés qui s'affichent dans les lecteurs PDF et les résultats de recherche — sans logiciel de bureau.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez le nouveau titre, l'auteur, le sujet et/ou les mots-clés.",
+      "Cliquez sur Enregistrer et téléchargez le PDF mis à jour."
+    ],
+    "features": [
+      "Modifier le titre, l'auteur, le sujet, les mots-clés",
+      "Contenu du document intact",
+      "Téléchargement instantané"
+    ],
+    "useCases": [
+      "Définir un titre approprié avant de publier un PDF",
+      "Ajouter votre nom comme auteur de vos documents",
+      "Nettoyer les métadonnées héritées d'un modèle",
+      "Ajouter des mots-clés pour mieux organiser les documents"
+    ],
+    "faqs": [
+      {
+        "q": "Comment changer le titre ou l'auteur d'un PDF ?",
+        "a": "Envoyez le PDF, remplissez le nouveau titre, l'auteur, le sujet ou les mots-clés, puis cliquez sur Enregistrer. Seules les métadonnées changent — vos pages restent exactement les mêmes."
+      },
+      {
+        "q": "La modification des métadonnées affectera-t-elle le contenu de mon document ?",
+        "a": "Non. Les métadonnées se trouvent dans le dictionnaire d'informations du document ; les pages, le texte et les images ne sont pas modifiés."
+      },
+      {
+        "q": "Pourquoi les métadonnées d'un PDF sont-elles importantes ?",
+        "a": "Les lecteurs PDF et les moteurs de recherche affichent le titre et l'auteur. Des métadonnées correctes rendent vos documents professionnels et plus faciles à trouver."
+      }
+    ],
+    "related": [
+      "metadata",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "watermark": {
+    "title": "Ajouter un filigrane à un PDF en ligne gratuitement — Tampon de texte | PDFEDI",
+    "description": "Apposez un filigrane de texte en diagonale sur les pages d'un PDF en ligne gratuitement. Texte personnalisé comme BROUILLON ou CONFIDENTIEL avec une opacité réglable. Sans inscription.",
+    "h1": "Ajouter un filigrane",
+    "intro": "Apposez du texte en diagonale sur chaque page de votre PDF. Ajoutez des mentions comme BROUILLON, CONFIDENTIEL ou ÉCHANTILLON avec une opacité réglable — un moyen simple d'indiquer le statut d'un document.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez le texte du filigrane et choisissez un niveau d'opacité.",
+      "Cliquez sur Ajouter un filigrane et téléchargez le PDF estampillé."
+    ],
+    "features": [
+      "Tampon de texte en diagonale sur chaque page",
+      "Texte personnalisé de votre choix",
+      "Opacité réglable"
+    ],
+    "useCases": [
+      "Marquer les brouillons comme BROUILLON avant relecture",
+      "Étiqueter les fichiers sensibles CONFIDENTIEL",
+      "Estampiller ÉCHANTILLON sur les documents d'aperçu",
+      "Identifier les PDF sortants avec le nom de votre entreprise"
+    ],
+    "faqs": [
+      {
+        "q": "Comment ajouter un filigrane à un PDF ?",
+        "a": "Envoyez votre PDF, tapez le texte du filigrane, définissez l'opacité, puis cliquez sur Ajouter un filigrane. Le texte est estampillé en diagonale sur chaque page."
+      },
+      {
+        "q": "Puis-je contrôler la visibilité du filigrane ?",
+        "a": "Oui — l'option d'opacité vous permet de rendre le filigrane discret ou prononcé."
+      },
+      {
+        "q": "Quelles pages reçoivent le filigrane ?",
+        "a": "Chaque page du PDF reçoit le filigrane."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "edit_metadata",
+      "password_protect",
+      "flatten"
+    ]
+  },
+  "page_numbers": {
+    "title": "Ajouter des numéros de page à un PDF en ligne gratuitement — Numéroter les pages | PDFEDI",
+    "description": "Numérotez les pages de votre PDF en ligne gratuitement. Choisissez n'importe quelle position, un numéro de départ, un préfixe/suffixe et une taille de police de 6 à 48 pt. Fonctionne sur toutes les pages ou sur des plages.",
+    "h1": "Ajouter des numéros de page",
+    "intro": "Ajoutez des numéros de page à votre PDF exactement où vous le souhaitez. Choisissez la position dans un coin ou sur un bord, le numéro de départ, un préfixe/suffixe facultatif et la taille de police — idéal pour les rapports, les livres numériques et les documents prêts à imprimer.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez la position verticale et horizontale, le numéro de départ et un préfixe/suffixe facultatif.",
+      "Définissez la taille de police et les plages de pages si nécessaire.",
+      "Cliquez sur Ajouter les numéros et téléchargez."
+    ],
+    "features": [
+      "N'importe quelle position dans un coin ou sur un bord",
+      "Numéro de départ personnalisé",
+      "Préfixe et suffixe facultatifs (par ex. « Page 1 sur 10 »)",
+      "Taille de police réglable (6–48 pt)",
+      "S'applique à toutes les pages ou à des plages sélectionnées"
+    ],
+    "useCases": [
+      "Numéroter les pages d'un rapport pour faciliter les références",
+      "Préparer des livres numériques pour l'impression",
+      "Ajouter des pieds de page « Page X sur Y » aux propositions",
+      "Numéroter des documents numérisés sans pagination"
+    ],
+    "faqs": [
+      {
+        "q": "Comment ajouter des numéros de page à un PDF ?",
+        "a": "Envoyez votre PDF, choisissez où placer les numéros (par ex. en bas au centre), définissez le numéro de départ et la taille de police, puis cliquez sur Ajouter les numéros."
+      },
+      {
+        "q": "Puis-je créer des numéros de page comme « Page 1 sur 10 » ?",
+        "a": "Oui — utilisez le champ de préfixe pour « Page » et le champ de suffixe pour « sur 10 » autour du numéro automatique."
+      },
+      {
+        "q": "Puis-je commencer la numérotation à un autre numéro ?",
+        "a": "Oui. Définissez le numéro de départ selon vos besoins — utile lorsque votre PDF fait partie d'un document plus vaste."
+      },
+      {
+        "q": "Puis-je numéroter seulement certaines pages ?",
+        "a": "Oui — saisissez des plages de pages comme 3-10 pour numéroter uniquement ces pages."
+      }
+    ],
+    "related": [
+      "watermark",
+      "edit_metadata",
+      "merge",
+      "flatten"
+    ]
+  },
+  "password_protect": {
+    "title": "Protéger un PDF par mot de passe en ligne gratuitement — Chiffrer un PDF | PDFEDI",
+    "description": "Ajoutez une protection par mot de passe à un PDF en ligne gratuitement. Chiffrez votre document pour que seules les personnes connaissant le mot de passe puissent l'ouvrir dans n'importe quel lecteur. Sans inscription.",
+    "h1": "Protéger par mot de passe",
+    "intro": "Verrouillez votre PDF avec un mot de passe. Le document est chiffré et ne peut pas être ouvert sans le mot de passe que vous définissez — une protection simple pour les fichiers sensibles que vous devez partager ou stocker.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez le mot de passe avec lequel vous souhaitez le protéger.",
+      "Cliquez sur Protéger et téléchargez le PDF chiffré."
+    ],
+    "features": [
+      "Chiffrement PDF robuste",
+      "Mot de passe requis pour ouvrir",
+      "Fonctionne avec n'importe quel lecteur PDF"
+    ],
+    "useCases": [
+      "Protéger des contrats avant de les envoyer par e-mail",
+      "Sécuriser des documents financiers",
+      "Verrouiller des dossiers personnels stockés en ligne",
+      "Partager des fichiers sensibles avec un accès contrôlé"
+    ],
+    "faqs": [
+      {
+        "q": "Comment protéger un PDF par mot de passe ?",
+        "a": "Envoyez votre PDF, saisissez un mot de passe, puis cliquez sur Protéger. Le PDF téléchargé exigera ce mot de passe pour s'ouvrir dans n'importe quel lecteur PDF."
+      },
+      {
+        "q": "Que se passe-t-il si j'oublie le mot de passe ?",
+        "a": "Il n'y a pas de récupération — sans le mot de passe, le PDF ne peut pas être ouvert. Conservez votre mot de passe dans un endroit sûr."
+      },
+      {
+        "q": "Quel type de chiffrement est utilisé ?",
+        "a": "Le PDF est chiffré avec le chiffrement PDF standard pris en charge par tous les principaux lecteurs PDF."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "unlock_pdf": {
+    "title": "Déverrouiller un PDF en ligne gratuitement — Supprimer la protection par mot de passe | PDFEDI",
+    "description": "Supprimez la protection par mot de passe de votre propre PDF en ligne gratuitement. Saisissez le mot de passe correct et téléchargez une copie déverrouillée. Sans inscription, sans filigrane.",
+    "h1": "Déverrouiller un PDF",
+    "intro": "Supprimez le mot de passe d'un PDF qui vous appartient. Saisissez le mot de passe correct et téléchargez une copie déverrouillée que vous pouvez ouvrir, modifier et traiter librement avec d'autres outils.",
+    "howTo": [
+      "Envoyez votre PDF protégé par mot de passe (jusqu'à 50 Mo).",
+      "Saisissez le mot de passe correct.",
+      "Cliquez sur Déverrouiller et téléchargez le PDF non protégé."
+    ],
+    "features": [
+      "Supprime la protection par mot de passe",
+      "Le résultat fonctionne avec tous les autres outils PDFEDI",
+      "Gratuit et sans filigrane"
+    ],
+    "useCases": [
+      "Déverrouiller votre propre PDF après avoir oublié qu'il était verrouillé",
+      "Préparer un fichier protégé pour la fusion ou la division",
+      "Supprimer les mots de passe avant l'archivage",
+      "Activer l'extraction de texte sur des documents verrouillés"
+    ],
+    "faqs": [
+      {
+        "q": "Comment supprimer le mot de passe d'un PDF ?",
+        "a": "Envoyez le PDF protégé, saisissez son mot de passe, puis cliquez sur Déverrouiller. Vous obtiendrez un PDF normal sans invite de mot de passe."
+      },
+      {
+        "q": "Puis-je déverrouiller un PDF sans le mot de passe ?",
+        "a": "Non. Vous devez connaître le mot de passe correct — cet outil supprime la protection des fichiers auxquels vous avez le droit d'accéder ; il ne peut pas casser des mots de passe inconnus."
+      },
+      {
+        "q": "Pourquoi déverrouiller un PDF ?",
+        "a": "D'autres outils refusent les fichiers verrouillés par sécurité. Le déverrouillage préalable vous permet de fusionner, diviser, compresser ou convertir le document normalement."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "merge",
+      "split",
+      "extract_text"
+    ]
+  },
+  "redact": {
+    "title": "Caviarder un PDF en ligne gratuitement — Noircir du texte sensible | PDFEDI",
+    "description": "Caviardez définitivement du texte sensible dans un PDF en ligne gratuitement. Noircissez des noms, des e-mails et des identifiants par correspondance exacte du texte, plusieurs termes à la fois. Sans inscription.",
+    "h1": "Caviarder un PDF",
+    "intro": "Noircissez définitivement du texte sensible dans votre PDF. Saisissez les mots ou expressions à caviarder — noms, e-mails, numéros d'identification — et ils sont couverts de rectangles noirs pleins dans le document de sortie.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez le texte à caviarder, séparé par des virgules (par ex. SSN, john@example.com).",
+      "Cliquez sur Caviarder et téléchargez le PDF noirci."
+    ],
+    "features": [
+      "Caviardage par correspondance exacte du texte",
+      "Plusieurs termes en un seul passage",
+      "Rectangles de caviardage noirs pleins"
+    ],
+    "useCases": [
+      "Noircir des données personnelles avant de partager des documents",
+      "Caviarder les noms de clients dans des dossiers d'affaires",
+      "Supprimer des adresses e-mail de rapports publics",
+      "Assainir des documents pour une diffusion de type FOIA"
+    ],
+    "faqs": [
+      {
+        "q": "Comment noircir du texte dans un PDF ?",
+        "a": "Envoyez votre PDF, saisissez les mots ou expressions exacts à caviarder, séparés par des virgules, puis cliquez sur Caviarder. Chaque occurrence est couverte d'un rectangle noir."
+      },
+      {
+        "q": "Le texte caviardé est-il vraiment supprimé ?",
+        "a": "Le texte correspondant est couvert de rectangles noirs opaques dans le PDF de sortie. Pour une sécurité maximale avec des documents très sensibles, vérifiez le résultat avant de le diffuser."
+      },
+      {
+        "q": "Puis-je caviarder plusieurs mots différents à la fois ?",
+        "a": "Oui — saisissez-les sous forme de liste séparée par des virgules, par exemple : SSN, john@example.com, 555-1234."
+      },
+      {
+        "q": "Le caviardage fonctionne-t-il sur les PDF numérisés ?",
+        "a": "Le caviardage correspond à la couche de texte du PDF. Pour les PDF numérisés composés uniquement d'images, exécutez d'abord l'OCR pour ajouter une couche de texte, puis caviardez."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "unlock_pdf",
+      "extract_text",
+      "flatten"
+    ]
+  },
+  "flatten": {
+    "title": "Aplatir un PDF en ligne gratuitement — Intégrer les annotations dans les pages | PDFEDI",
+    "description": "Aplatissez un PDF en ligne gratuitement. Intégrez définitivement les annotations, commentaires et champs de formulaire remplis dans les pages pour figer l'apparence. Sans inscription.",
+    "h1": "Aplatir un PDF",
+    "intro": "Intégrez définitivement les annotations et les champs de formulaire dans les pages de votre PDF. L'aplatissement fusionne les marques, les commentaires et les formulaires remplis dans le contenu de la page, pour que le document ait la même apparence partout et ne puisse plus être modifié.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Cliquez sur Aplatir.",
+      "Téléchargez le PDF aplati."
+    ],
+    "features": [
+      "Fusionne les annotations dans le contenu de la page",
+      "Intègre les valeurs des champs de formulaire dans les pages",
+      "Fige l'apparence finale du document"
+    ],
+    "useCases": [
+      "Finaliser un formulaire rempli pour que les valeurs ne puissent plus être modifiées",
+      "Intégrer les commentaires de relecture dans un document",
+      "Garantir une apparence cohérente dans tous les lecteurs PDF",
+      "Préparer des documents pour l'impression ou l'archivage"
+    ],
+    "faqs": [
+      {
+        "q": "Que fait l'aplatissement d'un PDF ?",
+        "a": "L'aplatissement fusionne les annotations, les commentaires et les valeurs des champs de formulaire directement dans les graphiques de la page. Après l'aplatissement, ils font partie de la page et ne peuvent plus être modifiés ni déplacés."
+      },
+      {
+        "q": "Pourquoi aplatir un formulaire rempli ?",
+        "a": "Les valeurs d'un formulaire non aplati peuvent encore être modifiées par quiconque dispose d'un éditeur PDF. L'aplatissement fige les valeurs saisies."
+      },
+      {
+        "q": "L'aplatissement modifiera-t-il l'apparence de mon PDF ?",
+        "a": "Non — l'apparence visuelle reste la même. Seule la possibilité de modifier les annotations et les champs de formulaire change."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "watermark",
+      "page_numbers",
+      "redact"
+    ]
+  },
+  "crop": {
+    "title": "Recadrer un PDF en ligne gratuitement — Rogner les marges et couper les pages | PDFEDI",
+    "description": "Recadrez les pages d'un PDF en ligne gratuitement. Rognez les marges blanches ou coupez les pages en quantités exactes en points depuis le haut, le bas, la gauche et la droite. Sans inscription, fichiers privés.",
+    "h1": "Recadrer un PDF",
+    "intro": "Supprimez l'espace blanc superflu ou les bords indésirables de vos pages PDF. Saisissez le nombre de points à rogner de chaque côté — appliquez-le à toutes les pages ou uniquement aux plages de pages de votre choix.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Saisissez les quantités à rogner en points pour les bords supérieur, inférieur, gauche et droit (72 points = 1 pouce).",
+      "Limitez éventuellement le recadrage à des pages précises (par ex. 1-3,5). Laissez vide pour toutes les pages.",
+      "Cliquez sur Recadrer et téléchargez le PDF rogné."
+    ],
+    "features": [
+      "Rogner chaque bord indépendamment, en points",
+      "S'applique à toutes les pages ou à des plages de pages sélectionnées",
+      "Qualité du contenu d'origine entièrement préservée",
+      "Gratuit et sans inscription"
+    ],
+    "useCases": [
+      "Supprimer les larges marges blanches avant l'impression pour économiser du papier",
+      "Couper les ombres et bordures des bords de scanner des pages numérisées",
+      "Resserrer les pages pour une lecture plus facile sur téléphone et liseuse",
+      "Rogner les en-têtes ou pieds de page des rapports générés"
+    ],
+    "faqs": [
+      {
+        "q": "Combien puis-je recadrer d'une page de PDF ?",
+        "a": "Autant que vous le souhaitez, tant qu'il reste une partie de la page. Si les quantités à rogner supprimeraient toute la largeur ou la hauteur de la page, l'outil s'arrête avec une erreur au lieu de produire une page vide."
+      },
+      {
+        "q": "Quelle est l'unité des quantités de recadrage ?",
+        "a": "Le point — l'unité standard du PDF. 72 points équivalent à 1 pouce, donc rogner 36 points retire un demi-pouce de ce bord."
+      },
+      {
+        "q": "Le recadrage supprime-t-il définitivement le contenu rogné ?",
+        "a": "Le recadrage ajuste le cadre de rognage visible de chaque page. Le contenu masqué n'est pas réécrit, donc pour supprimer définitivement du contenu sensible, utilisez plutôt l'outil Caviarder."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "rotate_pages",
+      "n_up"
+    ]
+  },
+  "grayscale": {
+    "title": "Convertir un PDF en niveaux de gris en ligne gratuitement — Noir et blanc | PDFEDI",
+    "description": "Convertissez un PDF couleur en niveaux de gris en ligne gratuitement. Impression moins chère et fichiers plus petits jusqu'à 600 PPP. Les pages sont rendues sous forme d'images — notez que le texte n'est plus sélectionnable.",
+    "h1": "PDF en niveaux de gris",
+    "intro": "Transformez un PDF couleur en une version noir et blanc nette, moins chère à imprimer et souvent plus petite. Choisissez la qualité de rendu de 72 à 600 PPP — les pages sont converties en images en niveaux de gris, donc le texte n'est plus sélectionnable ensuite.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Définissez la résolution — 200 est un bon équilibre entre qualité et taille de fichier ; utilisez 300 ou plus pour l'impression.",
+      "Cliquez sur Convertir et téléchargez votre PDF en niveaux de gris."
+    ],
+    "features": [
+      "Véritable conversion en niveaux de gris à 72–600 PPP",
+      "Conserve les formats de page et le nombre de pages d'origine",
+      "Des pages encodées en JPEG de haute qualité gardent les fichiers compacts",
+      "Gratuit et sans inscription"
+    ],
+    "useCases": [
+      "Réduire les coûts d'impression couleur pour les polycopiés et les brouillons",
+      "Préparer des documents pour des imprimantes noir et blanc uniquement",
+      "Rendre des diapositives très colorées lisibles une fois imprimées en monochrome",
+      "Réduire la taille des PDF couleur riches en images"
+    ],
+    "faqs": [
+      {
+        "q": "Pourquoi le texte de mon PDF en niveaux de gris n'est-il pas sélectionnable ?",
+        "a": "Pour garantir un vrai résultat en niveaux de gris, chaque page est rendue sous forme d'image en niveaux de gris. Cela signifie que le texte fait partie de l'image — il s'imprime à l'identique mais ne peut plus être sélectionné ni recherché. Conservez une copie de l'original si vous avez besoin de la couche de texte."
+      },
+      {
+        "q": "Quelle résolution (PPP) dois-je choisir ?",
+        "a": "150 PPP conviennent pour la lecture à l'écran, 200 PPP équilibrent taille et netteté, et 300 PPP ou plus sont préférables pour l'impression. Une résolution plus élevée signifie des fichiers plus volumineux."
+      },
+      {
+        "q": "Les niveaux de gris rendront-ils mon PDF plus petit ?",
+        "a": "Généralement oui pour les documents couleur riches en images, car les informations de couleur sont supprimées. Les PDF composés uniquement de texte peuvent légèrement grossir parce que les pages deviennent des images — l'outil Compresser est plus adapté pour ceux-là."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "n_up": {
+    "title": "PDF N-Up en ligne gratuitement — Plusieurs pages par feuille | PDFEDI",
+    "description": "Combinez 2, 4, 6 ou 9 pages PDF sur une seule feuille en ligne gratuitement. Feuilles A4 ou Lettre, portrait ou paysage. Parfait pour les polycopiés, les diapositives et les livrets. Sans inscription.",
+    "h1": "N-Up PDF",
+    "intro": "Imprimez plus, gaspillez moins : placez 2, 4, 6 ou 9 pages de votre PDF sur une seule feuille. Idéal pour les diapositives de cours, les polycopiés et les relectures de brouillons où les pages en pleine taille sont superflues.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez le nombre de pages par feuille : 2, 4, 6 ou 9.",
+      "Choisissez le format de feuille (A4 ou Lettre) et l'orientation (portrait ou paysage).",
+      "Cliquez sur Créer et téléchargez vos feuilles combinées."
+    ],
+    "features": [
+      "2, 4, 6 ou 9 pages par feuille",
+      "La grille s'adapte automatiquement à l'orientation",
+      "Contenu mis à l'échelle proportionnellement — jamais déformé",
+      "Formats de feuille A4 et Lettre"
+    ],
+    "useCases": [
+      "Imprimer des diapositives de cours sous forme de polycopiés compacts",
+      "Relire de longs documents en utilisant une fraction du papier",
+      "Créer des planches d'épreuves façon livret",
+      "Faire tenir toute une présentation sur quelques pages pour un déplacement"
+    ],
+    "faqs": [
+      {
+        "q": "Combien de feuilles de sortie vais-je obtenir ?",
+        "a": "Votre nombre de pages divisé par la mise en page, arrondi au supérieur. Par exemple, un PDF de 10 pages en 4 pages par feuille produit 3 feuilles — la dernière feuille a simplement des emplacements vides."
+      },
+      {
+        "q": "Le N-Up réduit-il la qualité ?",
+        "a": "Non. Les pages sont placées sur la feuille sous forme de contenu vectoriel à plus petite échelle — le texte et les images restent nets, simplement plus petits physiquement une fois imprimés."
+      },
+      {
+        "q": "Quelle mise en page choisir pour les diapositives ?",
+        "a": "4 pages par feuille en paysage convient bien à la plupart des présentations. Utilisez 2 pages par feuille si vous devez lire des annotations, et 6 ou 9 pages par feuille uniquement pour les vues d'ensemble — le texte devient petit."
+      }
+    ],
+    "related": [
+      "crop",
+      "merge",
+      "split"
+    ]
+  },
+  "repair": {
+    "title": "Réparer un PDF corrompu en ligne gratuitement — Corriger les fichiers endommagés | PDFEDI",
+    "description": "Réparez un PDF corrompu en ligne gratuitement. Reconstruisez les tables de références croisées cassées, les téléchargements tronqués et les objets mal formés. Si un fichier ne peut pas être enregistré, vous obtenez une erreur honnête.",
+    "h1": "Réparer un PDF",
+    "intro": "Remettez votre PDF endommagé en état de marche. Envoyez le fichier cassé et le moteur de réparation reconstruit sa structure interne — références croisées cassées, téléchargements tronqués et objets mal formés sont corrigés lorsque c'est physiquement possible.",
+    "howTo": [
+      "Envoyez le fichier PDF endommagé (jusqu'à 50 Mo).",
+      "Cliquez sur Réparer — la structure du fichier est analysée et reconstruite.",
+      "Téléchargez le PDF réparé et vérifiez que votre contenu est intact."
+    ],
+    "features": [
+      "Reconstruit les tables de références croisées cassées",
+      "Récupère les fichiers tronqués et partiellement téléchargés",
+      "Répare les flux d'objets mal formés",
+      "Résultat honnête — les fichiers irréparables signalent une erreur, pas une fausse réparation"
+    ],
+    "useCases": [
+      "Ouvrir un PDF qui affiche des erreurs « fichier endommagé »",
+      "Récupérer des documents issus de téléchargements interrompus",
+      "Corriger des PDF corrompus par des transferts USB défectueux ou des pièces jointes",
+      "Sauver d'anciens PDF archivés qui ne s'ouvrent plus"
+    ],
+    "faqs": [
+      {
+        "q": "Quels types de dommages peuvent être réparés ?",
+        "a": "Les tables de références croisées cassées ou manquantes, les décalages d'objets erronés, les fichiers tronqués et les longueurs de flux mal formées sont les problèmes les plus couramment réparables. Si les octets du contenu lui-même ont disparu, aucun outil ne peut les recréer."
+      },
+      {
+        "q": "Que se passe-t-il si mon fichier ne peut pas être réparé ?",
+        "a": "Vous obtenez une erreur claire « irréparable » expliquant que le fichier est trop endommagé — jamais un téléchargement silencieusement cassé. Essayez de l'ouvrir dans un autre lecteur pour confirmer, puis obtenez à nouveau le fichier à sa source si possible."
+      },
+      {
+        "q": "Mon PDF est protégé par mot de passe. Puis-je le réparer ?",
+        "a": "Pas directement — la réparation ne peut pas fonctionner sur des fichiers chiffrés. Utilisez d'abord l'outil Déverrouiller un PDF avec votre mot de passe, puis réparez le fichier déverrouillé."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "merge",
+      "metadata"
+    ]
+  },
+  "pdf_to_word": {
+    "title": "PDF vers Word en ligne gratuitement — Convertir un PDF en DOCX | PDFEDI",
+    "description": "Convertissez un PDF en document Word modifiable en ligne gratuitement. Vrais paragraphes, styles de titres et images intégrées. Idéal pour les documents textuels — les tableaux complexes sont approximatifs.",
+    "h1": "PDF vers Word",
+    "intro": "Transformez votre PDF en un document Word que vous pouvez vraiment modifier. Le texte est reconstruit en vrais paragraphes avec des styles de titres appropriés, et les images intégrées sont placées dans l'ordre de lecture. Fonctionne le mieux sur les documents textuels — les tableaux complexes et les mises en page multi-colonnes ressortent approximatifs.",
+    "howTo": [
+      "Envoyez votre fichier PDF (jusqu'à 50 Mo, 50 pages maximum).",
+      "Cliquez sur Convertir — le texte est extrait avec sa mise en page et reconstruit en document Word.",
+      "Téléchargez le .docx et modifiez-le dans Word, Google Docs ou LibreOffice."
+    ],
+    "features": [
+      "Vrais paragraphes modifiables — pas des images de texte",
+      "Styles de titres détectés à partir des tailles de caractères",
+      "Mise en gras préservée lorsqu'elle est détectée",
+      "Images intégrées placées dans l'ordre de lecture"
+    ],
+    "useCases": [
+      "Modifier un rapport PDF dont vous ne disposez que sous forme de fichier",
+      "Réutiliser le contenu d'un PDF dans une proposition ou une présentation",
+      "Extraire du texte structuré dans un document que vous pouvez réviser",
+      "Convertir des PDF archivés en fichiers Word exploitables"
+    ],
+    "faqs": [
+      {
+        "q": "Mon document ressemblera-t-il exactement au PDF ?",
+        "a": "Presque, pour les documents textuels, approximativement pour les complexes. Les paragraphes, les titres et les images se transfèrent bien ; les tableaux complexes et les mises en page de magazine multi-colonnes sont reconstruits au mieux mais ne seront pas parfaits au pixel près. L'objectif est un document modifiable, pas un clone visuel."
+      },
+      {
+        "q": "Mon PDF est un scan sans texte sélectionnable. Que se passe-t-il ?",
+        "a": "Vous obtiendrez une erreur claire vous orientant vers l'outil OCR. Exécutez d'abord l'OCR pour rendre le scan consultable, puis convertissez le résultat OCR en Word."
+      },
+      {
+        "q": "Quel programme ouvre le fichier téléchargé ?",
+        "a": "Le téléchargement est un fichier .docx standard — il s'ouvre dans Microsoft Word, Google Docs, LibreOffice Writer et Apple Pages."
+      }
+    ],
+    "related": [
+      "ocr",
+      "extract_text",
+      "images_to_pdf",
+      "edit_metadata"
+    ]
+  },
+  "compress": {
+    "title": "Compresser un PDF en ligne gratuitement — Réduire à une taille cible | PDFEDI",
+    "description": "Compressez un PDF jusqu'à une taille cible en ligne gratuitement. Choisissez une limite — par ex. 25 Mo, la limite de dépôt électronique la plus courante — et les images sont réduites jusqu'à ce qu'elle soit atteinte. Lot de 10 fichiers maximum, téléchargement ZIP.",
+    "h1": "Compresser un PDF",
+    "intro": "Réduisez un PDF jusqu'à une taille de votre choix. Choisissez une cible — 25 Mo est la limite de dépôt électronique (CM/ECF) la plus courante, mais les limites varient selon le tribunal, d'environ 3 à 200 Mo, alors vérifiez d'abord la règle locale de votre tribunal. L'outil reconstruit le fichier et réduit les images intégrées jusqu'à ce qu'il tienne dans la limite, et le ZIP inclut un rapport indiquant la taille avant et après pour chaque fichier.",
+    "howTo": [
+      "Envoyez de 1 à 10 fichiers PDF (jusqu'à 50 Mo chacun).",
+      "Choisissez une taille cible, par exemple 25 Mo.",
+      "Cliquez sur Compresser et téléchargez le ZIP.",
+      "Consultez compression_report.txt dans le ZIP — il indique pour chaque fichier si la cible a été atteinte."
+    ],
+    "features": [
+      "Compresser jusqu'à une taille cible : 2, 5, 10, 25 ou 50 Mo",
+      "Lot de 10 PDF maximum, résultats en ZIP",
+      "Rapport par fichier avec les tailles avant/après et le statut de la cible",
+      "Résultat honnête — si une cible ne peut pas être atteinte, le rapport le dit"
+    ],
+    "useCases": [
+      "Réduire un mémoire sous la limite de taille de dépôt électronique de votre tribunal",
+      "Compresser des pièces numérisées pour pouvoir les déposer ou les envoyer par e-mail",
+      "Réduire un gros PDF avant de l'envoyer à un client ou un collègue",
+      "Compresser un ensemble de documents par lot en une seule tâche"
+    ],
+    "faqs": [
+      {
+        "q": "Quelle taille cible choisir pour le dépôt au tribunal ?",
+        "a": "Cela dépend de votre tribunal — les limites CM/ECF varient d'environ 3 Mo à 200 Mo selon le tribunal, et 25 Mo est la plus courante. Vérifiez la règle locale ou le guide de dépôt électronique de votre tribunal, puis choisissez cette taille ici."
+      },
+      {
+        "q": "Que se passe-t-il si mon PDF ne peut pas être compressé jusqu'à la cible ?",
+        "a": "Vous obtenez quand même la plus petite version que l'outil a pu produire, et compression_report.txt dans le ZIP indique que la cible a été manquée et de combien. Essayez une cible plus grande, ou divisez d'abord le document."
+      },
+      {
+        "q": "La compression changera-t-elle l'apparence de mon document ?",
+        "a": "Le texte et la mise en page sont préservés. Les images intégrées sont réduites et réencodées en JPEG, donc les très grandes photos deviennent plus douces — c'est de là que vient le gain de taille. Les PDF composés uniquement de texte se réduisent à peine, car il n'y a pas d'images à réduire."
+      },
+      {
+        "q": "Puis-je compresser plusieurs PDF à la fois ?",
+        "a": "Oui — envoyez jusqu'à 10 PDF en une seule tâche. Les résultats reviennent dans un ZIP avec un PDF compressé par fichier plus un rapport. Les fichiers sont traités en toute sécurité et supprimés automatiquement. Aucune inscription requise."
+      }
+    ],
+    "related": [
+      "exhibit_combine",
+      "strip_metadata",
+      "split",
+      "grayscale"
+    ]
+  },
+  "strip_metadata": {
+    "title": "Supprimer les métadonnées d'un PDF en ligne gratuitement — Retirer les infos cachées | PDFEDI",
+    "description": "Supprimez les métadonnées cachées d'un PDF en ligne gratuitement. Retire le titre, l'auteur, les dates, le créateur et le producteur en un clic, avec un rapport avant/après. Lot de 10 fichiers maximum.",
+    "h1": "Supprimer les métadonnées",
+    "intro": "Supprimez les informations cachées stockées dans un PDF — titre, auteur, dates de création et de modification, logiciels créateur et producteur, et le paquet de métadonnées XMP — en un clic. Vous obtenez le PDF nettoyé plus un rapport avant/après montrant exactement ce que contenait le fichier et ce qui a été supprimé, pour pouvoir le prouver avant de transmettre le fichier.",
+    "howTo": [
+      "Envoyez de 1 à 10 fichiers PDF (jusqu'à 50 Mo chacun).",
+      "Cliquez sur Supprimer les métadonnées — aucun réglage à définir.",
+      "Téléchargez le ZIP avec les PDF nettoyés et metadata_report.json.",
+      "Ouvrez le rapport pour voir ce qui a été supprimé de chaque fichier."
+    ],
+    "features": [
+      "Suppression en un clic de toutes les métadonnées du document",
+      "Rapport avant/après pour chaque fichier (JSON)",
+      "Supprime aussi les paquets de métadonnées XMP",
+      "Lot de 10 PDF maximum, résultats en ZIP"
+    ],
+    "useCases": [
+      "Nettoyer un mémoire ou une pièce avant de le déposer ou de le partager",
+      "Supprimer l'auteur et les détails de création d'un document envoyé à la partie adverse",
+      "Supprimer les métadonnées d'un lot de fichiers clients avant divulgation",
+      "Vérifier quelles métadonnées contient réellement un PDF reçu"
+    ],
+    "faqs": [
+      {
+        "q": "Quelles métadonnées sont supprimées ?",
+        "a": "Le titre, l'auteur, le sujet, les mots-clés, le créateur, le producteur, les dates de création et de modification, et le paquet de métadonnées XMP. Le rapport liste chaque champ avant et après, pour que vous puissiez voir exactement ce qui a changé."
+      },
+      {
+        "q": "En quoi est-ce différent de Modifier les métadonnées ?",
+        "a": "« Modifier les métadonnées » change les champs un par un — vous définissez un nouveau titre ou auteur. « Supprimer les métadonnées » retire tout en un clic et le prouve avec un rapport avant/après. Utilisez Supprimer lorsque le fichier quitte votre bureau ; utilisez Modifier lorsque vous voulez corriger un champ."
+      },
+      {
+        "q": "Le PDF nettoyé contient-il encore des métadonnées ?",
+        "a": "Le rapport montre ce qui reste. L'outil d'écriture PDF appose sa propre valeur de producteur lorsque le fichier nettoyé est écrit — elle est indiquée comme restante dans le rapport, pas cachée. Aucune information de votre fichier d'origine ne survit."
+      },
+      {
+        "q": "Est-ce gratuit ?",
+        "a": "Oui. La suppression des métadonnées sur PDFEDI est entièrement gratuite et sans inscription. Les fichiers sont traités en toute sécurité et supprimés automatiquement. Aucune inscription requise."
+      }
+    ],
+    "related": [
+      "metadata",
+      "edit_metadata",
+      "redact",
+      "strip_image_metadata"
+    ]
+  },
+  "exhibit_combine": {
+    "title": "Combiner des pièces PDF en ligne gratuitement — Intercalaires et Bates | PDFEDI",
+    "description": "Combinez des pièces PDF en un seul document prêt à déposer en ligne gratuitement. Intercalaires avant chaque pièce et numéros de page continus de style Bates. 2 à 20 PDF, sans inscription.",
+    "h1": "Combiner des pièces",
+    "intro": "Transformez un ensemble de PDF en un seul document prêt à déposer. Chaque pièce reçoit un intercalaire (Pièce A, Pièce B, etc., avec son nom de fichier et son nombre de pages) et chaque page de pièce est estampillée d'un numéro de style Bates — BATES-000001, BATES-000002 — compté en continu d'une pièce à l'autre. Envoyez vos pièces dans l'ordre et téléchargez un seul PDF prêt à déposer.",
+    "howTo": [
+      "Envoyez de 2 à 20 fichiers PDF dans l'ordre des pièces (jusqu'à 50 Mo chacun).",
+      "Définissez le libellé de pièce, le préfixe Bates et le premier numéro Bates si vous souhaitez d'autres valeurs.",
+      "Cliquez sur Combiner des pièces et téléchargez le PDF unique.",
+      "Vérifiez les intercalaires et les numéros Bates sur les premières pages avant le dépôt."
+    ],
+    "features": [
+      "Intercalaire avant chaque pièce avec libellé, nom de fichier et nombre de pages",
+      "Numérotation continue de style Bates sur toutes les pièces",
+      "Libellé de pièce, préfixe Bates et numéro de départ personnalisés",
+      "Combiner 2 à 20 PDF en un seul fichier prêt à déposer"
+    ],
+    "useCases": [
+      "Assembler des pièces pour un dépôt au tribunal en un seul document",
+      "Constituer un ensemble de pièces de déposition avec numéros Bates pour référence",
+      "Combiner des documents justificatifs en un seul dossier indexé",
+      "Préparer un dossier d'audience sous forme d'un seul PDF au lieu de nombreux fichiers"
+    ],
+    "faqs": [
+      {
+        "q": "Qu'est-ce qu'un numéro Bates ?",
+        "a": "Un numéro Bates est un numéro séquentiel unique estampillé sur chaque page d'un ensemble de documents (par exemple BATES-000001, BATES-000002), utilisé pour que toutes les personnes impliquées dans une affaire puissent se référer à la même page. Cet outil les estampille en continu sur toutes vos pièces."
+      },
+      {
+        "q": "Que contient un intercalaire ?",
+        "a": "Une page avant chaque pièce, indiquant le libellé de la pièce (Pièce A, B, C…), le nom du fichier d'origine et le nombre de pages de cette pièce. Les intercalaires ne sont pas numérotés Bates. Vous pouvez les désactiver si vous n'en voulez pas."
+      },
+      {
+        "q": "Puis-je commencer la numérotation Bates à un autre nombre que 1 ?",
+        "a": "Oui — définissez le premier numéro Bates pour poursuivre un ensemble déjà commencé, par exemple 501 pour reprendre là où une production antérieure s'était arrêtée."
+      },
+      {
+        "q": "Dans quel ordre les pièces sont-elles disposées ?",
+        "a": "Dans l'ordre où vous les envoyez. Envoyez la pièce A en premier, puis B, puis C. Les fichiers sont traités en toute sécurité et supprimés automatiquement. Aucune inscription requise."
+      }
+    ],
+    "related": [
+      "merge",
+      "page_numbers",
+      "compress",
+      "redact"
+    ]
+  },
+  "strip_image_metadata": {
+    "title": "Supprimer les métadonnées d'images en ligne gratuitement — Retirer EXIF et GPS | PDFEDI",
+    "description": "Supprimez les métadonnées EXIF et GPS des photos en ligne gratuitement. Retire les données d'appareil photo, de date et de localisation des images JPG, PNG et WebP, avec un rapport avant/après. Lot de 10 images maximum.",
+    "h1": "Supprimer les métadonnées des images",
+    "intro": "Les photos contiennent des données cachées : la marque et le modèle de l'appareil, la date de prise de vue, et souvent des coordonnées GPS indiquant exactement où elles ont été prises. Cet outil liste ces métadonnées pour chaque image, les supprime, et vous donne un rapport avant/après montrant ce qui a été retiré — pour pouvoir partager des photos sans partager où et quand elles ont été prises.",
+    "howTo": [
+      "Envoyez de 1 à 10 images JPG, PNG ou WebP.",
+      "Cliquez sur Supprimer les métadonnées des images — aucun réglage à définir.",
+      "Téléchargez le ZIP avec les images nettoyées et metadata_report.json.",
+      "Ouvrez le rapport pour voir ce qui a été supprimé de chaque image."
+    ],
+    "features": [
+      "Supprime les données EXIF : appareil photo, date, logiciel",
+      "Supprime les données de localisation GPS des photos",
+      "Rapport avant/après pour chaque image (JSON)",
+      "Lot de 10 images maximum, résultats en ZIP"
+    ],
+    "useCases": [
+      "Supprimer les données de localisation des photos avant de les partager",
+      "Nettoyer les photos de clients ou de dossiers avant divulgation",
+      "Retirer les détails d'appareil photo et de date des images d'un site web",
+      "Vérifier quelles métadonnées contiennent réellement les photos de votre téléphone"
+    ],
+    "faqs": [
+      {
+        "q": "Quelles métadonnées sont supprimées de mes photos ?",
+        "a": "Les données EXIF, y compris la marque et le modèle de l'appareil, la date de prise de vue, le logiciel et les coordonnées GPS, ainsi que les données XMP lorsqu'elles sont présentes. Le rapport liste chaque champ trouvé avant le nettoyage et confirme sa disparition après."
+      },
+      {
+        "q": "Cela supprime-t-il les marqueurs C2PA ou de génération par IA ?",
+        "a": "Non — cet outil supprime uniquement les métadonnées standard EXIF/XMP/GPS, et il ne vérifie pas la suppression des marqueurs C2PA ou de génération par IA. Pour le nettoyage C2PA/SynthID, utilisez ClearMark, conçu pour ce travail."
+      },
+      {
+        "q": "Mes photos auront-elles un aspect différent après le nettoyage ?",
+        "a": "Non. Seules les métadonnées cachées sont supprimées — l'image elle-même est réenregistrée en haute qualité (qualité JPEG 95) et a le même aspect."
+      },
+      {
+        "q": "Est-ce gratuit ?",
+        "a": "Oui. La suppression des métadonnées d'images sur PDFEDI est entièrement gratuite et sans inscription. Les fichiers sont traités en toute sécurité et supprimés automatiquement. Aucune inscription requise."
+      }
+    ],
+    "related": [
+      "strip_metadata",
+      "metadata",
+      "images_to_pdf",
+      "redact"
+    ]
+  }
+}
