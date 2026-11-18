@@ -19,9 +19,15 @@ import { useOrganizer } from "../../../hooks/useOrganizer";
 import { CanvasShell } from "../CanvasShell";
 import { ThumbnailGrid, type GridCell } from "../ThumbnailGrid";
 import { PagePreviewModal, thumbLoaderFor } from "../canvasUtils";
-import { ToolButton, useUndoKeys, type ToolCanvasProps } from "./common";
+import { useLocale, useTranslations } from "next-intl";
+import { ToolButton, translatePayloadError, useUndoKeys, type ToolCanvasProps } from "./common";
 
 export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) {
+  const locale = useLocale();
+  const t = useTranslations("canvas");
+  const tTools = useTranslations("tools");
+  const tContent = useTranslations("toolContent");
+  const tErr = useTranslations("errors");
   const pdf = pdfs[0];
   const initialItems = useMemo<OrganizerItem[]>(
     () =>
@@ -56,26 +62,31 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
       const built = buildReorderPayload(order);
       return { ...built, error: null as string | null };
     } catch (e) {
-      return { config: {}, error: e instanceof Error ? e.message : String(e) };
+      return { config: {}, error: translatePayloadError(e, tErr) };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [doc.items]);
 
   const summary =
     changed.length === 0
-      ? "Pages are in their original order — drag thumbnails to rearrange them."
-      : `${changed.length} page${changed.length === 1 ? "" : "s"} moved: ` +
-        changed
-          .slice(0, 5)
-          .map((c) => `p.${c.page} → position ${c.current}`)
-          .join(", ") +
-        (changed.length > 5 ? `, +${changed.length - 5} more` : "");
+      ? t("reorder.summaryOriginal")
+      : t("reorder.summaryMoved", {
+          count: changed.length,
+          list: changed
+            .slice(0, 5)
+            .map((c) => `p.${c.page} → ${t("reorder.position", { n: c.current })}`)
+            .join(", "),
+          more:
+            changed.length > 5
+              ? t("reorder.summaryMore", { count: changed.length - 5 })
+              : "",
+        });
 
   const cells: GridCell[] = useMemo(
     () =>
       doc.items.map((it, idx) => ({
         id: it.id,
-        label: `Page ${it.page}`,
+        label: t("pageLabel", { n: it.page }),
         position: idx + 1,
       })),
     [doc.items],
@@ -98,21 +109,22 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
         nums.some((n) => !Number.isInteger(n) || n < 1 || n > pageCount) ||
         new Set(nums).size !== pageCount
       ) {
-        throw new Error(
-          `Order must be a permutation of pages 1..${pageCount}, e.g. '${original.join(",")}'.`,
+        setOrderError(
+          t("reorder.orderError", { count: pageCount, example: original.join(",") }),
         );
+        return;
       }
       setOrderError(null);
       dispatch({ type: "setOrder", order: nums });
     } catch (e) {
-      setOrderError(e instanceof Error ? e.message : String(e));
+      setOrderError(translatePayloadError(e, tErr));
     }
   }
 
   return (
     <CanvasShell
-      toolName={job.spec?.name ?? "Reorder Pages"}
-      description={job.spec?.description ?? ""}
+      toolName={tTools("reorder_pages.name")}
+      description={tContent("reorder_pages.description")}
       fileLabel={localFiles.map((f) => f.name).join(", ")}
       quota={job.quota}
       maxFiles={1}
@@ -124,7 +136,7 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
       summary={summary}
       payload={{ tool_key: "reorder_pages", file_ids: job.files.map((f) => f.id), config: payload.config }}
       payloadError={payload.error ?? orderError}
-      processLabel="Reorder now"
+      processLabel={t("reorder.processLabel")}
       canProcess={payload.error === null && job.files.length === 1}
       onProcess={() => void job.startJob(job.files, payload.config)}
       onPick={onPick}
@@ -132,25 +144,26 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
       onBackToOrganize={() => job.setPhase("organize")}
       onDownload={job.download}
       downloadPct={job.downloadPct}
-      activityLabel="Reordering"
+      locale={locale}
+      activityLabel={t("reorder.activity")}
       error={job.error}
     >
       <div className="mt-4">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <ToolButton onClick={org.undo} disabled={!org.canUndo} title="Undo (Ctrl+Z)">↩ Undo</ToolButton>
-          <ToolButton onClick={org.redo} disabled={!org.canRedo} title="Redo (Ctrl+Y)">↪ Redo</ToolButton>
-          <ToolButton onClick={() => dispatch({ type: "reverseOrder" })}>Reverse order</ToolButton>
+          <ToolButton onClick={org.undo} disabled={!org.canUndo} title={t("undoTitle")}>↩ {t("undo")}</ToolButton>
+          <ToolButton onClick={org.redo} disabled={!org.canRedo} title={t("redoTitle")}>↪ {t("redo")}</ToolButton>
+          <ToolButton onClick={() => dispatch({ type: "reverseOrder" })}>{t("reorder.reverseOrder")}</ToolButton>
           <ToolButton onClick={() => dispatch({ type: "setOrder", order: original })} disabled={changed.length === 0}>
-            Reset to original
+            {t("reorder.resetOriginal")}
           </ToolButton>
-          <ToolButton onClick={() => moveSelected(-1)} disabled={org.selected.length === 0} title="Move selection one step earlier (Ctrl+←)">
-            ↑ Move up
+          <ToolButton onClick={() => moveSelected(-1)} disabled={org.selected.length === 0} title={t("reorder.moveUpTitle")}>
+            {t("reorder.moveUp")}
           </ToolButton>
-          <ToolButton onClick={() => moveSelected(1)} disabled={org.selected.length === 0} title="Move selection one step later (Ctrl+→)">
-            ↓ Move down
+          <ToolButton onClick={() => moveSelected(1)} disabled={org.selected.length === 0} title={t("reorder.moveDownTitle")}>
+            {t("reorder.moveDown")}
           </ToolButton>
           <label className="flex items-center gap-2 text-sm text-slate-600">
-            Order
+            {t("reorder.orderLabel")}
             <input
               type="text"
               value={orderText ?? order.join(",")}
@@ -160,7 +173,7 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
                 if (e.key === "Enter") (e.target as HTMLInputElement).blur();
               }}
               className="w-52 rounded-lg border border-slate-300 px-2 py-1.5 font-mono text-sm"
-              aria-label="Page order"
+              aria-label={t("reorder.orderAria")}
             />
           </label>
         </div>
@@ -172,19 +185,15 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
           onMove={(id, to) => dispatch({ type: "moveItems", ids: [id], toIndex: to })}
           onMoveSelected={moveSelected}
           onPreview={(cell) => setPreview({ page: Number(cell.id.split(":")[1]) })}
-          ariaLabel="Pages in new order"
+          ariaLabel={t("reorder.gridAria")}
         />
-        <p className="mt-2 text-xs text-slate-500">
-          Drag thumbnails to reorder (the position badges update live) ·
-          Select a page and press Ctrl+← / Ctrl+→ to move it · The order
-          field above stays in sync and accepts a typed permutation.
-        </p>
+        <p className="mt-2 text-xs text-slate-500">{t("reorder.hint")}</p>
       </div>
       {preview && pdf && (
         <PagePreviewModal
           pdf={pdf}
           page={preview.page}
-          label={`${pdf.fileName} — page ${preview.page}`}
+          label={t("filePageLabel", { name: pdf.fileName, n: preview.page })}
           onClose={() => setPreview(null)}
         />
       )}
