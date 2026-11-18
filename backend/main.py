@@ -66,6 +66,7 @@ async def lifespan(app: FastAPI):
                 "The server restarted while this job was processing. "
                 "Please try again."
             )
+            job.error_code = "server_restart"
             job.updated_at = utcnow_iso()
         if orphaned:
             db.commit()
@@ -228,11 +229,37 @@ def create_app() -> FastAPI:
                 return _frontend_file(path, candidate)
             if (frontend / path / "index.html").is_file():
                 return FileResponse(frontend / path / "index.html")
+            # Locale-prefixed tool pages (es/tools/merge) are served by
+            # the index.html check above when they exist. Unknown slugs
+            # under a locale must 404 exactly like the English ones —
+            # otherwise the SPA fallback would serve the homepage with
+            # a 200 for a page that does not exist.
+            _LOCALES = {"es", "fr", "pt", "id", "zh-cn", "hi", "bn", "ar", "ur"}
+            _parts = path.split("/")
+            _is_locale_tools = (
+                len(_parts) == 3 and _parts[0] in _LOCALES and _parts[1] == "tools"
+            )
             if path.startswith("tools/"):
                 tool_page = frontend / "tools" / path.split("/")[-1] / "index.html"
                 if tool_page.is_file():
                     return FileResponse(tool_page)
                 # Unknown tool slug: real 404 page, not a silent homepage.
+                not_found = frontend / "404" / "index.html"
+                if not_found.is_file():
+                    return FileResponse(not_found, status_code=404)
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
+            if _is_locale_tools:
+                # The localized file would already have been served by the
+                # index.html check above, so reaching here means the slug
+                # is unknown (or that locale was not generated): real 404.
+                # Deliberately no fallback to the English tool page — a
+                # locale URL must never return English content with a 200.
+                not_found = frontend / "404" / "index.html"
+                if not_found.is_file():
+                    return FileResponse(not_found, status_code=404)
+                return JSONResponse(status_code=404, content={"detail": "Not found"})
+            # Same for the removed editor under a locale prefix.
+            if len(_parts) == 2 and _parts[0] in _LOCALES and _parts[1] == "editor":
                 not_found = frontend / "404" / "index.html"
                 if not_found.is_file():
                     return FileResponse(not_found, status_code=404)
