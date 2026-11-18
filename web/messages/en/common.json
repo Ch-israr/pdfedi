@@ -1,0 +1,787 @@
+{
+  "meta": {
+    "siteTitle": "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
+    "siteDescription": "Merge, split, convert and protect PDFs free online. 26 PDF tools — no sign-up, no watermarks, private by design.",
+    "homeTitle": "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
+    "homeDescription": "Merge, split, convert and protect PDFs free online. 26 PDF tools — no sign-up, no watermarks, private by design.",
+    "lawyersTitle": "PDF Tools for Lawyers — Redact, File & Combine Exhibits | PDFEDI",
+    "lawyersDescription": "Free PDF tools for lawyers: true redaction, metadata stripping, court-size compression, exhibit combining with Bates numbers. No sign-up, no watermarks.",
+    "lawyersOgDescription": "Redact, strip metadata, compress to your court's filing limit and combine exhibits with Bates numbers — free, no sign-up.",
+    "privacyTitle": "How We Handle Your Files — Privacy | PDFEDI",
+    "privacyDescription": "What happens to your files on PDFEDI: uploaded to our server to be processed, deleted automatically, no account, no file content kept or shared.",
+    "privacyOgDescription": "Uploaded to our server, processed, deleted automatically. No account, no file content kept."
+  },
+  "chrome": {
+    "allTools": "All tools",
+    "forLawyers": "For lawyers",
+    "tagline": "PDFEDI — free online PDF tools.",
+    "footerNote": "No sign-up. Files are processed and deleted automatically.",
+    "home": "Home",
+    "language": "Language"
+  },
+  "home": {
+    "heroTitle": "Every PDF tool you need.",
+    "heroAccent": "Free.",
+    "heroSubtitle": "Merge, split, convert, protect and more — right in your browser. No sign-up, no watermarks.",
+    "privateTitle": "Private by design",
+    "privateText": "Files are processed on our servers and deleted automatically. We never ask for an account — just pick a tool and go.",
+    "privateLink": "How we handle your files →",
+    "lawyersTitle": "For lawyers",
+    "lawyersText": "True redaction, metadata stripping, court-size compression and exhibit combining with Bates numbers — plus 12 short guides for filing work.",
+    "lawyersCta": "See the lawyer tools →"
+  },
+  "categories": {
+    "organize": {
+      "name": "Organize",
+      "tagline": "Merge, split and rearrange pages"
+    },
+    "convert": {
+      "name": "Convert",
+      "tagline": "Turn PDFs into other formats and back"
+    },
+    "edit": {
+      "name": "Edit",
+      "tagline": "Tweak content and document info"
+    },
+    "optimize": {
+      "name": "Optimize",
+      "tagline": "Make files smaller and faster"
+    },
+    "security": {
+      "name": "Security",
+      "tagline": "Protect, unlock and finalize documents"
+    },
+    "legal": {
+      "name": "For Lawyers",
+      "tagline": "Filing-ready redaction, exhibits and court-size files"
+    }
+  },
+  "tools": {
+    "merge": {
+      "name": "Merge PDF",
+      "tagline": "Combine multiple PDFs into one"
+    },
+    "split": {
+      "name": "Split PDF",
+      "tagline": "Split a PDF into separate files"
+    },
+    "rotate_pages": {
+      "name": "Rotate Pages",
+      "tagline": "Rotate PDF pages"
+    },
+    "delete_pages": {
+      "name": "Delete Pages",
+      "tagline": "Remove pages from a PDF"
+    },
+    "reorder_pages": {
+      "name": "Reorder Pages",
+      "tagline": "Rearrange page order"
+    },
+    "n_up": {
+      "name": "N-Up PDF",
+      "tagline": "Print multiple pages per sheet"
+    },
+    "extract_text": {
+      "name": "Extract Text",
+      "tagline": "Get text out of a PDF"
+    },
+    "pdf_to_images": {
+      "name": "PDF to Images",
+      "tagline": "Convert pages to images"
+    },
+    "images_to_pdf": {
+      "name": "Images to PDF",
+      "tagline": "Make a PDF from images"
+    },
+    "ocr": {
+      "name": "OCR",
+      "tagline": "Make scanned PDFs searchable"
+    },
+    "pdf_to_word": {
+      "name": "PDF to Word",
+      "tagline": "Convert PDF to editable Word document"
+    },
+    "metadata": {
+      "name": "View Metadata",
+      "tagline": "Inspect PDF metadata"
+    },
+    "edit_metadata": {
+      "name": "Edit Metadata",
+      "tagline": "Update title, author and more"
+    },
+    "watermark": {
+      "name": "Watermark",
+      "tagline": "Stamp text on every page"
+    },
+    "page_numbers": {
+      "name": "Page Numbers",
+      "tagline": "Add page numbers"
+    },
+    "crop": {
+      "name": "Crop PDF",
+      "tagline": "Trim margins from pages"
+    },
+    "grayscale": {
+      "name": "Grayscale PDF",
+      "tagline": "Convert pages to black and white"
+    },
+    "compress": {
+      "name": "Compress PDF",
+      "tagline": "Shrink a PDF to a target size for filing"
+    },
+    "repair": {
+      "name": "Repair PDF",
+      "tagline": "Fix corrupted or unreadable PDFs"
+    },
+    "password_protect": {
+      "name": "Protect PDF",
+      "tagline": "Add a password to a PDF"
+    },
+    "unlock_pdf": {
+      "name": "Unlock PDF",
+      "tagline": "Remove password protection"
+    },
+    "redact": {
+      "name": "Redact",
+      "tagline": "Permanently black out text"
+    },
+    "flatten": {
+      "name": "Flatten PDF",
+      "tagline": "Bake annotations into pages"
+    },
+    "strip_image_metadata": {
+      "name": "Strip Image Metadata",
+      "tagline": "Remove EXIF and GPS from photos"
+    },
+    "exhibit_combine": {
+      "name": "Combine Exhibits",
+      "tagline": "Filing-ready PDF with slip sheets and Bates numbers"
+    },
+    "strip_metadata": {
+      "name": "Strip Metadata",
+      "tagline": "Remove hidden metadata, with a report"
+    }
+  },
+  "runner": {
+    "loading": "Loading…",
+    "loadFailed": "Failed to load tool: {error}",
+    "description": "description",
+    "quotaLeft": "{remaining, plural, one {# of {limit} free use left this hour} other {# of {limit} free uses left this hour}}",
+    "quotaResets": "· Resets at {time}",
+    "steps": {
+      "uploading": "Uploading",
+      "preparing": "Preparing",
+      "processing": "Processing",
+      "converting": "Converting",
+      "optimizing": "Optimizing",
+      "finalizing": "Finalizing",
+      "completed": "Completed"
+    },
+    "choosePdf": "Choose PDF file(s)",
+    "chooseImage": "Choose image file(s)",
+    "uploading": "Uploading…",
+    "fileLimit": "Up to {max, plural, one {# file} other {# files}}, {mb} MB each. No sign-up needed.",
+    "atMost": "This tool accepts at most {max, plural, one {# file} other {# files}}.",
+    "atLeast": "Select at least {min, plural, one {# file} other {# files}}.",
+    "tooBig": "\"{name}\" exceeds the {mb} MB upload limit.",
+    "startButton": "{tool} now",
+    "starting": "Starting…",
+    "preparing": "Preparing your files…",
+    "preparingSub": "Your job is queued and about to start.",
+    "activeSub": "This usually takes a few seconds.",
+    "finalizing": "Finalizing your file…",
+    "finalizingSub": "Almost there.",
+    "failedTitle": "Failed",
+    "failedFallback": "Something went wrong.",
+    "tryAgain": "Try again",
+    "startOver": "Start over",
+    "completedTitle": "Completed",
+    "completedNote": "Your file was processed on our server and is deleted automatically. Files are never kept or shared.",
+    "completedLink": "How we handle your files →",
+    "downloadResult": "Download result",
+    "downloading": "Downloading…",
+    "downloadingPct": "Downloading… {pct}%",
+    "downloadFailed": "Download failed."
+  },
+  "canvas": {
+    "startOver": "Start over",
+    "uploadingToServer": "Uploading to server…",
+    "largeDoc": "Large document ({count} pages). Thumbnails load as you scroll; Split produces at most 200 output files per job.",
+    "pagesScroll": "{count} pages — thumbnails load as you scroll.",
+    "dropTitle": "Drop PDF file(s) here or click to choose",
+    "dropTitleUploading": "Uploading…",
+    "dropSub": "Up to {max, plural, one {# file} other {# files}}, {mb} MB each. No sign-up needed. Files are processed on our server — previews below are rendered in your browser.",
+    "dropAria": "Choose PDF file",
+    "dropAriaPlural": "Choose PDF files",
+    "fileLabelPages": "{count, plural, one {# page} other {# pages}}",
+    "whatWillBeSent": "What will be sent",
+    "starting": "Starting…",
+    "processingSub": "This usually takes a few seconds.",
+    "failedTitle": "Failed",
+    "failedFallback": "Something went wrong.",
+    "backToEditor": "Back to editor",
+    "completedTitle": "Completed",
+    "completedNote": "Your file was processed on our server and is deleted automatically. Files are never kept or shared.",
+    "completedLink": "How we handle your files →",
+    "downloadResult": "Download result",
+    "downloadingPct": "Downloading… {pct}%",
+    "undo": "Undo",
+    "redo": "Redo",
+    "undoTitle": "Undo (Ctrl+Z)",
+    "redoTitle": "Redo (Ctrl+Y)",
+    "selectAll": "Select all",
+    "clearSelection": "Clear selection",
+    "loadingThumb": "Loading…",
+    "willBeDeleted": "✕ Will be deleted",
+    "removed": "Removed",
+    "markedForDeletion": "marked for deletion",
+    "previewClose": "Close ✕",
+    "previewRendering": "Rendering…",
+    "pageLabel": "Page {n}",
+    "merge": {
+      "addMoreFiles": "Add at least one more file.",
+      "addAtLeast2": "Add at least 2 PDF files to merge.",
+      "summary": "{files, plural, one {Merging # file} other {Merging # files}} · {pages, plural, one {# page} other {# pages}}{removed} → one PDF",
+      "summaryRemoved": " · {count, plural, one {# removed} other {# removed}}",
+      "processLabel": "Merge now",
+      "activity": "Merging",
+      "moveFileUp": "Move file up",
+      "moveFileDown": "Move file down",
+      "removeFile": "Remove file from merge",
+      "fileRemoved": "(removed)",
+      "restore": "Restore",
+      "addFiles": "+ Add files",
+      "previewFirstPage": "Preview first page",
+      "removeSelected": "Remove selected ({count})",
+      "restoreAllRemoved": "Restore all removed",
+      "gridAria": "Pages to merge, in merge order",
+      "hint": "Drag pages to reorder (across files too) · Click to select, Shift-click for a range · Delete key removes selected pages · Double-click a page for a large preview · Arrow keys move the selection, Ctrl+Z / Ctrl+Y undo and redo.",
+      "filePages": "{count, plural, one {# page} other {# pages}}",
+      "moveFileUpAria": "Move {name} up",
+      "moveFileDownAria": "Move {name} down",
+      "removeFileFromMerge": "Remove {name} from merge",
+      "removeFileTitle": "Remove file from merge",
+      "removedFileLabel": "{name} (removed)",
+      "addFilesLabel": "Add files",
+      "removeSelectedCount": "Remove selected ({count})",
+      "removeSelectedTitle": "Remove selected pages from the merge (Delete key)",
+      "gridAriaOrder": "Pages to merge, in merge order",
+      "gridHint": "Drag pages to reorder (across files too) · Click to select, Shift-click for a range · Delete key removes selected pages · Double-click a page for a large preview · Arrow keys move the selection, Ctrl+Z / Ctrl+Y undo and redo."
+    },
+    "split": {
+      "summaryEvery": "{count, plural, one {# output file} other {# output files}} — one PDF per page, delivered as a ZIP.",
+      "summaryExtract": "{count, plural, one {# output file} other {# output files}} — one PDF per selected page, delivered as a ZIP.",
+      "summaryExtractEmpty": "Click pages to extract each one as its own PDF.",
+      "summaryRanges": "{count, plural, one {# output file} other {# output files}}: {groups}, delivered as a ZIP.",
+      "processEvery": "Split into single pages",
+      "processExtract": "Extract selected pages",
+      "processRanges": "Split now",
+      "activity": "Splitting",
+      "modeRanges": "Ranges",
+      "modeExtract": "Extract pages",
+      "modeEvery": "Every page",
+      "modeAria": "Split mode",
+      "clearDividers": "Clear dividers",
+      "rangesLabel": "Ranges",
+      "rangesAria": "Page ranges",
+      "rangesPlaceholder": "1-3,4-7",
+      "selectAllPages": "Select all pages",
+      "rangesHint": "Click a gap between pages to drop a split marker there. Each coloured group becomes one output file.",
+      "extractHint": "Click pages to select them — each selected page becomes its own PDF.",
+      "rangesHintBottom": "Click a gap to add or remove a split marker · Undo/redo with Ctrl+Z / Ctrl+Y · The ranges field above stays in sync.",
+      "extractHintBottom": "Click to select, Shift-click for a range · Each selected page becomes its own file.",
+      "everyHintBottom": "One PDF per page — no selection needed.",
+      "splitAfter": "Split after page {n}",
+      "removeSplitAfter": "Remove split after page {n}",
+      "gridAria": "Pages to split",
+      "pageRangeExceeds": "Page numbers exceed the document page count ({count})."
+    },
+    "rotate": {
+      "summaryEmpty": "Select pages, then rotate them — or rotate all pages at once.",
+      "summary": "{count, plural, one {# page} other {# pages}} rotated: {list}",
+      "processLabel": "Rotate now",
+      "activity": "Rotating",
+      "rotateLeft": "Rotate selection 90° counter-clockwise",
+      "rotateRight": "Rotate selection 90° clockwise",
+      "rotateAll": "Rotate all 90°",
+      "resetAll": "Reset all",
+      "pagesLabel": "Pages",
+      "pagesAria": "Pages to rotate",
+      "pagesPlaceholder": "1-3,5",
+      "angleLabel": "Angle",
+      "angleAria": "Rotation angle",
+      "applyToPages": "Apply to pages",
+      "selectedWithAngle": "Selected pages with an angle: {ranges}",
+      "typePagesFirst": "Type page numbers first, e.g. '1-3,5'.",
+      "pageExceeds": "Page(s) {pages} exceed the document page count ({count}).",
+      "rotateCcw": "Rotate 90° counter-clockwise",
+      "rotateCw": "Rotate 90° clockwise",
+      "gridAria": "Pages to rotate",
+      "hint": "Click to select, Shift-click for a range · The ⟲ / ⟳ buttons on a page rotate just that page · Thumbnails show the rotated preview; the real rotation is applied server-side.",
+      "rotatePageCcw": "Rotate {label} 90 degrees counter-clockwise",
+      "rotatePageCw": "Rotate {label} 90 degrees clockwise"
+    },
+    "delete": {
+      "summaryEmpty": "Click pages to mark them for deletion. At least one page must remain.",
+      "summary": "Deleting {marked} of {total} pages · {remaining} will remain.",
+      "processLabel": "Delete {count, plural, one {# page} other {# pages}}",
+      "activity": "Deleting pages",
+      "cannotDeleteAll": "Cannot delete every page; at least one page must remain.",
+      "pageExceeds": "Page(s) {pages} exceed the document page count ({count}).",
+      "invertSelection": "Invert selection",
+      "markSelected": "Mark selected ({count})",
+      "markSelectedTitle": "Mark the selected pages for deletion (Delete key)",
+      "clearMarks": "Clear marks",
+      "pagesToDelete": "Pages to delete",
+      "pagesToDeleteAria": "Pages to delete",
+      "pagesPlaceholder": "1,3,5-7",
+      "markForDeletion": "Mark for deletion",
+      "markedUndo": "✕ Marked — undo",
+      "markAria": "Mark {label} for deletion",
+      "unmarkAria": "Unmark {label} for deletion",
+      "gridAria": "Pages to delete",
+      "hint": "Click to select, Shift-click for a range · “Mark selected” or the Delete key marks the selection · The button on a page marks just that page · Marked pages stay visible until processing, and every mark is undoable."
+    },
+    "reorder": {
+      "summaryOriginal": "Pages are in their original order — drag thumbnails to rearrange them.",
+      "summaryMoved": "{count, plural, one {# page} other {# pages}} moved: {list}{more}",
+      "summaryMore": ", +{count} more",
+      "processLabel": "Reorder now",
+      "activity": "Reordering",
+      "reverseOrder": "Reverse order",
+      "resetOriginal": "Reset to original",
+      "moveUp": "↑ Move up",
+      "moveUpTitle": "Move selection one step earlier (Ctrl+←)",
+      "moveDown": "↓ Move down",
+      "moveDownTitle": "Move selection one step later (Ctrl+→)",
+      "orderLabel": "Order",
+      "orderAria": "Page order",
+      "orderError": "Order must be a permutation of pages 1..{count}, e.g. '{example}'.",
+      "gridAria": "Pages in new order",
+      "hint": "Drag thumbnails to reorder (the position badges update live) · Select a page and press Ctrl+← / Ctrl+→ to move it · The order field above stays in sync and accepts a typed permutation.",
+      "position": "position {n}"
+    }
+  },
+  "errors": {
+    "tool_error": "Something went wrong. Please try again.",
+    "internal_error": "Processing failed. Please try again.",
+    "server_restart": "The server restarted while this job was processing. Please try again.",
+    "invalid_option": "A page number or option is not valid. Check the page numbers and try again.",
+    "bad_option": "An option value is not valid. Check the values and try again.",
+    "bad_options": "An option value is not valid. Check the values and try again.",
+    "missing_input": "A required file is missing. Upload the file and try again.",
+    "missing_option": "A required option is missing.",
+    "invalid_input": "The uploaded file could not be read. Check that it is a valid PDF and try again.",
+    "ocr_failed": "Text recognition failed for this file.",
+    "ocr_unavailable": "Text recognition is temporarily unavailable. Try again later.",
+    "wrong_password": "The password is wrong. Check it and try again.",
+    "quota_exceeded": "You have used all free uses for this hour. Try again after {time}.",
+    "file_too_large": "The file is too large. The upload limit is {mb} MB.",
+    "lost_contact": "Lost contact with the server.",
+    "download_failed": "Download failed.",
+    "not_loaded": "Tool not loaded yet.",
+    "failed_to_load": "Failed to load tool.",
+    "invalid_page_range": "Invalid page range “{token}”. Use forms like '1-3,5'.",
+    "invalid_range_start": "Invalid range {range}: page numbers start at 1.",
+    "select_at_least_one_page": "Select at least one page.",
+    "rotate_at_least_one_page": "Rotate at least one page.",
+    "cannot_delete_all": "Cannot delete every page; at least one page must remain.",
+    "nothing_to_reorder": "Nothing to reorder.",
+    "output_too_large": "The result is too large to download.",
+    "pdf_unreadable": "This file could not be read as a PDF.",
+    "pdf_unreadable_one": "One of the files could not be read as a PDF."
+  },
+  "toolOptions": {
+    "compress": {
+      "target_mb": {
+        "label": "Target size (MB)",
+        "help": "Compress to at most this size. Court e-filing (CM/ECF) limits vary by court, roughly 3–200 MB — 25 MB is the most common. Check your court's local rule."
+      }
+    },
+    "crop": {
+      "top": {
+        "label": "Top margin (pt)",
+        "help": "Points to trim from the top edge."
+      },
+      "bottom": {
+        "label": "Bottom margin (pt)",
+        "help": "Points to trim from the bottom edge."
+      },
+      "left": {
+        "label": "Left margin (pt)",
+        "help": "Points to trim from the left edge."
+      },
+      "right": {
+        "label": "Right margin (pt)",
+        "help": "Points to trim from the right edge."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "1-based ranges like '1-3,5'. Leave empty for all pages."
+      }
+    },
+    "delete_pages": {
+      "pages": {
+        "label": "Pages to delete",
+        "help": "1-based pages to delete, e.g. '1,3,5-7'."
+      }
+    },
+    "edit_metadata": {
+      "title": {
+        "label": "Title",
+        "help": "Document title. Empty removes it."
+      },
+      "author": {
+        "label": "Author",
+        "help": "Document author. Empty removes it."
+      },
+      "subject": {
+        "label": "Subject",
+        "help": "Document subject. Empty removes it."
+      },
+      "keywords": {
+        "label": "Keywords",
+        "help": "Document keywords. Empty removes them."
+      }
+    },
+    "exhibit_combine": {
+      "exhibit_prefix": {
+        "label": "Exhibit label",
+        "help": "Word printed on each slip sheet, e.g. 'Exhibit'."
+      },
+      "bates_prefix": {
+        "label": "Bates prefix",
+        "help": "Prefix for the stamped numbers, e.g. 'BATES' gives BATES-000001."
+      },
+      "bates_start": {
+        "label": "First Bates number",
+        "help": "Numbering starts here (positive integer)."
+      },
+      "slip_sheets": {
+        "label": "Add slip sheets between exhibits",
+        "help": ""
+      }
+    },
+    "extract_text": {
+      "pages": {
+        "label": "Pages",
+        "help": "1-based ranges like '1-3,5'. Leave empty for all pages."
+      }
+    },
+    "grayscale": {
+      "dpi": {
+        "label": "Resolution (DPI)",
+        "help": "Render resolution in dots per inch (72–600)."
+      }
+    },
+    "merge": {
+      "page_order": {
+        "label": "Page order (JSON)",
+        "help": "Optional JSON list of [file, page] pairs in merge order, e.g. '[[1,2],[0,1]]' merges file 2 page 2 first, then file 1 page 1. File numbers are 0-based, page numbers 1-based. Omit to merge every page in upload order."
+      }
+    },
+    "n_up": {
+      "layout": {
+        "label": "Pages per sheet",
+        "help": "How many source pages to place on each sheet."
+      },
+      "sheet": {
+        "label": "Sheet size",
+        "help": "Output sheet size."
+      },
+      "orientation": {
+        "label": "Orientation",
+        "help": "Sheet orientation.",
+        "choices": {
+          "portrait": "Portrait",
+          "landscape": "Landscape"
+        }
+      }
+    },
+    "ocr": {
+      "language": {
+        "label": "Language",
+        "help": "Tesseract language code, e.g. 'eng' or 'eng+deu'."
+      }
+    },
+    "page_numbers": {
+      "vertical": {
+        "label": "Vertical position",
+        "help": "",
+        "choices": {
+          "top": "Top",
+          "bottom": "Bottom"
+        }
+      },
+      "horizontal": {
+        "label": "Horizontal position",
+        "help": "",
+        "choices": {
+          "left": "Left",
+          "center": "Center",
+          "right": "Right"
+        }
+      },
+      "start_number": {
+        "label": "Start number",
+        "help": "First page number (positive integer)."
+      },
+      "prefix": {
+        "label": "Prefix",
+        "help": ""
+      },
+      "suffix": {
+        "label": "Suffix",
+        "help": ""
+      },
+      "font_size": {
+        "label": "Font size",
+        "help": "6 to 48."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "1-based ranges like '1-3,5'. Leave empty for all pages."
+      }
+    },
+    "password_protect": {
+      "password": {
+        "label": "Password",
+        "help": null
+      }
+    },
+    "pdf_to_images": {
+      "format": {
+        "label": "Image format",
+        "help": "Output image format."
+      },
+      "dpi": {
+        "label": "Resolution (DPI)",
+        "help": null
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "1-based ranges like '1-3,5'. Leave empty for all pages."
+      }
+    },
+    "redact": {
+      "patterns": {
+        "label": "Text to redact",
+        "help": "Comma-separated literal strings to black out, e.g. 'SSN, john@example.com'."
+      },
+      "rasterise": {
+        "label": "Rasterise pages (strongest redaction)",
+        "help": "Render every page to an image after redacting, so no text layer survives anywhere in the file. Text in the output is no longer selectable or searchable."
+      }
+    },
+    "reorder_pages": {
+      "order": {
+        "label": "Page order",
+        "help": "1-based permutation of pages 1..N, e.g. '3,1,2'."
+      }
+    },
+    "rotate_pages": {
+      "angle": {
+        "label": "Rotation angle",
+        "help": "Clockwise rotation applied to the selected pages."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "1-based ranges like '1-3,5'. Empty means all pages."
+      },
+      "rotations": {
+        "label": "Per-page rotations (JSON)",
+        "help": "Optional JSON object mapping 1-based page numbers to angles, e.g. '{\"1\": 90, \"3\": 180}'. When present it replaces angle+pages, so each page can rotate differently."
+      }
+    },
+    "split": {
+      "mode": {
+        "label": "Split mode",
+        "help": "'ranges': one PDF per comma-separated range. 'every': one PDF per page.",
+        "choices": {
+          "ranges": "Ranges",
+          "every": "Every page"
+        }
+      },
+      "ranges": {
+        "label": "Page ranges",
+        "help": "1-based ranges like '1-3,5'. Required when mode is 'ranges'."
+      }
+    },
+    "unlock_pdf": {
+      "password": {
+        "label": "Current password",
+        "help": "The password currently protecting the PDF."
+      }
+    },
+    "watermark": {
+      "text": {
+        "label": "Watermark text",
+        "help": null
+      },
+      "opacity": {
+        "label": "Opacity",
+        "help": "0.1 (faint) to 0.5 (strong)."
+      }
+    }
+  },
+  "lawyers": {
+    "title": "PDF tools for lawyers",
+    "intro": "Redact properly, strip hidden metadata, fit your court's filing limit, and combine exhibits with Bates numbers. Free, no sign-up, no watermarks.",
+    "workflowTitle": "The filing workflow, in order",
+    "workflow": [
+      {
+        "step": "Redact",
+        "text": "sensitive text — the text is deleted from the file and the output is verified, not just blacked out."
+      },
+      {
+        "step": "Strip metadata",
+        "text": "— remove author, dates and software details, with a before/after report."
+      },
+      {
+        "step": "Compress",
+        "text": "to your court's size limit."
+      },
+      {
+        "step": "Combine exhibits",
+        "text": "with slip sheets and Bates numbers into one filing-ready PDF."
+      }
+    ],
+    "guides": [
+      {
+        "title": "Redact a deposition exhibit",
+        "answer": "Redaction here deletes the text from the file, not just covers it with a black box — and the output is re-checked so the redacted words can't be extracted. For maximum certainty, turn on Rasterise pages: every page becomes an image, so no text layer survives at all.",
+        "tool": "/tools/redact",
+        "toolName": "Redact PDF"
+      },
+      {
+        "title": "Combine exhibits into a filing-ready PDF",
+        "answer": "Upload your exhibits in order and get one document back: a slip sheet before each exhibit (Exhibit A, B, C… with filename and page count) and Bates numbers stamped continuously across every exhibit page.",
+        "tool": "/tools/exhibit_combine",
+        "toolName": "Combine Exhibits"
+      },
+      {
+        "title": "Compress a brief under your court's limit",
+        "answer": "Pick your court's size limit — 25 MB is the most common CM/ECF limit, but courts vary from about 3 to 200 MB, so check your local rule. The tool shrinks the file to fit and the ZIP includes a report showing the size before and after.",
+        "tool": "/tools/compress",
+        "toolName": "Compress PDF"
+      },
+      {
+        "title": "Strip metadata before sending a document to the other side",
+        "answer": "A PDF can carry its author's name, creation dates and the software that made it. Strip Metadata removes all of it in one click and gives you a before/after report proving what was removed.",
+        "tool": "/tools/strip_metadata",
+        "toolName": "Strip Metadata"
+      },
+      {
+        "title": "Remove location data from case photos",
+        "answer": "Photos often carry GPS coordinates and camera details in their EXIF data. Strip Image Metadata lists what each photo carries, removes it, and reports what was taken out. Note: it does not verify removal of C2PA/AI markers — use ClearMark for those.",
+        "tool": "/tools/strip_image_metadata",
+        "toolName": "Strip Image Metadata"
+      },
+      {
+        "title": "Check what metadata a PDF you received contains",
+        "answer": "Before you rely on a document, see what's hidden in it. View Metadata reads the title, author, dates, creator and producer and gives you the result as JSON.",
+        "tool": "/tools/metadata",
+        "toolName": "View Metadata"
+      },
+      {
+        "title": "Fix a document's title or author before filing",
+        "answer": "If a PDF's stored title or author is wrong — or names someone it shouldn't — Edit Metadata lets you set or clear the title, author, subject and keywords without touching the pages.",
+        "tool": "/tools/edit_metadata",
+        "toolName": "Edit Metadata"
+      },
+      {
+        "title": "Number the pages of a filing",
+        "answer": "Add page numbers in any corner, starting from any number, with a prefix or suffix if your court wants one. You can number only selected page ranges and leave the rest alone.",
+        "tool": "/tools/page_numbers",
+        "toolName": "Add Page Numbers"
+      },
+      {
+        "title": "Merge supporting documents into one bundle",
+        "answer": "Combine 2 to 20 PDFs into a single file in the order you upload them — pleadings, attachments and supporting documents as one bundle instead of many files.",
+        "tool": "/tools/merge",
+        "toolName": "Merge PDF"
+      },
+      {
+        "title": "Pull one document out of a bundle",
+        "answer": "Split a PDF by page ranges (for example 1–3, 5) or into one file per page, and download the results as a ZIP. Useful when a bundle arrives as one file and you need a single exhibit from it.",
+        "tool": "/tools/split",
+        "toolName": "Split PDF"
+      },
+      {
+        "title": "Protect a sensitive document with a password",
+        "answer": "Add a password to a PDF before sending it, so only someone with the password can open it. And if you receive a protected file and know the password, Unlock PDF removes the protection.",
+        "tool": "/tools/password_protect",
+        "toolName": "Protect PDF"
+      },
+      {
+        "title": "Make a scanned document searchable",
+        "answer": "Scanned pages are pictures, not text — you can't search them or copy from them. OCR adds an invisible text layer so the document becomes searchable while looking exactly the same.",
+        "tool": "/tools/ocr",
+        "toolName": "OCR"
+      }
+    ],
+    "limitsTitle": "A note on limits",
+    "limitsText": "PDFEDI is a tool, not a lawyer. Court filing limits, redaction duties and disclosure rules vary by court and jurisdiction — check your court's local rules and your professional obligations before filing. Redaction here removes the text you name; always check the output before you file it. Files uploaded to these tools are processed on our server — see <link>how we handle your files</link>."
+  },
+  "privacy": {
+    "title": "How we handle your files",
+    "intro": "Plainly, without the usual privacy slogans. There are two different kinds of tools on PDFEDI, and they handle your files differently.",
+    "serverTitle": "Server tools (most tools on this site)",
+    "serverText": "When you use a tool like Merge, Redact or Compress, your file is uploaded to our server, processed there, and the result is sent back to you for download. Your file does leave your device — anyone who says otherwise about a server-processed tool is not telling you the truth. What we do promise:",
+    "serverPoints": [
+      "No account, no sign-up, no email address asked for.",
+      "Files are processed automatically and deleted automatically.",
+      "Your file content is not kept, not shared with anyone, and not used to train anything.",
+      "We count anonymous usage (how many times a tool ran) so we can keep the free limits fair — we do not record what your files contain."
+    ],
+    "serverNote": "Because these tools run on a server, the “airplane-mode test” does not apply to them: if you disconnect from the internet, a server tool cannot work at all. The checks that do apply here are the ones built into the tools themselves — for example, Redact re-checks its output so redacted text can't be extracted, and Strip Metadata gives you a before/after report showing exactly what was removed.",
+    "previewTitle": "Previews in your browser",
+    "previewText": "On the organizer tools (Merge, Split, Reorder, Delete, Rotate), the page thumbnails you see are rendered in your browser from the file on your device — no preview is uploaded to show them. Processing still happens on our server: when you press the process button, the file is uploaded, processed, and the result is sent back for download.",
+    "checkTitle": "How to check our claims yourself",
+    "checkPoints": [
+      {
+        "title": "Redaction:",
+        "text": "after redacting, try searching the output PDF for the redacted words — they should not be found. Turn on “Rasterise pages” and the output has no text layer at all."
+      },
+      {
+        "title": "Metadata:",
+        "text": "open the metadata_report.json that comes with Strip Metadata, or use View Metadata on the cleaned file, and compare it with the original."
+      },
+      {
+        "title": "Previews:",
+        "text": "open your browser's Network tab while arranging pages — no upload happens until you press the process button."
+      }
+    ],
+    "dontTitle": "What we don't do",
+    "dontPoints": [
+      "We don't sell or share your files.",
+      "We don't ask for an account to use the free tools.",
+      "We don't claim server-processed files “never leave your device” — they do, for processing, and then they're deleted."
+    ],
+    "backLink": "← Back to all tools",
+    "localeNote": "Your language preference is stored only in your own browser, so we can show you the site in your language next time. It is never sent to our servers."
+  },
+  "suggest": {
+    "title": "Would you like to view PDFEDi in {language}?",
+    "subtitle": "{nativeName} — Switch the interface to {language}. You can change it back anytime.",
+    "switch": "Switch to {language}",
+    "continue": "Continue in English",
+    "dismiss": "Dismiss"
+  },
+  "switcher": {
+    "label": "Language",
+    "current": "Current language: {language}",
+    "choose": "Choose language"
+  },
+  "seo": {
+    "whatItDoes": "{h1} — what it does",
+    "howToUse": "How to use {h1}",
+    "keyFeatures": "Key features",
+    "whenToUse": "When to use {h1}",
+    "faq": "Frequently asked questions",
+    "relatedTools": "Related tools",
+    "privateByDesign": "Private by design",
+    "privateNote": "Files you upload are processed securely and deleted automatically afterwards. PDFEDI never asks for an account — pick a tool and go. Each file can be up to 50MB, and every tool is free to use up to 5 times per hour.",
+    "breadcrumbHome": "Home"
+  }
+}
