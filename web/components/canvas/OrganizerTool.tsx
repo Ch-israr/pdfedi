@@ -9,17 +9,39 @@
 // The workspace appears only once the local documents are ready; the
 // Process button stays disabled until every file has an uploaded id.
 // On "Start over" the session key bumps and the canvas remounts fresh.
+//
+// Lazy loading: each tool canvas is a separate chunk, loaded only when
+// its tool page opens (next/dynamic). The shared shell/grid code stays
+// in the tool page bundle; the five canvases never load together.
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 import { usePdfFiles } from "../../hooks/usePdfDocument";
 import { ORGANIZER_TOOL_SLUGS } from "../../lib/tools";
 import { useOrganizerJob } from "./useOrganizerJob";
-import { DeleteCanvas } from "./tools/DeleteCanvas";
-import { MergeCanvas } from "./tools/MergeCanvas";
-import { ReorderCanvas } from "./tools/ReorderCanvas";
-import { RotateCanvas } from "./tools/RotateCanvas";
-import { SplitCanvas } from "./tools/SplitCanvas";
+
+function CanvasLoading() {
+  const t = useTranslations("runner");
+  return <p className="py-16 text-center text-slate-500">{t("loading")}</p>;
+}
+
+const DeleteCanvas = dynamic(() => import("./tools/DeleteCanvas").then((m) => m.DeleteCanvas), {
+  loading: () => <CanvasLoading />,
+});
+const MergeCanvas = dynamic(() => import("./tools/MergeCanvas").then((m) => m.MergeCanvas), {
+  loading: () => <CanvasLoading />,
+});
+const ReorderCanvas = dynamic(() => import("./tools/ReorderCanvas").then((m) => m.ReorderCanvas), {
+  loading: () => <CanvasLoading />,
+});
+const RotateCanvas = dynamic(() => import("./tools/RotateCanvas").then((m) => m.RotateCanvas), {
+  loading: () => <CanvasLoading />,
+});
+const SplitCanvas = dynamic(() => import("./tools/SplitCanvas").then((m) => m.SplitCanvas), {
+  loading: () => <CanvasLoading />,
+});
 
 const CANVASES = {
   merge: MergeCanvas,
@@ -32,6 +54,8 @@ const CANVASES = {
 export const ORGANIZER_TOOLS: readonly string[] = ORGANIZER_TOOL_SLUGS;
 
 export function OrganizerTool({ toolKey }: { toolKey: string }) {
+  const tRunner = useTranslations("runner");
+  const tErr = useTranslations("errors");
   const job = useOrganizerJob(toolKey);
   const [localFiles, setLocalFiles] = useState<File[]>([]);
   const [session, setSession] = useState(0);
@@ -71,12 +95,12 @@ export function OrganizerTool({ toolKey }: { toolKey: string }) {
   }, [job]);
 
   if (job.specError) {
-    return <p className="text-red-600">Failed to load tool: {job.specError}</p>;
+    return <p className="text-red-600">{tRunner("loadFailed", { error: job.specError })}</p>;
   }
-  if (!job.spec) return <p className="text-slate-500">Loading…</p>;
+  if (!job.spec) return <p className="text-slate-500">{tRunner("loading")}</p>;
 
   const Canvas = CANVASES[toolKey as keyof typeof CANVASES];
-  if (!Canvas) return <p className="text-red-600">Unknown organizer tool: {toolKey}</p>;
+  if (!Canvas) return <p className="text-red-600">{tErr("tool_error")}</p>;
 
   const pdfs = pdfsState.status === "ready" ? pdfsState.pdfs : [];
   const effectiveJob = {
