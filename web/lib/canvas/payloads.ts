@@ -35,17 +35,30 @@ export function pagesToRanges(pages: number[]): string {
 }
 
 /** "1-3,5" -> [1,2,3,5]. Throws on malformed tokens (mirrors the backend). */
+// Errors with a stable code so the UI can translate them instead of
+// showing the English message text. `params` feeds the ICU message.
+export class PayloadError extends Error {
+  code: string;
+  params: Record<string, string | number>;
+  constructor(code: string, message: string, params: Record<string, string | number> = {}) {
+    super(message);
+    this.name = "PayloadError";
+    this.code = code;
+    this.params = params;
+  }
+}
+
 export function rangesToPages(spec: string): number[] {
   if (!spec.trim()) return [];
   const pages = new Set<number>();
   for (const rawToken of spec.split(",")) {
     const token = rawToken.trim();
     const m = /^(\d+)\s*(?:-\s*(\d+)\s*)?$/.exec(token);
-    if (!m) throw new Error(`Invalid page range token ${token}. Use forms like '1-3,5'.`);
+    if (!m) throw new PayloadError("invalid_page_range", `Invalid page range token ${token}.`, { token });
     const start = parseInt(m[1], 10);
     const end = m[2] ? parseInt(m[2], 10) : start;
     if (start < 1 || end < start) {
-      throw new Error(`Invalid range ${start}-${end}: page numbers start at 1.`);
+      throw new PayloadError("invalid_range_start", `Invalid range ${start}-${end}.`, { range: `${start}-${end}` });
     }
     for (let p = start; p <= end; p++) pages.add(p);
   }
@@ -110,7 +123,7 @@ export function buildSplitPayload(
 ): SplitPayload {
   if (mode === "every") return { config: { mode: "every" } };
   if (mode === "extract") {
-    if (extractPages.length === 0) throw new Error("Select at least one page to extract.");
+    if (extractPages.length === 0) throw new PayloadError("select_at_least_one_page", "Select at least one page to extract.");
     return { config: { mode: "ranges", ranges: pagesToRanges(extractPages) } };
   }
   const cuts = [...new Set(dividers)]
@@ -139,7 +152,7 @@ export function buildRotatePayload(rotations: Map<number, number>): RotatePayloa
   for (const [page, angle] of [...rotations.entries()].sort((a, b) => a[0] - b[0])) {
     if (angle % 360 !== 0) obj[String(page)] = ((angle % 360) + 360) % 360;
   }
-  if (Object.keys(obj).length === 0) throw new Error("Rotate at least one page.");
+  if (Object.keys(obj).length === 0) throw new PayloadError("rotate_at_least_one_page", "Rotate at least one page.");
   return { config: { rotations: JSON.stringify(obj) } };
 }
 
@@ -150,9 +163,9 @@ export interface DeletePayload {
 /** Build a Delete job payload from the marked pages. Guards the backend's rule. */
 export function buildDeletePayload(pageCount: number, marked: number[]): DeletePayload {
   const pages = [...new Set(marked)].sort((a, b) => a - b);
-  if (pages.length === 0) throw new Error("Select at least one page to delete.");
+  if (pages.length === 0) throw new PayloadError("select_at_least_one_page", "Select at least one page to delete.");
   if (pages.length >= pageCount) {
-    throw new Error("Cannot delete every page; at least one page must remain.");
+    throw new PayloadError("cannot_delete_all", "Cannot delete every page; at least one page must remain.");
   }
   return { config: { pages: pagesToRanges(pages) } };
 }
@@ -163,6 +176,6 @@ export interface ReorderPayload {
 
 /** Build a Reorder job payload from the current page order (permutation). */
 export function buildReorderPayload(order: number[]): ReorderPayload {
-  if (order.length === 0) throw new Error("Nothing to reorder.");
+  if (order.length === 0) throw new PayloadError("nothing_to_reorder", "Nothing to reorder.");
   return { config: { order: order.join(",") } };
 }
