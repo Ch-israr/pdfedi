@@ -1,0 +1,1160 @@
+{
+  "merge": {
+    "title": "Merge PDF Files Online Free — Combine PDFs | PDFEDI",
+    "description": "Merge PDF files into one document online for free. Combine 2–20 PDFs in any order with original quality preserved. No sign-up, no watermarks, 50MB per file.",
+    "h1": "Merge PDFs",
+    "intro": "Combine multiple PDF files into a single, well-ordered document. Upload 2 to 20 PDFs, arrange them the way you want, and download one clean merged file — perfect for reports, applications, and paperwork that arrives in pieces.",
+    "howTo": [
+      "Upload 2 to 20 PDF files (up to 50MB each).",
+      "The files are merged in upload order.",
+      "Click Merge and wait for processing to finish.",
+      "Download your combined PDF."
+    ],
+    "features": [
+      "Combine 2–20 PDF files into one",
+      "Preserves original page quality and formatting",
+      "Free with no watermarks",
+      "Works on desktop, tablet, and mobile"
+    ],
+    "useCases": [
+      "Combine chapters or sections into a finished report",
+      "Merge invoices or receipts into a single file for accounting",
+      "Join application documents (CV, cover letter, certificates) into one PDF",
+      "Consolidate scanned pages into one document"
+    ],
+    "faqs": [
+      {
+        "q": "How do I merge multiple PDF files?",
+        "a": "Upload 2 to 20 PDF files to the Merge PDF tool, then click Merge. Your files are combined into a single PDF in upload order, ready to download."
+      },
+      {
+        "q": "How many PDF files can I merge at once?",
+        "a": "You can merge between 2 and 20 PDF files in a single job. Each file can be up to 50MB."
+      },
+      {
+        "q": "Will merging PDFs reduce their quality?",
+        "a": "No. Merging only rearranges pages into one file — the content, images, and text of each PDF are preserved exactly as they were."
+      },
+      {
+        "q": "Can I merge a password-protected PDF?",
+        "a": "Password-protected PDFs must be unlocked first. Use the Unlock PDF tool with the correct password, then merge the unlocked file."
+      },
+      {
+        "q": "Is it free to merge PDFs online?",
+        "a": "Yes. Merging PDFs on PDFEDI is completely free with no watermarks and no sign-up. Files are processed securely and deleted automatically. No sign-up required."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "delete_pages"
+    ]
+  },
+  "split": {
+    "title": "Split PDF Online Free — Divide into Separate Files | PDFEDI",
+    "description": "Split a PDF into separate files online for free. Extract page ranges or split every page into its own PDF. No sign-up, results delivered as a ZIP download.",
+    "h1": "Split PDF",
+    "intro": "Divide a PDF into multiple smaller files. Extract specific page ranges (for example pages 1–3 and 5) or split every page into its own PDF. Results are delivered as a convenient ZIP download.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose a mode: page ranges (e.g. 1-3,5) or every page separately.",
+      "If using ranges, enter them like 1-3,5.",
+      "Click Split and download the ZIP containing your files."
+    ],
+    "features": [
+      "Split by custom page ranges (e.g. 1-3,5)",
+      "Split every page into its own PDF",
+      "Results delivered as a ZIP archive",
+      "Original quality preserved"
+    ],
+    "useCases": [
+      "Extract a chapter from an ebook",
+      "Separate a scanned batch into individual documents",
+      "Pull out specific pages to share or print",
+      "Break a large PDF into emailable chunks"
+    ],
+    "faqs": [
+      {
+        "q": "How do I split a PDF into separate files?",
+        "a": "Upload your PDF, choose 'ranges' mode and enter page ranges like 1-3,5, or choose 'every' to make each page its own file. Click Split and download the ZIP."
+      },
+      {
+        "q": "What page range format should I use?",
+        "a": "Use 1-based page numbers with commas and dashes, for example 1-3,5,8-10. This extracts pages 1, 2, 3, 5, 8, 9, and 10."
+      },
+      {
+        "q": "Can I split a PDF into individual pages?",
+        "a": "Yes. Select the 'every' mode and each page of your PDF becomes a separate PDF file inside the ZIP download."
+      },
+      {
+        "q": "Is there a page limit for splitting?",
+        "a": "There's no fixed page limit, but the 50MB upload cap applies. Very large PDFs are processed page by page to stay within server memory."
+      }
+    ],
+    "related": [
+      "merge",
+      "delete_pages",
+      "extract_text"
+    ]
+  },
+  "rotate_pages": {
+    "title": "Rotate PDF Pages Online Free — Fix Orientation | PDFEDI",
+    "description": "Rotate PDF pages 90°, 180° or 270° online for free. Fix sideways or upside-down scans across all pages or selected ranges. No sign-up, quality preserved.",
+    "h1": "Rotate Pages",
+    "intro": "Fix sideways or upside-down PDF pages. Rotate all pages or just selected page ranges by 90, 180, or 270 degrees — ideal for scanned documents that came out with the wrong orientation.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose the rotation angle: 90°, 180°, or 270°.",
+      "Optionally limit rotation to specific pages (e.g. 1-3,5). Leave empty for all pages.",
+      "Click Rotate and download the corrected PDF."
+    ],
+    "features": [
+      "Rotate 90°, 180°, or 270°",
+      "Apply to all pages or selected page ranges",
+      "Fixes sideways scanned documents",
+      "No quality loss"
+    ],
+    "useCases": [
+      "Correct pages scanned in landscape instead of portrait",
+      "Fix upside-down pages in a scanned batch",
+      "Rotate a single sideways page without affecting the rest",
+      "Standardize orientation before merging documents"
+    ],
+    "faqs": [
+      {
+        "q": "How do I rotate a PDF page?",
+        "a": "Upload your PDF, pick 90°, 180°, or 270°, optionally enter page ranges like 2-4, then click Rotate. Leave the pages field empty to rotate every page."
+      },
+      {
+        "q": "Can I rotate only some pages of a PDF?",
+        "a": "Yes. Enter 1-based page ranges such as 1-3,5 and only those pages are rotated. All other pages stay as they are."
+      },
+      {
+        "q": "Will rotating reduce PDF quality?",
+        "a": "No. Rotation changes the page orientation metadata and content positioning — your text and images keep their original quality."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "reorder_pages",
+      "merge",
+      "split"
+    ]
+  },
+  "delete_pages": {
+    "title": "Delete PDF Pages Online Free — Remove Pages | PDFEDI",
+    "description": "Delete pages from a PDF online for free. Remove unwanted pages by number or range and download a clean PDF. No sign-up, remaining pages keep original quality.",
+    "h1": "Delete Pages",
+    "intro": "Remove unwanted pages from your PDF. Enter the page ranges to delete — like 2, 5-7 — and download a clean PDF with only the pages you want to keep.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter the pages to delete using ranges like 1-3,5.",
+      "Click Delete Pages and download the result."
+    ],
+    "features": [
+      "Delete pages by range (e.g. 1-3,5)",
+      "Remaining pages keep original quality and order",
+      "Free with no watermarks"
+    ],
+    "useCases": [
+      "Remove blank or duplicate pages from a scan",
+      "Cut advertisement pages from a downloaded document",
+      "Trim a report down to the relevant sections",
+      "Clean up a PDF before sharing or printing"
+    ],
+    "faqs": [
+      {
+        "q": "How do I delete pages from a PDF?",
+        "a": "Upload your PDF, enter the 1-based page numbers or ranges to remove (for example 2,5-7), and click Delete Pages. The remaining pages are saved in their original order."
+      },
+      {
+        "q": "Can I delete multiple non-consecutive pages?",
+        "a": "Yes. Separate pages and ranges with commas, like 1,3,5-8, to delete them all in one go."
+      },
+      {
+        "q": "Does deleting pages affect the rest of the document?",
+        "a": "No. The pages you keep are untouched — same content, same order, same quality."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "rotate_pages",
+      "merge"
+    ]
+  },
+  "reorder_pages": {
+    "title": "Reorder PDF Pages Online Free — Rearrange Page Order | PDFEDI",
+    "description": "Rearrange PDF pages into any order online for free. Fix wrong page sequences by entering the new order as numbers. No sign-up, content fully preserved.",
+    "h1": "Reorder Pages",
+    "intro": "Put your PDF pages in the right order. Specify the new page sequence and get a PDF with pages rearranged exactly as you want — no need to re-scan or rebuild the document.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter the new page order as comma-separated page numbers (e.g. 3,1,2,4).",
+      "Click Reorder and download the rearranged PDF."
+    ],
+    "features": [
+      "Rearrange pages into any sequence",
+      "Simple comma-separated page order input",
+      "Content and quality fully preserved"
+    ],
+    "useCases": [
+      "Fix pages scanned in the wrong order",
+      "Move the table of contents or cover to the front",
+      "Reorganize a report's sections",
+      "Correct page sequence before printing"
+    ],
+    "faqs": [
+      {
+        "q": "How do I rearrange pages in a PDF?",
+        "a": "Upload your PDF and enter the desired page order as numbers separated by commas — for example 3,1,2,4 puts old page 3 first. Click Reorder to download."
+      },
+      {
+        "q": "Do I need to list every page?",
+        "a": "Enter the full sequence of pages you want in the output. Pages not listed are not included, so list every page you want to keep."
+      },
+      {
+        "q": "Will reordering change my PDF's quality?",
+        "a": "No. Pages are rearranged without touching their content, so quality is identical."
+      }
+    ],
+    "related": [
+      "merge",
+      "split",
+      "delete_pages",
+      "rotate_pages"
+    ]
+  },
+  "extract_text": {
+    "title": "Extract Text from PDF Online Free — Save as TXT | PDFEDI",
+    "description": "Extract text from any text-based PDF online for free and download it as a plain .txt file. Choose all pages or selected ranges. No sign-up required.",
+    "h1": "Extract Text",
+    "intro": "Pull the plain text out of any text-based PDF and download it as a .txt file. Choose all pages or specific ranges — handy for quoting, archiving, or feeding text into other tools.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Optionally enter page ranges (e.g. 1-3,5). Leave empty for all pages.",
+      "Click Extract and download the .txt file."
+    ],
+    "features": [
+      "Extract text to plain .txt format",
+      "All pages or selected page ranges",
+      "Fast — no OCR needed for text PDFs"
+    ],
+    "useCases": [
+      "Copy article text for quoting or citing",
+      "Archive contract text in a searchable format",
+      "Feed PDF content into translation tools",
+      "Quickly check what a long PDF contains"
+    ],
+    "faqs": [
+      {
+        "q": "How do I extract text from a PDF?",
+        "a": "Upload your PDF and click Extract. You'll get a .txt file with the document's text. Optionally limit extraction to page ranges like 1-3,5."
+      },
+      {
+        "q": "Does this work on scanned PDFs?",
+        "a": "Text extraction reads the PDF's built-in text layer, so it works on text-based PDFs. For scanned image-only PDFs, use the OCR tool first to add a searchable text layer, then extract."
+      },
+      {
+        "q": "What format is the extracted text?",
+        "a": "Plain text (.txt), which opens in any text editor and works everywhere."
+      }
+    ],
+    "related": [
+      "ocr",
+      "split",
+      "metadata",
+      "pdf_to_images"
+    ]
+  },
+  "pdf_to_images": {
+    "title": "Convert PDF to Images Online Free — PNG & JPG | PDFEDI",
+    "description": "Convert PDF pages to PNG or JPG images online for free. Choose resolution from 72 to 300 DPI, convert all pages or selected ranges. Download as ZIP.",
+    "h1": "PDF to Images",
+    "intro": "Turn every page of your PDF into a high-quality PNG or JPEG image. Pick the output format and resolution (72–300 DPI), select pages or convert them all, and download everything as a ZIP.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose PNG or JPEG output and a resolution from 72 to 300 DPI.",
+      "Optionally select page ranges (e.g. 1-3,5). Leave empty for all pages.",
+      "Click Convert and download the ZIP of images."
+    ],
+    "features": [
+      "PNG or JPEG output",
+      "Adjustable resolution: 72–300 DPI",
+      "Convert all pages or selected ranges",
+      "ZIP download with one image per page"
+    ],
+    "useCases": [
+      "Create slide images from a PDF presentation",
+      "Extract figures or diagrams as images",
+      "Make thumbnails or previews of documents",
+      "Share PDF pages on platforms that only accept images"
+    ],
+    "faqs": [
+      {
+        "q": "How do I convert a PDF to JPG or PNG?",
+        "a": "Upload your PDF, choose JPEG or PNG, set your preferred DPI (higher means sharper), and click Convert. You get a ZIP with one image per page."
+      },
+      {
+        "q": "What DPI should I choose?",
+        "a": "72–100 DPI is fine for screen viewing, 150 DPI is a good all-rounder, and 300 DPI gives print-quality images (with larger file sizes)."
+      },
+      {
+        "q": "Can I convert only some pages to images?",
+        "a": "Yes — enter page ranges like 1-3,5 and only those pages are converted."
+      }
+    ],
+    "related": [
+      "images_to_pdf",
+      "extract_text"
+    ]
+  },
+  "images_to_pdf": {
+    "title": "Convert Images to PDF Online Free — JPG, PNG to PDF | PDFEDI",
+    "description": "Combine JPG, PNG or WebP images into one PDF online for free. Up to 20 images per PDF, each becomes a full page at original quality. No sign-up.",
+    "h1": "Images to PDF",
+    "intro": "Combine up to 20 JPG, PNG, or WebP images into a single PDF document. Each image becomes a page — ideal for turning photo scans, screenshots, or artwork into a shareable PDF.",
+    "howTo": [
+      "Upload 1 to 20 images (JPG, PNG, or WebP, up to 50MB total).",
+      "Images become pages in upload order.",
+      "Click Convert and download your PDF."
+    ],
+    "features": [
+      "JPG, PNG, and WebP input",
+      "Up to 20 images per PDF",
+      "Each image becomes a full page",
+      "Free with no watermarks"
+    ],
+    "useCases": [
+      "Turn phone photos of documents into a PDF",
+      "Combine screenshots into a single file",
+      "Create a PDF portfolio from artwork",
+      "Archive whiteboard photos as a document"
+    ],
+    "faqs": [
+      {
+        "q": "How do I convert JPG to PDF?",
+        "a": "Upload your JPG images (up to 20), then click Convert. Each image becomes a page in the resulting PDF, in upload order."
+      },
+      {
+        "q": "Which image formats are supported?",
+        "a": "JPG/JPEG, PNG, and WebP images are supported."
+      },
+      {
+        "q": "How many images can I combine?",
+        "a": "Between 1 and 20 images per PDF."
+      },
+      {
+        "q": "Will my images lose quality?",
+        "a": "Images are embedded at their original resolution — nothing is downsampled during conversion."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr",
+      "merge"
+    ]
+  },
+  "ocr": {
+    "title": "OCR PDF Online Free — Make Scanned PDFs Searchable | PDFEDI",
+    "description": "Run OCR on scanned PDFs online for free. Add a searchable, selectable text layer while pages look exactly the same. Multiple languages, no sign-up.",
+    "h1": "OCR to Searchable PDF",
+    "intro": "Make scanned PDFs searchable and selectable. Optical character recognition reads the text in your scanned pages and adds an invisible text layer — the pages look identical, but you can now search, select, and copy the text. Pages that already contain text are skipped automatically.",
+    "howTo": [
+      "Upload your scanned PDF (up to 50MB).",
+      "Choose the document language (e.g. eng, eng+deu).",
+      "Click Run OCR and wait — scanned pages are processed one by one.",
+      "Download your searchable PDF."
+    ],
+    "features": [
+      "Searchable, selectable text layer on scanned pages",
+      "Original page images preserved exactly",
+      "Pages with existing text are skipped automatically",
+      "Multiple OCR languages supported"
+    ],
+    "useCases": [
+      "Make scanned contracts searchable",
+      "Digitize paper archives into searchable PDFs",
+      "Enable text selection in scanned books",
+      "Prepare scans for text extraction or indexing"
+    ],
+    "faqs": [
+      {
+        "q": "What does OCR do to a PDF?",
+        "a": "OCR (optical character recognition) analyzes the images in a scanned PDF, recognizes the text, and embeds an invisible text layer. The pages look the same, but the text becomes searchable and selectable."
+      },
+      {
+        "q": "How long does OCR take?",
+        "a": "It depends on page count and content — scanned pages are processed individually. Pages that already have text are skipped instantly, so mixed documents finish much faster."
+      },
+      {
+        "q": "Which languages are supported?",
+        "a": "Set the language option with a Tesseract language code such as eng for English or eng+deu for English and German combined."
+      },
+      {
+        "q": "Will OCR change how my pages look?",
+        "a": "No. The original scanned images are kept as the visible pages; only an invisible text layer is added underneath."
+      },
+      {
+        "q": "My PDF already has some text. Will it be re-OCRed?",
+        "a": "No — pages with a usable text layer are detected and copied through unchanged. Only image-only pages go through recognition."
+      }
+    ],
+    "related": [
+      "extract_text",
+      "images_to_pdf",
+      "pdf_to_images"
+    ]
+  },
+  "metadata": {
+    "title": "View PDF Metadata Online Free — Inspect Document Info | PDFEDI",
+    "description": "Inspect a PDF's hidden metadata online for free. See title, author, creation date, page count, producer and encryption status as JSON. No sign-up.",
+    "h1": "Inspect Metadata",
+    "intro": "See what's hidden inside your PDF. This tool reads the document's metadata — title, author, subject, keywords, creation date, producer software, page count, and encryption status — and shows it as easy-to-read JSON.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Click View Metadata.",
+      "Read the document info displayed as JSON."
+    ],
+    "features": [
+      "Title, author, subject, keywords",
+      "Creation and modification dates",
+      "Page count and producer info",
+      "Encryption status",
+      "JSON output"
+    ],
+    "useCases": [
+      "Check a PDF's author and creation date",
+      "Verify document properties before publishing",
+      "Audit files for leftover metadata",
+      "Debug PDF processing issues"
+    ],
+    "faqs": [
+      {
+        "q": "What is PDF metadata?",
+        "a": "Metadata is hidden information stored in the PDF: title, author, subject, keywords, creation date, the software that made it, page count, and whether it's encrypted."
+      },
+      {
+        "q": "Can I see if a PDF is password protected?",
+        "a": "Yes — the metadata view includes the document's encryption status."
+      },
+      {
+        "q": "Is the metadata always accurate?",
+        "a": "It reflects what the PDF's creator stored in the file. Some PDFs have empty or generic metadata if the authoring software didn't fill it in."
+      }
+    ],
+    "related": [
+      "edit_metadata",
+      "extract_text",
+      "unlock_pdf"
+    ]
+  },
+  "edit_metadata": {
+    "title": "Edit PDF Metadata Online Free — Update Title & Author | PDFEDI",
+    "description": "Edit PDF metadata online for free. Change title, author, subject and keywords that appear in PDF readers and search results. Content untouched, no sign-up.",
+    "h1": "Edit Metadata",
+    "intro": "Update your PDF's document info. Change the title, author, subject, and keywords that show up in PDF readers and search results — no desktop software needed.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter the new title, author, subject, and/or keywords.",
+      "Click Save and download the updated PDF."
+    ],
+    "features": [
+      "Edit title, author, subject, keywords",
+      "Document content untouched",
+      "Instant download"
+    ],
+    "useCases": [
+      "Set a proper title before publishing a PDF",
+      "Add your name as author to your documents",
+      "Clean up metadata inherited from a template",
+      "Add keywords for better document organization"
+    ],
+    "faqs": [
+      {
+        "q": "How do I change a PDF's title or author?",
+        "a": "Upload the PDF, fill in the new title, author, subject, or keywords, and click Save. Only the metadata changes — your pages stay exactly the same."
+      },
+      {
+        "q": "Will editing metadata affect my document's content?",
+        "a": "No. Metadata lives in the document info dictionary; pages, text, and images are not modified."
+      },
+      {
+        "q": "Why does PDF metadata matter?",
+        "a": "PDF readers and search engines display the title and author. Correct metadata makes your documents look professional and easier to find."
+      }
+    ],
+    "related": [
+      "metadata",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "watermark": {
+    "title": "Add Watermark to PDF Online Free — Text Stamp | PDFEDI",
+    "description": "Stamp a diagonal text watermark across PDF pages online for free. Custom text like DRAFT or CONFIDENTIAL with adjustable opacity. No sign-up.",
+    "h1": "Add Watermark",
+    "intro": "Stamp text diagonally across every page of your PDF. Add marks like DRAFT, CONFIDENTIAL, or SAMPLE with adjustable opacity — a simple way to label document status.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter your watermark text and choose an opacity level.",
+      "Click Add Watermark and download the stamped PDF."
+    ],
+    "features": [
+      "Diagonal text stamp on every page",
+      "Custom text of your choice",
+      "Adjustable opacity"
+    ],
+    "useCases": [
+      "Mark drafts as DRAFT before review",
+      "Label sensitive files CONFIDENTIAL",
+      "Stamp SAMPLE on preview documents",
+      "Brand outgoing PDFs with your company name"
+    ],
+    "faqs": [
+      {
+        "q": "How do I add a watermark to a PDF?",
+        "a": "Upload your PDF, type the watermark text, set the opacity, and click Add Watermark. The text is stamped diagonally on every page."
+      },
+      {
+        "q": "Can I control how visible the watermark is?",
+        "a": "Yes — the opacity option lets you make the watermark subtle or bold."
+      },
+      {
+        "q": "Which pages get watermarked?",
+        "a": "Every page of the PDF receives the watermark."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "edit_metadata",
+      "password_protect",
+      "flatten"
+    ]
+  },
+  "page_numbers": {
+    "title": "Add Page Numbers to PDF Online Free — Number Pages | PDFEDI",
+    "description": "Number your PDF pages online for free. Choose any position, start number, prefix/suffix text and font size from 6–48pt. Works on all pages or ranges.",
+    "h1": "Add Page Numbers",
+    "intro": "Add page numbers to your PDF exactly where you want them. Choose the corner or edge position, starting number, optional prefix/suffix text, and font size — ideal for reports, ebooks, and print-ready documents.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose vertical and horizontal position, start number, and optional prefix/suffix.",
+      "Set the font size and page ranges if needed.",
+      "Click Add Numbers and download."
+    ],
+    "features": [
+      "Any corner or edge position",
+      "Custom start number",
+      "Optional prefix and suffix text (e.g. 'Page 1 of 10')",
+      "Adjustable font size (6–48pt)",
+      "Apply to all pages or selected ranges"
+    ],
+    "useCases": [
+      "Number report pages for easy reference",
+      "Prepare ebooks for print",
+      "Add 'Page X of Y' footers to proposals",
+      "Number scanned documents that lack pagination"
+    ],
+    "faqs": [
+      {
+        "q": "How do I add page numbers to a PDF?",
+        "a": "Upload your PDF, pick where the numbers go (e.g. bottom center), set the start number and font size, then click Add Numbers."
+      },
+      {
+        "q": "Can I make page numbers like 'Page 1 of 10'?",
+        "a": "Yes — use the prefix field for 'Page ' and the suffix field for ' of 10' around the automatic number."
+      },
+      {
+        "q": "Can I start numbering from a different number?",
+        "a": "Yes. Set the start number to whatever you need — useful when your PDF is one part of a larger document."
+      },
+      {
+        "q": "Can I number only some pages?",
+        "a": "Yes — enter page ranges like 3-10 to number just those pages."
+      }
+    ],
+    "related": [
+      "watermark",
+      "edit_metadata",
+      "merge",
+      "flatten"
+    ]
+  },
+  "password_protect": {
+    "title": "Protect PDF with Password Online Free — Encrypt PDF | PDFEDI",
+    "description": "Add password protection to a PDF online for free. Encrypt your document so only people with the password can open it in any reader. No sign-up.",
+    "h1": "Password Protect",
+    "intro": "Lock your PDF with a password. The document is encrypted so it can't be opened without the password you set — simple protection for sensitive files you need to share or store.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter the password you want to protect it with.",
+      "Click Protect and download the encrypted PDF."
+    ],
+    "features": [
+      "Strong PDF encryption",
+      "Password required to open",
+      "Works with any PDF reader"
+    ],
+    "useCases": [
+      "Protect contracts before emailing them",
+      "Secure financial documents",
+      "Lock personal records stored online",
+      "Share sensitive files with controlled access"
+    ],
+    "faqs": [
+      {
+        "q": "How do I password-protect a PDF?",
+        "a": "Upload your PDF, enter a password, and click Protect. The downloaded PDF will require that password to open in any PDF reader."
+      },
+      {
+        "q": "What happens if I forget the password?",
+        "a": "There's no recovery — without the password the PDF can't be opened. Store your password somewhere safe."
+      },
+      {
+        "q": "What kind of encryption is used?",
+        "a": "The PDF is encrypted with standard PDF encryption supported by all major PDF readers."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "unlock_pdf": {
+    "title": "Unlock PDF Online Free — Remove Password Protection | PDFEDI",
+    "description": "Remove password protection from your own PDF online for free. Enter the correct password and download an unlocked copy. No sign-up, no watermarks.",
+    "h1": "Unlock PDF",
+    "intro": "Remove the password from a PDF you own. Enter the correct password and download an unlocked copy that's free to open, edit, and process with other tools.",
+    "howTo": [
+      "Upload your password-protected PDF (up to 50MB).",
+      "Enter the correct password.",
+      "Click Unlock and download the unprotected PDF."
+    ],
+    "features": [
+      "Removes password protection",
+      "Output works with all other PDFEDI tools",
+      "Free with no watermarks"
+    ],
+    "useCases": [
+      "Unlock your own PDF after forgetting it was locked",
+      "Prepare a protected file for merging or splitting",
+      "Remove passwords before archiving",
+      "Enable text extraction on locked documents"
+    ],
+    "faqs": [
+      {
+        "q": "How do I remove a password from a PDF?",
+        "a": "Upload the protected PDF, enter its password, and click Unlock. You'll get a normal PDF with no password prompt."
+      },
+      {
+        "q": "Can I unlock a PDF without the password?",
+        "a": "No. You must know the correct password — this tool removes protection from files you have the right to access; it cannot crack unknown passwords."
+      },
+      {
+        "q": "Why would I unlock a PDF?",
+        "a": "Other tools refuse locked files for safety. Unlocking first lets you merge, split, compress, or convert the document normally."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "merge",
+      "split",
+      "extract_text"
+    ]
+  },
+  "redact": {
+    "title": "Redact PDF Online Free — Black Out Sensitive Text | PDFEDI",
+    "description": "Permanently redact sensitive text in a PDF online for free. Black out names, emails and IDs by exact text match, multiple terms at once. No sign-up.",
+    "h1": "Redact PDF",
+    "intro": "Permanently black out sensitive text in your PDF. Enter the words or phrases to redact — names, emails, ID numbers — and they're covered with solid black boxes in the output document.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter comma-separated text to redact (e.g. SSN, john@example.com).",
+      "Click Redact and download the blacked-out PDF."
+    ],
+    "features": [
+      "Redact by exact text match",
+      "Multiple terms in one pass",
+      "Solid black redaction boxes"
+    ],
+    "useCases": [
+      "Black out personal data before sharing documents",
+      "Redact client names from case files",
+      "Remove email addresses from public reports",
+      "Sanitize documents for FOIA-style release"
+    ],
+    "faqs": [
+      {
+        "q": "How do I black out text in a PDF?",
+        "a": "Upload your PDF, enter the exact words or phrases to redact separated by commas, and click Redact. Every match is covered with a black box."
+      },
+      {
+        "q": "Is the redacted text truly removed?",
+        "a": "The matched text is covered with opaque black rectangles in the output PDF. For maximum safety with highly sensitive material, verify the output before distributing."
+      },
+      {
+        "q": "Can I redact multiple different words at once?",
+        "a": "Yes — enter them as a comma-separated list, for example: SSN, john@example.com, 555-1234."
+      },
+      {
+        "q": "Does redaction work on scanned PDFs?",
+        "a": "Redaction matches the PDF's text layer. For scanned image-only PDFs, run OCR first to add a text layer, then redact."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "unlock_pdf",
+      "extract_text",
+      "flatten"
+    ]
+  },
+  "flatten": {
+    "title": "Flatten PDF Online Free — Bake Annotations into Pages | PDFEDI",
+    "description": "Flatten a PDF online for free. Bake annotations, comments and filled form fields permanently into pages so appearance is locked. No sign-up.",
+    "h1": "Flatten PDF",
+    "intro": "Bake annotations and form fields permanently into your PDF's pages. Flattening merges markups, comments, and filled forms into the page content so the document looks the same everywhere and can't be edited further.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Click Flatten.",
+      "Download the flattened PDF."
+    ],
+    "features": [
+      "Merges annotations into page content",
+      "Bakes form field values into pages",
+      "Locks final document appearance"
+    ],
+    "useCases": [
+      "Finalize a filled form so values can't be changed",
+      "Bake review comments into a document",
+      "Ensure consistent appearance across PDF readers",
+      "Prepare documents for printing or archiving"
+    ],
+    "faqs": [
+      {
+        "q": "What does flattening a PDF do?",
+        "a": "Flattening merges annotations, comments, and form field values directly into the page graphics. After flattening, they become part of the page and can no longer be edited or moved."
+      },
+      {
+        "q": "Why should I flatten a filled form?",
+        "a": "An unflattened form's values can still be edited by anyone with a PDF editor. Flattening locks the filled-in values in place."
+      },
+      {
+        "q": "Will flattening change how my PDF looks?",
+        "a": "No — the visual appearance stays the same. Only the editability of annotations and form fields changes."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "watermark",
+      "page_numbers",
+      "redact"
+    ]
+  },
+  "crop": {
+    "title": "Crop PDF Online Free — Trim Margins & Cut Pages | PDFEDI",
+    "description": "Crop PDF pages online for free. Trim white margins or cut pages by exact point amounts from the top, bottom, left and right. No sign-up, files stay private.",
+    "h1": "Crop PDF",
+    "intro": "Remove excess white space or unwanted edges from your PDF pages. Enter how many points to trim from each side — apply it to every page or only the page ranges you choose.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Enter the trim amounts in points for the top, bottom, left and right edges (72 points = 1 inch).",
+      "Optionally limit cropping to specific pages (e.g. 1-3,5). Leave empty for all pages.",
+      "Click Crop and download the trimmed PDF."
+    ],
+    "features": [
+      "Trim each edge independently, in points",
+      "Apply to all pages or selected page ranges",
+      "Original content quality fully preserved",
+      "Free with no sign-up"
+    ],
+    "useCases": [
+      "Remove wide white margins before printing to save paper",
+      "Cut scanner edge shadows and borders from scanned pages",
+      "Tighten pages for easier reading on phones and e-readers",
+      "Trim letterhead or footer areas from generated reports"
+    ],
+    "faqs": [
+      {
+        "q": "How much can I crop from a PDF page?",
+        "a": "As much as you like, as long as some of the page remains. If the trim amounts would remove the entire page width or height, the tool stops with an error instead of producing an empty page."
+      },
+      {
+        "q": "What unit are the crop amounts in?",
+        "a": "Points — the standard PDF unit. 72 points equal 1 inch, so trimming 36 points removes half an inch from that edge."
+      },
+      {
+        "q": "Does cropping delete the trimmed content permanently?",
+        "a": "Cropping adjusts each page's visible crop box. The hidden content is not rewritten, so for permanent removal of sensitive content use the Redact tool instead."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "rotate_pages",
+      "n_up"
+    ]
+  },
+  "grayscale": {
+    "title": "Convert PDF to Grayscale Online Free — Black & White | PDFEDI",
+    "description": "Convert a colour PDF to grayscale online for free. Cheaper printing and smaller files at up to 600 DPI. Pages are rendered as images — note text is no longer selectable.",
+    "h1": "Grayscale PDF",
+    "intro": "Turn a colour PDF into a clean black-and-white version that's cheaper to print and often smaller. Choose the rendering quality from 72 to 600 DPI — pages are converted to grayscale images, so text is no longer selectable afterwards.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Set the DPI — 200 is a good balance of quality and file size; use 300+ for printing.",
+      "Click Convert and download your grayscale PDF."
+    ],
+    "features": [
+      "True grayscale conversion at 72–600 DPI",
+      "Keeps original page sizes and page count",
+      "High-quality JPEG-encoded pages keep files compact",
+      "Free with no sign-up"
+    ],
+    "useCases": [
+      "Cut colour printing costs for handouts and drafts",
+      "Prepare documents for black-and-white only printers",
+      "Make colour-heavy slides readable when printed in mono",
+      "Reduce file size of image-heavy colour PDFs"
+    ],
+    "faqs": [
+      {
+        "q": "Why is the text in my grayscale PDF not selectable?",
+        "a": "To guarantee a true grayscale result, each page is rendered as a grayscale image. That means text becomes part of the picture — it prints identically but can no longer be selected or searched. Keep a copy of the original if you need the text layer."
+      },
+      {
+        "q": "Which DPI should I choose?",
+        "a": "150 DPI is fine for on-screen reading, 200 DPI balances size and clarity, and 300 DPI or more is best for printing. Higher DPI means larger files."
+      },
+      {
+        "q": "Will grayscale make my PDF smaller?",
+        "a": "Usually yes for colour, image-heavy documents, because colour information is dropped. Text-only PDFs may grow slightly because pages become images — the Compress tool is better for those."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "n_up": {
+    "title": "N-Up PDF Online Free — Multiple Pages Per Sheet | PDFEDI",
+    "description": "Combine 2, 4, 6 or 9 PDF pages onto one sheet online for free. A4 or Letter sheets, portrait or landscape. Perfect for handouts, slides and booklets. No sign-up.",
+    "h1": "N-Up PDF",
+    "intro": "Print more, waste less: place 2, 4, 6 or 9 pages of your PDF onto a single sheet. Ideal for lecture slides, handouts and draft reviews where full-size pages are overkill.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose how many pages per sheet: 2, 4, 6 or 9.",
+      "Pick the sheet size (A4 or Letter) and orientation (portrait or landscape).",
+      "Click Create and download your combined sheets."
+    ],
+    "features": [
+      "2, 4, 6 or 9 pages per sheet",
+      "Grid adjusts automatically to orientation",
+      "Content scaled proportionally — never distorted",
+      "A4 and Letter sheet sizes"
+    ],
+    "useCases": [
+      "Print lecture slides as compact handouts",
+      "Review long documents using a fraction of the paper",
+      "Create booklet-style proof sheets",
+      "Fit a whole presentation on a few pages for travel"
+    ],
+    "faqs": [
+      {
+        "q": "How many output sheets will I get?",
+        "a": "Your page count divided by the layout, rounded up. For example, a 10-page PDF at 4-up produces 3 sheets — the last sheet simply has empty slots."
+      },
+      {
+        "q": "Does N-Up reduce quality?",
+        "a": "No. Pages are placed onto the sheet as vector content at a smaller scale — text and images stay sharp, just physically smaller when printed."
+      },
+      {
+        "q": "Which layout should I pick for slides?",
+        "a": "4-up in landscape works well for most slide decks. Use 2-up if you need to read annotations, and 6 or 9-up only for overviews — text gets small."
+      }
+    ],
+    "related": [
+      "crop",
+      "merge",
+      "split"
+    ]
+  },
+  "repair": {
+    "title": "Repair Corrupted PDF Online Free — Fix Damaged Files | PDFEDI",
+    "description": "Repair a corrupted PDF online for free. Rebuild broken cross-reference tables, truncated downloads and malformed objects. If a file can't be saved, you get an honest error.",
+    "h1": "Repair PDF",
+    "intro": "Get your damaged PDF working again. Upload the broken file and the repair engine rebuilds its internal structure — broken cross-references, truncated downloads and malformed objects are fixed where physically possible.",
+    "howTo": [
+      "Upload the damaged PDF file (up to 50MB).",
+      "Click Repair — the file's structure is analyzed and rebuilt.",
+      "Download the repaired PDF and check your content is intact."
+    ],
+    "features": [
+      "Rebuilds broken cross-reference tables",
+      "Recovers truncated and partially downloaded files",
+      "Repairs malformed object streams",
+      "Honest result — unfixable files report an error, not a fake repair"
+    ],
+    "useCases": [
+      "Open a PDF that shows 'file is damaged' errors",
+      "Recover documents from interrupted downloads",
+      "Fix PDFs corrupted by faulty USB transfers or email attachments",
+      "Salvage old archived PDFs that no longer open"
+    ],
+    "faqs": [
+      {
+        "q": "What kinds of damage can be repaired?",
+        "a": "Broken or missing cross-reference tables, wrong object offsets, truncated files and malformed stream lengths are the most common fixable problems. If the actual content bytes are gone, no tool can recreate them."
+      },
+      {
+        "q": "What if my file can't be repaired?",
+        "a": "You get a clear 'unrepairable' error explaining the file is too damaged — never a silently broken download. Try opening it in another reader to confirm, then re-obtain the file from its source if possible."
+      },
+      {
+        "q": "My PDF is password-protected. Can I repair it?",
+        "a": "Not directly — repair can't work on encrypted files. Use the Unlock PDF tool with your password first, then repair the unlocked file."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "merge",
+      "metadata"
+    ]
+  },
+  "pdf_to_word": {
+    "title": "PDF to Word Online Free — Convert PDF to DOCX | PDFEDI",
+    "description": "Convert PDF to an editable Word document online for free. Real paragraphs, heading styles and embedded images. Best for text documents — complex tables are approximate.",
+    "h1": "PDF to Word",
+    "intro": "Turn your PDF into a Word document you can actually edit. Text is rebuilt into real paragraphs with proper heading styles, and embedded images are placed in reading order. Works best on text-based documents — complex tables and multi-column layouts come out approximate.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB, 50 pages max).",
+      "Click Convert — text is extracted with its layout and rebuilt as a Word document.",
+      "Download the .docx and edit it in Word, Google Docs or LibreOffice."
+    ],
+    "features": [
+      "True editable paragraphs — not images of text",
+      "Heading styles detected from type sizes",
+      "Bold formatting preserved where detected",
+      "Embedded images placed in reading order"
+    ],
+    "useCases": [
+      "Edit a PDF report you only have as a file",
+      "Reuse PDF content in a proposal or presentation",
+      "Extract structured text into a document you can revise",
+      "Convert archived PDFs into working Word files"
+    ],
+    "faqs": [
+      {
+        "q": "Will my document look exactly like the PDF?",
+        "a": "Close for text documents, approximate for complex ones. Paragraphs, headings and images transfer well; intricate tables and multi-column magazine layouts are rebuilt as best as possible but won't be pixel-perfect. The goal is an editable document, not a visual clone."
+      },
+      {
+        "q": "My PDF is a scan with no selectable text. What happens?",
+        "a": "You'll get a clear error pointing you to the OCR tool. Run OCR first to make the scan searchable, then convert the OCR'd result to Word."
+      },
+      {
+        "q": "What program opens the downloaded file?",
+        "a": "The download is a standard .docx file — it opens in Microsoft Word, Google Docs, LibreOffice Writer and Apple Pages."
+      }
+    ],
+    "related": [
+      "ocr",
+      "extract_text",
+      "images_to_pdf",
+      "edit_metadata"
+    ]
+  },
+  "compress": {
+    "title": "Compress PDF Online Free — Shrink to a Target Size | PDFEDI",
+    "description": "Compress a PDF to a target size online for free. Pick a limit — e.g. 25 MB, the most common court e-filing limit — and images are downscaled until it fits. Batch up to 10 files, ZIP download.",
+    "h1": "Compress PDF",
+    "intro": "Shrink a PDF down to a size you choose. Pick a target — 25 MB is the most common court e-filing (CM/ECF) limit, but limits vary by court from about 3 to 200 MB, so check your court's local rule first. The tool rebuilds the file and downscales embedded images until it fits, and the ZIP includes a report showing the size before and after for each file.",
+    "howTo": [
+      "Upload 1 to 10 PDF files (up to 50MB each).",
+      "Choose a target size, for example 25 MB.",
+      "Click Compress and download the ZIP.",
+      "Check compression_report.txt in the ZIP — it says for each file whether the target was met."
+    ],
+    "features": [
+      "Compress to a target size: 2, 5, 10, 25 or 50 MB",
+      "Batch up to 10 PDFs, results as a ZIP",
+      "Per-file report with before/after sizes and target status",
+      "Honest result — if a target can't be reached, the report says so"
+    ],
+    "useCases": [
+      "Shrink a brief under your court's e-filing size limit",
+      "Compress scanned exhibits so they can be filed or emailed",
+      "Reduce a large PDF before sending it to a client or colleague",
+      "Batch-compress a set of documents in one job"
+    ],
+    "faqs": [
+      {
+        "q": "What target size should I pick for court filing?",
+        "a": "It depends on your court — CM/ECF limits vary from about 3 MB to 200 MB by court, and 25 MB is the most common. Check your court's local rule or e-filing guide, then pick that size here."
+      },
+      {
+        "q": "What if my PDF can't be compressed to the target?",
+        "a": "You still get the smallest version the tool could make, and compression_report.txt in the ZIP says the target was missed and by how much. Try a larger target, or split the document first."
+      },
+      {
+        "q": "Will compression change how my document looks?",
+        "a": "Text and layout are preserved. Embedded images are downscaled and re-encoded as JPEG, so very large photos get softer — that is where the size saving comes from. Text-only PDFs barely shrink, because there are no images to downscale."
+      },
+      {
+        "q": "Can I compress several PDFs at once?",
+        "a": "Yes — upload up to 10 PDFs in one job. The results come back as a ZIP with one compressed PDF per file plus a report. Files are processed securely and deleted automatically. No sign-up required."
+      }
+    ],
+    "related": [
+      "exhibit_combine",
+      "strip_metadata",
+      "split",
+      "grayscale"
+    ]
+  },
+  "strip_metadata": {
+    "title": "Remove PDF Metadata Online Free — Strip Hidden Info | PDFEDI",
+    "description": "Strip hidden metadata from a PDF online for free. Removes title, author, dates, creator and producer in one click, with a before/after report. Batch up to 10 files.",
+    "h1": "Strip Metadata",
+    "intro": "Remove the hidden information stored inside a PDF — title, author, creation and modification dates, creator and producer software, and the XMP metadata packet — in one click. You get the cleaned PDF plus a before/after report showing exactly what was in the file and what was removed, so you can prove it before sending the file on.",
+    "howTo": [
+      "Upload 1 to 10 PDF files (up to 50MB each).",
+      "Click Strip Metadata — no options to set.",
+      "Download the ZIP with cleaned PDFs and metadata_report.json.",
+      "Open the report to see what was removed from each file."
+    ],
+    "features": [
+      "One-click removal of all document metadata",
+      "Before/after report for every file (JSON)",
+      "Removes XMP metadata packets too",
+      "Batch up to 10 PDFs, results as a ZIP"
+    ],
+    "useCases": [
+      "Clean a brief or exhibit before filing or sharing it",
+      "Remove author and creation details from a document sent to the other side",
+      "Strip metadata from a batch of client files before disclosure",
+      "Check what metadata a PDF you received actually contains"
+    ],
+    "faqs": [
+      {
+        "q": "What metadata is removed?",
+        "a": "Title, author, subject, keywords, creator, producer, creation and modification dates, and the XMP metadata packet. The report lists every field before and after, so you can see exactly what changed."
+      },
+      {
+        "q": "How is this different from Edit Metadata?",
+        "a": "Edit Metadata changes fields one by one — you set a new title or author. Strip Metadata removes everything in one click and proves it with a before/after report. Use Strip when the file is leaving your office; use Edit when you want to correct a field."
+      },
+      {
+        "q": "Does the cleaned PDF still have any metadata?",
+        "a": "The report shows what remains. The PDF writer stamps its own producer value when the cleaned file is written — that is listed as remaining in the report, not hidden. No information from your original file survives."
+      },
+      {
+        "q": "Is it free?",
+        "a": "Yes. Stripping metadata on PDFEDI is completely free with no sign-up. Files are processed securely and deleted automatically. No sign-up required."
+      }
+    ],
+    "related": [
+      "metadata",
+      "edit_metadata",
+      "redact",
+      "strip_image_metadata"
+    ]
+  },
+  "exhibit_combine": {
+    "title": "Combine PDF Exhibits Online Free — Slip Sheets & Bates | PDFEDI",
+    "description": "Combine PDF exhibits into one filing-ready document online for free. Slip sheets before each exhibit and continuous Bates-style page numbers. 2–20 PDFs, no sign-up.",
+    "h1": "Combine Exhibits",
+    "intro": "Turn a set of PDFs into one filing-ready document. Each exhibit gets a slip sheet (Exhibit A, Exhibit B, and so on, with its filename and page count) and every exhibit page is stamped with a Bates-style number — BATES-000001, BATES-000002 — counting continuously across exhibits. Upload your exhibits in order and download a single PDF ready to file.",
+    "howTo": [
+      "Upload 2 to 20 PDF files in exhibit order (up to 50MB each).",
+      "Set the exhibit label, Bates prefix and first Bates number if you want different ones.",
+      "Click Combine Exhibits and download the single PDF.",
+      "Check the slip sheets and Bates numbers on the first pages before filing."
+    ],
+    "features": [
+      "Slip sheet before each exhibit with label, filename and page count",
+      "Continuous Bates-style numbering across all exhibits",
+      "Custom exhibit label, Bates prefix and starting number",
+      "Combine 2–20 PDFs into one filing-ready file"
+    ],
+    "useCases": [
+      "Assemble exhibits for a court filing in one document",
+      "Build a deposition exhibit set with Bates numbers for reference",
+      "Combine supporting documents into a single indexed bundle",
+      "Prepare a hearing binder as one PDF instead of many files"
+    ],
+    "faqs": [
+      {
+        "q": "What is a Bates number?",
+        "a": "A Bates number is a unique sequential number stamped on every page of a document set (for example BATES-000001, BATES-000002), used so everyone in a case can refer to the same page. This tool stamps them continuously across all your exhibits."
+      },
+      {
+        "q": "What is on a slip sheet?",
+        "a": "One page before each exhibit, showing the exhibit label (Exhibit A, B, C…), the original filename and how many pages that exhibit has. Slip sheets are not Bates-numbered. You can turn them off if you don't want them."
+      },
+      {
+        "q": "Can I start Bates numbering at a number other than 1?",
+        "a": "Yes — set the first Bates number to continue a set you already started, for example 501 to pick up where an earlier production left off."
+      },
+      {
+        "q": "What order do the exhibits go in?",
+        "a": "The order you upload them in. Upload Exhibit A first, then B, then C. Files are processed securely and deleted automatically. No sign-up required."
+      }
+    ],
+    "related": [
+      "merge",
+      "page_numbers",
+      "compress",
+      "redact"
+    ]
+  },
+  "strip_image_metadata": {
+    "title": "Remove Image Metadata Online Free — Strip EXIF & GPS | PDFEDI",
+    "description": "Strip EXIF and GPS metadata from photos online for free. Removes camera, date and location data from JPG, PNG and WebP images, with a before/after report. Batch up to 10 images.",
+    "h1": "Strip Image Metadata",
+    "intro": "Photos carry hidden data: camera make and model, the date they were taken, and often GPS coordinates showing exactly where. This tool lists that metadata for each image, removes it, and gives you a before/after report showing what was taken out — so you can share photos without sharing where and when they were taken.",
+    "howTo": [
+      "Upload 1 to 10 JPG, PNG or WebP images.",
+      "Click Strip Image Metadata — no options to set.",
+      "Download the ZIP with cleaned images and metadata_report.json.",
+      "Open the report to see what was removed from each image."
+    ],
+    "features": [
+      "Removes EXIF data: camera, date, software",
+      "Removes GPS location data from photos",
+      "Before/after report for every image (JSON)",
+      "Batch up to 10 images, results as a ZIP"
+    ],
+    "useCases": [
+      "Remove location data from photos before sharing them",
+      "Clean client or case photos before disclosure",
+      "Strip camera and date details from images for a website",
+      "Check what metadata your phone's photos actually contain"
+    ],
+    "faqs": [
+      {
+        "q": "What metadata is removed from my photos?",
+        "a": "EXIF data including camera make and model, date taken, software, and GPS coordinates, plus XMP data where present. The report lists every field found before cleaning and confirms it is gone after."
+      },
+      {
+        "q": "Does this remove C2PA or AI-generation markers?",
+        "a": "No — this tool removes standard EXIF/XMP/GPS metadata only, and it does not verify removal of C2PA or AI-generation markers. For C2PA/SynthID cleaning, use ClearMark, which is built for that job."
+      },
+      {
+        "q": "Will my photos look different after cleaning?",
+        "a": "No. Only the hidden metadata is removed — the image itself is re-saved at high quality (JPEG quality 95) and looks the same."
+      },
+      {
+        "q": "Is it free?",
+        "a": "Yes. Stripping image metadata on PDFEDI is completely free with no sign-up. Files are processed securely and deleted automatically. No sign-up required."
+      }
+    ],
+    "related": [
+      "strip_metadata",
+      "metadata",
+      "images_to_pdf",
+      "redact"
+    ]
+  }
+}
