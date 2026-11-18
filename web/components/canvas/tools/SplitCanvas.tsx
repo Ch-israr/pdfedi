@@ -21,9 +21,15 @@ import { useOrganizer } from "../../../hooks/useOrganizer";
 import { CanvasShell } from "../CanvasShell";
 import { ThumbnailGrid, type GridCell } from "../ThumbnailGrid";
 import { PagePreviewModal, thumbLoaderFor } from "../canvasUtils";
-import { ToolButton, useUndoKeys, type ToolCanvasProps } from "./common";
+import { useLocale, useTranslations } from "next-intl";
+import { ToolButton, translatePayloadError, useUndoKeys, type ToolCanvasProps } from "./common";
 
 export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) {
+  const locale = useLocale();
+  const t = useTranslations("canvas");
+  const tTools = useTranslations("tools");
+  const tContent = useTranslations("toolContent");
+  const tErr = useTranslations("errors");
   const pdf = pdfs[0];
   const initialItems = useMemo<OrganizerItem[]>(
     () =>
@@ -65,28 +71,31 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
       const built = buildSplitPayload(pageCount, mode, doc.dividers, extractPages);
       return { ...built, error: null as string | null };
     } catch (e) {
-      return { config: {}, error: e instanceof Error ? e.message : String(e) };
+      return { config: {}, error: translatePayloadError(e, tErr) };
     }
   }, [pageCount, mode, doc.dividers, org.selected]);
 
   const summary =
     mode === "every"
-      ? `${pageCount} output files — one PDF per page, delivered as a ZIP.`
+      ? t("split.summaryEvery", { count: pageCount })
       : mode === "extract"
         ? org.selected.length > 0
-          ? `${org.selected.length} output file${org.selected.length === 1 ? "" : "s"} — one PDF per selected page, delivered as a ZIP.`
-          : "Click pages to extract each one as its own PDF."
+          ? t("split.summaryExtract", { count: org.selected.length })
+          : t("split.summaryExtractEmpty")
         : groups.length > 0
-          ? `${groups.length} output file${groups.length === 1 ? "" : "s"}: ` +
-            groups.map(([s, e]) => (s === e ? `p. ${s}` : `pp. ${s}–${e}`)).join(", ") +
-            `, delivered as a ZIP.`
+          ? t("split.summaryRanges", {
+              count: groups.length,
+              groups: groups
+                .map(([s, e]) => (s === e ? `p. ${s}` : `pp. ${s}–${e}`))
+                .join(", "),
+            })
           : "";
 
   const cells: GridCell[] = useMemo(
     () =>
       doc.items.map((it) => ({
         id: it.id,
-        label: `Page ${it.page}`,
+        label: t("pageLabel", { n: it.page }),
         groupIndex: groupOf(it.page),
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -119,20 +128,21 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
         prev = cur;
       }
       if (pages.some((p) => p > pageCount)) {
-        throw new Error(`Page numbers exceed the document page count (${pageCount}).`);
+        setRangesError(t("split.pageRangeExceeds", { count: pageCount }));
+        return;
       }
       setRangesError(null);
       // One undo step for the whole text commit.
       dispatch({ type: "setDividers", dividers });
     } catch (e) {
-      setRangesError(e instanceof Error ? e.message : String(e));
+      setRangesError(translatePayloadError(e, tErr));
     }
   }
 
   return (
     <CanvasShell
-      toolName={job.spec?.name ?? "Split PDF"}
-      description={job.spec?.description ?? ""}
+      toolName={tTools("split.name")}
+      description={tContent("split.description")}
       fileLabel={localFiles.map((f) => f.name).join(", ")}
       quota={job.quota}
       maxFiles={1}
@@ -146,10 +156,10 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
       payloadError={payload.error ?? rangesError}
       processLabel={
         mode === "every"
-          ? "Split into single pages"
+          ? t("split.processEvery")
           : mode === "extract"
-            ? "Extract selected pages"
-            : "Split now"
+            ? t("split.processExtract")
+            : t("split.processRanges")
       }
       canProcess={payload.error === null && job.files.length === 1}
       onProcess={() => void job.startJob(job.files, payload.config)}
@@ -158,14 +168,15 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
       onBackToOrganize={() => job.setPhase("organize")}
       onDownload={job.download}
       downloadPct={job.downloadPct}
-      activityLabel="Splitting"
+      locale={locale}
+      activityLabel={t("split.activity")}
       error={job.error}
     >
       <div className="mt-4">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <ToolButton onClick={org.undo} disabled={!org.canUndo} title="Undo (Ctrl+Z)">↩ Undo</ToolButton>
-          <ToolButton onClick={org.redo} disabled={!org.canRedo} title="Redo (Ctrl+Y)">↪ Redo</ToolButton>
-          <div className="ml-1 flex rounded-lg border border-slate-300 bg-white p-0.5" role="tablist" aria-label="Split mode">
+          <ToolButton onClick={org.undo} disabled={!org.canUndo} title={t("undoTitle")}>↩ {t("undo")}</ToolButton>
+          <ToolButton onClick={org.redo} disabled={!org.canRedo} title={t("redoTitle")}>↪ {t("redo")}</ToolButton>
+          <div className="ms-1 flex rounded-lg border border-slate-300 bg-white p-0.5" role="tablist" aria-label={t("split.modeAria")}>
             {(["ranges", "extract", "every"] as const).map((m) => (
               <button
                 key={m}
@@ -179,46 +190,41 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                   mode === m ? "bg-brand-600 text-white" : "text-slate-600 hover:text-brand-600"
                 }`}
               >
-                {m === "ranges" ? "Ranges" : m === "extract" ? "Extract pages" : "Every page"}
+                {m === "ranges" ? t("split.modeRanges") : m === "extract" ? t("split.modeExtract") : t("split.modeEvery")}
               </button>
             ))}
           </div>
           {mode === "ranges" && (
             <>
               <ToolButton onClick={() => dispatch({ type: "clearDividers" })} disabled={doc.dividers.length === 0}>
-                Clear dividers
+                {t("split.clearDividers")}
               </ToolButton>
               <label className="flex items-center gap-2 text-sm text-slate-600">
-                Ranges
+                {t("split.rangesLabel")}
                 <input
                   type="text"
                   value={rangesValue}
-                  aria-label="Page ranges"
+                  aria-label={t("split.rangesAria")}
                   onChange={(e) => setRangesText(e.target.value)}
                   onBlur={(e) => commitRanges(e.target.value)}
                   onKeyDown={(e) => {
                     if (e.key === "Enter") (e.target as HTMLInputElement).blur();
                   }}
                   className="w-44 rounded-lg border border-slate-300 px-2 py-1.5 font-mono text-sm"
-                  placeholder="1-3,4-7"
+                  placeholder={t("split.rangesPlaceholder")}
                 />
               </label>
             </>
           )}
           {mode === "extract" && (
-            <ToolButton onClick={() => org.selectAll(allIds)}>Select all pages</ToolButton>
+            <ToolButton onClick={() => org.selectAll(allIds)}>{t("split.selectAllPages")}</ToolButton>
           )}
         </div>
         {mode === "ranges" && (
-          <p className="mb-2 text-sm text-slate-600">
-            Click a gap between pages to drop a split marker there. Each coloured
-            group becomes one output file.
-          </p>
+          <p className="mb-2 text-sm text-slate-600">{t("split.rangesHint")}</p>
         )}
         {mode === "extract" && (
-          <p className="mb-2 text-sm text-slate-600">
-            Click pages to select them — each selected page becomes its own PDF.
-          </p>
+          <p className="mb-2 text-sm text-slate-600">{t("split.extractHint")}</p>
         )}
         <ThumbnailGrid
           items={cells}
@@ -235,8 +241,8 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                     <button
                       key={`div-${afterIndex}`}
                       onClick={() => dispatch({ type: "toggleDivider", afterIndex })}
-                      title={has ? `Remove split after page ${afterIndex}` : `Split after page ${afterIndex}`}
-                      aria-label={has ? `Remove split after page ${afterIndex}` : `Split after page ${afterIndex}`}
+                      title={has ? t("split.removeSplitAfter", { n: afterIndex }) : t("split.splitAfter", { n: afterIndex })}
+                      aria-label={has ? t("split.removeSplitAfter", { n: afterIndex }) : t("split.splitAfter", { n: afterIndex })}
                       className={`flex w-7 shrink-0 flex-col items-center justify-center self-stretch rounded-lg border-2 text-xs font-bold ${
                         has
                           ? "border-brand-600 bg-brand-600 text-white"
@@ -249,14 +255,14 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
                 }
               : undefined
           }
-          ariaLabel="Pages to split"
+          ariaLabel={t("split.gridAria")}
         />
         <p className="mt-2 text-xs text-slate-500">
           {mode === "ranges"
-            ? "Click a gap to add or remove a split marker · Undo/redo with Ctrl+Z / Ctrl+Y · The ranges field above stays in sync."
+            ? t("split.rangesHintBottom")
             : mode === "extract"
-              ? "Click to select, Shift-click for a range · Each selected page becomes its own file."
-              : "One PDF per page — no selection needed."}
+              ? t("split.extractHintBottom")
+              : t("split.everyHintBottom")}
         </p>
       </div>
       {preview && pdf && (
