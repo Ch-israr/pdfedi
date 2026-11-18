@@ -1,7 +1,16 @@
+// Generic tool flow (21 non-canvas tools): pick files -> options ->
+// poll job -> download. All user-visible strings come from the
+// messages dictionaries. Backend option labels are overridden from the
+// toolOptions namespace (keyed by tool + option name); backend job
+// failures are translated by stable error code, never by matching the
+// English message text.
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { api, ToolSpec, UploadedFile, Job } from "../lib/api";
+import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
+import { ApiError, api, ToolSpec, UploadedFile, Job } from "../lib/api";
+import { toLocalePath } from "../i18n/routing";
 
 type Phase =
   | "pick"
@@ -14,12 +23,6 @@ type Phase =
   | "failed"
   | "downloading";
 
-const ACTIVITY_LABEL: Record<string, string> = {
-  processing: "Processing",
-  converting: "Converting",
-  optimizing: "Optimizing",
-};
-
 // The server resets quota windows on the clock hour. Render the upcoming
 // reset in local 24h time, e.g. "14:00".
 function quotaResetTime(): string {
@@ -29,6 +32,12 @@ function quotaResetTime(): string {
 }
 
 export function ToolRunner({ toolKey }: { toolKey: string }) {
+  const locale = useLocale();
+  const t = useTranslations("runner");
+  const tErr = useTranslations("errors");
+  const tOpt = useTranslations("toolOptions");
+  const tTools = useTranslations("tools");
+  const tContent = useTranslations("toolContent");
   const [spec, setSpec] = useState<ToolSpec | null>(null);
   const [files, setFiles] = useState<UploadedFile[]>([]);
   const [options, setOptions] = useState<Record<string, unknown>>({});
@@ -42,13 +51,46 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
   const inputRef = useRef<HTMLInputElement>(null);
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Translate an error by stable code. Falls back to the English
+  // message only when no code is available (e.g. a network failure).
+  function resolveError(e: unknown): string {
+    if (e instanceof ApiError) {
+      if (e.status === 429) return tErr("quota_exceeded", { time: quotaResetTime() });
+      if (e.code && tErr.has(e.code)) return tErr(e.code);
+      return e.message;
+    }
+    return e instanceof Error ? e.message : String(e);
+  }
+
+  // Translate a failed job: prefer the backend error code.
+  function jobError(j: Job): string {
+    if (j.error_code && tErr.has(j.error_code)) return tErr(j.error_code);
+    return j.error || tErr("internal_error");
+  }
+
+  // Frontend override for a backend option label/help/choice, if the
+  // dictionary has one; otherwise the API's English label is used.
+  function optLabel(o: { name: string; label: string }): string {
+    const key = `${toolKey}.${o.name}.label`;
+    return tOpt.has(key) ? tOpt(key) : o.label;
+  }
+  function optHelp(o: { name: string; help: string }): string {
+    const key = `${toolKey}.${o.name}.help`;
+    return tOpt.has(key) ? tOpt(key) : o.help;
+  }
+  function choiceLabel(tool: string, optName: string, value: string): string {
+    const key = `${tool}.${optName}.choices.${value}`;
+    return tOpt.has(key) ? tOpt(key) : value;
+  }
+
   useEffect(() => {
-    api.tool(toolKey).then(setSpec).catch((e) => setError(String(e.message || e)));
+    api.tool(toolKey).then(setSpec).catch((e) => setError(resolveError(e)));
     api.quota(toolKey).then(setQuota).catch(() => {});
     api.limits().then(setLimits).catch(() => {});
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolKey]);
 
   const accept = spec
@@ -57,11 +99,23 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       : "application/pdf,.pdf"
     : "";
 
-  const activityLabel = spec ? ACTIVITY_LABEL[spec.activity] || "Processing" : "Processing";
+  const activityKey =
+    spec?.activity === "converting"
+      ? "converting"
+      : spec?.activity === "optimizing"
+        ? "optimizing"
+        : "processing";
+  const activityLabel = t(`steps.${activityKey}`);
 
   // Steps relevant to this tool, in order. Only these are ever shown.
   const steps = spec
-    ? ["Uploading", "Preparing", activityLabel, "Finalizing", "Completed"]
+    ? [
+        t("steps.uploading"),
+        t("steps.preparing"),
+        activityLabel,
+        t("steps.finalizing"),
+        t("steps.completed"),
+      ]
     : [];
   const stepIndex: Record<Phase, number> = {
     pick: -1,
@@ -101,12 +155,12 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
         } else {
           // failed or cancelled
           stopPolling();
-          setError(j.error || "Processing failed. Please try again.");
+          setError(jobError(j));
           setPhase("failed");
         }
       } catch (e: unknown) {
         stopPolling();
-        setError(e instanceof Error ? e.message : "Lost contact with the server.");
+        setError(resolveError(e));
         setPhase("failed");
       }
     };
@@ -119,7 +173,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
     setError(null);
     const chosen = Array.from(list).slice(0, spec.max_files);
     if (files.length + chosen.length > spec.max_files) {
-      setError(`This tool accepts at most ${spec.max_files} file(s).`);
+      setError(t("atMost", { max: spec.max_files }));
       return;
     }
     // Client-side size check against the server's real limit — instant,
@@ -128,7 +182,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
     const tooBig = chosen.find((f) => f.size > maxBytes);
     if (tooBig) {
       setError(
-        `"${tooBig.name}" exceeds the ${limits?.max_upload_mb ?? 50} MB upload limit.`
+        t("tooBig", { name: tooBig.name, mb: limits?.max_upload_mb ?? 50 }),
       );
       return;
     }
@@ -144,14 +198,14 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       setFiles(all);
       if (all.length < spec.min_files) {
         setPhase("pick");
-        setError(`Select at least ${spec.min_files} file(s).`);
+        setError(t("atLeast", { min: spec.min_files }));
       } else if (spec.options.length === 0) {
         await startJob(all, options);
       } else {
         setPhase("options");
       }
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(resolveError(e));
       setPhase("pick");
     } finally {
       setBusy(false);
@@ -169,7 +223,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       setPhase("preparing");
       await pollJob(j.id);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(resolveError(e));
       // A 429 here means the quota is spent — refresh so the reset-time
       // display and the disabled run state show up immediately.
       api.quota(toolKey).then(setQuota).catch(() => {});
@@ -186,7 +240,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
     setError(null);
     try {
       const res = await fetch(api.downloadUrl(job.output_file_id));
-      if (!res.ok || !res.body) throw new Error(`Download failed (${res.status})`);
+      if (!res.ok || !res.body) throw new Error(tErr("download_failed"));
       const total = Number(res.headers.get("content-length") || 0);
       const reader = res.body.getReader();
       const chunks: Uint8Array[] = [];
@@ -209,7 +263,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       setTimeout(() => URL.revokeObjectURL(url), 5000);
       setPhase("completed");
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Download failed.");
+      setError(e instanceof Error ? e.message : tErr("download_failed"));
       setPhase("completed");
     } finally {
       setDownloadPct(null);
@@ -238,24 +292,28 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       setPhase("preparing");
       await pollJob(j.id);
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : String(e));
+      setError(resolveError(e));
     }
   }
 
   if (error && !spec) {
-    return <p className="text-red-600">Failed to load tool: {error}</p>;
+    return <p className="text-red-600">{t("loadFailed", { error })}</p>;
   }
-  if (!spec) return <p className="text-slate-500">Loading…</p>;
+  if (!spec) return <p className="text-slate-500">{t("loading")}</p>;
 
   const currentStep = stepIndex[phase];
+  const toolName = tTools(`${toolKey}.name`);
+  const toolDescription = tContent.has(`${toolKey}.description`)
+    ? tContent(`${toolKey}.description`)
+    : spec.description;
 
   return (
     <div className="mx-auto max-w-2xl">
-      <p className="mt-2 text-slate-600">{spec.description}</p>
+      <p className="mt-2 text-slate-600">{toolDescription}</p>
       {quota && (
         <p className="mt-2 text-xs text-slate-500">
-          {quota.remaining} of {quota.limit} free uses left this hour
-          {quota.remaining === 0 && <> · Resets at {quotaResetTime()}</>}
+          {t("quotaLeft", { remaining: quota.remaining, limit: quota.limit })}
+          {quota.remaining === 0 && <> {t("quotaResets", { time: quotaResetTime() })}</>}
         </p>
       )}
 
@@ -273,8 +331,8 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
                       done
                         ? "bg-green-600 text-white"
                         : active
-                        ? "animate-pulse bg-brand-600 text-white"
-                        : "bg-slate-200 text-slate-500"
+                          ? "animate-pulse bg-brand-600 text-white"
+                          : "bg-slate-200 text-slate-500"
                     }`}
                   >
                     {done ? "✓" : i + 1}
@@ -325,11 +383,13 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
           />
           <p className="text-lg font-semibold">
             {phase === "uploading"
-              ? "Uploading…"
-              : `Choose ${spec.input_kinds.includes("image") ? "image" : "PDF"} file(s)`}
+              ? t("uploading")
+              : spec.input_kinds.includes("image")
+                ? t("chooseImage")
+                : t("choosePdf")}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            Up to {spec.max_files} file(s), {limits?.max_upload_mb ?? 50}&nbsp;MB each. No sign-up needed.
+            {t("fileLimit", { max: spec.max_files, mb: limits?.max_upload_mb ?? 50 })}
           </p>
         </div>
       )}
@@ -338,7 +398,9 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
         <ul className="mt-4 space-y-2">
           {files.map((f) => (
             <li key={f.id} className="flex items-center justify-between rounded-lg bg-slate-100 px-4 py-2 text-sm">
-              <span className="truncate">{f.filename}</span>
+              <span className="truncate">
+                <bdi>{f.filename}</bdi>
+              </span>
               <span className="text-slate-500">{(f.size_bytes / 1024).toFixed(0)} KB</span>
             </li>
           ))}
@@ -350,7 +412,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
           {spec.options.map((o) => (
             <div key={o.name}>
               <label className="mb-1 block text-sm font-medium text-slate-700">
-                {o.label} {o.required && <span className="text-red-500">*</span>}
+                {optLabel(o)} {o.required && <span className="text-red-500">*</span>}
               </label>
               {o.kind === "select" && (
                 <select
@@ -359,7 +421,9 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
                   onChange={(e) => setOpt(o.name, e.target.value)}
                 >
                   {(o.choices || []).map((c) => (
-                    <option key={c} value={c}>{c}</option>
+                    <option key={c} value={c}>
+                      {choiceLabel(toolKey, o.name, c)}
+                    </option>
                   ))}
                 </select>
               )}
@@ -374,6 +438,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
               {(o.kind === "text" || o.kind === "pages") && (
                 <input
                   type="text"
+                  dir="ltr"
                   className="w-full rounded-lg border border-slate-300 px-3 py-2"
                   placeholder={String(o.default ?? "")}
                   value={String(options[o.name] ?? "")}
@@ -383,12 +448,13 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
               {o.kind === "number" && (
                 <input
                   type="number"
+                  dir="ltr"
                   className="w-full rounded-lg border border-slate-300 px-3 py-2"
                   value={String(options[o.name] ?? o.default ?? "")}
                   onChange={(e) => setOpt(o.name, Number(e.target.value))}
                 />
               )}
-              {o.help && <p className="mt-1 text-xs text-slate-500">{o.help}</p>}
+              {optHelp(o) && <p className="mt-1 text-xs text-slate-500">{optHelp(o)}</p>}
             </div>
           ))}
           <button
@@ -396,7 +462,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
             onClick={() => startJob(files, options)}
             className="w-full rounded-xl bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
           >
-            {busy ? "Starting…" : `${spec.name} now`}
+            {busy ? t("starting") : t("startButton", { tool: toolName })}
           </button>
         </div>
       )}
@@ -405,33 +471,33 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
         <div className="mt-6 rounded-2xl bg-white p-8 text-center shadow-sm">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-brand-600" />
           <p className="mt-4 font-semibold">
-            {phase === "preparing" && "Preparing your files…"}
+            {phase === "preparing" && t("preparing")}
             {phase === "active" && `${activityLabel}…`}
-            {phase === "finalizing" && "Finalizing your file…"}
+            {phase === "finalizing" && t("finalizing")}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            {phase === "preparing" && "Your job is queued and about to start."}
-            {phase === "active" && "This usually takes a few seconds."}
-            {phase === "finalizing" && "Almost there."}
+            {phase === "preparing" && t("preparingSub")}
+            {phase === "active" && t("activeSub")}
+            {phase === "finalizing" && t("finalizingSub")}
           </p>
         </div>
       )}
 
       {phase === "failed" && (
         <div className="mt-6 rounded-2xl border border-red-200 bg-white p-6 text-center shadow-sm">
-          <p className="text-lg font-semibold text-red-700">Failed</p>
-          <p className="mt-2 text-sm text-slate-600">{error || "Something went wrong."}</p>
+          <p className="text-lg font-semibold text-red-700">{t("failedTitle")}</p>
+          <p className="mt-2 text-sm text-slate-600">{error || t("failedFallback")}</p>
           <div className="mt-4 flex gap-3 justify-center">
             {job && (
               <button
                 onClick={retry}
                 className="rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700"
               >
-                Try again
+                {t("tryAgain")}
               </button>
             )}
             <button onClick={reset} className="rounded-xl border border-slate-300 px-5 py-2.5 text-slate-600 hover:border-brand-600 hover:text-brand-600">
-              Start over
+              {t("startOver")}
             </button>
           </div>
         </div>
@@ -439,13 +505,15 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
 
       {(phase === "completed" || phase === "downloading") && (
         <div className="mt-6 rounded-2xl bg-white p-6 text-center shadow-sm">
-          <p className="text-lg font-semibold text-green-700">Completed</p>
+          <p className="text-lg font-semibold text-green-700">{t("completedTitle")}</p>
           <p className="mt-2 text-xs text-slate-500">
-            Your file was processed on our server and is deleted automatically.
-            Files are never kept or shared.{" "}
-            <a href="/how-we-handle-files" className="font-semibold text-brand-600 hover:text-brand-700">
-              How we handle your files →
-            </a>
+            {t("completedNote")}{" "}
+            <Link
+              href={toLocalePath("/how-we-handle-files", locale)}
+              className="font-semibold text-brand-600 hover:text-brand-700"
+            >
+              {t("completedLink")}
+            </Link>
           </p>
           <button
             onClick={download}
@@ -454,12 +522,12 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
           >
             {phase === "downloading"
               ? downloadPct !== null && downloadPct > 0
-                ? `Downloading… ${downloadPct}%`
-                : "Downloading…"
-              : "Download result"}
+                ? t("downloadingPct", { pct: downloadPct })
+                : t("downloading")
+              : t("downloadResult")}
           </button>
           <button onClick={reset} className="mt-4 block w-full text-sm text-slate-500 hover:text-brand-600">
-            Start over
+            {t("startOver")}
           </button>
         </div>
       )}
