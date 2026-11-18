@@ -25,9 +25,15 @@ import { useOrganizer } from "../../../hooks/useOrganizer";
 import { CanvasShell } from "../CanvasShell";
 import { ThumbnailGrid, type GridCell } from "../ThumbnailGrid";
 import { PagePreviewModal, thumbLoaderFor } from "../canvasUtils";
-import { ToolButton, useUndoKeys, type ToolCanvasProps } from "./common";
+import { useLocale, useTranslations } from "next-intl";
+import { ToolButton, translatePayloadError, useUndoKeys, type ToolCanvasProps } from "./common";
 
 export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) {
+  const locale = useLocale();
+  const t = useTranslations("canvas");
+  const tTools = useTranslations("tools");
+  const tContent = useTranslations("toolContent");
+  const tErr = useTranslations("errors");
   const pdf = pdfs[0];
   const initialItems = useMemo<OrganizerItem[]>(
     () =>
@@ -60,21 +66,23 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
       const built = buildRotatePayload(map);
       return { ...built, error: null as string | null };
     } catch (e) {
-      return { config: {}, error: e instanceof Error ? e.message : String(e) };
+      return { config: {}, error: translatePayloadError(e, tErr) };
     }
   }, [rotated]);
 
   const summary =
     rotated.length > 0
-      ? `${rotated.length} page${rotated.length === 1 ? "" : "s"} rotated: ` +
-        rotated.map((it) => `p.${it.page} → ${it.angle}°`).join(", ")
-      : "Select pages, then rotate them — or rotate all pages at once.";
+      ? t("rotate.summary", {
+          count: rotated.length,
+          list: rotated.map((it) => `p.${it.page} → ${it.angle}°`).join(", "),
+        })
+      : t("rotate.summaryEmpty");
 
   const cells: GridCell[] = useMemo(
     () =>
       doc.items.map((it) => ({
         id: it.id,
-        label: `Page ${it.page}`,
+        label: t("pageLabel", { n: it.page }),
         angle: it.angle,
       })),
     [doc.items],
@@ -91,21 +99,25 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
       const pages = rangesToPages(pagesText);
       const outOfRange = pages.filter((p) => p > pageCount);
       if (outOfRange.length > 0) {
-        throw new Error(`Page(s) ${outOfRange.join(", ")} exceed the document page count (${pageCount}).`);
+        setApplyError(t("rotate.pageExceeds", { pages: outOfRange.join(", "), count: pageCount }));
+        return;
       }
-      if (pages.length === 0) throw new Error("Type page numbers first, e.g. '1-3,5'.");
+      if (pages.length === 0) {
+        setApplyError(t("rotate.typePagesFirst"));
+        return;
+      }
       const ids = pages.map((p) => `0:${p}`);
       dispatch({ type: "setAngles", ids, angle: Number(applyAngle) });
       setApplyError(null);
     } catch (e) {
-      setApplyError(e instanceof Error ? e.message : String(e));
+      setApplyError(translatePayloadError(e, tErr));
     }
   }
 
   return (
     <CanvasShell
-      toolName={job.spec?.name ?? "Rotate Pages"}
-      description={job.spec?.description ?? ""}
+      toolName={tTools("rotate_pages.name")}
+      description={tContent("rotate_pages.description")}
       fileLabel={localFiles.map((f) => f.name).join(", ")}
       quota={job.quota}
       maxFiles={1}
@@ -117,7 +129,7 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
       summary={summary}
       payload={{ tool_key: "rotate_pages", file_ids: job.files.map((f) => f.id), config: payload.config }}
       payloadError={payload.error ?? applyError}
-      processLabel="Rotate now"
+      processLabel={t("rotate.processLabel")}
       canProcess={payload.error === null && job.files.length === 1}
       onProcess={() => void job.startJob(job.files, payload.config)}
       onPick={onPick}
@@ -125,31 +137,32 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
       onBackToOrganize={() => job.setPhase("organize")}
       onDownload={job.download}
       downloadPct={job.downloadPct}
-      activityLabel="Rotating"
+      locale={locale}
+      activityLabel={t("rotate.activity")}
       error={job.error}
     >
       <div className="mt-4">
         <div className="mb-3 flex flex-wrap items-center gap-2">
-          <ToolButton onClick={org.undo} disabled={!org.canUndo} title="Undo (Ctrl+Z)">↩ Undo</ToolButton>
-          <ToolButton onClick={org.redo} disabled={!org.canRedo} title="Redo (Ctrl+Y)">↪ Redo</ToolButton>
-          <ToolButton onClick={() => rotateSelected(-90)} title="Rotate selection 90° counter-clockwise">
+          <ToolButton onClick={org.undo} disabled={!org.canUndo} title={t("undoTitle")}>↩ {t("undo")}</ToolButton>
+          <ToolButton onClick={org.redo} disabled={!org.canRedo} title={t("redoTitle")}>↪ {t("redo")}</ToolButton>
+          <ToolButton onClick={() => rotateSelected(-90)} title={t("rotate.rotateLeft")}>
             ⟲ 90°
           </ToolButton>
-          <ToolButton onClick={() => rotateSelected(90)} title="Rotate selection 90° clockwise">
+          <ToolButton onClick={() => rotateSelected(90)} title={t("rotate.rotateRight")}>
             90° ⟳
           </ToolButton>
           <ToolButton onClick={() => dispatch({ type: "rotateItems", ids: allIds, step: 90 })}>
-            Rotate all 90°
+            {t("rotate.rotateAll")}
           </ToolButton>
           <ToolButton onClick={() => dispatch({ type: "resetAngles" })} disabled={rotated.length === 0}>
-            Reset all
+            {t("rotate.resetAll")}
           </ToolButton>
-          <ToolButton onClick={() => org.selectAll(allIds)}>Select all</ToolButton>
-          <ToolButton onClick={org.clearSelection} disabled={org.selected.length === 0}>Clear selection</ToolButton>
+          <ToolButton onClick={() => org.selectAll(allIds)}>{t("selectAll")}</ToolButton>
+          <ToolButton onClick={org.clearSelection} disabled={org.selected.length === 0}>{t("clearSelection")}</ToolButton>
         </div>
         <div className="mb-3 flex flex-wrap items-center gap-2 text-sm text-slate-600">
           <label className="flex items-center gap-2">
-            Pages
+            {t("rotate.pagesLabel")}
             <input
               type="text"
               value={pagesText}
@@ -158,27 +171,27 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
                 if (e.key === "Enter") applyToPages();
               }}
               className="w-32 rounded-lg border border-slate-300 px-2 py-1.5 font-mono text-sm"
-              placeholder="1-3,5"
-              aria-label="Pages to rotate"
+              placeholder={t("rotate.pagesPlaceholder")}
+              aria-label={t("rotate.pagesAria")}
             />
           </label>
           <label className="flex items-center gap-2">
-            Angle
+            {t("rotate.angleLabel")}
             <select
               value={applyAngle}
               onChange={(e) => setApplyAngle(e.target.value)}
               className="rounded-lg border border-slate-300 px-2 py-1.5"
-              aria-label="Rotation angle"
+              aria-label={t("rotate.angleAria")}
             >
               <option value="90">90°</option>
               <option value="180">180°</option>
               <option value="270">270°</option>
             </select>
           </label>
-          <ToolButton onClick={applyToPages}>Apply to pages</ToolButton>
+          <ToolButton onClick={applyToPages}>{t("rotate.applyToPages")}</ToolButton>
           {rotated.length > 0 && (
             <span className="text-xs text-slate-500">
-              Selected pages with an angle: {pagesToRanges(rotated.map((it) => it.page))}
+              {t("rotate.selectedWithAngle", { ranges: pagesToRanges(rotated.map((it) => it.page)) })}
             </span>
           )}
         </div>
@@ -196,8 +209,8 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
                   dispatch({ type: "rotateItems", ids: [cell.id], step: -90 });
                 }}
                 className="rounded border border-slate-300 px-1.5 py-0.5 text-[11px] hover:border-brand-600 hover:text-brand-600"
-                title="Rotate 90° counter-clockwise"
-                aria-label={`Rotate ${cell.label} 90 degrees counter-clockwise`}
+                title={t("rotate.rotateCcw")}
+                aria-label={t("rotate.rotatePageCcw", { label: cell.label })}
               >
                 ⟲
               </button>
@@ -207,26 +220,22 @@ export function RotateCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps)
                   dispatch({ type: "rotateItems", ids: [cell.id], step: 90 });
                 }}
                 className="rounded border border-slate-300 px-1.5 py-0.5 text-[11px] hover:border-brand-600 hover:text-brand-600"
-                title="Rotate 90° clockwise"
-                aria-label={`Rotate ${cell.label} 90 degrees clockwise`}
+                title={t("rotate.rotateCw")}
+                aria-label={t("rotate.rotatePageCw", { label: cell.label })}
               >
                 ⟳
               </button>
             </span>
           )}
-          ariaLabel="Pages to rotate"
+          ariaLabel={t("rotate.gridAria")}
         />
-        <p className="mt-2 text-xs text-slate-500">
-          Click to select, Shift-click for a range · The ⟲ / ⟳ buttons on a
-          page rotate just that page · Thumbnails show the rotated preview;
-          the real rotation is applied server-side.
-        </p>
+        <p className="mt-2 text-xs text-slate-500">{t("rotate.hint")}</p>
       </div>
       {preview && pdf && (
         <PagePreviewModal
           pdf={pdf}
           page={preview.page}
-          label={`${pdf.fileName} — page ${preview.page}`}
+          label={t("filePageLabel", { name: pdf.fileName, n: preview.page })}
           onClose={() => setPreview(null)}
         />
       )}
