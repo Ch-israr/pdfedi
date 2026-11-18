@@ -57,13 +57,19 @@ def job_to_dict(j: Job) -> dict:
         "options": json.loads(j.options),
         "output_file_id": j.output_file_id,
         "error": j.error,
+        "error_code": j.error_code,
         "created_at": j.created_at,
         "updated_at": j.updated_at,
     }
 
 
 def _as_http_error(e: jobs.UploadError) -> HTTPException:
-    return HTTPException(status_code=e.status_code, detail=str(e))
+    # Structured detail when the error carries a stable code, so the
+    # frontend can translate by code; plain string otherwise.
+    detail: str | dict = (
+        {"code": e.code, "message": str(e)} if e.code else str(e)
+    )
+    return HTTPException(status_code=e.status_code, detail=detail)
 
 
 # ---------------------------------------------------------------------------
@@ -181,7 +187,10 @@ def chunked_upload_init(payload: ChunkInit):
     if payload.size > settings.max_upload_bytes:
         raise HTTPException(
             status_code=413,
-            detail=f"File exceeds the {settings.max_upload_mb} MB upload limit.",
+            detail={
+                "code": "file_too_large",
+                "message": f"File exceeds the {settings.max_upload_mb} MB upload limit.",
+            },
         )
     if payload.size <= 0:
         raise HTTPException(status_code=422, detail="Empty file.")
@@ -293,9 +302,12 @@ def create_job(payload: JobCreate, request: Request, response: Response, db: Ses
         job = jobs.create_job(db, payload.tool_key, payload.file_ids, payload.config or {}, ip)
     except jobs.UploadError as e:
         if e.status_code == 429:
-            # Quota exhausted: same error body as before, plus Sejda-style
-            # rate-limit headers so clients need no extra call.
-            raise HTTPException(status_code=429, detail=str(e), headers=_ratelimit_headers(db, ip, payload.tool_key))
+            # Quota exhausted: structured error body (code quota_exceeded),
+            # plus Sejda-style rate-limit headers so clients need no
+            # extra call.
+            exc = _as_http_error(e)
+            exc.headers = _ratelimit_headers(db, ip, payload.tool_key)
+            raise exc
         raise _as_http_error(e)
     jobs.enqueue_job(job.id, ip)
     db.refresh(job)
