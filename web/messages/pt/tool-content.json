@@ -1,0 +1,1160 @@
+{
+  "merge": {
+    "title": "Mesclar Arquivos PDF Online Grátis — Combinar PDFs | PDFEDI",
+    "description": "Mescle arquivos PDF em um único documento online grátis. Combine 2–20 PDFs em qualquer ordem com a qualidade original preservada. Sem cadastro, sem marca d'água, 50 MB por arquivo.",
+    "h1": "Mesclar PDFs",
+    "intro": "Combine vários arquivos PDF em um único documento bem ordenado. Envie de 2 a 20 PDFs, organize-os como quiser e baixe um único arquivo mesclado e limpo — perfeito para relatórios, candidaturas e papelada que chega em pedaços.",
+    "howTo": [
+      "Envie de 2 a 20 arquivos PDF (até 50 MB cada).",
+      "Os arquivos são mesclados na ordem de envio.",
+      "Clique em Mesclar e aguarde o fim do processamento.",
+      "Baixe seu PDF combinado."
+    ],
+    "features": [
+      "Combine 2–20 arquivos PDF em um só",
+      "Preserva a qualidade e a formatação originais das páginas",
+      "Grátis e sem marca d'água",
+      "Funciona em computador, tablet e celular"
+    ],
+    "useCases": [
+      "Combinar capítulos ou seções em um relatório final",
+      "Mesclar faturas ou recibos em um único arquivo para a contabilidade",
+      "Juntar documentos de candidatura (CV, carta de apresentação, certificados) em um só PDF",
+      "Consolidar páginas digitalizadas em um único documento"
+    ],
+    "faqs": [
+      {
+        "q": "Como mesclo vários arquivos PDF?",
+        "a": "Envie de 2 a 20 arquivos PDF para a ferramenta Mesclar PDF e clique em Mesclar. Seus arquivos são combinados em um único PDF na ordem de envio, pronto para baixar."
+      },
+      {
+        "q": "Quantos arquivos PDF posso mesclar de uma vez?",
+        "a": "Você pode mesclar de 2 a 20 arquivos PDF em um único trabalho. Cada arquivo pode ter até 50 MB."
+      },
+      {
+        "q": "Mesclar PDFs reduz a qualidade?",
+        "a": "Não. Mesclar apenas reorganiza as páginas em um arquivo — o conteúdo, as imagens e o texto de cada PDF são preservados exatamente como estavam."
+      },
+      {
+        "q": "Posso mesclar um PDF protegido por senha?",
+        "a": "PDFs protegidos por senha precisam ser desbloqueados primeiro. Use a ferramenta Desbloquear PDF com a senha correta e depois mescle o arquivo desbloqueado."
+      },
+      {
+        "q": "É grátis mesclar PDFs online?",
+        "a": "Sim. Mesclar PDFs no PDFEDI é totalmente grátis, sem marca d'água e sem cadastro. Os arquivos são processados com segurança e excluídos automaticamente. Sem cadastro."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "delete_pages"
+    ]
+  },
+  "split": {
+    "title": "Dividir PDF Online Grátis — Separar em Arquivos | PDFEDI",
+    "description": "Divida um PDF em arquivos separados online grátis. Extraia intervalos de páginas ou divida cada página em seu próprio PDF. Sem cadastro, resultados entregues como download ZIP.",
+    "h1": "Dividir PDF",
+    "intro": "Divida um PDF em vários arquivos menores. Extraia intervalos de páginas específicos (por exemplo, páginas 1–3 e 5) ou divida cada página em seu próprio PDF. Os resultados são entregues como um prático download ZIP.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Escolha um modo: intervalos de páginas (ex.: 1-3,5) ou cada página separadamente.",
+      "Se usar intervalos, digite-os como 1-3,5.",
+      "Clique em Dividir e baixe o ZIP com seus arquivos."
+    ],
+    "features": [
+      "Divida por intervalos de páginas personalizados (ex.: 1-3,5)",
+      "Divida cada página em seu próprio PDF",
+      "Resultados entregues como arquivo ZIP",
+      "Qualidade original preservada"
+    ],
+    "useCases": [
+      "Extrair um capítulo de um e-book",
+      "Separar um lote digitalizado em documentos individuais",
+      "Retirar páginas específicas para compartilhar ou imprimir",
+      "Quebrar um PDF grande em partes que cabem no e-mail"
+    ],
+    "faqs": [
+      {
+        "q": "Como divido um PDF em arquivos separados?",
+        "a": "Envie seu PDF, escolha o modo 'intervalos' e digite intervalos de páginas como 1-3,5, ou escolha 'cada página' para que cada página vire seu próprio arquivo. Clique em Dividir e baixe o ZIP."
+      },
+      {
+        "q": "Qual formato de intervalo de páginas devo usar?",
+        "a": "Use números de página baseados em 1, com vírgulas e traços, por exemplo 1-3,5,8-10. Isso extrai as páginas 1, 2, 3, 5, 8, 9 e 10."
+      },
+      {
+        "q": "Posso dividir um PDF em páginas individuais?",
+        "a": "Sim. Selecione o modo 'cada página' e cada página do seu PDF vira um arquivo PDF separado dentro do download ZIP."
+      },
+      {
+        "q": "Há um limite de páginas para dividir?",
+        "a": "Não há um limite fixo de páginas, mas o limite de envio de 50 MB se aplica. PDFs muito grandes são processados página por página para ficar dentro da memória do servidor."
+      }
+    ],
+    "related": [
+      "merge",
+      "delete_pages",
+      "extract_text"
+    ]
+  },
+  "rotate_pages": {
+    "title": "Girar Páginas de PDF Online Grátis — Corrigir Orientação | PDFEDI",
+    "description": "Gire páginas de PDF em 90°, 180° ou 270° online grátis. Corrija digitalizações tortas ou de cabeça para baixo em todas as páginas ou em intervalos selecionados. Sem cadastro, qualidade preservada.",
+    "h1": "Girar Páginas",
+    "intro": "Corrija páginas de PDF tortas ou de cabeça para baixo. Gire todas as páginas ou apenas intervalos selecionados em 90, 180 ou 270 graus — ideal para documentos digitalizados que saíram com a orientação errada.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Escolha o ângulo de rotação: 90°, 180° ou 270°.",
+      "Opcionalmente, limite a rotação a páginas específicas (ex.: 1-3,5). Deixe vazio para todas as páginas.",
+      "Clique em Girar e baixe o PDF corrigido."
+    ],
+    "features": [
+      "Gire 90°, 180° ou 270°",
+      "Aplique a todas as páginas ou a intervalos selecionados",
+      "Corrige documentos digitalizados tortos",
+      "Sem perda de qualidade"
+    ],
+    "useCases": [
+      "Corrigir páginas digitalizadas em paisagem em vez de retrato",
+      "Corrigir páginas de cabeça para baixo em um lote digitalizado",
+      "Girar uma única página torta sem afetar o restante",
+      "Padronizar a orientação antes de mesclar documentos"
+    ],
+    "faqs": [
+      {
+        "q": "Como giro uma página de PDF?",
+        "a": "Envie seu PDF, escolha 90°, 180° ou 270°, opcionalmente digite intervalos de páginas como 2-4 e clique em Girar. Deixe o campo de páginas vazio para girar todas as páginas."
+      },
+      {
+        "q": "Posso girar apenas algumas páginas de um PDF?",
+        "a": "Sim. Digite intervalos de páginas baseados em 1, como 1-3,5, e apenas essas páginas serão giradas. Todas as outras páginas ficam como estão."
+      },
+      {
+        "q": "Girar reduz a qualidade do PDF?",
+        "a": "Não. A rotação altera os metadados de orientação da página e o posicionamento do conteúdo — seu texto e suas imagens mantêm a qualidade original."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "reorder_pages",
+      "merge",
+      "split"
+    ]
+  },
+  "delete_pages": {
+    "title": "Excluir Páginas de PDF Online Grátis — Remover Páginas | PDFEDI",
+    "description": "Exclua páginas de um PDF online grátis. Remova páginas indesejadas por número ou intervalo e baixe um PDF limpo. Sem cadastro, as páginas restantes mantêm a qualidade original.",
+    "h1": "Excluir Páginas",
+    "intro": "Remova páginas indesejadas do seu PDF. Digite os intervalos de páginas a excluir — como 2, 5-7 — e baixe um PDF limpo com apenas as páginas que você quer manter.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite as páginas a excluir usando intervalos como 1-3,5.",
+      "Clique em Excluir Páginas e baixe o resultado."
+    ],
+    "features": [
+      "Exclua páginas por intervalo (ex.: 1-3,5)",
+      "As páginas restantes mantêm a qualidade e a ordem originais",
+      "Grátis e sem marca d'água"
+    ],
+    "useCases": [
+      "Remover páginas em branco ou duplicadas de uma digitalização",
+      "Cortar páginas de propaganda de um documento baixado",
+      "Reduzir um relatório às seções relevantes",
+      "Limpar um PDF antes de compartilhar ou imprimir"
+    ],
+    "faqs": [
+      {
+        "q": "Como excluo páginas de um PDF?",
+        "a": "Envie seu PDF, digite os números ou intervalos de páginas baseados em 1 a remover (por exemplo, 2,5-7) e clique em Excluir Páginas. As páginas restantes são salvas na ordem original."
+      },
+      {
+        "q": "Posso excluir várias páginas não consecutivas?",
+        "a": "Sim. Separe páginas e intervalos com vírgulas, como 1,3,5-8, para excluí-las todas de uma vez."
+      },
+      {
+        "q": "Excluir páginas afeta o restante do documento?",
+        "a": "Não. As páginas que você mantém não são tocadas — mesmo conteúdo, mesma ordem, mesma qualidade."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "rotate_pages",
+      "merge"
+    ]
+  },
+  "reorder_pages": {
+    "title": "Reordenar Páginas de PDF Online Grátis — Reorganizar a Ordem | PDFEDI",
+    "description": "Reorganize páginas de PDF em qualquer ordem online grátis. Corrija sequências de páginas erradas digitando a nova ordem em números. Sem cadastro, conteúdo totalmente preservado.",
+    "h1": "Reordenar Páginas",
+    "intro": "Coloque as páginas do seu PDF na ordem certa. Especifique a nova sequência de páginas e receba um PDF com as páginas reorganizadas exatamente como você quer — sem precisar digitalizar ou reconstruir o documento.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite a nova ordem das páginas como números separados por vírgula (ex.: 3,1,2,4).",
+      "Clique em Reordenar e baixe o PDF reorganizado."
+    ],
+    "features": [
+      "Reorganize as páginas em qualquer sequência",
+      "Entrada simples de ordem de páginas separada por vírgulas",
+      "Conteúdo e qualidade totalmente preservados"
+    ],
+    "useCases": [
+      "Corrigir páginas digitalizadas na ordem errada",
+      "Mover o sumário ou a capa para o início",
+      "Reorganizar as seções de um relatório",
+      "Corrigir a sequência de páginas antes de imprimir"
+    ],
+    "faqs": [
+      {
+        "q": "Como reorganizo as páginas de um PDF?",
+        "a": "Envie seu PDF e digite a ordem de páginas desejada como números separados por vírgulas — por exemplo, 3,1,2,4 coloca a antiga página 3 em primeiro lugar. Clique em Reordenar para baixar."
+      },
+      {
+        "q": "Preciso listar todas as páginas?",
+        "a": "Digite a sequência completa de páginas que você quer na saída. Páginas não listadas não são incluídas, então liste todas as páginas que você quer manter."
+      },
+      {
+        "q": "Reordenar muda a qualidade do meu PDF?",
+        "a": "Não. As páginas são reorganizadas sem tocar no conteúdo, então a qualidade é idêntica."
+      }
+    ],
+    "related": [
+      "merge",
+      "split",
+      "delete_pages",
+      "rotate_pages"
+    ]
+  },
+  "extract_text": {
+    "title": "Extrair Texto de PDF Online Grátis — Salvar como TXT | PDFEDI",
+    "description": "Extraia texto de qualquer PDF com texto online grátis e baixe-o como um arquivo .txt simples. Escolha todas as páginas ou intervalos selecionados. Sem cadastro.",
+    "h1": "Extrair Texto",
+    "intro": "Extraia o texto simples de qualquer PDF com texto e baixe-o como arquivo .txt. Escolha todas as páginas ou intervalos específicos — útil para citar, arquivar ou alimentar o texto em outras ferramentas.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Opcionalmente, digite intervalos de páginas (ex.: 1-3,5). Deixe vazio para todas as páginas.",
+      "Clique em Extrair e baixe o arquivo .txt."
+    ],
+    "features": [
+      "Extrai texto para o formato .txt simples",
+      "Todas as páginas ou intervalos selecionados",
+      "Rápido — sem OCR para PDFs com texto"
+    ],
+    "useCases": [
+      "Copiar o texto de um artigo para citar ou referenciar",
+      "Arquivar o texto de um contrato em formato pesquisável",
+      "Alimentar o conteúdo de um PDF em ferramentas de tradução",
+      "Ver rapidamente o que contém um PDF longo"
+    ],
+    "faqs": [
+      {
+        "q": "Como extraio texto de um PDF?",
+        "a": "Envie seu PDF e clique em Extrair. Você receberá um arquivo .txt com o texto do documento. Opcionalmente, limite a extração a intervalos de páginas como 1-3,5."
+      },
+      {
+        "q": "Isso funciona em PDFs digitalizados?",
+        "a": "A extração de texto lê a camada de texto embutida no PDF, então funciona em PDFs com texto. Para PDFs digitalizados só com imagem, use primeiro a ferramenta OCR para adicionar uma camada de texto pesquisável e depois extraia."
+      },
+      {
+        "q": "Qual é o formato do texto extraído?",
+        "a": "Texto simples (.txt), que abre em qualquer editor de texto e funciona em qualquer lugar."
+      }
+    ],
+    "related": [
+      "ocr",
+      "split",
+      "metadata",
+      "pdf_to_images"
+    ]
+  },
+  "pdf_to_images": {
+    "title": "Converter PDF em Imagens Online Grátis — PNG e JPG | PDFEDI",
+    "description": "Converta páginas de PDF em imagens PNG ou JPG online grátis. Escolha a resolução de 72 a 300 DPI, converta todas as páginas ou intervalos selecionados. Baixe como ZIP.",
+    "h1": "PDF para Imagens",
+    "intro": "Transforme cada página do seu PDF em uma imagem PNG ou JPEG de alta qualidade. Escolha o formato de saída e a resolução (72–300 DPI), selecione páginas ou converta todas, e baixe tudo como ZIP.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Escolha a saída PNG ou JPEG e uma resolução de 72 a 300 DPI.",
+      "Opcionalmente, selecione intervalos de páginas (ex.: 1-3,5). Deixe vazio para todas as páginas.",
+      "Clique em Converter e baixe o ZIP de imagens."
+    ],
+    "features": [
+      "Saída PNG ou JPEG",
+      "Resolução ajustável: 72–300 DPI",
+      "Converta todas as páginas ou intervalos selecionados",
+      "Download ZIP com uma imagem por página"
+    ],
+    "useCases": [
+      "Criar imagens de slides a partir de uma apresentação em PDF",
+      "Extrair figuras ou diagramas como imagens",
+      "Criar miniaturas ou pré-visualizações de documentos",
+      "Compartilhar páginas de PDF em plataformas que só aceitam imagens"
+    ],
+    "faqs": [
+      {
+        "q": "Como converto um PDF em JPG ou PNG?",
+        "a": "Envie seu PDF, escolha JPEG ou PNG, defina o DPI de sua preferência (maior significa mais nítido) e clique em Converter. Você recebe um ZIP com uma imagem por página."
+      },
+      {
+        "q": "Qual DPI devo escolher?",
+        "a": "72–100 DPI é suficiente para visualização na tela, 150 DPI é um bom meio-termo, e 300 DPI dá imagens com qualidade de impressão (com arquivos maiores)."
+      },
+      {
+        "q": "Posso converter apenas algumas páginas em imagens?",
+        "a": "Sim — digite intervalos de páginas como 1-3,5 e apenas essas páginas serão convertidas."
+      }
+    ],
+    "related": [
+      "images_to_pdf",
+      "extract_text"
+    ]
+  },
+  "images_to_pdf": {
+    "title": "Converter Imagens em PDF Online Grátis — JPG, PNG para PDF | PDFEDI",
+    "description": "Combine imagens JPG, PNG ou WebP em um só PDF online grátis. Até 20 imagens por PDF, cada uma vira uma página inteira com qualidade original. Sem cadastro.",
+    "h1": "Imagens para PDF",
+    "intro": "Combine até 20 imagens JPG, PNG ou WebP em um único documento PDF. Cada imagem vira uma página — ideal para transformar fotos de documentos, capturas de tela ou obras de arte em um PDF compartilhável.",
+    "howTo": [
+      "Envie de 1 a 20 imagens (JPG, PNG ou WebP, até 50 MB no total).",
+      "As imagens viram páginas na ordem de envio.",
+      "Clique em Converter e baixe seu PDF."
+    ],
+    "features": [
+      "Entrada JPG, PNG e WebP",
+      "Até 20 imagens por PDF",
+      "Cada imagem vira uma página inteira",
+      "Grátis e sem marca d'água"
+    ],
+    "useCases": [
+      "Transformar fotos de documentos do celular em PDF",
+      "Combinar capturas de tela em um único arquivo",
+      "Criar um portfólio em PDF a partir de obras de arte",
+      "Arquivar fotos de quadro branco como documento"
+    ],
+    "faqs": [
+      {
+        "q": "Como converto JPG em PDF?",
+        "a": "Envie suas imagens JPG (até 20) e clique em Converter. Cada imagem vira uma página no PDF resultante, na ordem de envio."
+      },
+      {
+        "q": "Quais formatos de imagem são suportados?",
+        "a": "Imagens JPG/JPEG, PNG e WebP são suportadas."
+      },
+      {
+        "q": "Quantas imagens posso combinar?",
+        "a": "De 1 a 20 imagens por PDF."
+      },
+      {
+        "q": "Minhas imagens perderão qualidade?",
+        "a": "As imagens são incorporadas na resolução original — nada é reduzido durante a conversão."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr",
+      "merge"
+    ]
+  },
+  "ocr": {
+    "title": "OCR de PDF Online Grátis — Torne PDFs Digitalizados Pesquisáveis | PDFEDI",
+    "description": "Faça OCR em PDFs digitalizados online grátis. Adicione uma camada de texto pesquisável e selecionável enquanto as páginas ficam exatamente iguais. Vários idiomas, sem cadastro.",
+    "h1": "OCR para PDF Pesquisável",
+    "intro": "Torne PDFs digitalizados pesquisáveis e selecionáveis. O reconhecimento óptico de caracteres lê o texto das suas páginas digitalizadas e adiciona uma camada de texto invisível — as páginas ficam idênticas, mas agora você pode pesquisar, selecionar e copiar o texto. Páginas que já contêm texto são ignoradas automaticamente.",
+    "howTo": [
+      "Envie seu PDF digitalizado (até 50 MB).",
+      "Escolha o idioma do documento (ex.: eng, eng+deu).",
+      "Clique em Executar OCR e aguarde — as páginas digitalizadas são processadas uma a uma.",
+      "Baixe seu PDF pesquisável."
+    ],
+    "features": [
+      "Camada de texto pesquisável e selecionável em páginas digitalizadas",
+      "Imagens originais das páginas preservadas exatamente",
+      "Páginas com texto existente são ignoradas automaticamente",
+      "Vários idiomas de OCR suportados"
+    ],
+    "useCases": [
+      "Tornar contratos digitalizados pesquisáveis",
+      "Digitalizar arquivos em papel em PDFs pesquisáveis",
+      "Permitir seleção de texto em livros digitalizados",
+      "Preparar digitalizações para extração ou indexação de texto"
+    ],
+    "faqs": [
+      {
+        "q": "O que o OCR faz com um PDF?",
+        "a": "O OCR (reconhecimento óptico de caracteres) analisa as imagens de um PDF digitalizado, reconhece o texto e incorpora uma camada de texto invisível. As páginas ficam iguais, mas o texto se torna pesquisável e selecionável."
+      },
+      {
+        "q": "Quanto tempo leva o OCR?",
+        "a": "Depende da quantidade de páginas e do conteúdo — as páginas digitalizadas são processadas individualmente. Páginas que já têm texto são ignoradas na hora, então documentos mistos terminam bem mais rápido."
+      },
+      {
+        "q": "Quais idiomas são suportados?",
+        "a": "Defina a opção de idioma com um código de idioma do Tesseract, como eng para inglês ou eng+deu para inglês e alemão combinados."
+      },
+      {
+        "q": "O OCR muda a aparência das minhas páginas?",
+        "a": "Não. As imagens digitalizadas originais são mantidas como as páginas visíveis; apenas uma camada de texto invisível é adicionada por baixo."
+      },
+      {
+        "q": "Meu PDF já tem algum texto. Ele será processado novamente?",
+        "a": "Não — páginas com uma camada de texto utilizável são detectadas e copiadas sem alteração. Apenas páginas só com imagem passam pelo reconhecimento."
+      }
+    ],
+    "related": [
+      "extract_text",
+      "images_to_pdf",
+      "pdf_to_images"
+    ]
+  },
+  "metadata": {
+    "title": "Ver Metadados de PDF Online Grátis — Inspecionar Informações do Documento | PDFEDI",
+    "description": "Inspecione os metadados ocultos de um PDF online grátis. Veja título, autor, data de criação, contagem de páginas, produtor e status de criptografia como JSON. Sem cadastro.",
+    "h1": "Inspecionar Metadados",
+    "intro": "Veja o que está escondido dentro do seu PDF. Esta ferramenta lê os metadados do documento — título, autor, assunto, palavras-chave, data de criação, software produtor, contagem de páginas e status de criptografia — e os mostra como JSON fácil de ler.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Clique em Ver Metadados.",
+      "Leia as informações do documento exibidas como JSON."
+    ],
+    "features": [
+      "Título, autor, assunto, palavras-chave",
+      "Datas de criação e modificação",
+      "Contagem de páginas e informações do produtor",
+      "Status de criptografia",
+      "Saída JSON"
+    ],
+    "useCases": [
+      "Verificar o autor e a data de criação de um PDF",
+      "Verificar as propriedades do documento antes de publicar",
+      "Auditar arquivos em busca de metadados restantes",
+      "Depurar problemas de processamento de PDF"
+    ],
+    "faqs": [
+      {
+        "q": "O que são metadados de PDF?",
+        "a": "Metadados são informações ocultas armazenadas no PDF: título, autor, assunto, palavras-chave, data de criação, o software que o criou, contagem de páginas e se ele é criptografado."
+      },
+      {
+        "q": "Posso ver se um PDF está protegido por senha?",
+        "a": "Sim — a visualização de metadados inclui o status de criptografia do documento."
+      },
+      {
+        "q": "Os metadados são sempre precisos?",
+        "a": "Eles refletem o que o criador do PDF armazenou no arquivo. Alguns PDFs têm metadados vazios ou genéricos se o software de autoria não os preencheu."
+      }
+    ],
+    "related": [
+      "edit_metadata",
+      "extract_text",
+      "unlock_pdf"
+    ]
+  },
+  "edit_metadata": {
+    "title": "Editar Metadados de PDF Online Grátis — Atualizar Título e Autor | PDFEDI",
+    "description": "Edite metadados de PDF online grátis. Altere título, autor, assunto e palavras-chave que aparecem em leitores de PDF e resultados de busca. Conteúdo intacto, sem cadastro.",
+    "h1": "Editar Metadados",
+    "intro": "Atualize as informações do documento do seu PDF. Altere o título, autor, assunto e palavras-chave que aparecem em leitores de PDF e resultados de busca — sem precisar de software de computador.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite o novo título, autor, assunto e/ou palavras-chave.",
+      "Clique em Salvar e baixe o PDF atualizado."
+    ],
+    "features": [
+      "Edite título, autor, assunto, palavras-chave",
+      "Conteúdo do documento intacto",
+      "Download instantâneo"
+    ],
+    "useCases": [
+      "Definir um título adequado antes de publicar um PDF",
+      "Adicionar seu nome como autor aos seus documentos",
+      "Limpar metadados herdados de um modelo",
+      "Adicionar palavras-chave para melhor organização de documentos"
+    ],
+    "faqs": [
+      {
+        "q": "Como altero o título ou autor de um PDF?",
+        "a": "Envie o PDF, preencha o novo título, autor, assunto ou palavras-chave e clique em Salvar. Apenas os metadados mudam — suas páginas ficam exatamente iguais."
+      },
+      {
+        "q": "Editar metadados afeta o conteúdo do meu documento?",
+        "a": "Não. Os metadados ficam no dicionário de informações do documento; páginas, texto e imagens não são modificados."
+      },
+      {
+        "q": "Por que os metadados de PDF importam?",
+        "a": "Leitores de PDF e mecanismos de busca exibem o título e o autor. Metadados corretos fazem seus documentos parecerem profissionais e mais fáceis de encontrar."
+      }
+    ],
+    "related": [
+      "metadata",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "watermark": {
+    "title": "Adicionar Marca d'Água em PDF Online Grátis — Carimbo de Texto | PDFEDI",
+    "description": "Carimbe uma marca d'água de texto diagonal nas páginas de um PDF online grátis. Texto personalizado como RASCUNHO ou CONFIDENCIAL com opacidade ajustável. Sem cadastro.",
+    "h1": "Adicionar Marca d'Água",
+    "intro": "Carimbe texto na diagonal em todas as páginas do seu PDF. Adicione marcas como RASCUNHO, CONFIDENCIAL ou AMOSTRA com opacidade ajustável — uma forma simples de indicar o status do documento.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite o texto da marca d'água e escolha um nível de opacidade.",
+      "Clique em Adicionar Marca d'Água e baixe o PDF carimbado."
+    ],
+    "features": [
+      "Carimbo de texto diagonal em todas as páginas",
+      "Texto personalizado de sua escolha",
+      "Opacidade ajustável"
+    ],
+    "useCases": [
+      "Marcar rascunhos como RASCUNHO antes da revisão",
+      "Rotular arquivos sensíveis como CONFIDENCIAL",
+      "Carimbar AMOSTRA em documentos de pré-visualização",
+      "Assinar PDFs enviados com o nome da sua empresa"
+    ],
+    "faqs": [
+      {
+        "q": "Como adiciono uma marca d'água a um PDF?",
+        "a": "Envie seu PDF, digite o texto da marca d'água, defina a opacidade e clique em Adicionar Marca d'Água. O texto é carimbado na diagonal em todas as páginas."
+      },
+      {
+        "q": "Posso controlar o quanto a marca d'água fica visível?",
+        "a": "Sim — a opção de opacidade permite deixar a marca d'água sutil ou marcante."
+      },
+      {
+        "q": "Quais páginas recebem a marca d'água?",
+        "a": "Todas as páginas do PDF recebem a marca d'água."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "edit_metadata",
+      "password_protect",
+      "flatten"
+    ]
+  },
+  "page_numbers": {
+    "title": "Adicionar Números de Página em PDF Online Grátis — Numerar Páginas | PDFEDI",
+    "description": "Numere as páginas do seu PDF online grátis. Escolha qualquer posição, número inicial, texto de prefixo/sufixo e tamanho de fonte de 6 a 48 pt. Funciona em todas as páginas ou em intervalos.",
+    "h1": "Adicionar Números de Página",
+    "intro": "Adicione números de página ao seu PDF exatamente onde você quiser. Escolha a posição no canto ou na borda, o número inicial, texto opcional de prefixo/sufixo e o tamanho da fonte — ideal para relatórios, e-books e documentos prontos para impressão.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Escolha a posição vertical e horizontal, o número inicial e o prefixo/sufixo opcional.",
+      "Defina o tamanho da fonte e os intervalos de páginas, se necessário.",
+      "Clique em Adicionar Números e baixe."
+    ],
+    "features": [
+      "Qualquer posição de canto ou borda",
+      "Número inicial personalizado",
+      "Texto opcional de prefixo e sufixo (ex.: 'Página 1 de 10')",
+      "Tamanho de fonte ajustável (6–48 pt)",
+      "Aplique a todas as páginas ou a intervalos selecionados"
+    ],
+    "useCases": [
+      "Numerar páginas de relatório para fácil referência",
+      "Preparar e-books para impressão",
+      "Adicionar rodapés 'Página X de Y' a propostas",
+      "Numerar documentos digitalizados sem paginação"
+    ],
+    "faqs": [
+      {
+        "q": "Como adiciono números de página a um PDF?",
+        "a": "Envie seu PDF, escolha onde os números vão (ex.: inferior central), defina o número inicial e o tamanho da fonte e clique em Adicionar Números."
+      },
+      {
+        "q": "Posso criar números de página como 'Página 1 de 10'?",
+        "a": "Sim — use o campo de prefixo para 'Página ' e o campo de sufixo para ' de 10' ao redor do número automático."
+      },
+      {
+        "q": "Posso começar a numeração a partir de um número diferente?",
+        "a": "Sim. Defina o número inicial para o que você precisar — útil quando seu PDF é uma parte de um documento maior."
+      },
+      {
+        "q": "Posso numerar apenas algumas páginas?",
+        "a": "Sim — digite intervalos de páginas como 3-10 para numerar apenas essas páginas."
+      }
+    ],
+    "related": [
+      "watermark",
+      "edit_metadata",
+      "merge",
+      "flatten"
+    ]
+  },
+  "password_protect": {
+    "title": "Proteger PDF com Senha Online Grátis — Criptografar PDF | PDFEDI",
+    "description": "Adicione proteção por senha a um PDF online grátis. Criptografe seu documento para que só pessoas com a senha possam abri-lo em qualquer leitor. Sem cadastro.",
+    "h1": "Proteger com Senha",
+    "intro": "Trave seu PDF com uma senha. O documento é criptografado para que não possa ser aberto sem a senha que você definir — proteção simples para arquivos sensíveis que você precisa compartilhar ou guardar.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite a senha com a qual você quer protegê-lo.",
+      "Clique em Proteger e baixe o PDF criptografado."
+    ],
+    "features": [
+      "Criptografia forte de PDF",
+      "Senha necessária para abrir",
+      "Funciona com qualquer leitor de PDF"
+    ],
+    "useCases": [
+      "Proteger contratos antes de enviá-los por e-mail",
+      "Proteger documentos financeiros",
+      "Travar registros pessoais armazenados online",
+      "Compartilhar arquivos sensíveis com acesso controlado"
+    ],
+    "faqs": [
+      {
+        "q": "Como protejo um PDF com senha?",
+        "a": "Envie seu PDF, digite uma senha e clique em Proteger. O PDF baixado exigirá essa senha para abrir em qualquer leitor de PDF."
+      },
+      {
+        "q": "O que acontece se eu esquecer a senha?",
+        "a": "Não há recuperação — sem a senha, o PDF não pode ser aberto. Guarde sua senha em um lugar seguro."
+      },
+      {
+        "q": "Que tipo de criptografia é usada?",
+        "a": "O PDF é criptografado com a criptografia padrão de PDF suportada por todos os principais leitores de PDF."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "unlock_pdf": {
+    "title": "Desbloquear PDF Online Grátis — Remover Proteção por Senha | PDFEDI",
+    "description": "Remova a proteção por senha do seu próprio PDF online grátis. Digite a senha correta e baixe uma cópia desbloqueada. Sem cadastro, sem marca d'água.",
+    "h1": "Desbloquear PDF",
+    "intro": "Remova a senha de um PDF seu. Digite a senha correta e baixe uma cópia desbloqueada, livre para abrir, editar e processar com outras ferramentas.",
+    "howTo": [
+      "Envie seu PDF protegido por senha (até 50 MB).",
+      "Digite a senha correta.",
+      "Clique em Desbloquear e baixe o PDF sem proteção."
+    ],
+    "features": [
+      "Remove a proteção por senha",
+      "A saída funciona com todas as outras ferramentas do PDFEDI",
+      "Grátis e sem marca d'água"
+    ],
+    "useCases": [
+      "Desbloquear seu próprio PDF depois de esquecer que ele estava travado",
+      "Preparar um arquivo protegido para mesclar ou dividir",
+      "Remover senhas antes de arquivar",
+      "Permitir extração de texto em documentos travados"
+    ],
+    "faqs": [
+      {
+        "q": "Como removo a senha de um PDF?",
+        "a": "Envie o PDF protegido, digite sua senha e clique em Desbloquear. Você receberá um PDF normal, sem pedido de senha."
+      },
+      {
+        "q": "Posso desbloquear um PDF sem a senha?",
+        "a": "Não. Você precisa conhecer a senha correta — esta ferramenta remove a proteção de arquivos que você tem o direito de acessar; ela não consegue quebrar senhas desconhecidas."
+      },
+      {
+        "q": "Por que eu desbloquearia um PDF?",
+        "a": "Outras ferramentas recusam arquivos travados por segurança. Desbloquear primeiro permite mesclar, dividir, comprimir ou converter o documento normalmente."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "merge",
+      "split",
+      "extract_text"
+    ]
+  },
+  "redact": {
+    "title": "Tarjar PDF Online Grátis — Ocultar Texto Sensível | PDFEDI",
+    "description": "Tarje permanentemente texto sensível em um PDF online grátis. Oculte nomes, e-mails e IDs por correspondência exata de texto, vários termos de uma vez. Sem cadastro.",
+    "h1": "Tarjar PDF",
+    "intro": "Oculte permanentemente com tarja preta o texto sensível do seu PDF. Digite as palavras ou frases a tarjar — nomes, e-mails, números de documento — e elas serão cobertas com caixas pretas sólidas no documento de saída.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite o texto separado por vírgulas a tarjar (ex.: SSN, john@example.com).",
+      "Clique em Tarjar e baixe o PDF com tarja preta."
+    ],
+    "features": [
+      "Tarja por correspondência exata de texto",
+      "Vários termos em uma só passada",
+      "Caixas de tarja pretas sólidas"
+    ],
+    "useCases": [
+      "Ocultar dados pessoais antes de compartilhar documentos",
+      "Tarjar nomes de clientes em arquivos de casos",
+      "Remover endereços de e-mail de relatórios públicos",
+      "Higienizar documentos para divulgação estilo FOIA"
+    ],
+    "faqs": [
+      {
+        "q": "Como oculto texto com tarja preta em um PDF?",
+        "a": "Envie seu PDF, digite as palavras ou frases exatas a tarjar separadas por vírgulas e clique em Tarjar. Cada ocorrência é coberta com uma caixa preta."
+      },
+      {
+        "q": "O texto tarjado é realmente removido?",
+        "a": "O texto correspondente é coberto com retângulos pretos opacos no PDF de saída. Para máxima segurança com material altamente sensível, verifique a saída antes de distribuir."
+      },
+      {
+        "q": "Posso tarjar várias palavras diferentes de uma vez?",
+        "a": "Sim — digite-as como uma lista separada por vírgulas, por exemplo: SSN, john@example.com, 555-1234."
+      },
+      {
+        "q": "A tarja funciona em PDFs digitalizados?",
+        "a": "A tarja corresponde à camada de texto do PDF. Para PDFs digitalizados só com imagem, execute primeiro o OCR para adicionar uma camada de texto e depois tarje."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "unlock_pdf",
+      "extract_text",
+      "flatten"
+    ]
+  },
+  "flatten": {
+    "title": "Achatar PDF Online Grátis — Incorporar Anotações às Páginas | PDFEDI",
+    "description": "Achate um PDF online grátis. Incorpore anotações, comentários e campos de formulário preenchidos permanentemente às páginas para travar a aparência. Sem cadastro.",
+    "h1": "Achatar PDF",
+    "intro": "Incorpore anotações e campos de formulário permanentemente às páginas do seu PDF. Achatar mescla marcações, comentários e formulários preenchidos ao conteúdo da página, para que o documento fique igual em qualquer lugar e não possa mais ser editado.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Clique em Achatar.",
+      "Baixe o PDF achatado."
+    ],
+    "features": [
+      "Mescla anotações ao conteúdo da página",
+      "Incorpora os valores dos campos de formulário às páginas",
+      "Trava a aparência final do documento"
+    ],
+    "useCases": [
+      "Finalizar um formulário preenchido para que os valores não possam ser alterados",
+      "Incorporar comentários de revisão a um documento",
+      "Garantir aparência consistente em todos os leitores de PDF",
+      "Preparar documentos para impressão ou arquivamento"
+    ],
+    "faqs": [
+      {
+        "q": "O que achatar um PDF faz?",
+        "a": "Achatar mescla anotações, comentários e valores de campos de formulário diretamente nos gráficos da página. Depois de achatar, eles passam a fazer parte da página e não podem mais ser editados ou movidos."
+      },
+      {
+        "q": "Por que devo achatar um formulário preenchido?",
+        "a": "Os valores de um formulário não achatado ainda podem ser editados por qualquer pessoa com um editor de PDF. Achatar trava os valores preenchidos no lugar."
+      },
+      {
+        "q": "Achatar muda a aparência do meu PDF?",
+        "a": "Não — a aparência visual permanece a mesma. Apenas a editabilidade das anotações e dos campos de formulário muda."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "watermark",
+      "page_numbers",
+      "redact"
+    ]
+  },
+  "crop": {
+    "title": "Cortar PDF Online Grátis — Aparar Margens e Cortar Páginas | PDFEDI",
+    "description": "Corte páginas de PDF online grátis. Apare margens brancas ou corte páginas por quantidades exatas em pontos a partir do topo, da base, da esquerda e da direita. Sem cadastro, arquivos privados.",
+    "h1": "Cortar PDF",
+    "intro": "Remova o excesso de espaço em branco ou bordas indesejadas das páginas do seu PDF. Digite quantos pontos aparar de cada lado — aplique a todas as páginas ou apenas aos intervalos que você escolher.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Digite as quantidades de corte em pontos para as bordas superior, inferior, esquerda e direita (72 pontos = 1 polegada).",
+      "Opcionalmente, limite o corte a páginas específicas (ex.: 1-3,5). Deixe vazio para todas as páginas.",
+      "Clique em Cortar e baixe o PDF aparado."
+    ],
+    "features": [
+      "Apare cada borda de forma independente, em pontos",
+      "Aplique a todas as páginas ou a intervalos selecionados",
+      "Qualidade original do conteúdo totalmente preservada",
+      "Grátis e sem cadastro"
+    ],
+    "useCases": [
+      "Remover margens brancas largas antes de imprimir para economizar papel",
+      "Cortar sombras e bordas de scanner de páginas digitalizadas",
+      "Ajustar páginas para leitura mais fácil em celulares e e-readers",
+      "Aparar áreas de timbre ou rodapé de relatórios gerados"
+    ],
+    "faqs": [
+      {
+        "q": "Quanto posso cortar de uma página de PDF?",
+        "a": "O quanto quiser, desde que reste algo da página. Se as quantidades de corte removerem toda a largura ou altura da página, a ferramenta para com um erro em vez de produzir uma página vazia."
+      },
+      {
+        "q": "Em que unidade são as quantidades de corte?",
+        "a": "Pontos — a unidade padrão do PDF. 72 pontos equivalem a 1 polegada, então aparar 36 pontos remove meia polegada daquela borda."
+      },
+      {
+        "q": "Cortar exclui o conteúdo aparado permanentemente?",
+        "a": "Cortar ajusta a caixa de corte visível de cada página. O conteúdo oculto não é reescrito, então, para remoção permanente de conteúdo sensível, use a ferramenta Tarjar."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "rotate_pages",
+      "n_up"
+    ]
+  },
+  "grayscale": {
+    "title": "Converter PDF para Escala de Cinza Online Grátis — Preto e Branco | PDFEDI",
+    "description": "Converta um PDF colorido para escala de cinza online grátis. Impressão mais barata e arquivos menores com até 600 DPI. As páginas são renderizadas como imagens — observe que o texto deixa de ser selecionável.",
+    "h1": "PDF em Escala de Cinza",
+    "intro": "Transforme um PDF colorido em uma versão limpa em preto e branco, mais barata de imprimir e geralmente menor. Escolha a qualidade de renderização de 72 a 600 DPI — as páginas são convertidas em imagens em escala de cinza, então o texto deixa de ser selecionável depois.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Defina o DPI — 200 é um bom equilíbrio entre qualidade e tamanho de arquivo; use 300+ para impressão.",
+      "Clique em Converter e baixe seu PDF em escala de cinza."
+    ],
+    "features": [
+      "Conversão verdadeira para escala de cinza a 72–600 DPI",
+      "Mantém os tamanhos originais e a contagem de páginas",
+      "Páginas codificadas em JPEG de alta qualidade mantêm os arquivos compactos",
+      "Grátis e sem cadastro"
+    ],
+    "useCases": [
+      "Reduzir custos de impressão em cores para apostilas e rascunhos",
+      "Preparar documentos para impressoras só de preto e branco",
+      "Tornar slides coloridos legíveis quando impressos em monocromático",
+      "Reduzir o tamanho de PDFs coloridos com muitas imagens"
+    ],
+    "faqs": [
+      {
+        "q": "Por que o texto do meu PDF em escala de cinza não é selecionável?",
+        "a": "Para garantir um resultado verdadeiramente em escala de cinza, cada página é renderizada como uma imagem em escala de cinza. Isso significa que o texto passa a fazer parte da imagem — imprime de forma idêntica, mas não pode mais ser selecionado ou pesquisado. Guarde uma cópia do original se precisar da camada de texto."
+      },
+      {
+        "q": "Qual DPI devo escolher?",
+        "a": "150 DPI é suficiente para leitura na tela, 200 DPI equilibra tamanho e clareza, e 300 DPI ou mais é melhor para impressão. DPI maior significa arquivos maiores."
+      },
+      {
+        "q": "A escala de cinza deixa meu PDF menor?",
+        "a": "Geralmente sim para documentos coloridos com muitas imagens, porque a informação de cor é descartada. PDFs só de texto podem crescer um pouco porque as páginas viram imagens — a ferramenta Comprimir é melhor para esses."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "n_up": {
+    "title": "N-Up PDF Online Grátis — Várias Páginas por Folha | PDFEDI",
+    "description": "Combine 2, 4, 6 ou 9 páginas de PDF em uma só folha online grátis. Folhas A4 ou Carta, retrato ou paisagem. Perfeito para apostilas, slides e livretos. Sem cadastro.",
+    "h1": "N-Up PDF",
+    "intro": "Imprima mais, desperdice menos: coloque 2, 4, 6 ou 9 páginas do seu PDF em uma única folha. Ideal para slides de aula, apostilas e revisões de rascunho em que páginas em tamanho real são exagero.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB).",
+      "Escolha quantas páginas por folha: 2, 4, 6 ou 9.",
+      "Escolha o tamanho da folha (A4 ou Carta) e a orientação (retrato ou paisagem).",
+      "Clique em Criar e baixe suas folhas combinadas."
+    ],
+    "features": [
+      "2, 4, 6 ou 9 páginas por folha",
+      "A grade se ajusta automaticamente à orientação",
+      "Conteúdo escalado proporcionalmente — nunca distorcido",
+      "Tamanhos de folha A4 e Carta"
+    ],
+    "useCases": [
+      "Imprimir slides de aula como apostilas compactas",
+      "Revisar documentos longos usando uma fração do papel",
+      "Criar folhas de prova estilo livreto",
+      "Caber uma apresentação inteira em poucas páginas para viagem"
+    ],
+    "faqs": [
+      {
+        "q": "Quantas folhas de saída vou receber?",
+        "a": "Sua contagem de páginas dividida pelo layout, arredondada para cima. Por exemplo, um PDF de 10 páginas em 4-up produz 3 folhas — a última folha simplesmente tem espaços vazios."
+      },
+      {
+        "q": "O N-Up reduz a qualidade?",
+        "a": "Não. As páginas são colocadas na folha como conteúdo vetorial em escala menor — texto e imagens continuam nítidos, apenas fisicamente menores quando impressos."
+      },
+      {
+        "q": "Qual layout devo escolher para slides?",
+        "a": "4-up em paisagem funciona bem para a maioria dos conjuntos de slides. Use 2-up se precisar ler anotações, e 6 ou 9-up apenas para visões gerais — o texto fica pequeno."
+      }
+    ],
+    "related": [
+      "crop",
+      "merge",
+      "split"
+    ]
+  },
+  "repair": {
+    "title": "Reparar PDF Corrompido Online Grátis — Corrigir Arquivos Danificados | PDFEDI",
+    "description": "Repare um PDF corrompido online grátis. Reconstrua tabelas de referência cruzada quebradas, downloads truncados e objetos malformados. Se um arquivo não puder ser salvo, você recebe um erro honesto.",
+    "h1": "Reparar PDF",
+    "intro": "Faça seu PDF danificado funcionar novamente. Envie o arquivo quebrado e o mecanismo de reparo reconstrói sua estrutura interna — referências cruzadas quebradas, downloads truncados e objetos malformados são corrigidos onde for fisicamente possível.",
+    "howTo": [
+      "Envie o arquivo PDF danificado (até 50 MB).",
+      "Clique em Reparar — a estrutura do arquivo é analisada e reconstruída.",
+      "Baixe o PDF reparado e verifique se seu conteúdo está intacto."
+    ],
+    "features": [
+      "Reconstrói tabelas de referência cruzada quebradas",
+      "Recupera arquivos truncados e parcialmente baixados",
+      "Repara fluxos de objetos malformados",
+      "Resultado honesto — arquivos sem conserto relatam um erro, não um reparo falso"
+    ],
+    "useCases": [
+      "Abrir um PDF que mostra erros de 'arquivo danificado'",
+      "Recuperar documentos de downloads interrompidos",
+      "Corrigir PDFs corrompidos por transferências de USB defeituosas ou anexos de e-mail",
+      "Salvar PDFs antigos arquivados que não abrem mais"
+    ],
+    "faqs": [
+      {
+        "q": "Que tipos de dano podem ser reparados?",
+        "a": "Tabelas de referência cruzada quebradas ou ausentes, deslocamentos de objetos errados, arquivos truncados e comprimentos de fluxo malformados são os problemas corrigíveis mais comuns. Se os bytes reais do conteúdo se foram, nenhuma ferramenta pode recriá-los."
+      },
+      {
+        "q": "E se meu arquivo não puder ser reparado?",
+        "a": "Você recebe um erro claro de 'irreparável' explicando que o arquivo está danificado demais — nunca um download silenciosamente quebrado. Tente abri-lo em outro leitor para confirmar e, se possível, obtenha o arquivo novamente da fonte."
+      },
+      {
+        "q": "Meu PDF está protegido por senha. Posso repará-lo?",
+        "a": "Não diretamente — o reparo não funciona em arquivos criptografados. Use primeiro a ferramenta Desbloquear PDF com sua senha e depois repare o arquivo desbloqueado."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "merge",
+      "metadata"
+    ]
+  },
+  "pdf_to_word": {
+    "title": "PDF para Word Online Grátis — Converter PDF em DOCX | PDFEDI",
+    "description": "Converta PDF em um documento Word editável online grátis. Parágrafos reais, estilos de título e imagens incorporadas. Melhor para documentos de texto — tabelas complexas são aproximadas.",
+    "h1": "PDF para Word",
+    "intro": "Transforme seu PDF em um documento Word que você pode realmente editar. O texto é reconstruído em parágrafos reais com estilos de título adequados, e as imagens incorporadas são colocadas na ordem de leitura. Funciona melhor em documentos com texto — tabelas complexas e layouts de várias colunas saem aproximados.",
+    "howTo": [
+      "Envie seu arquivo PDF (até 50 MB, no máximo 50 páginas).",
+      "Clique em Converter — o texto é extraído com seu layout e reconstruído como documento Word.",
+      "Baixe o .docx e edite-o no Word, Google Docs ou LibreOffice."
+    ],
+    "features": [
+      "Parágrafos verdadeiramente editáveis — não imagens de texto",
+      "Estilos de título detectados a partir do tamanho da fonte",
+      "Formatação em negrito preservada onde detectada",
+      "Imagens incorporadas colocadas na ordem de leitura"
+    ],
+    "useCases": [
+      "Editar um relatório em PDF que você só tem como arquivo",
+      "Reutilizar conteúdo de PDF em uma proposta ou apresentação",
+      "Extrair texto estruturado para um documento que você pode revisar",
+      "Converter PDFs arquivados em arquivos Word funcionais"
+    ],
+    "faqs": [
+      {
+        "q": "Meu documento ficará exatamente igual ao PDF?",
+        "a": "Próximo, para documentos de texto; aproximado, para documentos complexos. Parágrafos, títulos e imagens são transferidos bem; tabelas complexas e layouts de revista com várias colunas são reconstruídos da melhor forma possível, mas não serão perfeitos em pixels. O objetivo é um documento editável, não um clone visual."
+      },
+      {
+        "q": "Meu PDF é uma digitalização sem texto selecionável. O que acontece?",
+        "a": "Você receberá um erro claro apontando para a ferramenta OCR. Execute primeiro o OCR para tornar a digitalização pesquisável e depois converta o resultado com OCR para Word."
+      },
+      {
+        "q": "Qual programa abre o arquivo baixado?",
+        "a": "O download é um arquivo .docx padrão — abre no Microsoft Word, Google Docs, LibreOffice Writer e Apple Pages."
+      }
+    ],
+    "related": [
+      "ocr",
+      "extract_text",
+      "images_to_pdf",
+      "edit_metadata"
+    ]
+  },
+  "compress": {
+    "title": "Comprimir PDF Online Grátis — Reduzir até um Tamanho-Alvo | PDFEDI",
+    "description": "Comprima um PDF até um tamanho-alvo online grátis. Escolha um limite — ex.: 25 MB, o limite mais comum de protocolo eletrônico em tribunais — e as imagens são reduzidas até caber. Lote de até 10 arquivos, download ZIP.",
+    "h1": "Comprimir PDF",
+    "intro": "Reduza um PDF até o tamanho que você escolher. Escolha uma meta — 25 MB é o limite mais comum de protocolo eletrônico (CM/ECF), mas os limites variam por tribunal de cerca de 3 a 200 MB, então verifique primeiro a regra local do seu tribunal. A ferramenta reconstrói o arquivo e reduz as imagens incorporadas até caber, e o ZIP inclui um relatório mostrando o tamanho antes e depois de cada arquivo.",
+    "howTo": [
+      "Envie de 1 a 10 arquivos PDF (até 50 MB cada).",
+      "Escolha um tamanho-alvo, por exemplo 25 MB.",
+      "Clique em Comprimir e baixe o ZIP.",
+      "Confira o compression_report.txt no ZIP — ele diz, para cada arquivo, se a meta foi atingida."
+    ],
+    "features": [
+      "Comprima até um tamanho-alvo: 2, 5, 10, 25 ou 50 MB",
+      "Lote de até 10 PDFs, resultados como ZIP",
+      "Relatório por arquivo com tamanhos antes/depois e status da meta",
+      "Resultado honesto — se uma meta não puder ser atingida, o relatório diz isso"
+    ],
+    "useCases": [
+      "Reduzir uma petição abaixo do limite de tamanho de protocolo eletrônico do seu tribunal",
+      "Comprimir anexos digitalizados para que possam ser protocolados ou enviados por e-mail",
+      "Reduzir um PDF grande antes de enviá-lo a um cliente ou colega",
+      "Comprimir em lote um conjunto de documentos em um só trabalho"
+    ],
+    "faqs": [
+      {
+        "q": "Qual tamanho-alvo devo escolher para protocolo em tribunal?",
+        "a": "Depende do seu tribunal — os limites do CM/ECF variam de cerca de 3 MB a 200 MB por tribunal, e 25 MB é o mais comum. Verifique a regra local ou o guia de protocolo eletrônico do seu tribunal e escolha esse tamanho aqui."
+      },
+      {
+        "q": "E se meu PDF não puder ser comprimido até a meta?",
+        "a": "Você ainda recebe a menor versão que a ferramenta conseguiu criar, e o compression_report.txt no ZIP diz que a meta não foi atingida e por quanto. Tente uma meta maior ou divida o documento primeiro."
+      },
+      {
+        "q": "A compressão muda a aparência do meu documento?",
+        "a": "Texto e layout são preservados. As imagens incorporadas são reduzidas e recodificadas como JPEG, então fotos muito grandes ficam mais suaves — é daí que vem a economia de tamanho. PDFs só de texto quase não encolhem, porque não há imagens para reduzir."
+      },
+      {
+        "q": "Posso comprimir vários PDFs de uma vez?",
+        "a": "Sim — envie até 10 PDFs em um só trabalho. Os resultados voltam como ZIP com um PDF comprimido por arquivo, mais um relatório. Os arquivos são processados com segurança e excluídos automaticamente. Sem cadastro."
+      }
+    ],
+    "related": [
+      "exhibit_combine",
+      "strip_metadata",
+      "split",
+      "grayscale"
+    ]
+  },
+  "strip_metadata": {
+    "title": "Remover Metadados de PDF Online Grátis — Eliminar Informações Ocultas | PDFEDI",
+    "description": "Remova metadados ocultos de um PDF online grátis. Remove título, autor, datas, criador e produtor em um clique, com relatório de antes/depois. Lote de até 10 arquivos.",
+    "h1": "Remover Metadados",
+    "intro": "Remova as informações ocultas armazenadas dentro de um PDF — título, autor, datas de criação e modificação, software criador e produtor, e o pacote de metadados XMP — em um clique. Você recebe o PDF limpo mais um relatório de antes/depois mostrando exatamente o que havia no arquivo e o que foi removido, para que você possa provar isso antes de repassar o arquivo.",
+    "howTo": [
+      "Envie de 1 a 10 arquivos PDF (até 50 MB cada).",
+      "Clique em Remover Metadados — sem opções para definir.",
+      "Baixe o ZIP com os PDFs limpos e o metadata_report.json.",
+      "Abra o relatório para ver o que foi removido de cada arquivo."
+    ],
+    "features": [
+      "Remoção em um clique de todos os metadados do documento",
+      "Relatório de antes/depois para cada arquivo (JSON)",
+      "Remove também os pacotes de metadados XMP",
+      "Lote de até 10 PDFs, resultados como ZIP"
+    ],
+    "useCases": [
+      "Limpar uma petição ou anexo antes de protocolar ou compartilhar",
+      "Remover autor e detalhes de criação de um documento enviado à outra parte",
+      "Remover metadados de um lote de arquivos de clientes antes da divulgação",
+      "Verificar quais metadados um PDF que você recebeu realmente contém"
+    ],
+    "faqs": [
+      {
+        "q": "Quais metadados são removidos?",
+        "a": "Título, autor, assunto, palavras-chave, criador, produtor, datas de criação e modificação, e o pacote de metadados XMP. O relatório lista cada campo antes e depois, para que você veja exatamente o que mudou."
+      },
+      {
+        "q": "Como isso difere de Editar Metadados?",
+        "a": "Editar Metadados altera os campos um a um — você define um novo título ou autor. Remover Metadados remove tudo em um clique e prova isso com um relatório de antes/depois. Use Remover quando o arquivo vai sair do seu escritório; use Editar quando quiser corrigir um campo."
+      },
+      {
+        "q": "O PDF limpo ainda tem algum metadado?",
+        "a": "O relatório mostra o que resta. O gravador de PDF carimba seu próprio valor de produtor quando o arquivo limpo é gravado — isso é listado como restante no relatório, não escondido. Nenhuma informação do seu arquivo original sobrevive."
+      },
+      {
+        "q": "É grátis?",
+        "a": "Sim. Remover metadados no PDFEDI é totalmente grátis e sem cadastro. Os arquivos são processados com segurança e excluídos automaticamente. Sem cadastro."
+      }
+    ],
+    "related": [
+      "metadata",
+      "edit_metadata",
+      "redact",
+      "strip_image_metadata"
+    ]
+  },
+  "exhibit_combine": {
+    "title": "Combinar Anexos de PDF Online Grátis — Folhas de Separação e Bates | PDFEDI",
+    "description": "Combine anexos de PDF em um único documento pronto para protocolar online grátis. Folhas de separação antes de cada anexo e números de página contínuos estilo Bates. 2–20 PDFs, sem cadastro.",
+    "h1": "Combinar Anexos",
+    "intro": "Transforme um conjunto de PDFs em um único documento pronto para protocolar. Cada anexo ganha uma folha de separação (Anexo A, Anexo B e assim por diante, com nome do arquivo e contagem de páginas) e cada página de anexo é carimbada com um número estilo Bates — BATES-000001, BATES-000002 — contando continuamente entre os anexos. Envie seus anexos em ordem e baixe um único PDF pronto para protocolar.",
+    "howTo": [
+      "Envie de 2 a 20 arquivos PDF na ordem dos anexos (até 50 MB cada).",
+      "Defina o rótulo do anexo, o prefixo Bates e o primeiro número Bates se quiser outros.",
+      "Clique em Combinar Anexos e baixe o PDF único.",
+      "Confira as folhas de separação e os números Bates nas primeiras páginas antes de protocolar."
+    ],
+    "features": [
+      "Folha de separação antes de cada anexo, com rótulo, nome do arquivo e contagem de páginas",
+      "Numeração contínua estilo Bates em todos os anexos",
+      "Rótulo de anexo, prefixo Bates e número inicial personalizados",
+      "Combine 2–20 PDFs em um único arquivo pronto para protocolar"
+    ],
+    "useCases": [
+      "Montar anexos para um protocolo em tribunal em um único documento",
+      "Criar um conjunto de anexos de depoimento com numeração Bates para referência",
+      "Combinar documentos de apoio em um único volume indexado",
+      "Preparar uma pasta de audiência como um só PDF em vez de muitos arquivos"
+    ],
+    "faqs": [
+      {
+        "q": "O que é um número Bates?",
+        "a": "Um número Bates é um número sequencial único carimbado em cada página de um conjunto de documentos (por exemplo, BATES-000001, BATES-000002), usado para que todos em um caso possam se referir à mesma página. Esta ferramenta os carimba continuamente em todos os seus anexos."
+      },
+      {
+        "q": "O que há em uma folha de separação?",
+        "a": "Uma página antes de cada anexo, mostrando o rótulo do anexo (Anexo A, B, C…), o nome original do arquivo e quantas páginas aquele anexo tem. Folhas de separação não recebem numeração Bates. Você pode desligá-las se não quiser."
+      },
+      {
+        "q": "Posso começar a numeração Bates em um número diferente de 1?",
+        "a": "Sim — defina o primeiro número Bates para continuar um conjunto que você já começou, por exemplo 501 para retomar de onde uma produção anterior parou."
+      },
+      {
+        "q": "Em que ordem vão os anexos?",
+        "a": "Na ordem em que você os enviar. Envie o Anexo A primeiro, depois B, depois C. Os arquivos são processados com segurança e excluídos automaticamente. Sem cadastro."
+      }
+    ],
+    "related": [
+      "merge",
+      "page_numbers",
+      "compress",
+      "redact"
+    ]
+  },
+  "strip_image_metadata": {
+    "title": "Remover Metadados de Imagens Online Grátis — Eliminar EXIF e GPS | PDFEDI",
+    "description": "Remova metadados EXIF e GPS de fotos online grátis. Remove dados de câmera, data e localização de imagens JPG, PNG e WebP, com relatório de antes/depois. Lote de até 10 imagens.",
+    "h1": "Remover Metadados de Imagens",
+    "intro": "Fotos carregam dados ocultos: marca e modelo da câmera, a data em que foram tiradas e, muitas vezes, coordenadas GPS mostrando exatamente onde. Esta ferramenta lista esses metadados de cada imagem, remove-os e entrega um relatório de antes/depois mostrando o que foi retirado — para que você possa compartilhar fotos sem compartilhar onde e quando elas foram tiradas.",
+    "howTo": [
+      "Envie de 1 a 10 imagens JPG, PNG ou WebP.",
+      "Clique em Remover Metadados de Imagens — sem opções para definir.",
+      "Baixe o ZIP com as imagens limpas e o metadata_report.json.",
+      "Abra o relatório para ver o que foi removido de cada imagem."
+    ],
+    "features": [
+      "Remove dados EXIF: câmera, data, software",
+      "Remove dados de localização GPS de fotos",
+      "Relatório de antes/depois para cada imagem (JSON)",
+      "Lote de até 10 imagens, resultados como ZIP"
+    ],
+    "useCases": [
+      "Remover dados de localização de fotos antes de compartilhá-las",
+      "Limpar fotos de clientes ou do caso antes da divulgação",
+      "Remover detalhes de câmera e data de imagens para um site",
+      "Verificar quais metadados as fotos do seu celular realmente contêm"
+    ],
+    "faqs": [
+      {
+        "q": "Quais metadados são removidos das minhas fotos?",
+        "a": "Dados EXIF, incluindo marca e modelo da câmera, data da foto, software e coordenadas GPS, além de dados XMP quando presentes. O relatório lista cada campo encontrado antes da limpeza e confirma que ele sumiu depois."
+      },
+      {
+        "q": "Isso remove marcadores C2PA ou de geração por IA?",
+        "a": "Não — esta ferramenta remove apenas metadados padrão EXIF/XMP/GPS e não verifica a remoção de marcadores C2PA ou de geração por IA. Para limpeza de C2PA/SynthID, use o ClearMark, que foi feito para esse trabalho."
+      },
+      {
+        "q": "Minhas fotos ficarão diferentes após a limpeza?",
+        "a": "Não. Apenas os metadados ocultos são removidos — a imagem em si é salva novamente em alta qualidade (qualidade JPEG 95) e fica igual."
+      },
+      {
+        "q": "É grátis?",
+        "a": "Sim. Remover metadados de imagens no PDFEDI é totalmente grátis e sem cadastro. Os arquivos são processados com segurança e excluídos automaticamente. Sem cadastro."
+      }
+    ],
+    "related": [
+      "strip_metadata",
+      "metadata",
+      "images_to_pdf",
+      "redact"
+    ]
+  }
+}
