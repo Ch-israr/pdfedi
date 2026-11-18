@@ -1,0 +1,1160 @@
+{
+  "merge": {
+    "title": "Gabung File PDF Online Gratis — Satukan PDF | PDFEDI",
+    "description": "Gabung file PDF menjadi satu dokumen online gratis. Satukan 2–20 PDF dalam urutan apa pun dengan kualitas asli tetap terjaga. Tanpa mendaftar, tanpa tanda air, 50MB per file.",
+    "h1": "Gabung PDF",
+    "intro": "Gabungkan beberapa file PDF menjadi satu dokumen yang tertata rapi. Unggah 2 hingga 20 PDF, atur sesuai keinginan Anda, dan unduh satu file gabungan yang bersih — cocok untuk laporan, lamaran, dan dokumen yang datang terpisah-pisah.",
+    "howTo": [
+      "Unggah 2 hingga 20 file PDF (maksimal 50MB per file).",
+      "File digabungkan sesuai urutan unggah.",
+      "Klik Gabung dan tunggu hingga pemrosesan selesai.",
+      "Unduh PDF gabungan Anda."
+    ],
+    "features": [
+      "Gabungkan 2–20 file PDF menjadi satu",
+      "Mempertahankan kualitas dan format halaman asli",
+      "Gratis tanpa tanda air",
+      "Berfungsi di desktop, tablet, dan ponsel"
+    ],
+    "useCases": [
+      "Gabungkan bab atau bagian menjadi laporan yang selesai",
+      "Gabungkan faktur atau kuitansi menjadi satu file untuk pembukuan",
+      "Satukan dokumen lamaran (CV, surat lamaran, sertifikat) menjadi satu PDF",
+      "Satukan halaman hasil pindaian menjadi satu dokumen"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menggabungkan beberapa file PDF?",
+        "a": "Unggah 2 hingga 20 file PDF ke alat Gabung PDF, lalu klik Gabung. File Anda digabungkan menjadi satu PDF sesuai urutan unggah, siap diunduh."
+      },
+      {
+        "q": "Berapa file PDF yang dapat saya gabungkan sekaligus?",
+        "a": "Anda dapat menggabungkan 2 hingga 20 file PDF dalam satu pekerjaan. Setiap file maksimal 50MB."
+      },
+      {
+        "q": "Apakah menggabungkan PDF akan menurunkan kualitasnya?",
+        "a": "Tidak. Penggabungan hanya menyusun ulang halaman menjadi satu file — konten, gambar, dan teks setiap PDF dipertahankan persis seperti semula."
+      },
+      {
+        "q": "Bisakah saya menggabungkan PDF yang dilindungi kata sandi?",
+        "a": "PDF yang dilindungi kata sandi harus dibuka kuncinya terlebih dahulu. Gunakan alat Buka Kunci PDF dengan kata sandi yang benar, lalu gabungkan file yang sudah tidak terkunci."
+      },
+      {
+        "q": "Apakah gratis menggabungkan PDF secara online?",
+        "a": "Ya. Menggabungkan PDF di PDFEDI sepenuhnya gratis tanpa tanda air dan tanpa mendaftar. File diproses dengan aman dan dihapus otomatis. Tidak perlu mendaftar."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "delete_pages"
+    ]
+  },
+  "split": {
+    "title": "Pisah PDF Online Gratis — Bagi Menjadi File Terpisah | PDFEDI",
+    "description": "Pisah PDF menjadi beberapa file online gratis. Ekstrak rentang halaman atau pisah setiap halaman menjadi PDF tersendiri. Tanpa mendaftar, hasil dikirim sebagai unduhan ZIP.",
+    "h1": "Pisah PDF",
+    "intro": "Bagi PDF menjadi beberapa file yang lebih kecil. Ekstrak rentang halaman tertentu (misalnya halaman 1–3 dan 5) atau pisah setiap halaman menjadi PDF tersendiri. Hasil dikirim sebagai unduhan ZIP yang praktis.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Pilih mode: rentang halaman (contoh 1-3,5) atau setiap halaman secara terpisah.",
+      "Jika menggunakan rentang, ketik seperti 1-3,5.",
+      "Klik Pisah dan unduh ZIP berisi file Anda."
+    ],
+    "features": [
+      "Pisah berdasarkan rentang halaman khusus (contoh 1-3,5)",
+      "Pisah setiap halaman menjadi PDF tersendiri",
+      "Hasil dikirim sebagai arsip ZIP",
+      "Kualitas asli tetap terjaga"
+    ],
+    "useCases": [
+      "Ekstrak satu bab dari ebook",
+      "Pisahkan hasil pindaian massal menjadi dokumen individual",
+      "Ambil halaman tertentu untuk dibagikan atau dicetak",
+      "Pecah PDF besar menjadi potongan yang bisa dikirim lewat email"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara memisah PDF menjadi beberapa file?",
+        "a": "Unggah PDF Anda, pilih mode 'rentang' dan ketik rentang halaman seperti 1-3,5, atau pilih 'setiap halaman' untuk menjadikan setiap halaman file tersendiri. Klik Pisah dan unduh ZIP-nya."
+      },
+      {
+        "q": "Format rentang halaman apa yang harus saya gunakan?",
+        "a": "Gunakan nomor halaman berbasis 1 dengan koma dan tanda hubung, misalnya 1-3,5,8-10. Ini mengekstrak halaman 1, 2, 3, 5, 8, 9, dan 10."
+      },
+      {
+        "q": "Bisakah saya memisah PDF menjadi halaman individual?",
+        "a": "Ya. Pilih mode 'setiap halaman' dan setiap halaman PDF Anda menjadi file PDF terpisah di dalam unduhan ZIP."
+      },
+      {
+        "q": "Apakah ada batas halaman untuk memisah?",
+        "a": "Tidak ada batas halaman tetap, tetapi batas unggah 50MB berlaku. PDF yang sangat besar diproses halaman demi halaman agar tetap dalam memori server."
+      }
+    ],
+    "related": [
+      "merge",
+      "delete_pages",
+      "extract_text"
+    ]
+  },
+  "rotate_pages": {
+    "title": "Putar Halaman PDF Online Gratis — Perbaiki Orientasi | PDFEDI",
+    "description": "Putar halaman PDF 90°, 180°, atau 270° online gratis. Perbaiki hasil pindaian yang miring atau terbalik di semua halaman atau rentang yang dipilih. Tanpa mendaftar, kualitas terjaga.",
+    "h1": "Putar Halaman",
+    "intro": "Perbaiki halaman PDF yang miring atau terbalik. Putar semua halaman atau hanya rentang halaman yang dipilih sebesar 90, 180, atau 270 derajat — ideal untuk dokumen hasil pindaian yang orientasinya salah.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Pilih sudut putaran: 90°, 180°, atau 270°.",
+      "Opsional: batasi putaran ke halaman tertentu (contoh 1-3,5). Kosongkan untuk semua halaman.",
+      "Klik Putar dan unduh PDF yang sudah diperbaiki."
+    ],
+    "features": [
+      "Putar 90°, 180°, atau 270°",
+      "Berlaku untuk semua halaman atau rentang halaman yang dipilih",
+      "Memperbaiki dokumen hasil pindaian yang miring",
+      "Tanpa penurunan kualitas"
+    ],
+    "useCases": [
+      "Perbaiki halaman yang dipindai dalam orientasi lanskap, bukan potret",
+      "Perbaiki halaman terbalik dalam hasil pindaian massal",
+      "Putar satu halaman yang miring tanpa memengaruhi sisanya",
+      "Samakan orientasi sebelum menggabungkan dokumen"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara memutar halaman PDF?",
+        "a": "Unggah PDF Anda, pilih 90°, 180°, atau 270°, opsional ketik rentang halaman seperti 2-4, lalu klik Putar. Kosongkan kolom halaman untuk memutar semua halaman."
+      },
+      {
+        "q": "Bisakah saya memutar hanya beberapa halaman PDF?",
+        "a": "Ya. Ketik rentang halaman berbasis 1 seperti 1-3,5 dan hanya halaman itu yang diputar. Halaman lain tetap seperti semula."
+      },
+      {
+        "q": "Apakah memutar akan menurunkan kualitas PDF?",
+        "a": "Tidak. Putaran mengubah metadata orientasi halaman dan penempatan konten — teks dan gambar Anda tetap mempertahankan kualitas aslinya."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "reorder_pages",
+      "merge",
+      "split"
+    ]
+  },
+  "delete_pages": {
+    "title": "Hapus Halaman PDF Online Gratis — Hapus Halaman | PDFEDI",
+    "description": "Hapus halaman dari PDF online gratis. Hapus halaman yang tidak diinginkan berdasarkan nomor atau rentang dan unduh PDF yang bersih. Tanpa mendaftar, halaman yang tersisa tetap berkualitas asli.",
+    "h1": "Hapus Halaman",
+    "intro": "Hapus halaman yang tidak diinginkan dari PDF Anda. Ketik rentang halaman yang akan dihapus — seperti 2, 5-7 — dan unduh PDF bersih yang hanya berisi halaman yang ingin Anda simpan.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik halaman yang akan dihapus menggunakan rentang seperti 1-3,5.",
+      "Klik Hapus Halaman dan unduh hasilnya."
+    ],
+    "features": [
+      "Hapus halaman berdasarkan rentang (contoh 1-3,5)",
+      "Halaman yang tersisa mempertahankan kualitas dan urutan asli",
+      "Gratis tanpa tanda air"
+    ],
+    "useCases": [
+      "Hapus halaman kosong atau duplikat dari hasil pindaian",
+      "Potong halaman iklan dari dokumen yang diunduh",
+      "Pangkas laporan hanya ke bagian yang relevan",
+      "Bersihkan PDF sebelum dibagikan atau dicetak"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menghapus halaman dari PDF?",
+        "a": "Unggah PDF Anda, ketik nomor atau rentang halaman berbasis 1 yang akan dihapus (misalnya 2,5-7), lalu klik Hapus Halaman. Halaman yang tersisa disimpan dalam urutan aslinya."
+      },
+      {
+        "q": "Bisakah saya menghapus beberapa halaman yang tidak berurutan?",
+        "a": "Ya. Pisahkan halaman dan rentang dengan koma, seperti 1,3,5-8, untuk menghapus semuanya sekaligus."
+      },
+      {
+        "q": "Apakah menghapus halaman memengaruhi sisa dokumen?",
+        "a": "Tidak. Halaman yang Anda simpan tidak disentuh — konten, urutan, dan kualitasnya sama."
+      }
+    ],
+    "related": [
+      "split",
+      "reorder_pages",
+      "rotate_pages",
+      "merge"
+    ]
+  },
+  "reorder_pages": {
+    "title": "Susun Ulang Halaman PDF Online Gratis — Atur Ulang Urutan Halaman | PDFEDI",
+    "description": "Susun ulang halaman PDF dalam urutan apa pun online gratis. Perbaiki urutan halaman yang salah dengan memasukkan urutan baru sebagai angka. Tanpa mendaftar, konten sepenuhnya terjaga.",
+    "h1": "Susun Ulang Halaman",
+    "intro": "Tempatkan halaman PDF Anda dalam urutan yang benar. Tentukan urutan halaman yang baru dan dapatkan PDF dengan halaman yang disusun persis seperti yang Anda inginkan — tanpa perlu memindai ulang atau membuat ulang dokumen.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik urutan halaman baru sebagai nomor halaman yang dipisahkan koma (contoh 3,1,2,4).",
+      "Klik Susun Ulang dan unduh PDF yang sudah disusun ulang."
+    ],
+    "features": [
+      "Susun ulang halaman dalam urutan apa pun",
+      "Input urutan halaman sederhana yang dipisahkan koma",
+      "Konten dan kualitas sepenuhnya terjaga"
+    ],
+    "useCases": [
+      "Perbaiki halaman yang dipindai dalam urutan yang salah",
+      "Pindahkan daftar isi atau sampul ke depan",
+      "Susun ulang bagian-bagian laporan",
+      "Perbaiki urutan halaman sebelum mencetak"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menyusun ulang halaman dalam PDF?",
+        "a": "Unggah PDF Anda dan ketik urutan halaman yang diinginkan sebagai angka yang dipisahkan koma — misalnya 3,1,2,4 menempatkan halaman lama 3 di urutan pertama. Klik Susun Ulang untuk mengunduh."
+      },
+      {
+        "q": "Apakah saya harus mencantumkan semua halaman?",
+        "a": "Ketik urutan lengkap halaman yang Anda inginkan dalam output. Halaman yang tidak tercantum tidak disertakan, jadi cantumkan semua halaman yang ingin Anda simpan."
+      },
+      {
+        "q": "Apakah penyusunan ulang akan mengubah kualitas PDF saya?",
+        "a": "Tidak. Halaman disusun ulang tanpa menyentuh kontennya, jadi kualitasnya identik."
+      }
+    ],
+    "related": [
+      "merge",
+      "split",
+      "delete_pages",
+      "rotate_pages"
+    ]
+  },
+  "extract_text": {
+    "title": "Ekstrak Teks dari PDF Online Gratis — Simpan sebagai TXT | PDFEDI",
+    "description": "Ekstrak teks dari PDF berbasis teks apa pun online gratis dan unduh sebagai file .txt biasa. Pilih semua halaman atau rentang tertentu. Tanpa mendaftar.",
+    "h1": "Ekstrak Teks",
+    "intro": "Ambil teks biasa dari PDF berbasis teks apa pun dan unduh sebagai file .txt. Pilih semua halaman atau rentang tertentu — berguna untuk mengutip, mengarsip, atau memasukkan teks ke alat lain.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Opsional: ketik rentang halaman (contoh 1-3,5). Kosongkan untuk semua halaman.",
+      "Klik Ekstrak dan unduh file .txt."
+    ],
+    "features": [
+      "Ekstrak teks ke format .txt biasa",
+      "Semua halaman atau rentang halaman yang dipilih",
+      "Cepat — tanpa OCR untuk PDF teks"
+    ],
+    "useCases": [
+      "Salin teks artikel untuk dikutip atau dirujuk",
+      "Arsipkan teks kontrak dalam format yang dapat dicari",
+      "Masukkan konten PDF ke alat terjemahan",
+      "Periksa dengan cepat isi PDF yang panjang"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara mengekstrak teks dari PDF?",
+        "a": "Unggah PDF Anda dan klik Ekstrak. Anda akan mendapatkan file .txt berisi teks dokumen. Opsional: batasi ekstraksi ke rentang halaman seperti 1-3,5."
+      },
+      {
+        "q": "Apakah ini berfungsi pada PDF hasil pindaian?",
+        "a": "Ekstraksi teks membaca lapisan teks bawaan PDF, jadi berfungsi pada PDF berbasis teks. Untuk PDF hasil pindaian yang hanya berisi gambar, gunakan alat OCR terlebih dahulu untuk menambahkan lapisan teks yang dapat dicari, lalu ekstrak."
+      },
+      {
+        "q": "Format apa teks yang diekstrak?",
+        "a": "Teks biasa (.txt), yang dapat dibuka di editor teks apa pun dan berfungsi di mana saja."
+      }
+    ],
+    "related": [
+      "ocr",
+      "split",
+      "metadata",
+      "pdf_to_images"
+    ]
+  },
+  "pdf_to_images": {
+    "title": "Konversi PDF ke Gambar Online Gratis — PNG & JPG | PDFEDI",
+    "description": "Ubah halaman PDF menjadi gambar PNG atau JPG online gratis. Pilih resolusi 72 hingga 300 DPI, konversi semua halaman atau rentang yang dipilih. Unduh sebagai ZIP.",
+    "h1": "PDF ke Gambar",
+    "intro": "Ubah setiap halaman PDF Anda menjadi gambar PNG atau JPEG berkualitas tinggi. Pilih format output dan resolusi (72–300 DPI), pilih halaman atau konversi semuanya, lalu unduh semuanya sebagai ZIP.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Pilih output PNG atau JPEG dan resolusi 72 hingga 300 DPI.",
+      "Opsional: pilih rentang halaman (contoh 1-3,5). Kosongkan untuk semua halaman.",
+      "Klik Konversi dan unduh ZIP berisi gambar."
+    ],
+    "features": [
+      "Output PNG atau JPEG",
+      "Resolusi dapat disesuaikan: 72–300 DPI",
+      "Konversi semua halaman atau rentang yang dipilih",
+      "Unduhan ZIP dengan satu gambar per halaman"
+    ],
+    "useCases": [
+      "Buat gambar slide dari presentasi PDF",
+      "Ekstrak gambar atau diagram sebagai gambar",
+      "Buat thumbnail atau pratinjau dokumen",
+      "Bagikan halaman PDF di platform yang hanya menerima gambar"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara mengubah PDF menjadi JPG atau PNG?",
+        "a": "Unggah PDF Anda, pilih JPEG atau PNG, atur DPI yang diinginkan (lebih tinggi berarti lebih tajam), lalu klik Konversi. Anda mendapatkan ZIP berisi satu gambar per halaman."
+      },
+      {
+        "q": "DPI berapa yang harus saya pilih?",
+        "a": "72–100 DPI cukup untuk dilihat di layar, 150 DPI pilihan serbaguna yang bagus, dan 300 DPI menghasilkan gambar berkualitas cetak (dengan ukuran file lebih besar)."
+      },
+      {
+        "q": "Bisakah saya mengonversi hanya beberapa halaman menjadi gambar?",
+        "a": "Ya — ketik rentang halaman seperti 1-3,5 dan hanya halaman itu yang dikonversi."
+      }
+    ],
+    "related": [
+      "images_to_pdf",
+      "extract_text"
+    ]
+  },
+  "images_to_pdf": {
+    "title": "Konversi Gambar ke PDF Online Gratis — JPG, PNG ke PDF | PDFEDI",
+    "description": "Gabungkan gambar JPG, PNG, atau WebP menjadi satu PDF online gratis. Hingga 20 gambar per PDF, masing-masing menjadi satu halaman penuh dengan kualitas asli. Tanpa mendaftar.",
+    "h1": "Gambar ke PDF",
+    "intro": "Gabungkan hingga 20 gambar JPG, PNG, atau WebP menjadi satu dokumen PDF. Setiap gambar menjadi satu halaman — ideal untuk mengubah foto hasil pindaian, tangkapan layar, atau karya seni menjadi PDF yang dapat dibagikan.",
+    "howTo": [
+      "Unggah 1 hingga 20 gambar (JPG, PNG, atau WebP, total maksimal 50MB).",
+      "Gambar menjadi halaman sesuai urutan unggah.",
+      "Klik Konversi dan unduh PDF Anda."
+    ],
+    "features": [
+      "Input JPG, PNG, dan WebP",
+      "Hingga 20 gambar per PDF",
+      "Setiap gambar menjadi satu halaman penuh",
+      "Gratis tanpa tanda air"
+    ],
+    "useCases": [
+      "Ubah foto dokumen dari ponsel menjadi PDF",
+      "Gabungkan tangkapan layar menjadi satu file",
+      "Buat portofolio PDF dari karya seni",
+      "Arsipkan foto papan tulis sebagai dokumen"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara mengubah JPG menjadi PDF?",
+        "a": "Unggah gambar JPG Anda (hingga 20), lalu klik Konversi. Setiap gambar menjadi satu halaman dalam PDF hasil, sesuai urutan unggah."
+      },
+      {
+        "q": "Format gambar apa saja yang didukung?",
+        "a": "Gambar JPG/JPEG, PNG, dan WebP didukung."
+      },
+      {
+        "q": "Berapa gambar yang dapat saya gabungkan?",
+        "a": "Antara 1 hingga 20 gambar per PDF."
+      },
+      {
+        "q": "Apakah gambar saya akan kehilangan kualitas?",
+        "a": "Gambar disematkan pada resolusi aslinya — tidak ada penurunan kualitas selama konversi."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr",
+      "merge"
+    ]
+  },
+  "ocr": {
+    "title": "OCR PDF Online Gratis — Jadikan PDF Hasil Pindaian Dapat Dicari | PDFEDI",
+    "description": "Jalankan OCR pada PDF hasil pindaian online gratis. Tambahkan lapisan teks yang dapat dicari dan dipilih sementara halaman tampak persis sama. Berbagai bahasa, tanpa mendaftar.",
+    "h1": "OCR ke PDF yang Dapat Dicari",
+    "intro": "Jadikan PDF hasil pindaian dapat dicari dan dipilih. Pengenalan karakter optis membaca teks di halaman hasil pindaian Anda dan menambahkan lapisan teks tak terlihat — halaman tampak identik, tetapi kini Anda dapat mencari, memilih, dan menyalin teks. Halaman yang sudah berisi teks dilewati secara otomatis.",
+    "howTo": [
+      "Unggah PDF hasil pindaian Anda (maksimal 50MB).",
+      "Pilih bahasa dokumen (contoh eng, eng+deu).",
+      "Klik Jalankan OCR dan tunggu — halaman hasil pindaian diproses satu per satu.",
+      "Unduh PDF Anda yang dapat dicari."
+    ],
+    "features": [
+      "Lapisan teks yang dapat dicari dan dipilih pada halaman hasil pindaian",
+      "Gambar halaman asli dipertahankan persis",
+      "Halaman yang sudah berteks dilewati otomatis",
+      "Berbagai bahasa OCR didukung"
+    ],
+    "useCases": [
+      "Jadikan kontrak hasil pindaian dapat dicari",
+      "Digitalisasi arsip kertas menjadi PDF yang dapat dicari",
+      "Aktifkan pemilihan teks dalam buku hasil pindaian",
+      "Siapkan hasil pindaian untuk ekstraksi teks atau pengindeksan"
+    ],
+    "faqs": [
+      {
+        "q": "Apa yang dilakukan OCR pada PDF?",
+        "a": "OCR (pengenalan karakter optis) menganalisis gambar dalam PDF hasil pindaian, mengenali teks, dan menyematkan lapisan teks tak terlihat. Halaman tampak sama, tetapi teks menjadi dapat dicari dan dipilih."
+      },
+      {
+        "q": "Berapa lama OCR berlangsung?",
+        "a": "Tergantung jumlah halaman dan konten — halaman hasil pindaian diproses satu per satu. Halaman yang sudah berteks dilewati seketika, jadi dokumen campuran selesai jauh lebih cepat."
+      },
+      {
+        "q": "Bahasa apa saja yang didukung?",
+        "a": "Atur opsi bahasa dengan kode bahasa Tesseract seperti eng untuk bahasa Inggris atau eng+deu untuk bahasa Inggris dan Jerman sekaligus."
+      },
+      {
+        "q": "Apakah OCR akan mengubah tampilan halaman saya?",
+        "a": "Tidak. Gambar hasil pindaian asli tetap menjadi halaman yang terlihat; hanya lapisan teks tak terlihat yang ditambahkan di bawahnya."
+      },
+      {
+        "q": "PDF saya sudah memiliki sebagian teks. Apakah akan di-OCR ulang?",
+        "a": "Tidak — halaman dengan lapisan teks yang dapat digunakan terdeteksi dan disalin tanpa perubahan. Hanya halaman yang hanya berisi gambar yang melalui pengenalan."
+      }
+    ],
+    "related": [
+      "extract_text",
+      "images_to_pdf",
+      "pdf_to_images"
+    ]
+  },
+  "metadata": {
+    "title": "Lihat Metadata PDF Online Gratis — Periksa Info Dokumen | PDFEDI",
+    "description": "Periksa metadata tersembunyi PDF online gratis. Lihat judul, penulis, tanggal pembuatan, jumlah halaman, produsen, dan status enkripsi sebagai JSON. Tanpa mendaftar.",
+    "h1": "Lihat Metadata",
+    "intro": "Lihat apa yang tersembunyi di dalam PDF Anda. Alat ini membaca metadata dokumen — judul, penulis, subjek, kata kunci, tanggal pembuatan, perangkat lunak produsen, jumlah halaman, dan status enkripsi — dan menampilkannya sebagai JSON yang mudah dibaca.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Klik Lihat Metadata.",
+      "Baca info dokumen yang ditampilkan sebagai JSON."
+    ],
+    "features": [
+      "Judul, penulis, subjek, kata kunci",
+      "Tanggal pembuatan dan modifikasi",
+      "Jumlah halaman dan info produsen",
+      "Status enkripsi",
+      "Output JSON"
+    ],
+    "useCases": [
+      "Periksa penulis dan tanggal pembuatan PDF",
+      "Verifikasi properti dokumen sebelum diterbitkan",
+      "Audit file untuk metadata yang tersisa",
+      "Debug masalah pemrosesan PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Apa itu metadata PDF?",
+        "a": "Metadata adalah informasi tersembunyi yang disimpan dalam PDF: judul, penulis, subjek, kata kunci, tanggal pembuatan, perangkat lunak pembuatnya, jumlah halaman, dan apakah file dienkripsi."
+      },
+      {
+        "q": "Bisakah saya melihat apakah PDF dilindungi kata sandi?",
+        "a": "Ya — tampilan metadata mencakup status enkripsi dokumen."
+      },
+      {
+        "q": "Apakah metadata selalu akurat?",
+        "a": "Metadata mencerminkan apa yang disimpan pembuat PDF dalam file. Beberapa PDF memiliki metadata kosong atau umum jika perangkat lunak pembuatnya tidak mengisinya."
+      }
+    ],
+    "related": [
+      "edit_metadata",
+      "extract_text",
+      "unlock_pdf"
+    ]
+  },
+  "edit_metadata": {
+    "title": "Edit Metadata PDF Online Gratis — Perbarui Judul & Penulis | PDFEDI",
+    "description": "Edit metadata PDF online gratis. Ubah judul, penulis, subjek, dan kata kunci yang muncul di pembaca PDF dan hasil pencarian. Konten tidak disentuh, tanpa mendaftar.",
+    "h1": "Edit Metadata",
+    "intro": "Perbarui info dokumen PDF Anda. Ubah judul, penulis, subjek, dan kata kunci yang muncul di pembaca PDF dan hasil pencarian — tanpa perangkat lunak desktop.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik judul, penulis, subjek, dan/atau kata kunci yang baru.",
+      "Klik Simpan dan unduh PDF yang diperbarui."
+    ],
+    "features": [
+      "Edit judul, penulis, subjek, kata kunci",
+      "Konten dokumen tidak disentuh",
+      "Unduhan instan"
+    ],
+    "useCases": [
+      "Atur judul yang benar sebelum menerbitkan PDF",
+      "Tambahkan nama Anda sebagai penulis dokumen Anda",
+      "Bersihkan metadata warisan dari template",
+      "Tambahkan kata kunci untuk pengorganisasian dokumen yang lebih baik"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara mengubah judul atau penulis PDF?",
+        "a": "Unggah PDF, isi judul, penulis, subjek, atau kata kunci yang baru, lalu klik Simpan. Hanya metadata yang berubah — halaman Anda tetap persis sama."
+      },
+      {
+        "q": "Apakah mengedit metadata memengaruhi konten dokumen saya?",
+        "a": "Tidak. Metadata berada dalam kamus info dokumen; halaman, teks, dan gambar tidak dimodifikasi."
+      },
+      {
+        "q": "Mengapa metadata PDF penting?",
+        "a": "Pembaca PDF dan mesin pencari menampilkan judul dan penulis. Metadata yang benar membuat dokumen Anda tampak profesional dan lebih mudah ditemukan."
+      }
+    ],
+    "related": [
+      "metadata",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "watermark": {
+    "title": "Tambah Tanda Air ke PDF Online Gratis — Stempel Teks | PDFEDI",
+    "description": "Beri stempel tanda air teks diagonal di halaman PDF online gratis. Teks khusus seperti DRAFT atau CONFIDENTIAL dengan opasitas yang dapat disesuaikan. Tanpa mendaftar.",
+    "h1": "Tambah Tanda Air",
+    "intro": "Beri stempel teks secara diagonal di setiap halaman PDF Anda. Tambahkan tanda seperti DRAFT, CONFIDENTIAL, atau SAMPLE dengan opasitas yang dapat disesuaikan — cara sederhana untuk memberi label pada status dokumen.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik teks tanda air Anda dan pilih tingkat opasitas.",
+      "Klik Tambah Tanda Air dan unduh PDF yang sudah dicap."
+    ],
+    "features": [
+      "Stempel teks diagonal di setiap halaman",
+      "Teks khusus sesuai pilihan Anda",
+      "Opasitas dapat disesuaikan"
+    ],
+    "useCases": [
+      "Tandai draf sebagai DRAFT sebelum ditinjau",
+      "Beri label CONFIDENTIAL pada file sensitif",
+      "Beri stempel SAMPLE pada dokumen pratinjau",
+      "Beri merek pada PDF keluar dengan nama perusahaan Anda"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menambahkan tanda air ke PDF?",
+        "a": "Unggah PDF Anda, ketik teks tanda air, atur opasitas, lalu klik Tambah Tanda Air. Teks dicap secara diagonal di setiap halaman."
+      },
+      {
+        "q": "Bisakah saya mengontrol seberapa terlihat tanda airnya?",
+        "a": "Ya — opsi opasitas memungkinkan Anda membuat tanda air samar atau tegas."
+      },
+      {
+        "q": "Halaman mana saja yang diberi tanda air?",
+        "a": "Setiap halaman PDF menerima tanda air."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "edit_metadata",
+      "password_protect",
+      "flatten"
+    ]
+  },
+  "page_numbers": {
+    "title": "Tambah Nomor Halaman ke PDF Online Gratis — Beri Nomor Halaman | PDFEDI",
+    "description": "Beri nomor pada halaman PDF Anda online gratis. Pilih posisi apa pun, nomor awal, teks awalan/akhiran, dan ukuran font 6–48pt. Berlaku untuk semua halaman atau rentang.",
+    "h1": "Tambah Nomor Halaman",
+    "intro": "Tambahkan nomor halaman ke PDF Anda tepat di tempat yang Anda inginkan. Pilih posisi sudut atau tepi, nomor awal, teks awalan/akhiran opsional, dan ukuran font — ideal untuk laporan, ebook, dan dokumen siap cetak.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Pilih posisi vertikal dan horizontal, nomor awal, serta awalan/akhiran opsional.",
+      "Atur ukuran font dan rentang halaman jika perlu.",
+      "Klik Tambah Nomor dan unduh."
+    ],
+    "features": [
+      "Posisi sudut atau tepi mana pun",
+      "Nomor awal khusus",
+      "Teks awalan dan akhiran opsional (contoh 'Page 1 of 10')",
+      "Ukuran font dapat disesuaikan (6–48pt)",
+      "Berlaku untuk semua halaman atau rentang yang dipilih"
+    ],
+    "useCases": [
+      "Beri nomor pada halaman laporan untuk referensi yang mudah",
+      "Siapkan ebook untuk dicetak",
+      "Tambahkan footer 'Page X of Y' pada proposal",
+      "Beri nomor pada dokumen hasil pindaian yang tidak memiliki penomoran"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menambahkan nomor halaman ke PDF?",
+        "a": "Unggah PDF Anda, pilih letak nomor (contoh tengah bawah), atur nomor awal dan ukuran font, lalu klik Tambah Nomor."
+      },
+      {
+        "q": "Bisakah saya membuat nomor halaman seperti 'Page 1 of 10'?",
+        "a": "Ya — gunakan kolom awalan untuk 'Page ' dan kolom akhiran untuk ' of 10' di sekitar nomor otomatis."
+      },
+      {
+        "q": "Bisakah saya memulai penomoran dari nomor yang berbeda?",
+        "a": "Ya. Atur nomor awal sesuai kebutuhan Anda — berguna saat PDF Anda adalah satu bagian dari dokumen yang lebih besar."
+      },
+      {
+        "q": "Bisakah saya memberi nomor hanya pada beberapa halaman?",
+        "a": "Ya — ketik rentang halaman seperti 3-10 untuk memberi nomor hanya pada halaman itu."
+      }
+    ],
+    "related": [
+      "watermark",
+      "edit_metadata",
+      "merge",
+      "flatten"
+    ]
+  },
+  "password_protect": {
+    "title": "Lindungi PDF dengan Kata Sandi Online Gratis — Enkripsi PDF | PDFEDI",
+    "description": "Tambahkan perlindungan kata sandi ke PDF online gratis. Enkripsi dokumen Anda sehingga hanya orang yang memiliki kata sandi yang dapat membukanya di pembaca apa pun. Tanpa mendaftar.",
+    "h1": "Lindungi PDF dengan Kata Sandi",
+    "intro": "Kunci PDF Anda dengan kata sandi. Dokumen dienkripsi sehingga tidak dapat dibuka tanpa kata sandi yang Anda tetapkan — perlindungan sederhana untuk file sensitif yang perlu Anda bagikan atau simpan.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik kata sandi yang ingin Anda gunakan untuk melindunginya.",
+      "Klik Lindungi dan unduh PDF terenkripsi."
+    ],
+    "features": [
+      "Enkripsi PDF yang kuat",
+      "Kata sandi diperlukan untuk membuka",
+      "Berfungsi dengan pembaca PDF apa pun"
+    ],
+    "useCases": [
+      "Lindungi kontrak sebelum dikirim lewat email",
+      "Amankan dokumen keuangan",
+      "Kunci catatan pribadi yang disimpan online",
+      "Bagikan file sensitif dengan akses terkontrol"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara melindungi PDF dengan kata sandi?",
+        "a": "Unggah PDF Anda, ketik kata sandi, lalu klik Lindungi. PDF yang diunduh akan meminta kata sandi itu untuk dibuka di pembaca PDF apa pun."
+      },
+      {
+        "q": "Apa yang terjadi jika saya lupa kata sandinya?",
+        "a": "Tidak ada pemulihan — tanpa kata sandi, PDF tidak dapat dibuka. Simpan kata sandi Anda di tempat yang aman."
+      },
+      {
+        "q": "Enkripsi jenis apa yang digunakan?",
+        "a": "PDF dienkripsi dengan enkripsi PDF standar yang didukung semua pembaca PDF utama."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "unlock_pdf": {
+    "title": "Buka Kunci PDF Online Gratis — Hapus Perlindungan Kata Sandi | PDFEDI",
+    "description": "Hapus perlindungan kata sandi dari PDF milik Anda online gratis. Ketik kata sandi yang benar dan unduh salinan yang sudah tidak terkunci. Tanpa mendaftar, tanpa tanda air.",
+    "h1": "Buka Kunci PDF",
+    "intro": "Hapus kata sandi dari PDF milik Anda. Ketik kata sandi yang benar dan unduh salinan yang sudah tidak terkunci, yang bebas dibuka, diedit, dan diproses dengan alat lain.",
+    "howTo": [
+      "Unggah PDF Anda yang dilindungi kata sandi (maksimal 50MB).",
+      "Ketik kata sandi yang benar.",
+      "Klik Buka Kunci dan unduh PDF yang sudah tidak dilindungi."
+    ],
+    "features": [
+      "Menghapus perlindungan kata sandi",
+      "Output berfungsi dengan semua alat PDFEDI lainnya",
+      "Gratis tanpa tanda air"
+    ],
+    "useCases": [
+      "Buka kunci PDF Anda sendiri setelah lupa bahwa file itu terkunci",
+      "Siapkan file yang dilindungi untuk digabung atau dipisah",
+      "Hapus kata sandi sebelum pengarsipan",
+      "Aktifkan ekstraksi teks pada dokumen yang terkunci"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menghapus kata sandi dari PDF?",
+        "a": "Unggah PDF yang dilindungi, ketik kata sandinya, lalu klik Buka Kunci. Anda akan mendapatkan PDF biasa tanpa permintaan kata sandi."
+      },
+      {
+        "q": "Bisakah saya membuka kunci PDF tanpa kata sandi?",
+        "a": "Tidak. Anda harus mengetahui kata sandi yang benar — alat ini menghapus perlindungan dari file yang berhak Anda akses; alat ini tidak dapat membobol kata sandi yang tidak diketahui."
+      },
+      {
+        "q": "Mengapa saya perlu membuka kunci PDF?",
+        "a": "Alat lain menolak file yang terkunci demi keamanan. Membuka kunci terlebih dahulu memungkinkan Anda menggabung, memisah, mengompres, atau mengonversi dokumen secara normal."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "merge",
+      "split",
+      "extract_text"
+    ]
+  },
+  "redact": {
+    "title": "Redaksi PDF Online Gratis — Hitamkan Teks Sensitif | PDFEDI",
+    "description": "Sensor teks sensitif dalam PDF secara permanen online gratis. Hitamkan nama, email, dan ID berdasarkan kecocokan teks persis, beberapa istilah sekaligus. Tanpa mendaftar.",
+    "h1": "Redaksi PDF",
+    "intro": "Hitamkan teks sensitif dalam PDF Anda secara permanen. Ketik kata atau frasa yang akan disensor — nama, email, nomor ID — dan kata-kata itu ditutup dengan kotak hitam solid dalam dokumen output.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik teks yang dipisahkan koma untuk disensor (contoh SSN, john@example.com).",
+      "Klik Redaksi dan unduh PDF yang sudah dihitamkan."
+    ],
+    "features": [
+      "Redaksi berdasarkan kecocokan teks persis",
+      "Beberapa istilah dalam satu proses",
+      "Kotak redaksi hitam solid"
+    ],
+    "useCases": [
+      "Hitamkan data pribadi sebelum membagikan dokumen",
+      "Sensor nama klien dari berkas perkara",
+      "Hapus alamat email dari laporan publik",
+      "Bersihkan dokumen untuk rilis ala FOIA"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menghitamkan teks dalam PDF?",
+        "a": "Unggah PDF Anda, ketik kata atau frasa persis yang akan disensor, dipisahkan koma, lalu klik Redaksi. Setiap kecocokan ditutup dengan kotak hitam."
+      },
+      {
+        "q": "Apakah teks yang disensor benar-benar dihapus?",
+        "a": "Teks yang cocok ditutup dengan persegi panjang hitam buram dalam PDF output. Untuk keamanan maksimal pada materi yang sangat sensitif, verifikasi output sebelum didistribusikan."
+      },
+      {
+        "q": "Bisakah saya menyensor beberapa kata berbeda sekaligus?",
+        "a": "Ya — ketik sebagai daftar yang dipisahkan koma, misalnya: SSN, john@example.com, 555-1234."
+      },
+      {
+        "q": "Apakah redaksi berfungsi pada PDF hasil pindaian?",
+        "a": "Redaksi mencocokkan lapisan teks PDF. Untuk PDF hasil pindaian yang hanya berisi gambar, jalankan OCR terlebih dahulu untuk menambahkan lapisan teks, lalu sensor."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "unlock_pdf",
+      "extract_text",
+      "flatten"
+    ]
+  },
+  "flatten": {
+    "title": "Ratakan PDF Online Gratis — Satukan Anotasi ke Halaman | PDFEDI",
+    "description": "Ratakan PDF online gratis. Satukan anotasi, komentar, dan kolom formulir yang terisi secara permanen ke halaman sehingga tampilannya terkunci. Tanpa mendaftar.",
+    "h1": "Ratakan PDF",
+    "intro": "Satukan anotasi dan kolom formulir secara permanen ke halaman PDF Anda. Perataan menggabungkan markup, komentar, dan formulir yang terisi ke dalam konten halaman sehingga dokumen tampak sama di mana saja dan tidak dapat diedit lagi.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Klik Ratakan.",
+      "Unduh PDF yang sudah diratakan."
+    ],
+    "features": [
+      "Menggabungkan anotasi ke dalam konten halaman",
+      "Menyatukan nilai kolom formulir ke halaman",
+      "Mengunci tampilan akhir dokumen"
+    ],
+    "useCases": [
+      "Finalisasi formulir yang terisi agar nilainya tidak dapat diubah",
+      "Satukan komentar tinjauan ke dalam dokumen",
+      "Pastikan tampilan konsisten di semua pembaca PDF",
+      "Siapkan dokumen untuk dicetak atau diarsipkan"
+    ],
+    "faqs": [
+      {
+        "q": "Apa yang dilakukan perataan PDF?",
+        "a": "Perataan menggabungkan anotasi, komentar, dan nilai kolom formulir langsung ke dalam grafik halaman. Setelah diratakan, semuanya menjadi bagian halaman dan tidak dapat lagi diedit atau dipindahkan."
+      },
+      {
+        "q": "Mengapa saya harus meratakan formulir yang terisi?",
+        "a": "Nilai formulir yang belum diratakan masih dapat diedit oleh siapa pun yang memiliki editor PDF. Perataan mengunci nilai yang terisi di tempatnya."
+      },
+      {
+        "q": "Apakah perataan akan mengubah tampilan PDF saya?",
+        "a": "Tidak — tampilan visual tetap sama. Hanya kemampuan edit anotasi dan kolom formulir yang berubah."
+      }
+    ],
+    "related": [
+      "password_protect",
+      "watermark",
+      "page_numbers",
+      "redact"
+    ]
+  },
+  "crop": {
+    "title": "Potong PDF Online Gratis — Pangkas Margin & Potong Halaman | PDFEDI",
+    "description": "Potong halaman PDF online gratis. Pangkas margin putih atau potong halaman dengan jumlah poin yang tepat dari atas, bawah, kiri, dan kanan. Tanpa mendaftar, file tetap privat.",
+    "h1": "Potong PDF",
+    "intro": "Hapus ruang putih berlebih atau tepi yang tidak diinginkan dari halaman PDF Anda. Ketik berapa poin yang akan dipangkas dari setiap sisi — terapkan ke semua halaman atau hanya rentang halaman yang Anda pilih.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Ketik jumlah pangkasan dalam poin untuk tepi atas, bawah, kiri, dan kanan (72 poin = 1 inci).",
+      "Opsional: batasi pemotongan ke halaman tertentu (contoh 1-3,5). Kosongkan untuk semua halaman.",
+      "Klik Potong dan unduh PDF yang sudah dipangkas."
+    ],
+    "features": [
+      "Pangkas setiap tepi secara terpisah, dalam poin",
+      "Berlaku untuk semua halaman atau rentang halaman yang dipilih",
+      "Kualitas konten asli sepenuhnya terjaga",
+      "Gratis tanpa mendaftar"
+    ],
+    "useCases": [
+      "Hapus margin putih yang lebar sebelum mencetak untuk menghemat kertas",
+      "Potong bayangan tepi dan bingkai hasil pindaian dari halaman",
+      "Padatkan halaman agar lebih mudah dibaca di ponsel dan e-reader",
+      "Pangkas area kop surat atau footer dari laporan yang dibuat otomatis"
+    ],
+    "faqs": [
+      {
+        "q": "Seberapa banyak saya dapat memotong dari halaman PDF?",
+        "a": "Sebanyak yang Anda mau, selama sebagian halaman masih tersisa. Jika jumlah pangkasan akan menghapus seluruh lebar atau tinggi halaman, alat berhenti dengan pesan kesalahan alih-alih menghasilkan halaman kosong."
+      },
+      {
+        "q": "Satuan apa yang digunakan untuk jumlah potongan?",
+        "a": "Poin — satuan standar PDF. 72 poin sama dengan 1 inci, jadi memangkas 36 poin menghapus setengah inci dari tepi itu."
+      },
+      {
+        "q": "Apakah pemotongan menghapus konten yang dipangkas secara permanen?",
+        "a": "Pemotongan menyesuaikan kotak potong (crop box) yang terlihat di setiap halaman. Konten yang tersembunyi tidak ditulis ulang, jadi untuk penghapusan permanen konten sensitif gunakan alat Redaksi."
+      }
+    ],
+    "related": [
+      "delete_pages",
+      "rotate_pages",
+      "n_up"
+    ]
+  },
+  "grayscale": {
+    "title": "Ubah PDF menjadi Grayscale Online Gratis — Hitam & Putih | PDFEDI",
+    "description": "Ubah PDF berwarna menjadi grayscale online gratis. Biaya cetak lebih murah dan file lebih kecil hingga 600 DPI. Halaman dirender sebagai gambar — perlu dicatat teks tidak lagi dapat dipilih.",
+    "h1": "PDF Grayscale",
+    "intro": "Ubah PDF berwarna menjadi versi hitam-putih yang bersih, lebih murah dicetak dan sering kali lebih kecil. Pilih kualitas render 72 hingga 600 DPI — halaman dikonversi menjadi gambar grayscale, sehingga teks tidak lagi dapat dipilih setelahnya.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Atur DPI — 200 adalah keseimbangan yang baik antara kualitas dan ukuran file; gunakan 300+ untuk mencetak.",
+      "Klik Konversi dan unduh PDF grayscale Anda."
+    ],
+    "features": [
+      "Konversi grayscale sejati pada 72–600 DPI",
+      "Mempertahankan ukuran halaman dan jumlah halaman asli",
+      "Halaman berkode JPEG berkualitas tinggi membuat file tetap ringkas",
+      "Gratis tanpa mendaftar"
+    ],
+    "useCases": [
+      "Potong biaya cetak berwarna untuk handout dan draf",
+      "Siapkan dokumen untuk printer hitam-putih saja",
+      "Buat slide yang banyak warna tetap terbaca saat dicetak mono",
+      "Perkecil ukuran file PDF berwarna yang banyak gambar"
+    ],
+    "faqs": [
+      {
+        "q": "Mengapa teks dalam PDF grayscale saya tidak dapat dipilih?",
+        "a": "Untuk menjamin hasil grayscale sejati, setiap halaman dirender sebagai gambar grayscale. Artinya teks menjadi bagian dari gambar — tercetak identik tetapi tidak lagi dapat dipilih atau dicari. Simpan salinan aslinya jika Anda membutuhkan lapisan teks."
+      },
+      {
+        "q": "DPI berapa yang harus saya pilih?",
+        "a": "150 DPI cukup untuk dibaca di layar, 200 DPI menyeimbangkan ukuran dan kejelasan, dan 300 DPI atau lebih paling baik untuk mencetak. DPI yang lebih tinggi berarti file lebih besar."
+      },
+      {
+        "q": "Apakah grayscale akan membuat PDF saya lebih kecil?",
+        "a": "Biasanya ya untuk dokumen berwarna yang banyak gambar, karena informasi warna dihapus. PDF yang hanya berisi teks mungkin sedikit membesar karena halaman menjadi gambar — alat Kompres lebih baik untuk itu."
+      }
+    ],
+    "related": [
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "n_up": {
+    "title": "N-Up PDF Online Gratis — Beberapa Halaman Per Lembar | PDFEDI",
+    "description": "Gabungkan 2, 4, 6, atau 9 halaman PDF ke dalam satu lembar online gratis. Lembar A4 atau Letter, potret atau lanskap. Cocok untuk handout, slide, dan buklet. Tanpa mendaftar.",
+    "h1": "N-Up PDF",
+    "intro": "Cetak lebih banyak, buang lebih sedikit: tempatkan 2, 4, 6, atau 9 halaman PDF Anda ke dalam satu lembar. Ideal untuk slide kuliah, handout, dan tinjauan draf yang tidak memerlukan halaman ukuran penuh.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Pilih jumlah halaman per lembar: 2, 4, 6, atau 9.",
+      "Pilih ukuran lembar (A4 atau Letter) dan orientasi (potret atau lanskap).",
+      "Klik Buat dan unduh lembar gabungan Anda."
+    ],
+    "features": [
+      "2, 4, 6, atau 9 halaman per lembar",
+      "Grid menyesuaikan otomatis dengan orientasi",
+      "Konten diskalakan secara proporsional — tidak pernah terdistorsi",
+      "Ukuran lembar A4 dan Letter"
+    ],
+    "useCases": [
+      "Cetak slide kuliah sebagai handout ringkas",
+      "Tinjau dokumen panjang dengan sebagian kecil kertas",
+      "Buat lembar bukti bergaya buklet",
+      "Muat seluruh presentasi dalam beberapa halaman untuk perjalanan"
+    ],
+    "faqs": [
+      {
+        "q": "Berapa lembar output yang akan saya dapatkan?",
+        "a": "Jumlah halaman Anda dibagi tata letak, dibulatkan ke atas. Misalnya, PDF 10 halaman pada 4-up menghasilkan 3 lembar — lembar terakhir hanya memiliki slot kosong."
+      },
+      {
+        "q": "Apakah N-Up menurunkan kualitas?",
+        "a": "Tidak. Halaman ditempatkan ke lembar sebagai konten vektor pada skala yang lebih kecil — teks dan gambar tetap tajam, hanya lebih kecil secara fisik saat dicetak."
+      },
+      {
+        "q": "Tata letak apa yang harus saya pilih untuk slide?",
+        "a": "4-up dalam lanskap cocok untuk sebagian besar kumpulan slide. Gunakan 2-up jika Anda perlu membaca anotasi, dan 6 atau 9-up hanya untuk tinjauan umum — teks menjadi kecil."
+      }
+    ],
+    "related": [
+      "crop",
+      "merge",
+      "split"
+    ]
+  },
+  "repair": {
+    "title": "Perbaiki PDF Rusak Online Gratis — Perbaiki File Rusak | PDFEDI",
+    "description": "Perbaiki PDF yang rusak online gratis. Bangun ulang tabel referensi silang yang rusak, unduhan yang terpotong, dan objek yang cacat. Jika file tidak dapat disimpan, Anda mendapatkan pesan kesalahan yang jujur.",
+    "h1": "Perbaiki PDF",
+    "intro": "Buat PDF Anda yang rusak berfungsi lagi. Unggah file yang rusak dan mesin perbaikan membangun ulang struktur internalnya — referensi silang yang rusak, unduhan yang terpotong, dan objek yang cacat diperbaiki sejauh memungkinkan secara fisik.",
+    "howTo": [
+      "Unggah file PDF yang rusak (maksimal 50MB).",
+      "Klik Perbaiki — struktur file dianalisis dan dibangun ulang.",
+      "Unduh PDF yang sudah diperbaiki dan periksa konten Anda masih utuh."
+    ],
+    "features": [
+      "Membangun ulang tabel referensi silang yang rusak",
+      "Memulihkan file yang terpotong dan unduhan sebagian",
+      "Memperbaiki aliran objek yang cacat",
+      "Hasil yang jujur — file yang tidak dapat diperbaiki melaporkan kesalahan, bukan perbaikan palsu"
+    ],
+    "useCases": [
+      "Buka PDF yang menampilkan kesalahan 'file rusak'",
+      "Pulihkan dokumen dari unduhan yang terputus",
+      "Perbaiki PDF yang rusak akibat transfer USB yang bermasalah atau lampiran email",
+      "Selamatkan PDF arsip lama yang tidak lagi dapat dibuka"
+    ],
+    "faqs": [
+      {
+        "q": "Jenis kerusakan apa yang dapat diperbaiki?",
+        "a": "Tabel referensi silang yang rusak atau hilang, offset objek yang salah, file yang terpotong, dan panjang aliran yang cacat adalah masalah yang paling umum dapat diperbaiki. Jika byte konten sebenarnya sudah hilang, tidak ada alat yang dapat membuatnya kembali."
+      },
+      {
+        "q": "Bagaimana jika file saya tidak dapat diperbaiki?",
+        "a": "Anda mendapatkan pesan kesalahan 'tidak dapat diperbaiki' yang jelas, yang menjelaskan file terlalu rusak — tidak pernah unduhan yang diam-diam rusak. Coba buka di pembaca lain untuk memastikan, lalu peroleh kembali file dari sumbernya jika memungkinkan."
+      },
+      {
+        "q": "PDF saya dilindungi kata sandi. Bisakah diperbaiki?",
+        "a": "Tidak langsung — perbaikan tidak dapat bekerja pada file terenkripsi. Gunakan alat Buka Kunci PDF dengan kata sandi Anda terlebih dahulu, lalu perbaiki file yang sudah tidak terkunci."
+      }
+    ],
+    "related": [
+      "unlock_pdf",
+      "merge",
+      "metadata"
+    ]
+  },
+  "pdf_to_word": {
+    "title": "PDF ke Word Online Gratis — Konversi PDF ke DOCX | PDFEDI",
+    "description": "Ubah PDF menjadi dokumen Word yang dapat diedit online gratis. Paragraf asli, gaya heading, dan gambar yang disematkan. Paling baik untuk dokumen teks — tabel yang rumit bersifat perkiraan.",
+    "h1": "PDF ke Word",
+    "intro": "Ubah PDF Anda menjadi dokumen Word yang benar-benar dapat diedit. Teks dibangun ulang menjadi paragraf asli dengan gaya heading yang benar, dan gambar yang disematkan ditempatkan sesuai urutan baca. Paling baik untuk dokumen berbasis teks — tabel rumit dan tata letak multi-kolom hasilnya bersifat perkiraan.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB, maksimal 50 halaman).",
+      "Klik Konversi — teks diekstrak beserta tata letaknya dan dibangun ulang sebagai dokumen Word.",
+      "Unduh .docx dan edit di Word, Google Docs, atau LibreOffice."
+    ],
+    "features": [
+      "Paragraf yang benar-benar dapat diedit — bukan gambar teks",
+      "Gaya heading terdeteksi dari ukuran huruf",
+      "Format tebal dipertahankan jika terdeteksi",
+      "Gambar yang disematkan ditempatkan sesuai urutan baca"
+    ],
+    "useCases": [
+      "Edit laporan PDF yang hanya Anda miliki sebagai file",
+      "Gunakan kembali konten PDF dalam proposal atau presentasi",
+      "Ekstrak teks terstruktur ke dokumen yang dapat Anda revisi",
+      "Ubah PDF arsip menjadi file Word yang dapat dikerjakan"
+    ],
+    "faqs": [
+      {
+        "q": "Apakah dokumen saya akan tampak persis seperti PDF?",
+        "a": "Mendekati untuk dokumen teks, perkiraan untuk dokumen yang rumit. Paragraf, heading, dan gambar berpindah dengan baik; tabel yang rumit dan tata letak majalah multi-kolom dibangun ulang sebaik mungkin tetapi tidak akan sempurna seperti piksel. Tujuannya adalah dokumen yang dapat diedit, bukan tiruan visual."
+      },
+      {
+        "q": "PDF saya adalah hasil pindaian tanpa teks yang dapat dipilih. Apa yang terjadi?",
+        "a": "Anda akan mendapatkan pesan kesalahan yang jelas yang mengarahkan Anda ke alat OCR. Jalankan OCR terlebih dahulu untuk membuat hasil pindaian dapat dicari, lalu konversi hasil OCR ke Word."
+      },
+      {
+        "q": "Program apa yang membuka file yang diunduh?",
+        "a": "Unduhan adalah file .docx standar — dapat dibuka di Microsoft Word, Google Docs, LibreOffice Writer, dan Apple Pages."
+      }
+    ],
+    "related": [
+      "ocr",
+      "extract_text",
+      "images_to_pdf",
+      "edit_metadata"
+    ]
+  },
+  "compress": {
+    "title": "Kompres PDF Online Gratis — Perkecil ke Ukuran Target | PDFEDI",
+    "description": "Kompres PDF ke ukuran target online gratis. Pilih batas — contoh 25 MB, batas e-filing pengadilan yang paling umum — dan gambar diperkecil sampai muat. Batch hingga 10 file, unduhan ZIP.",
+    "h1": "Kompres PDF",
+    "intro": "Perkecil PDF hingga ukuran yang Anda pilih. Pilih target — 25 MB adalah batas e-filing pengadilan (CM/ECF) yang paling umum, tetapi batas berbeda-beda tiap pengadilan, dari sekitar 3 hingga 200 MB, jadi periksa dulu aturan setempat pengadilan Anda. Alat ini membangun ulang file dan memperkecil gambar yang disematkan sampai muat, dan ZIP menyertakan laporan yang menunjukkan ukuran sebelum dan sesudah untuk setiap file.",
+    "howTo": [
+      "Unggah 1 hingga 10 file PDF (maksimal 50MB per file).",
+      "Pilih ukuran target, misalnya 25 MB.",
+      "Klik Kompres dan unduh ZIP.",
+      "Periksa compression_report.txt di dalam ZIP — file itu menyatakan untuk setiap file apakah target tercapai."
+    ],
+    "features": [
+      "Kompres ke ukuran target: 2, 5, 10, 25, atau 50 MB",
+      "Batch hingga 10 PDF, hasil sebagai ZIP",
+      "Laporan per file dengan ukuran sebelum/sesudah dan status target",
+      "Hasil yang jujur — jika target tidak dapat dicapai, laporan menyatakan demikian"
+    ],
+    "useCases": [
+      "Perkecil brief di bawah batas ukuran e-filing pengadilan Anda",
+      "Kompres lampiran hasil pindaian agar dapat diajukan atau dikirim lewat email",
+      "Perkecil PDF besar sebelum mengirimnya ke klien atau rekan",
+      "Kompres sejumlah dokumen sekaligus dalam satu pekerjaan"
+    ],
+    "faqs": [
+      {
+        "q": "Ukuran target apa yang harus saya pilih untuk pengajuan pengadilan?",
+        "a": "Tergantung pengadilan Anda — batas CM/ECF berbeda-beda dari sekitar 3 MB hingga 200 MB tiap pengadilan, dan 25 MB paling umum. Periksa aturan setempat atau panduan e-filing pengadilan Anda, lalu pilih ukuran itu di sini."
+      },
+      {
+        "q": "Bagaimana jika PDF saya tidak dapat dikompres hingga target?",
+        "a": "Anda tetap mendapatkan versi terkecil yang dapat dibuat alat, dan compression_report.txt di dalam ZIP menyatakan target terlewat dan selisihnya. Coba target yang lebih besar, atau pisah dokumen terlebih dahulu."
+      },
+      {
+        "q": "Apakah kompresi akan mengubah tampilan dokumen saya?",
+        "a": "Teks dan tata letak dipertahankan. Gambar yang disematkan diperkecil dan dikode ulang sebagai JPEG, jadi foto yang sangat besar menjadi lebih lembut — di situlah penghematan ukuran berasal. PDF yang hanya berisi teks hampir tidak mengecil, karena tidak ada gambar untuk diperkecil."
+      },
+      {
+        "q": "Bisakah saya mengompres beberapa PDF sekaligus?",
+        "a": "Ya — unggah hingga 10 PDF dalam satu pekerjaan. Hasilnya kembali sebagai ZIP berisi satu PDF terkompres per file plus laporan. File diproses dengan aman dan dihapus otomatis. Tidak perlu mendaftar."
+      }
+    ],
+    "related": [
+      "exhibit_combine",
+      "strip_metadata",
+      "split",
+      "grayscale"
+    ]
+  },
+  "strip_metadata": {
+    "title": "Hapus Metadata PDF Online Gratis — Hapus Info Tersembunyi | PDFEDI",
+    "description": "Hapus metadata tersembunyi dari PDF online gratis. Menghapus judul, penulis, tanggal, pembuat, dan produsen dalam satu klik, beserta laporan sebelum/sesudah. Batch hingga 10 file.",
+    "h1": "Hapus Metadata",
+    "intro": "Hapus informasi tersembunyi yang tersimpan di dalam PDF — judul, penulis, tanggal pembuatan dan modifikasi, perangkat lunak pembuat dan produsen, serta paket metadata XMP — dalam satu klik. Anda mendapatkan PDF yang sudah dibersihkan plus laporan sebelum/sesudah yang menunjukkan persis apa yang ada di file dan apa yang dihapus, sehingga Anda dapat membuktikannya sebelum mengirim file.",
+    "howTo": [
+      "Unggah 1 hingga 10 file PDF (maksimal 50MB per file).",
+      "Klik Hapus Metadata — tidak ada opsi yang perlu diatur.",
+      "Unduh ZIP berisi PDF yang sudah dibersihkan dan metadata_report.json.",
+      "Buka laporan untuk melihat apa yang dihapus dari setiap file."
+    ],
+    "features": [
+      "Penghapusan semua metadata dokumen dalam satu klik",
+      "Laporan sebelum/sesudah untuk setiap file (JSON)",
+      "Menghapus paket metadata XMP juga",
+      "Batch hingga 10 PDF, hasil sebagai ZIP"
+    ],
+    "useCases": [
+      "Bersihkan brief atau lampiran sebelum diajukan atau dibagikan",
+      "Hapus penulis dan detail pembuatan dari dokumen yang dikirim ke pihak lawan",
+      "Hapus metadata dari sejumlah file klien sebelum pengungkapan",
+      "Periksa metadata apa yang sebenarnya dibawa PDF yang Anda terima"
+    ],
+    "faqs": [
+      {
+        "q": "Metadata apa yang dihapus?",
+        "a": "Judul, penulis, subjek, kata kunci, pembuat, produsen, tanggal pembuatan dan modifikasi, serta paket metadata XMP. Laporan mencantumkan setiap kolom sebelum dan sesudah, sehingga Anda dapat melihat persis apa yang berubah."
+      },
+      {
+        "q": "Apa bedanya dengan Edit Metadata?",
+        "a": "Edit Metadata mengubah kolom satu per satu — Anda menetapkan judul atau penulis baru. Hapus Metadata menghapus semuanya dalam satu klik dan membuktikannya dengan laporan sebelum/sesudah. Gunakan Hapus saat file meninggalkan kantor Anda; gunakan Edit saat Anda ingin memperbaiki sebuah kolom."
+      },
+      {
+        "q": "Apakah PDF yang sudah dibersihkan masih memiliki metadata?",
+        "a": "Laporan menunjukkan apa yang tersisa. Penulis PDF mencapkan nilai produsennya sendiri saat file yang dibersihkan ditulis — itu dicantumkan sebagai tersisa dalam laporan, bukan disembunyikan. Tidak ada informasi dari file asli Anda yang bertahan."
+      },
+      {
+        "q": "Apakah gratis?",
+        "a": "Ya. Menghapus metadata di PDFEDI sepenuhnya gratis tanpa mendaftar. File diproses dengan aman dan dihapus otomatis. Tidak perlu mendaftar."
+      }
+    ],
+    "related": [
+      "metadata",
+      "edit_metadata",
+      "redact",
+      "strip_image_metadata"
+    ]
+  },
+  "exhibit_combine": {
+    "title": "Gabung Lampiran PDF Online Gratis — Lembar Pemisah & Bates | PDFEDI",
+    "description": "Gabungkan lampiran PDF menjadi satu dokumen siap diajukan online gratis. Lembar pemisah sebelum setiap lampiran dan nomor halaman ala Bates yang berkelanjutan. 2–20 PDF, tanpa mendaftar.",
+    "h1": "Gabung Lampiran",
+    "intro": "Ubah sejumlah PDF menjadi satu dokumen siap diajukan. Setiap lampiran mendapat lembar pemisah (Lampiran A, Lampiran B, dan seterusnya, beserta nama file dan jumlah halamannya) dan setiap halaman lampiran dicap dengan nomor ala Bates — BATES-000001, BATES-000002 — yang berurutan terus-menerus antar lampiran. Unggah lampiran Anda secara berurutan dan unduh satu PDF yang siap diajukan.",
+    "howTo": [
+      "Unggah 2 hingga 20 file PDF sesuai urutan lampiran (maksimal 50MB per file).",
+      "Atur label lampiran, awalan Bates, dan nomor Bates pertama jika Anda menginginkan yang berbeda.",
+      "Klik Gabung Lampiran dan unduh satu PDF.",
+      "Periksa lembar pemisah dan nomor Bates di halaman pertama sebelum mengajukan."
+    ],
+    "features": [
+      "Lembar pemisah sebelum setiap lampiran dengan label, nama file, dan jumlah halaman",
+      "Penomoran ala Bates yang berkelanjutan di semua lampiran",
+      "Label lampiran, awalan Bates, dan nomor awal khusus",
+      "Gabungkan 2–20 PDF menjadi satu file siap diajukan"
+    ],
+    "useCases": [
+      "Susun lampiran untuk pengajuan pengadilan dalam satu dokumen",
+      "Buat kumpulan lampiran deposisi dengan nomor Bates untuk referensi",
+      "Gabungkan dokumen pendukung menjadi satu bundel berindeks",
+      "Siapkan binder sidang sebagai satu PDF, bukan banyak file"
+    ],
+    "faqs": [
+      {
+        "q": "Apa itu nomor Bates?",
+        "a": "Nomor Bates adalah nomor urut unik yang dicap pada setiap halaman dari satu kumpulan dokumen (misalnya BATES-000001, BATES-000002), digunakan agar semua orang dalam suatu perkara dapat merujuk ke halaman yang sama. Alat ini mencapnya secara berkelanjutan di semua lampiran Anda."
+      },
+      {
+        "q": "Apa isi lembar pemisah?",
+        "a": "Satu halaman sebelum setiap lampiran, yang menunjukkan label lampiran (Lampiran A, B, C…), nama file asli, dan jumlah halaman lampiran itu. Lembar pemisah tidak diberi nomor Bates. Anda dapat mematikannya jika tidak menginginkannya."
+      },
+      {
+        "q": "Bisakah saya memulai penomoran Bates dari nomor selain 1?",
+        "a": "Ya — atur nomor Bates pertama untuk melanjutkan kumpulan yang sudah Anda mulai, misalnya 501 untuk melanjutkan dari produksi sebelumnya."
+      },
+      {
+        "q": "Dalam urutan apa lampiran disusun?",
+        "a": "Sesuai urutan Anda mengunggahnya. Unggah Lampiran A terlebih dahulu, lalu B, lalu C. File diproses dengan aman dan dihapus otomatis. Tidak perlu mendaftar."
+      }
+    ],
+    "related": [
+      "merge",
+      "page_numbers",
+      "compress",
+      "redact"
+    ]
+  },
+  "strip_image_metadata": {
+    "title": "Hapus Metadata Gambar Online Gratis — Hapus EXIF & GPS | PDFEDI",
+    "description": "Hapus metadata EXIF dan GPS dari foto online gratis. Menghapus data kamera, tanggal, dan lokasi dari gambar JPG, PNG, dan WebP, beserta laporan sebelum/sesudah. Batch hingga 10 gambar.",
+    "h1": "Hapus Metadata Gambar",
+    "intro": "Foto membawa data tersembunyi: merek dan model kamera, tanggal foto diambil, dan sering kali koordinat GPS yang menunjukkan persis di mana foto itu diambil. Alat ini mencantumkan metadata itu untuk setiap gambar, menghapusnya, dan memberi Anda laporan sebelum/sesudah yang menunjukkan apa yang diambil — sehingga Anda dapat berbagi foto tanpa membagikan di mana dan kapan foto itu diambil.",
+    "howTo": [
+      "Unggah 1 hingga 10 gambar JPG, PNG, atau WebP.",
+      "Klik Hapus Metadata Gambar — tidak ada opsi yang perlu diatur.",
+      "Unduh ZIP berisi gambar yang sudah dibersihkan dan metadata_report.json.",
+      "Buka laporan untuk melihat apa yang dihapus dari setiap gambar."
+    ],
+    "features": [
+      "Menghapus data EXIF: kamera, tanggal, perangkat lunak",
+      "Menghapus data lokasi GPS dari foto",
+      "Laporan sebelum/sesudah untuk setiap gambar (JSON)",
+      "Batch hingga 10 gambar, hasil sebagai ZIP"
+    ],
+    "useCases": [
+      "Hapus data lokasi dari foto sebelum membagikannya",
+      "Bersihkan foto klien atau perkara sebelum pengungkapan",
+      "Hapus detail kamera dan tanggal dari gambar untuk situs web",
+      "Periksa metadata apa yang sebenarnya dibawa foto dari ponsel Anda"
+    ],
+    "faqs": [
+      {
+        "q": "Metadata apa yang dihapus dari foto saya?",
+        "a": "Data EXIF termasuk merek dan model kamera, tanggal pengambilan, perangkat lunak, dan koordinat GPS, plus data XMP jika ada. Laporan mencantumkan setiap kolom yang ditemukan sebelum pembersihan dan mengonfirmasi bahwa kolom itu hilang setelahnya."
+      },
+      {
+        "q": "Apakah ini menghapus penanda C2PA atau AI?",
+        "a": "Tidak — alat ini hanya menghapus metadata standar EXIF/XMP/GPS, dan tidak memverifikasi penghapusan penanda C2PA atau AI. Untuk pembersihan C2PA/SynthID, gunakan ClearMark, yang dibuat untuk pekerjaan itu."
+      },
+      {
+        "q": "Apakah foto saya akan tampak berbeda setelah dibersihkan?",
+        "a": "Tidak. Hanya metadata tersembunyi yang dihapus — gambar itu sendiri disimpan ulang dengan kualitas tinggi (kualitas JPEG 95) dan tampak sama."
+      },
+      {
+        "q": "Apakah gratis?",
+        "a": "Ya. Menghapus metadata gambar di PDFEDI sepenuhnya gratis tanpa mendaftar. File diproses dengan aman dan dihapus otomatis. Tidak perlu mendaftar."
+      }
+    ],
+    "related": [
+      "strip_metadata",
+      "metadata",
+      "images_to_pdf",
+      "redact"
+    ]
+  }
+}
