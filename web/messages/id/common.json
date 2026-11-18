@@ -1,0 +1,787 @@
+{
+  "meta": {
+    "siteTitle": "PDFEDI — Alat PDF Online Gratis: Gabung, Pisah, Kompres & Edit",
+    "siteDescription": "Gabung, pisah, konversi, dan lindungi PDF gratis secara online. 26 alat PDF — tanpa mendaftar, tanpa tanda air, privat sejak awal.",
+    "homeTitle": "PDFEDI — Alat PDF Online Gratis: Gabung, Pisah, Kompres & Edit",
+    "homeDescription": "Gabung, pisah, konversi, dan lindungi PDF gratis secara online. 26 alat PDF — tanpa mendaftar, tanpa tanda air, privat sejak awal.",
+    "lawyersTitle": "Alat PDF untuk Pengacara — Redaksi, Arsip & Gabung Lampiran | PDFEDI",
+    "lawyersDescription": "Alat PDF gratis untuk pengacara: redaksi sejati, penghapusan metadata, kompresi sesuai ukuran pengadilan, penggabungan lampiran dengan nomor Bates. Tanpa mendaftar, tanpa tanda air.",
+    "lawyersOgDescription": "Redaksi, hapus metadata, kompres sesuai batas pengajuan pengadilan, dan gabung lampiran dengan nomor Bates — gratis, tanpa mendaftar.",
+    "privacyTitle": "Cara Kami Menangani File Anda — Privasi | PDFEDI",
+    "privacyDescription": "Apa yang terjadi pada file Anda di PDFEDI: diunggah ke server kami untuk diproses, dihapus otomatis, tanpa akun, tanpa isi file yang disimpan atau dibagikan.",
+    "privacyOgDescription": "Diunggah ke server kami, diproses, dihapus otomatis. Tanpa akun, tanpa isi file yang disimpan."
+  },
+  "chrome": {
+    "allTools": "Semua alat",
+    "forLawyers": "Untuk pengacara",
+    "tagline": "PDFEDI — alat PDF online gratis.",
+    "footerNote": "Tanpa mendaftar. File diproses dan dihapus otomatis.",
+    "home": "Beranda",
+    "language": "Bahasa"
+  },
+  "home": {
+    "heroTitle": "Semua alat PDF yang Anda butuhkan.",
+    "heroAccent": "Gratis.",
+    "heroSubtitle": "Gabung, pisah, konversi, lindungi, dan banyak lagi — langsung di browser Anda. Tanpa mendaftar, tanpa tanda air.",
+    "privateTitle": "Privat sejak awal",
+    "privateText": "File diproses di server kami dan dihapus otomatis. Kami tidak pernah meminta akun — cukup pilih alat dan mulai.",
+    "privateLink": "Cara kami menangani file Anda →",
+    "lawyersTitle": "Untuk pengacara",
+    "lawyersText": "Redaksi sejati, penghapusan metadata, kompresi sesuai ukuran pengadilan, dan penggabungan lampiran dengan nomor Bates — plus 12 panduan singkat untuk pekerjaan pengarsipan.",
+    "lawyersCta": "Lihat alat untuk pengacara →"
+  },
+  "categories": {
+    "organize": {
+      "name": "Atur",
+      "tagline": "Gabung, pisah, dan susun ulang halaman"
+    },
+    "convert": {
+      "name": "Konversi",
+      "tagline": "Ubah PDF ke format lain dan sebaliknya"
+    },
+    "edit": {
+      "name": "Edit",
+      "tagline": "Ubah konten dan info dokumen"
+    },
+    "optimize": {
+      "name": "Optimalkan",
+      "tagline": "Perkecil ukuran file dan percepat"
+    },
+    "security": {
+      "name": "Keamanan",
+      "tagline": "Lindungi, buka kunci, dan finalisasi dokumen"
+    },
+    "legal": {
+      "name": "Untuk Pengacara",
+      "tagline": "Redaksi, lampiran, dan file sesuai ukuran pengadilan yang siap diajukan"
+    }
+  },
+  "tools": {
+    "merge": {
+      "name": "Gabung PDF",
+      "tagline": "Gabungkan beberapa PDF menjadi satu"
+    },
+    "split": {
+      "name": "Pisah PDF",
+      "tagline": "Pisah PDF menjadi beberapa file"
+    },
+    "rotate_pages": {
+      "name": "Putar Halaman",
+      "tagline": "Putar halaman PDF"
+    },
+    "delete_pages": {
+      "name": "Hapus Halaman",
+      "tagline": "Hapus halaman dari PDF"
+    },
+    "reorder_pages": {
+      "name": "Susun Ulang Halaman",
+      "tagline": "Susun ulang urutan halaman"
+    },
+    "n_up": {
+      "name": "N-Up PDF",
+      "tagline": "Cetak beberapa halaman per lembar"
+    },
+    "extract_text": {
+      "name": "Ekstrak Teks",
+      "tagline": "Ambil teks dari PDF"
+    },
+    "pdf_to_images": {
+      "name": "PDF ke Gambar",
+      "tagline": "Ubah halaman menjadi gambar"
+    },
+    "images_to_pdf": {
+      "name": "Gambar ke PDF",
+      "tagline": "Buat PDF dari gambar"
+    },
+    "ocr": {
+      "name": "OCR",
+      "tagline": "Jadikan PDF hasil pindaian dapat dicari"
+    },
+    "pdf_to_word": {
+      "name": "PDF ke Word",
+      "tagline": "Ubah PDF menjadi dokumen Word yang dapat diedit"
+    },
+    "metadata": {
+      "name": "Lihat Metadata",
+      "tagline": "Periksa metadata PDF"
+    },
+    "edit_metadata": {
+      "name": "Edit Metadata",
+      "tagline": "Perbarui judul, penulis, dan lainnya"
+    },
+    "watermark": {
+      "name": "Tanda Air",
+      "tagline": "Beri stempel teks di setiap halaman"
+    },
+    "page_numbers": {
+      "name": "Nomor Halaman",
+      "tagline": "Tambahkan nomor halaman"
+    },
+    "crop": {
+      "name": "Potong PDF",
+      "tagline": "Pangkas margin halaman"
+    },
+    "grayscale": {
+      "name": "PDF Grayscale",
+      "tagline": "Ubah halaman menjadi hitam putih"
+    },
+    "compress": {
+      "name": "Kompres PDF",
+      "tagline": "Perkecil PDF ke ukuran target untuk pengajuan"
+    },
+    "repair": {
+      "name": "Perbaiki PDF",
+      "tagline": "Perbaiki PDF yang rusak atau tidak dapat dibaca"
+    },
+    "password_protect": {
+      "name": "Lindungi PDF",
+      "tagline": "Tambahkan kata sandi ke PDF"
+    },
+    "unlock_pdf": {
+      "name": "Buka Kunci PDF",
+      "tagline": "Hapus perlindungan kata sandi"
+    },
+    "redact": {
+      "name": "Redaksi",
+      "tagline": "Hitamkan teks secara permanen"
+    },
+    "flatten": {
+      "name": "Ratakan PDF",
+      "tagline": "Satukan anotasi ke dalam halaman"
+    },
+    "strip_image_metadata": {
+      "name": "Hapus Metadata Gambar",
+      "tagline": "Hapus EXIF dan GPS dari foto"
+    },
+    "exhibit_combine": {
+      "name": "Gabung Lampiran",
+      "tagline": "PDF siap diajukan dengan lembar pemisah dan nomor Bates"
+    },
+    "strip_metadata": {
+      "name": "Hapus Metadata",
+      "tagline": "Hapus metadata tersembunyi, beserta laporan"
+    }
+  },
+  "runner": {
+    "loading": "Memuat…",
+    "loadFailed": "Gagal memuat alat: {error}",
+    "description": "deskripsi",
+    "quotaLeft": "{remaining, plural, other {# dari {limit} penggunaan gratis tersisa jam ini}}",
+    "quotaResets": "· Direset pada {time}",
+    "steps": {
+      "uploading": "Mengunggah",
+      "preparing": "Menyiapkan",
+      "processing": "Memproses",
+      "converting": "Mengonversi",
+      "optimizing": "Mengoptimalkan",
+      "finalizing": "Menyelesaikan",
+      "completed": "Selesai"
+    },
+    "choosePdf": "Pilih file PDF",
+    "chooseImage": "Pilih file gambar",
+    "uploading": "Mengunggah…",
+    "fileLimit": "Maksimal {max, plural, other {# file}}, masing-masing {mb} MB. Tidak perlu mendaftar.",
+    "atMost": "Alat ini menerima maksimal {max, plural, other {# file}}.",
+    "atLeast": "Pilih setidaknya {min, plural, other {# file}}.",
+    "tooBig": "\"{name}\" melebihi batas unggah {mb} MB.",
+    "startButton": "{tool} sekarang",
+    "starting": "Memulai…",
+    "preparing": "Menyiapkan file Anda…",
+    "preparingSub": "Pekerjaan Anda sudah antre dan akan segera dimulai.",
+    "activeSub": "Biasanya hanya perlu beberapa detik.",
+    "finalizing": "Menyelesaikan file Anda…",
+    "finalizingSub": "Hampir selesai.",
+    "failedTitle": "Gagal",
+    "failedFallback": "Terjadi kesalahan.",
+    "tryAgain": "Coba lagi",
+    "startOver": "Mulai dari awal",
+    "completedTitle": "Selesai",
+    "completedNote": "File Anda diproses di server kami dan dihapus otomatis. File tidak pernah disimpan atau dibagikan.",
+    "completedLink": "Cara kami menangani file Anda →",
+    "downloadResult": "Unduh hasil",
+    "downloading": "Mengunduh…",
+    "downloadingPct": "Mengunduh… {pct}%",
+    "downloadFailed": "Unduhan gagal."
+  },
+  "canvas": {
+    "startOver": "Mulai dari awal",
+    "uploadingToServer": "Mengunggah ke server…",
+    "largeDoc": "Dokumen besar ({count} halaman). Thumbnail dimuat saat Anda menggulir; Pisah menghasilkan maksimal 200 file output per pekerjaan.",
+    "pagesScroll": "{count} halaman — thumbnail dimuat saat Anda menggulir.",
+    "dropTitle": "Jatuhkan file PDF di sini atau klik untuk memilih",
+    "dropTitleUploading": "Mengunggah…",
+    "dropSub": "Maksimal {max, plural, other {# file}}, masing-masing {mb} MB. Tidak perlu mendaftar. File diproses di server kami — pratinjau di bawah dirender di browser Anda.",
+    "dropAria": "Pilih file PDF",
+    "dropAriaPlural": "Pilih file PDF",
+    "fileLabelPages": "{count, plural, other {# halaman}}",
+    "whatWillBeSent": "Yang akan dikirim",
+    "starting": "Memulai…",
+    "processingSub": "Biasanya hanya perlu beberapa detik.",
+    "failedTitle": "Gagal",
+    "failedFallback": "Terjadi kesalahan.",
+    "backToEditor": "Kembali ke editor",
+    "completedTitle": "Selesai",
+    "completedNote": "File Anda diproses di server kami dan dihapus otomatis. File tidak pernah disimpan atau dibagikan.",
+    "completedLink": "Cara kami menangani file Anda →",
+    "downloadResult": "Unduh hasil",
+    "downloadingPct": "Mengunduh… {pct}%",
+    "undo": "Urungkan",
+    "redo": "Ulangi",
+    "undoTitle": "Urungkan (Ctrl+Z)",
+    "redoTitle": "Ulangi (Ctrl+Y)",
+    "selectAll": "Pilih semua",
+    "clearSelection": "Hapus pilihan",
+    "loadingThumb": "Memuat…",
+    "willBeDeleted": "✕ Akan dihapus",
+    "removed": "Dihapus",
+    "markedForDeletion": "ditandai untuk dihapus",
+    "previewClose": "Tutup ✕",
+    "previewRendering": "Merender…",
+    "pageLabel": "Halaman {n}",
+    "merge": {
+      "addMoreFiles": "Tambahkan setidaknya satu file lagi.",
+      "addAtLeast2": "Tambahkan setidaknya 2 file PDF untuk digabung.",
+      "summary": "{files, plural, other {Menggabungkan # file}} · {pages, plural, other {# halaman}}{removed} → satu PDF",
+      "summaryRemoved": " · {count, plural, other {# dihapus}}",
+      "processLabel": "Gabung sekarang",
+      "activity": "Menggabungkan",
+      "moveFileUp": "Pindahkan file ke atas",
+      "moveFileDown": "Pindahkan file ke bawah",
+      "removeFile": "Hapus file dari gabungan",
+      "fileRemoved": "(dihapus)",
+      "restore": "Pulihkan",
+      "addFiles": "+ Tambah file",
+      "previewFirstPage": "Pratinjau halaman pertama",
+      "removeSelected": "Hapus yang dipilih ({count})",
+      "restoreAllRemoved": "Pulihkan semua yang dihapus",
+      "gridAria": "Halaman yang akan digabung, sesuai urutan gabungan",
+      "hint": "Seret halaman untuk menyusun ulang (antar file juga bisa) · Klik untuk memilih, Shift-klik untuk rentang · Tombol Delete menghapus halaman yang dipilih · Klik ganda pada halaman untuk pratinjau besar · Tombol panah memindahkan pilihan, Ctrl+Z / Ctrl+Y untuk urungkan dan ulangi.",
+      "filePages": "{count, plural, other {# halaman}}",
+      "moveFileUpAria": "Pindahkan {name} ke atas",
+      "moveFileDownAria": "Pindahkan {name} ke bawah",
+      "removeFileFromMerge": "Hapus {name} dari gabungan",
+      "removeFileTitle": "Hapus file dari gabungan",
+      "removedFileLabel": "{name} (dihapus)",
+      "addFilesLabel": "Tambah file",
+      "removeSelectedCount": "Hapus yang dipilih ({count})",
+      "removeSelectedTitle": "Hapus halaman yang dipilih dari gabungan (tombol Delete)",
+      "gridAriaOrder": "Halaman yang akan digabung, sesuai urutan gabungan",
+      "gridHint": "Seret halaman untuk menyusun ulang (antar file juga bisa) · Klik untuk memilih, Shift-klik untuk rentang · Tombol Delete menghapus halaman yang dipilih · Klik ganda pada halaman untuk pratinjau besar · Tombol panah memindahkan pilihan, Ctrl+Z / Ctrl+Y untuk urungkan dan ulangi."
+    },
+    "split": {
+      "summaryEvery": "{count, plural, other {# file output}} — satu PDF per halaman, dikirim sebagai ZIP.",
+      "summaryExtract": "{count, plural, other {# file output}} — satu PDF per halaman yang dipilih, dikirim sebagai ZIP.",
+      "summaryExtractEmpty": "Klik halaman untuk mengekstrak masing-masing sebagai PDF tersendiri.",
+      "summaryRanges": "{count, plural, other {# file output}}: {groups}, dikirim sebagai ZIP.",
+      "processEvery": "Pisah menjadi halaman tunggal",
+      "processExtract": "Ekstrak halaman yang dipilih",
+      "processRanges": "Pisah sekarang",
+      "activity": "Memisahkan",
+      "modeRanges": "Rentang",
+      "modeExtract": "Ekstrak halaman",
+      "modeEvery": "Setiap halaman",
+      "modeAria": "Mode pisah",
+      "clearDividers": "Hapus pembatas",
+      "rangesLabel": "Rentang",
+      "rangesAria": "Rentang halaman",
+      "rangesPlaceholder": "1-3,4-7",
+      "selectAllPages": "Pilih semua halaman",
+      "rangesHint": "Klik celah di antara halaman untuk menaruh penanda pisah di sana. Setiap kelompok berwarna menjadi satu file output.",
+      "extractHint": "Klik halaman untuk memilihnya — setiap halaman yang dipilih menjadi PDF tersendiri.",
+      "rangesHintBottom": "Klik celah untuk menambah atau menghapus penanda pisah · Urungkan/ulangi dengan Ctrl+Z / Ctrl+Y · Kolom rentang di atas tetap tersinkron.",
+      "extractHintBottom": "Klik untuk memilih, Shift-klik untuk rentang · Setiap halaman yang dipilih menjadi file tersendiri.",
+      "everyHintBottom": "Satu PDF per halaman — tidak perlu memilih.",
+      "splitAfter": "Pisah setelah halaman {n}",
+      "removeSplitAfter": "Hapus pisahan setelah halaman {n}",
+      "gridAria": "Halaman yang akan dipisah",
+      "pageRangeExceeds": "Nomor halaman melebihi jumlah halaman dokumen ({count})."
+    },
+    "rotate": {
+      "summaryEmpty": "Pilih halaman, lalu putar — atau putar semua halaman sekaligus.",
+      "summary": "{count, plural, other {# halaman}} diputar: {list}",
+      "processLabel": "Putar sekarang",
+      "activity": "Memutar",
+      "rotateLeft": "Putar pilihan 90° berlawanan arah jarum jam",
+      "rotateRight": "Putar pilihan 90° searah jarum jam",
+      "rotateAll": "Putar semua 90°",
+      "resetAll": "Setel ulang semua",
+      "pagesLabel": "Halaman",
+      "pagesAria": "Halaman yang akan diputar",
+      "pagesPlaceholder": "1-3,5",
+      "angleLabel": "Sudut",
+      "angleAria": "Sudut putaran",
+      "applyToPages": "Terapkan ke halaman",
+      "selectedWithAngle": "Halaman yang dipilih dengan sudut: {ranges}",
+      "typePagesFirst": "Ketik nomor halaman dulu, contoh '1-3,5'.",
+      "pageExceeds": "Halaman {pages} melebihi jumlah halaman dokumen ({count}).",
+      "rotateCcw": "Putar 90° berlawanan arah jarum jam",
+      "rotateCw": "Putar 90° searah jarum jam",
+      "gridAria": "Halaman yang akan diputar",
+      "hint": "Klik untuk memilih, Shift-klik untuk rentang · Tombol ⟲ / ⟳ pada halaman memutar halaman itu saja · Thumbnail menampilkan pratinjau yang diputar; putaran sebenarnya diterapkan di server.",
+      "rotatePageCcw": "Putar {label} 90 derajat berlawanan arah jarum jam",
+      "rotatePageCw": "Putar {label} 90 derajat searah jarum jam"
+    },
+    "delete": {
+      "summaryEmpty": "Klik halaman untuk menandainya agar dihapus. Setidaknya satu halaman harus tersisa.",
+      "summary": "Menghapus {marked} dari {total} halaman · {remaining} akan tersisa.",
+      "processLabel": "Hapus {count, plural, other {# halaman}}",
+      "activity": "Menghapus halaman",
+      "cannotDeleteAll": "Tidak dapat menghapus semua halaman; setidaknya satu halaman harus tersisa.",
+      "pageExceeds": "Halaman {pages} melebihi jumlah halaman dokumen ({count}).",
+      "invertSelection": "Balik pilihan",
+      "markSelected": "Tandai yang dipilih ({count})",
+      "markSelectedTitle": "Tandai halaman yang dipilih untuk dihapus (tombol Delete)",
+      "clearMarks": "Hapus tanda",
+      "pagesToDelete": "Halaman yang akan dihapus",
+      "pagesToDeleteAria": "Halaman yang akan dihapus",
+      "pagesPlaceholder": "1,3,5-7",
+      "markForDeletion": "Tandai untuk dihapus",
+      "markedUndo": "✕ Ditandai — urungkan",
+      "markAria": "Tandai {label} untuk dihapus",
+      "unmarkAria": "Batalkan tanda {label} untuk dihapus",
+      "gridAria": "Halaman yang akan dihapus",
+      "hint": "Klik untuk memilih, Shift-klik untuk rentang · “Tandai yang dipilih” atau tombol Delete menandai pilihan · Tombol pada halaman menandai halaman itu saja · Halaman yang ditandai tetap terlihat sampai diproses, dan setiap tanda dapat diurungkan."
+    },
+    "reorder": {
+      "summaryOriginal": "Halaman masih dalam urutan asli — seret thumbnail untuk menyusun ulang.",
+      "summaryMoved": "{count, plural, other {# halaman}} dipindahkan: {list}{more}",
+      "summaryMore": ", +{count} lagi",
+      "processLabel": "Susun ulang sekarang",
+      "activity": "Menyusun ulang",
+      "reverseOrder": "Balik urutan",
+      "resetOriginal": "Setel ulang ke awal",
+      "moveUp": "↑ Pindah ke atas",
+      "moveUpTitle": "Pindahkan pilihan satu langkah lebih awal (Ctrl+←)",
+      "moveDown": "↓ Pindah ke bawah",
+      "moveDownTitle": "Pindahkan pilihan satu langkah lebih akhir (Ctrl+→)",
+      "orderLabel": "Urutan",
+      "orderAria": "Urutan halaman",
+      "orderError": "Urutan harus berupa permutasi halaman 1..{count}, contoh '{example}'.",
+      "gridAria": "Halaman dalam urutan baru",
+      "hint": "Seret thumbnail untuk menyusun ulang (lencana posisi diperbarui langsung) · Pilih halaman lalu tekan Ctrl+← / Ctrl+→ untuk memindahkannya · Kolom urutan di atas tetap tersinkron dan menerima permutasi yang diketik.",
+      "position": "posisi {n}"
+    }
+  },
+  "errors": {
+    "tool_error": "Terjadi kesalahan. Silakan coba lagi.",
+    "internal_error": "Pemrosesan gagal. Silakan coba lagi.",
+    "server_restart": "Server dimulai ulang saat pekerjaan ini diproses. Silakan coba lagi.",
+    "invalid_option": "Nomor halaman atau opsi tidak valid. Periksa nomor halaman dan coba lagi.",
+    "bad_option": "Nilai opsi tidak valid. Periksa nilainya dan coba lagi.",
+    "bad_options": "Nilai opsi tidak valid. Periksa nilainya dan coba lagi.",
+    "missing_input": "File yang diperlukan tidak ada. Unggah file dan coba lagi.",
+    "missing_option": "Opsi yang diperlukan tidak ada.",
+    "invalid_input": "File yang diunggah tidak dapat dibaca. Pastikan file tersebut PDF yang valid dan coba lagi.",
+    "ocr_failed": "Pengenalan teks gagal untuk file ini.",
+    "ocr_unavailable": "Pengenalan teks sementara tidak tersedia. Coba lagi nanti.",
+    "wrong_password": "Kata sandi salah. Periksa dan coba lagi.",
+    "quota_exceeded": "Anda telah menggunakan semua penggunaan gratis untuk jam ini. Coba lagi setelah {time}.",
+    "file_too_large": "File terlalu besar. Batas unggah adalah {mb} MB.",
+    "lost_contact": "Kehilangan kontak dengan server.",
+    "download_failed": "Unduhan gagal.",
+    "not_loaded": "Alat belum dimuat.",
+    "failed_to_load": "Gagal memuat alat.",
+    "invalid_page_range": "Rentang halaman tidak valid “{token}”. Gunakan format seperti '1-3,5'.",
+    "invalid_range_start": "Rentang tidak valid {range}: nomor halaman dimulai dari 1.",
+    "select_at_least_one_page": "Pilih setidaknya satu halaman.",
+    "rotate_at_least_one_page": "Putar setidaknya satu halaman.",
+    "cannot_delete_all": "Tidak dapat menghapus semua halaman; setidaknya satu halaman harus tersisa.",
+    "nothing_to_reorder": "Tidak ada yang perlu disusun ulang.",
+    "output_too_large": "Hasilnya terlalu besar untuk diunduh.",
+    "pdf_unreadable": "File ini tidak dapat dibaca sebagai PDF.",
+    "pdf_unreadable_one": "Salah satu file tidak dapat dibaca sebagai PDF."
+  },
+  "toolOptions": {
+    "compress": {
+      "target_mb": {
+        "label": "Ukuran target (MB)",
+        "help": "Kompres hingga maksimal ukuran ini. Batas e-filing pengadilan (CM/ECF) berbeda-beda tiap pengadilan, sekitar 3–200 MB — 25 MB paling umum. Periksa aturan setempat pengadilan Anda."
+      }
+    },
+    "crop": {
+      "top": {
+        "label": "Margin atas (pt)",
+        "help": "Poin yang dipangkas dari tepi atas."
+      },
+      "bottom": {
+        "label": "Margin bawah (pt)",
+        "help": "Poin yang dipangkas dari tepi bawah."
+      },
+      "left": {
+        "label": "Margin kiri (pt)",
+        "help": "Poin yang dipangkas dari tepi kiri."
+      },
+      "right": {
+        "label": "Margin kanan (pt)",
+        "help": "Poin yang dipangkas dari tepi kanan."
+      },
+      "pages": {
+        "label": "Halaman",
+        "help": "Rentang berbasis 1 seperti '1-3,5'. Kosongkan untuk semua halaman."
+      }
+    },
+    "delete_pages": {
+      "pages": {
+        "label": "Halaman yang akan dihapus",
+        "help": "Halaman berbasis 1 yang akan dihapus, contoh '1,3,5-7'."
+      }
+    },
+    "edit_metadata": {
+      "title": {
+        "label": "Judul",
+        "help": "Judul dokumen. Kosong berarti menghapusnya."
+      },
+      "author": {
+        "label": "Penulis",
+        "help": "Penulis dokumen. Kosong berarti menghapusnya."
+      },
+      "subject": {
+        "label": "Subjek",
+        "help": "Subjek dokumen. Kosong berarti menghapusnya."
+      },
+      "keywords": {
+        "label": "Kata kunci",
+        "help": "Kata kunci dokumen. Kosong berarti menghapusnya."
+      }
+    },
+    "exhibit_combine": {
+      "exhibit_prefix": {
+        "label": "Label lampiran",
+        "help": "Kata yang dicetak di setiap lembar pemisah, contoh 'Exhibit'."
+      },
+      "bates_prefix": {
+        "label": "Awalan Bates",
+        "help": "Awalan untuk nomor yang dicap, contoh 'BATES' menghasilkan BATES-000001."
+      },
+      "bates_start": {
+        "label": "Nomor Bates pertama",
+        "help": "Penomoran dimulai dari sini (bilangan bulat positif)."
+      },
+      "slip_sheets": {
+        "label": "Tambahkan lembar pemisah antar lampiran",
+        "help": ""
+      }
+    },
+    "extract_text": {
+      "pages": {
+        "label": "Halaman",
+        "help": "Rentang berbasis 1 seperti '1-3,5'. Kosongkan untuk semua halaman."
+      }
+    },
+    "grayscale": {
+      "dpi": {
+        "label": "Resolusi (DPI)",
+        "help": "Resolusi render dalam titik per inci (72–600)."
+      }
+    },
+    "merge": {
+      "page_order": {
+        "label": "Urutan halaman (JSON)",
+        "help": "Daftar JSON opsional pasangan [file, halaman] sesuai urutan gabungan, contoh '[[1,2],[0,1]]' menggabungkan file 2 halaman 2 dulu, lalu file 1 halaman 1. Nomor file berbasis 0, nomor halaman berbasis 1. Kosongkan untuk menggabungkan semua halaman sesuai urutan unggah."
+      }
+    },
+    "n_up": {
+      "layout": {
+        "label": "Halaman per lembar",
+        "help": "Berapa halaman sumber yang ditempatkan di setiap lembar."
+      },
+      "sheet": {
+        "label": "Ukuran lembar",
+        "help": "Ukuran lembar output."
+      },
+      "orientation": {
+        "label": "Orientasi",
+        "help": "Orientasi lembar.",
+        "choices": {
+          "portrait": "Potret",
+          "landscape": "Lanskap"
+        }
+      }
+    },
+    "ocr": {
+      "language": {
+        "label": "Bahasa",
+        "help": "Kode bahasa Tesseract, contoh 'eng' atau 'eng+deu'."
+      }
+    },
+    "page_numbers": {
+      "vertical": {
+        "label": "Posisi vertikal",
+        "help": "",
+        "choices": {
+          "top": "Atas",
+          "bottom": "Bawah"
+        }
+      },
+      "horizontal": {
+        "label": "Posisi horizontal",
+        "help": "",
+        "choices": {
+          "left": "Kiri",
+          "center": "Tengah",
+          "right": "Kanan"
+        }
+      },
+      "start_number": {
+        "label": "Nomor awal",
+        "help": "Nomor halaman pertama (bilangan bulat positif)."
+      },
+      "prefix": {
+        "label": "Awalan",
+        "help": ""
+      },
+      "suffix": {
+        "label": "Akhiran",
+        "help": ""
+      },
+      "font_size": {
+        "label": "Ukuran font",
+        "help": "6 sampai 48."
+      },
+      "pages": {
+        "label": "Halaman",
+        "help": "Rentang berbasis 1 seperti '1-3,5'. Kosongkan untuk semua halaman."
+      }
+    },
+    "password_protect": {
+      "password": {
+        "label": "Kata sandi",
+        "help": null
+      }
+    },
+    "pdf_to_images": {
+      "format": {
+        "label": "Format gambar",
+        "help": "Format gambar output."
+      },
+      "dpi": {
+        "label": "Resolusi (DPI)",
+        "help": null
+      },
+      "pages": {
+        "label": "Halaman",
+        "help": "Rentang berbasis 1 seperti '1-3,5'. Kosongkan untuk semua halaman."
+      }
+    },
+    "redact": {
+      "patterns": {
+        "label": "Teks yang akan disensor",
+        "help": "String literal yang dipisahkan koma untuk dihitamkan, contoh 'SSN, john@example.com'."
+      },
+      "rasterise": {
+        "label": "Rasterisasi halaman (redaksi terkuat)",
+        "help": "Render setiap halaman menjadi gambar setelah disensor, sehingga tidak ada lapisan teks yang tersisa di mana pun dalam file. Teks dalam output tidak lagi dapat dipilih atau dicari."
+      }
+    },
+    "reorder_pages": {
+      "order": {
+        "label": "Urutan halaman",
+        "help": "Permutasi berbasis 1 dari halaman 1..N, contoh '3,1,2'."
+      }
+    },
+    "rotate_pages": {
+      "angle": {
+        "label": "Sudut putaran",
+        "help": "Putaran searah jarum jam yang diterapkan ke halaman yang dipilih."
+      },
+      "pages": {
+        "label": "Halaman",
+        "help": "Rentang berbasis 1 seperti '1-3,5'. Kosong berarti semua halaman."
+      },
+      "rotations": {
+        "label": "Putaran per halaman (JSON)",
+        "help": "Objek JSON opsional yang memetakan nomor halaman berbasis 1 ke sudut, contoh '{\"1\": 90, \"3\": 180}'. Jika ada, ini menggantikan sudut+halaman, sehingga setiap halaman dapat diputar berbeda."
+      }
+    },
+    "split": {
+      "mode": {
+        "label": "Mode pisah",
+        "help": "'ranges': satu PDF per rentang yang dipisahkan koma. 'every': satu PDF per halaman.",
+        "choices": {
+          "ranges": "Rentang",
+          "every": "Setiap halaman"
+        }
+      },
+      "ranges": {
+        "label": "Rentang halaman",
+        "help": "Rentang berbasis 1 seperti '1-3,5'. Wajib jika mode 'ranges'."
+      }
+    },
+    "unlock_pdf": {
+      "password": {
+        "label": "Kata sandi saat ini",
+        "help": "Kata sandi yang saat ini melindungi PDF."
+      }
+    },
+    "watermark": {
+      "text": {
+        "label": "Teks tanda air",
+        "help": null
+      },
+      "opacity": {
+        "label": "Opasitas",
+        "help": "0.1 (samar) hingga 0.5 (tegas)."
+      }
+    }
+  },
+  "lawyers": {
+    "title": "Alat PDF untuk pengacara",
+    "intro": "Lakukan redaksi dengan benar, hapus metadata tersembunyi, sesuaikan dengan batas ukuran pengajuan pengadilan, dan gabung lampiran dengan nomor Bates. Gratis, tanpa mendaftar, tanpa tanda air.",
+    "workflowTitle": "Alur kerja pengajuan, secara berurutan",
+    "workflow": [
+      {
+        "step": "Redaksi",
+        "text": "teks sensitif — teks dihapus dari file dan output diverifikasi, bukan sekadar ditutup kotak hitam."
+      },
+      {
+        "step": "Hapus metadata",
+        "text": "— hapus penulis, tanggal, dan detail perangkat lunak, beserta laporan sebelum/sesudah."
+      },
+      {
+        "step": "Kompres",
+        "text": "sesuai batas ukuran pengadilan Anda."
+      },
+      {
+        "step": "Gabung lampiran",
+        "text": "dengan lembar pemisah dan nomor Bates menjadi satu PDF siap diajukan."
+      }
+    ],
+    "guides": [
+      {
+        "title": "Redaksi lampiran deposisi",
+        "answer": "Redaksi di sini menghapus teks dari file, bukan sekadar menutupinya dengan kotak hitam — dan output diperiksa ulang sehingga kata-kata yang disensor tidak dapat diekstrak. Untuk kepastian maksimal, aktifkan Rasterisasi halaman: setiap halaman menjadi gambar, sehingga tidak ada lapisan teks yang tersisa sama sekali.",
+        "tool": "/tools/redact",
+        "toolName": "Redaksi PDF"
+      },
+      {
+        "title": "Gabung lampiran menjadi PDF siap diajukan",
+        "answer": "Unggah lampiran Anda secara berurutan dan dapatkan satu dokumen: lembar pemisah sebelum setiap lampiran (Lampiran A, B, C… beserta nama file dan jumlah halaman) dan nomor Bates yang dicap berurutan di semua halaman lampiran.",
+        "tool": "/tools/exhibit_combine",
+        "toolName": "Gabung Lampiran"
+      },
+      {
+        "title": "Kompres brief di bawah batas pengadilan Anda",
+        "answer": "Pilih batas ukuran pengadilan Anda — 25 MB adalah batas CM/ECF yang paling umum, tetapi tiap pengadilan berbeda, sekitar 3 hingga 200 MB, jadi periksa aturan setempat Anda. Alat ini mengecilkan file agar muat dan ZIP menyertakan laporan yang menunjukkan ukuran sebelum dan sesudah.",
+        "tool": "/tools/compress",
+        "toolName": "Kompres PDF"
+      },
+      {
+        "title": "Hapus metadata sebelum mengirim dokumen ke pihak lawan",
+        "answer": "PDF dapat membawa nama penulis, tanggal pembuatan, dan perangkat lunak pembuatnya. Hapus Metadata menghapus semuanya dalam satu klik dan memberi Anda laporan sebelum/sesudah yang membuktikan apa yang dihapus.",
+        "tool": "/tools/strip_metadata",
+        "toolName": "Hapus Metadata"
+      },
+      {
+        "title": "Hapus data lokasi dari foto perkara",
+        "answer": "Foto sering membawa koordinat GPS dan detail kamera dalam data EXIF-nya. Hapus Metadata Gambar mencantumkan apa yang dibawa setiap foto, menghapusnya, dan melaporkan apa yang diambil. Catatan: alat ini tidak memverifikasi penghapusan penanda C2PA/AI — gunakan ClearMark untuk itu.",
+        "tool": "/tools/strip_image_metadata",
+        "toolName": "Hapus Metadata Gambar"
+      },
+      {
+        "title": "Periksa metadata yang dibawa PDF yang Anda terima",
+        "answer": "Sebelum mengandalkan sebuah dokumen, lihat apa yang tersembunyi di dalamnya. Lihat Metadata membaca judul, penulis, tanggal, pembuat, dan produsen, lalu memberi Anda hasilnya sebagai JSON.",
+        "tool": "/tools/metadata",
+        "toolName": "Lihat Metadata"
+      },
+      {
+        "title": "Perbaiki judul atau penulis dokumen sebelum pengajuan",
+        "answer": "Jika judul atau penulis yang tersimpan di PDF salah — atau menyebut seseorang yang seharusnya tidak disebut — Edit Metadata memungkinkan Anda mengatur atau menghapus judul, penulis, subjek, dan kata kunci tanpa menyentuh halaman.",
+        "tool": "/tools/edit_metadata",
+        "toolName": "Edit Metadata"
+      },
+      {
+        "title": "Beri nomor pada halaman pengajuan",
+        "answer": "Tambahkan nomor halaman di sudut mana pun, mulai dari nomor berapa pun, dengan awalan atau akhiran jika pengadilan Anda memintanya. Anda dapat memberi nomor hanya pada rentang halaman tertentu dan membiarkan sisanya.",
+        "tool": "/tools/page_numbers",
+        "toolName": "Tambah Nomor Halaman"
+      },
+      {
+        "title": "Gabung dokumen pendukung menjadi satu bundel",
+        "answer": "Gabungkan 2 hingga 20 PDF menjadi satu file sesuai urutan Anda mengunggahnya — pleidoi, lampiran, dan dokumen pendukung sebagai satu bundel, bukan banyak file.",
+        "tool": "/tools/merge",
+        "toolName": "Gabung PDF"
+      },
+      {
+        "title": "Keluarkan satu dokumen dari bundel",
+        "answer": "Pisah PDF berdasarkan rentang halaman (misalnya 1–3, 5) atau menjadi satu file per halaman, dan unduh hasilnya sebagai ZIP. Berguna saat bundel tiba sebagai satu file dan Anda membutuhkan satu lampiran saja.",
+        "tool": "/tools/split",
+        "toolName": "Pisah PDF"
+      },
+      {
+        "title": "Lindungi dokumen sensitif dengan kata sandi",
+        "answer": "Tambahkan kata sandi ke PDF sebelum mengirimnya, sehingga hanya orang yang memiliki kata sandi yang dapat membukanya. Dan jika Anda menerima file yang dilindungi dan mengetahui kata sandinya, Buka Kunci PDF menghapus perlindungan itu.",
+        "tool": "/tools/password_protect",
+        "toolName": "Lindungi PDF"
+      },
+      {
+        "title": "Jadikan dokumen hasil pindaian dapat dicari",
+        "answer": "Halaman hasil pindaian adalah gambar, bukan teks — Anda tidak dapat mencarinya atau menyalin darinya. OCR menambahkan lapisan teks tak terlihat sehingga dokumen menjadi dapat dicari sambil tampak persis sama.",
+        "tool": "/tools/ocr",
+        "toolName": "OCR"
+      }
+    ],
+    "limitsTitle": "Catatan tentang batas",
+    "limitsText": "PDFEDI adalah alat, bukan pengacara. Batas pengajuan pengadilan, kewajiban redaksi, dan aturan pengungkapan berbeda-beda tiap pengadilan dan yurisdiksi — periksa aturan setempat pengadilan Anda dan kewajiban profesional Anda sebelum mengajukan. Redaksi di sini menghapus teks yang Anda sebutkan; selalu periksa output sebelum mengajukannya. File yang diunggah ke alat-alat ini diproses di server kami — lihat <link>cara kami menangani file Anda</link>."
+  },
+  "privacy": {
+    "title": "Cara kami menangani file Anda",
+    "intro": "Terus terang, tanpa slogan privasi yang biasa. Ada dua jenis alat yang berbeda di PDFEDI, dan keduanya menangani file Anda secara berbeda.",
+    "serverTitle": "Alat server (sebagian besar alat di situs ini)",
+    "serverText": "Saat Anda menggunakan alat seperti Gabung, Redaksi, atau Kompres, file Anda diunggah ke server kami, diproses di sana, dan hasilnya dikirim kembali untuk Anda unduh. File Anda memang meninggalkan perangkat Anda — siapa pun yang mengatakan sebaliknya tentang alat yang diproses di server tidak berkata jujur. Yang kami janjikan:",
+    "serverPoints": [
+      "Tanpa akun, tanpa mendaftar, tanpa alamat email yang diminta.",
+      "File diproses otomatis dan dihapus otomatis.",
+      "Isi file Anda tidak disimpan, tidak dibagikan kepada siapa pun, dan tidak digunakan untuk melatih apa pun.",
+      "Kami menghitung penggunaan anonim (berapa kali sebuah alat dijalankan) agar batas gratis tetap adil — kami tidak mencatat isi file Anda."
+    ],
+    "serverNote": "Karena alat-alat ini berjalan di server, “tes mode pesawat” tidak berlaku untuknya: jika Anda memutuskan internet, alat server tidak dapat bekerja sama sekali. Pemeriksaan yang berlaku di sini adalah yang sudah ada di dalam alat itu sendiri — misalnya, Redaksi memeriksa ulang outputnya sehingga teks yang disensor tidak dapat diekstrak, dan Hapus Metadata memberi Anda laporan sebelum/sesudah yang menunjukkan persis apa yang dihapus.",
+    "previewTitle": "Pratinjau di browser Anda",
+    "previewText": "Pada alat pengatur (Gabung, Pisah, Susun Ulang, Hapus, Putar), thumbnail halaman yang Anda lihat dirender di browser Anda dari file di perangkat Anda — tidak ada pratinjau yang diunggah untuk menampilkannya. Pemrosesan tetap terjadi di server kami: saat Anda menekan tombol proses, file diunggah, diproses, dan hasilnya dikirim kembali untuk diunduh.",
+    "checkTitle": "Cara memeriksa klaim kami sendiri",
+    "checkPoints": [
+      {
+        "title": "Redaksi:",
+        "text": "setelah menyensor, coba cari kata-kata yang disensor di PDF output — seharusnya tidak ditemukan. Aktifkan “Rasterisasi halaman” dan output tidak memiliki lapisan teks sama sekali."
+      },
+      {
+        "title": "Metadata:",
+        "text": "buka metadata_report.json yang disertakan bersama Hapus Metadata, atau gunakan Lihat Metadata pada file yang sudah dibersihkan, dan bandingkan dengan aslinya."
+      },
+      {
+        "title": "Pratinjau:",
+        "text": "buka tab Network di browser Anda saat mengatur halaman — tidak ada unggahan yang terjadi sampai Anda menekan tombol proses."
+      }
+    ],
+    "dontTitle": "Yang tidak kami lakukan",
+    "dontPoints": [
+      "Kami tidak menjual atau membagikan file Anda.",
+      "Kami tidak meminta akun untuk menggunakan alat gratis.",
+      "Kami tidak mengklaim file yang diproses di server “tidak pernah meninggalkan perangkat Anda” — file itu memang pergi, untuk diproses, lalu dihapus."
+    ],
+    "backLink": "← Kembali ke semua alat",
+    "localeNote": "Preferensi bahasa Anda hanya disimpan di browser Anda sendiri, agar kami dapat menampilkan situs dalam bahasa Anda lain kali. Preferensi itu tidak pernah dikirim ke server kami."
+  },
+  "suggest": {
+    "title": "Apakah Anda ingin melihat PDFEDI dalam {language}?",
+    "subtitle": "{nativeName} — Alihkan antarmuka ke {language}. Anda dapat mengubahnya kembali kapan saja.",
+    "switch": "Alihkan ke {language}",
+    "continue": "Lanjutkan dalam bahasa Inggris",
+    "dismiss": "Tutup"
+  },
+  "switcher": {
+    "label": "Bahasa",
+    "current": "Bahasa saat ini: {language}",
+    "choose": "Pilih bahasa"
+  },
+  "seo": {
+    "whatItDoes": "{h1} — apa fungsinya",
+    "howToUse": "Cara menggunakan {h1}",
+    "keyFeatures": "Fitur utama",
+    "whenToUse": "Kapan menggunakan {h1}",
+    "faq": "Pertanyaan yang sering diajukan",
+    "relatedTools": "Alat terkait",
+    "privateByDesign": "Privat sejak awal",
+    "privateNote": "File yang Anda unggah diproses dengan aman dan dihapus otomatis setelahnya. PDFEDI tidak pernah meminta akun — pilih alat dan mulai. Setiap file maksimal 50MB, dan setiap alat gratis digunakan hingga 5 kali per jam.",
+    "breadcrumbHome": "Beranda"
+  }
+}
