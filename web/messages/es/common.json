@@ -1,0 +1,787 @@
+{
+  "meta": {
+    "siteTitle": "PDFEDI — Herramientas PDF gratuitas en línea: combinar, dividir, comprimir y editar",
+    "siteDescription": "Combina, divide, convierte y protege PDF gratis en línea. 26 herramientas PDF: sin registro, sin marcas de agua, privado por diseño.",
+    "homeTitle": "PDFEDI — Herramientas PDF gratuitas en línea: combinar, dividir, comprimir y editar",
+    "homeDescription": "Combina, divide, convierte y protege PDF gratis en línea. 26 herramientas PDF: sin registro, sin marcas de agua, privado por diseño.",
+    "lawyersTitle": "Herramientas PDF para abogados — Redactar, archivar y combinar anexos | PDFEDI",
+    "lawyersDescription": "Herramientas PDF gratuitas para abogados: redacción real, eliminación de metadatos, compresión al tamaño de la corte, combinación de anexos con números Bates. Sin registro, sin marcas de agua.",
+    "lawyersOgDescription": "Redacta, elimina metadatos, comprime al límite de presentación de tu corte y combina anexos con números Bates — gratis, sin registro.",
+    "privacyTitle": "Cómo tratamos tus archivos — Privacidad | PDFEDI",
+    "privacyDescription": "Qué ocurre con tus archivos en PDFEDI: se suben a nuestro servidor para procesarlos, se eliminan automáticamente, sin cuenta, sin conservar ni compartir el contenido de los archivos.",
+    "privacyOgDescription": "Se suben a nuestro servidor, se procesan y se eliminan automáticamente. Sin cuenta, sin conservar el contenido de los archivos."
+  },
+  "chrome": {
+    "allTools": "Todas las herramientas",
+    "forLawyers": "Para abogados",
+    "tagline": "PDFEDI — herramientas PDF gratuitas en línea.",
+    "footerNote": "Sin registro. Los archivos se procesan y se eliminan automáticamente.",
+    "home": "Inicio",
+    "language": "Idioma"
+  },
+  "home": {
+    "heroTitle": "Todas las herramientas PDF que necesitas.",
+    "heroAccent": "Gratis.",
+    "heroSubtitle": "Combina, divide, convierte, protege y más, directamente en tu navegador. Sin registro, sin marcas de agua.",
+    "privateTitle": "Privado por diseño",
+    "privateText": "Los archivos se procesan en nuestros servidores y se eliminan automáticamente. Nunca pedimos una cuenta: solo elige una herramienta y listo.",
+    "privateLink": "Cómo tratamos tus archivos →",
+    "lawyersTitle": "Para abogados",
+    "lawyersText": "Redacción real, eliminación de metadatos, compresión al tamaño de la corte y combinación de anexos con números Bates, además de 12 guías cortas para el trabajo de presentación.",
+    "lawyersCta": "Ver las herramientas para abogados →"
+  },
+  "categories": {
+    "organize": {
+      "name": "Organizar",
+      "tagline": "Combina, divide y reordena páginas"
+    },
+    "convert": {
+      "name": "Convertir",
+      "tagline": "Convierte PDF a otros formatos y viceversa"
+    },
+    "edit": {
+      "name": "Editar",
+      "tagline": "Ajusta el contenido y la información del documento"
+    },
+    "optimize": {
+      "name": "Optimizar",
+      "tagline": "Haz los archivos más pequeños y rápidos"
+    },
+    "security": {
+      "name": "Seguridad",
+      "tagline": "Protege, desbloquea y finaliza documentos"
+    },
+    "legal": {
+      "name": "Para abogados",
+      "tagline": "Redacción, anexos y archivos del tamaño de la corte, listos para presentar"
+    }
+  },
+  "tools": {
+    "merge": {
+      "name": "Combinar PDF",
+      "tagline": "Combina varios PDF en uno solo"
+    },
+    "split": {
+      "name": "Dividir PDF",
+      "tagline": "Divide un PDF en archivos separados"
+    },
+    "rotate_pages": {
+      "name": "Girar páginas",
+      "tagline": "Gira las páginas de un PDF"
+    },
+    "delete_pages": {
+      "name": "Eliminar páginas",
+      "tagline": "Quita páginas de un PDF"
+    },
+    "reorder_pages": {
+      "name": "Reordenar páginas",
+      "tagline": "Cambia el orden de las páginas"
+    },
+    "n_up": {
+      "name": "N-Up PDF",
+      "tagline": "Imprime varias páginas por hoja"
+    },
+    "extract_text": {
+      "name": "Extraer texto",
+      "tagline": "Saca el texto de un PDF"
+    },
+    "pdf_to_images": {
+      "name": "PDF a imágenes",
+      "tagline": "Convierte páginas a imágenes"
+    },
+    "images_to_pdf": {
+      "name": "Imágenes a PDF",
+      "tagline": "Crea un PDF a partir de imágenes"
+    },
+    "ocr": {
+      "name": "OCR",
+      "tagline": "Haz que los PDF escaneados se puedan buscar"
+    },
+    "pdf_to_word": {
+      "name": "PDF a Word",
+      "tagline": "Convierte un PDF a un documento de Word editable"
+    },
+    "metadata": {
+      "name": "Ver metadatos",
+      "tagline": "Inspecciona los metadatos de un PDF"
+    },
+    "edit_metadata": {
+      "name": "Editar metadatos",
+      "tagline": "Actualiza el título, el autor y más"
+    },
+    "watermark": {
+      "name": "Marca de agua",
+      "tagline": "Estampa texto en cada página"
+    },
+    "page_numbers": {
+      "name": "Números de página",
+      "tagline": "Añade números de página"
+    },
+    "crop": {
+      "name": "Recortar PDF",
+      "tagline": "Recorta los márgenes de las páginas"
+    },
+    "grayscale": {
+      "name": "PDF en escala de grises",
+      "tagline": "Convierte las páginas a blanco y negro"
+    },
+    "compress": {
+      "name": "Comprimir PDF",
+      "tagline": "Reduce un PDF a un tamaño objetivo para presentarlo"
+    },
+    "repair": {
+      "name": "Reparar PDF",
+      "tagline": "Corrige PDF dañados o ilegibles"
+    },
+    "password_protect": {
+      "name": "Proteger PDF",
+      "tagline": "Añade una contraseña a un PDF"
+    },
+    "unlock_pdf": {
+      "name": "Desbloquear PDF",
+      "tagline": "Quita la protección con contraseña"
+    },
+    "redact": {
+      "name": "Redactar PDF",
+      "tagline": "Tacha texto de forma permanente"
+    },
+    "flatten": {
+      "name": "Aplanar PDF",
+      "tagline": "Integra las anotaciones en las páginas"
+    },
+    "strip_image_metadata": {
+      "name": "Eliminar metadatos de imágenes",
+      "tagline": "Elimina EXIF y GPS de las fotos"
+    },
+    "exhibit_combine": {
+      "name": "Combinar anexos",
+      "tagline": "PDF listo para presentar, con hojas separadoras y números Bates"
+    },
+    "strip_metadata": {
+      "name": "Eliminar metadatos",
+      "tagline": "Elimina metadatos ocultos, con un informe"
+    }
+  },
+  "runner": {
+    "loading": "Cargando…",
+    "loadFailed": "No se pudo cargar la herramienta: {error}",
+    "description": "descripción",
+    "quotaLeft": "{remaining, plural, one {# de {limit} uso gratuito restante esta hora} other {# de {limit} usos gratuitos restantes esta hora}}",
+    "quotaResets": "· Se restablece a las {time}",
+    "steps": {
+      "uploading": "Subiendo",
+      "preparing": "Preparando",
+      "processing": "Procesando",
+      "converting": "Convirtiendo",
+      "optimizing": "Optimizando",
+      "finalizing": "Finalizando",
+      "completed": "Completado"
+    },
+    "choosePdf": "Elige archivo(s) PDF",
+    "chooseImage": "Elige archivo(s) de imagen",
+    "uploading": "Subiendo…",
+    "fileLimit": "Hasta {max, plural, one {# archivo} other {# archivos}}, {mb} MB cada uno. No necesitas registrarte.",
+    "atMost": "Esta herramienta acepta como máximo {max, plural, one {# archivo} other {# archivos}}.",
+    "atLeast": "Selecciona al menos {min, plural, one {# archivo} other {# archivos}}.",
+    "tooBig": "«{name}» supera el límite de subida de {mb} MB.",
+    "startButton": "{tool} ahora",
+    "starting": "Iniciando…",
+    "preparing": "Preparando tus archivos…",
+    "preparingSub": "Tu trabajo está en cola y está a punto de comenzar.",
+    "activeSub": "Esto suele tardar unos segundos.",
+    "finalizing": "Finalizando tu archivo…",
+    "finalizingSub": "Ya casi está.",
+    "failedTitle": "Error",
+    "failedFallback": "Algo salió mal.",
+    "tryAgain": "Intentar de nuevo",
+    "startOver": "Empezar de nuevo",
+    "completedTitle": "Completado",
+    "completedNote": "Tu archivo se procesó en nuestro servidor y se elimina automáticamente. Los archivos nunca se conservan ni se comparten.",
+    "completedLink": "Cómo tratamos tus archivos →",
+    "downloadResult": "Descargar resultado",
+    "downloading": "Descargando…",
+    "downloadingPct": "Descargando… {pct}%",
+    "downloadFailed": "La descarga falló."
+  },
+  "canvas": {
+    "startOver": "Empezar de nuevo",
+    "uploadingToServer": "Subiendo al servidor…",
+    "largeDoc": "Documento grande ({count} páginas). Las miniaturas se cargan al desplazarte; Dividir produce como máximo 200 archivos de salida por trabajo.",
+    "pagesScroll": "{count} páginas: las miniaturas se cargan al desplazarte.",
+    "dropTitle": "Suelta aquí el archivo PDF o haz clic para elegir",
+    "dropTitleUploading": "Subiendo…",
+    "dropSub": "Hasta {max, plural, one {# archivo} other {# archivos}}, {mb} MB cada uno. No necesitas registrarte. Los archivos se procesan en nuestro servidor; las vistas previas de abajo se muestran en tu navegador.",
+    "dropAria": "Elegir archivo PDF",
+    "dropAriaPlural": "Elegir archivos PDF",
+    "fileLabelPages": "{count, plural, one {# página} other {# páginas}}",
+    "whatWillBeSent": "Qué se enviará",
+    "starting": "Iniciando…",
+    "processingSub": "Esto suele tardar unos segundos.",
+    "failedTitle": "Error",
+    "failedFallback": "Algo salió mal.",
+    "backToEditor": "Volver al editor",
+    "completedTitle": "Completado",
+    "completedNote": "Tu archivo se procesó en nuestro servidor y se elimina automáticamente. Los archivos nunca se conservan ni se comparten.",
+    "completedLink": "Cómo tratamos tus archivos →",
+    "downloadResult": "Descargar resultado",
+    "downloadingPct": "Descargando… {pct}%",
+    "undo": "Deshacer",
+    "redo": "Rehacer",
+    "undoTitle": "Deshacer (Ctrl+Z)",
+    "redoTitle": "Rehacer (Ctrl+Y)",
+    "selectAll": "Seleccionar todo",
+    "clearSelection": "Limpiar selección",
+    "loadingThumb": "Cargando…",
+    "willBeDeleted": "✕ Se eliminará",
+    "removed": "Eliminado",
+    "markedForDeletion": "marcado para eliminar",
+    "previewClose": "Cerrar ✕",
+    "previewRendering": "Mostrando…",
+    "pageLabel": "Página {n}",
+    "merge": {
+      "addMoreFiles": "Añade al menos un archivo más.",
+      "addAtLeast2": "Añade al menos 2 archivos PDF para combinar.",
+      "summary": "{files, plural, one {Combinando # archivo} other {Combinando # archivos}} · {pages, plural, one {# página} other {# páginas}}{removed} → un PDF",
+      "summaryRemoved": " · {count, plural, one {# eliminada} other {# eliminadas}}",
+      "processLabel": "Combinar ahora",
+      "activity": "Combinando",
+      "moveFileUp": "Subir archivo",
+      "moveFileDown": "Bajar archivo",
+      "removeFile": "Quitar archivo de la combinación",
+      "fileRemoved": "(eliminado)",
+      "restore": "Restaurar",
+      "addFiles": "+ Añadir archivos",
+      "previewFirstPage": "Vista previa de la primera página",
+      "removeSelected": "Quitar seleccionadas ({count})",
+      "restoreAllRemoved": "Restaurar todas las eliminadas",
+      "gridAria": "Páginas a combinar, en orden de combinación",
+      "hint": "Arrastra las páginas para reordenarlas (también entre archivos) · Haz clic para seleccionar, Mayús+clic para un rango · La tecla Supr quita las páginas seleccionadas · Doble clic en una página para una vista previa grande · Las flechas mueven la selección, Ctrl+Z / Ctrl+Y deshacen y rehacen.",
+      "filePages": "{count, plural, one {# página} other {# páginas}}",
+      "moveFileUpAria": "Subir {name}",
+      "moveFileDownAria": "Bajar {name}",
+      "removeFileFromMerge": "Quitar {name} de la combinación",
+      "removeFileTitle": "Quitar archivo de la combinación",
+      "removedFileLabel": "{name} (eliminado)",
+      "addFilesLabel": "Añadir archivos",
+      "removeSelectedCount": "Quitar seleccionadas ({count})",
+      "removeSelectedTitle": "Quitar las páginas seleccionadas de la combinación (tecla Supr)",
+      "gridAriaOrder": "Páginas a combinar, en orden de combinación",
+      "gridHint": "Arrastra las páginas para reordenarlas (también entre archivos) · Haz clic para seleccionar, Mayús+clic para un rango · La tecla Supr quita las páginas seleccionadas · Doble clic en una página para una vista previa grande · Las flechas mueven la selección, Ctrl+Z / Ctrl+Y deshacen y rehacen."
+    },
+    "split": {
+      "summaryEvery": "{count, plural, one {# archivo de salida} other {# archivos de salida}}: un PDF por página, entregados como ZIP.",
+      "summaryExtract": "{count, plural, one {# archivo de salida} other {# archivos de salida}}: un PDF por página seleccionada, entregados como ZIP.",
+      "summaryExtractEmpty": "Haz clic en las páginas para extraer cada una como su propio PDF.",
+      "summaryRanges": "{count, plural, one {# archivo de salida} other {# archivos de salida}}: {groups}, entregados como ZIP.",
+      "processEvery": "Dividir en páginas individuales",
+      "processExtract": "Extraer páginas seleccionadas",
+      "processRanges": "Dividir ahora",
+      "activity": "Dividiendo",
+      "modeRanges": "Rangos",
+      "modeExtract": "Extraer páginas",
+      "modeEvery": "Cada página",
+      "modeAria": "Modo de división",
+      "clearDividers": "Limpiar divisores",
+      "rangesLabel": "Rangos",
+      "rangesAria": "Rangos de páginas",
+      "rangesPlaceholder": "1-3,4-7",
+      "selectAllPages": "Seleccionar todas las páginas",
+      "rangesHint": "Haz clic en un espacio entre páginas para colocar un marcador de división. Cada grupo de color se convierte en un archivo de salida.",
+      "extractHint": "Haz clic en las páginas para seleccionarlas; cada página seleccionada se convierte en su propio PDF.",
+      "rangesHintBottom": "Haz clic en un espacio para añadir o quitar un marcador de división · Deshacer/rehacer con Ctrl+Z / Ctrl+Y · El campo de rangos de arriba se mantiene sincronizado.",
+      "extractHintBottom": "Haz clic para seleccionar, Mayús+clic para un rango · Cada página seleccionada se convierte en su propio archivo.",
+      "everyHintBottom": "Un PDF por página, sin necesidad de selección.",
+      "splitAfter": "Dividir después de la página {n}",
+      "removeSplitAfter": "Quitar la división después de la página {n}",
+      "gridAria": "Páginas para dividir",
+      "pageRangeExceeds": "Los números de página superan el número de páginas del documento ({count})."
+    },
+    "rotate": {
+      "summaryEmpty": "Selecciona páginas y gíralas, o gira todas las páginas a la vez.",
+      "summary": "{count, plural, one {# página} other {# páginas}} giradas: {list}",
+      "processLabel": "Girar ahora",
+      "activity": "Girando",
+      "rotateLeft": "Girar la selección 90° en sentido antihorario",
+      "rotateRight": "Girar la selección 90° en sentido horario",
+      "rotateAll": "Girar todas 90°",
+      "resetAll": "Restablecer todo",
+      "pagesLabel": "Páginas",
+      "pagesAria": "Páginas a girar",
+      "pagesPlaceholder": "1-3,5",
+      "angleLabel": "Ángulo",
+      "angleAria": "Ángulo de rotación",
+      "applyToPages": "Aplicar a las páginas",
+      "selectedWithAngle": "Páginas seleccionadas con ángulo: {ranges}",
+      "typePagesFirst": "Escribe primero los números de página, p. ej., «1-3,5».",
+      "pageExceeds": "La(s) página(s) {pages} superan el número de páginas del documento ({count}).",
+      "rotateCcw": "Girar 90° en sentido antihorario",
+      "rotateCw": "Girar 90° en sentido horario",
+      "gridAria": "Páginas a girar",
+      "hint": "Haz clic para seleccionar, Mayús+clic para un rango · Los botones ⟲ / ⟳ de una página giran solo esa página · Las miniaturas muestran la vista previa girada; la rotación real se aplica en el servidor.",
+      "rotatePageCcw": "Girar {label} 90 grados en sentido antihorario",
+      "rotatePageCw": "Girar {label} 90 grados en sentido horario"
+    },
+    "delete": {
+      "summaryEmpty": "Haz clic en las páginas para marcarlas para eliminar. Debe quedar al menos una página.",
+      "summary": "Eliminando {marked} de {total} páginas · Quedarán {remaining}.",
+      "processLabel": "Eliminar {count, plural, one {# página} other {# páginas}}",
+      "activity": "Eliminando páginas",
+      "cannotDeleteAll": "No se pueden eliminar todas las páginas; debe quedar al menos una.",
+      "pageExceeds": "La(s) página(s) {pages} superan el número de páginas del documento ({count}).",
+      "invertSelection": "Invertir selección",
+      "markSelected": "Marcar seleccionadas ({count})",
+      "markSelectedTitle": "Marcar las páginas seleccionadas para eliminar (tecla Supr)",
+      "clearMarks": "Limpiar marcas",
+      "pagesToDelete": "Páginas a eliminar",
+      "pagesToDeleteAria": "Páginas a eliminar",
+      "pagesPlaceholder": "1,3,5-7",
+      "markForDeletion": "Marcar para eliminar",
+      "markedUndo": "✕ Marcada — deshacer",
+      "markAria": "Marcar {label} para eliminar",
+      "unmarkAria": "Desmarcar {label} para eliminar",
+      "gridAria": "Páginas a eliminar",
+      "hint": "Haz clic para seleccionar, Mayús+clic para un rango · «Marcar seleccionadas» o la tecla Supr marca la selección · El botón de una página marca solo esa página · Las páginas marcadas se mantienen visibles hasta el procesamiento, y cada marca se puede deshacer."
+    },
+    "reorder": {
+      "summaryOriginal": "Las páginas están en su orden original: arrastra las miniaturas para reordenarlas.",
+      "summaryMoved": "{count, plural, one {# página} other {# páginas}} movidas: {list}{more}",
+      "summaryMore": ", +{count} más",
+      "processLabel": "Reordenar ahora",
+      "activity": "Reordenando",
+      "reverseOrder": "Invertir orden",
+      "resetOriginal": "Restablecer al original",
+      "moveUp": "↑ Subir",
+      "moveUpTitle": "Mover la selección un paso antes (Ctrl+←)",
+      "moveDown": "↓ Bajar",
+      "moveDownTitle": "Mover la selección un paso después (Ctrl+→)",
+      "orderLabel": "Orden",
+      "orderAria": "Orden de páginas",
+      "orderError": "El orden debe ser una permutación de las páginas 1..{count}, p. ej., «{example}».",
+      "gridAria": "Páginas en el nuevo orden",
+      "hint": "Arrastra las miniaturas para reordenar (las insignias de posición se actualizan en vivo) · Selecciona una página y pulsa Ctrl+← / Ctrl+→ para moverla · El campo de orden de arriba se mantiene sincronizado y acepta una permutación escrita.",
+      "position": "posición {n}"
+    }
+  },
+  "errors": {
+    "tool_error": "Algo salió mal. Inténtalo de nuevo.",
+    "internal_error": "El procesamiento falló. Inténtalo de nuevo.",
+    "server_restart": "El servidor se reinició mientras se procesaba este trabajo. Inténtalo de nuevo.",
+    "invalid_option": "Un número de página o una opción no es válido. Revisa los números de página e inténtalo de nuevo.",
+    "bad_option": "Un valor de opción no es válido. Revisa los valores e inténtalo de nuevo.",
+    "bad_options": "Un valor de opción no es válido. Revisa los valores e inténtalo de nuevo.",
+    "missing_input": "Falta un archivo requerido. Sube el archivo e inténtalo de nuevo.",
+    "missing_option": "Falta una opción requerida.",
+    "invalid_input": "No se pudo leer el archivo subido. Comprueba que sea un PDF válido e inténtalo de nuevo.",
+    "ocr_failed": "El reconocimiento de texto falló para este archivo.",
+    "ocr_unavailable": "El reconocimiento de texto no está disponible temporalmente. Inténtalo más tarde.",
+    "wrong_password": "La contraseña es incorrecta. Revísala e inténtalo de nuevo.",
+    "quota_exceeded": "Ya usaste todos los usos gratuitos de esta hora. Inténtalo de nuevo después de las {time}.",
+    "file_too_large": "El archivo es demasiado grande. El límite de subida es de {mb} MB.",
+    "lost_contact": "Se perdió el contacto con el servidor.",
+    "download_failed": "La descarga falló.",
+    "not_loaded": "La herramienta aún no se ha cargado.",
+    "failed_to_load": "No se pudo cargar la herramienta.",
+    "invalid_page_range": "Rango de páginas no válido «{token}». Usa formas como «1-3,5».",
+    "invalid_range_start": "Rango no válido {range}: los números de página empiezan en 1.",
+    "select_at_least_one_page": "Selecciona al menos una página.",
+    "rotate_at_least_one_page": "Gira al menos una página.",
+    "cannot_delete_all": "No se pueden eliminar todas las páginas; debe quedar al menos una.",
+    "nothing_to_reorder": "No hay nada que reordenar.",
+    "output_too_large": "El resultado es demasiado grande para descargarlo.",
+    "pdf_unreadable": "No se pudo leer este archivo como PDF.",
+    "pdf_unreadable_one": "No se pudo leer uno de los archivos como PDF."
+  },
+  "toolOptions": {
+    "compress": {
+      "target_mb": {
+        "label": "Tamaño objetivo (MB)",
+        "help": "Comprime hasta este tamaño como máximo. Los límites de presentación electrónica (CM/ECF) varían según la corte, aproximadamente de 3 a 200 MB; 25 MB es el más común. Revisa la norma local de tu corte."
+      }
+    },
+    "crop": {
+      "top": {
+        "label": "Margen superior (pt)",
+        "help": "Puntos a recortar del borde superior."
+      },
+      "bottom": {
+        "label": "Margen inferior (pt)",
+        "help": "Puntos a recortar del borde inferior."
+      },
+      "left": {
+        "label": "Margen izquierdo (pt)",
+        "help": "Puntos a recortar del borde izquierdo."
+      },
+      "right": {
+        "label": "Margen derecho (pt)",
+        "help": "Puntos a recortar del borde derecho."
+      },
+      "pages": {
+        "label": "Páginas",
+        "help": "Rangos con base 1 como «1-3,5». Déjalo vacío para todas las páginas."
+      }
+    },
+    "delete_pages": {
+      "pages": {
+        "label": "Páginas a eliminar",
+        "help": "Páginas con base 1 a eliminar, p. ej., «1,3,5-7»."
+      }
+    },
+    "edit_metadata": {
+      "title": {
+        "label": "Título",
+        "help": "Título del documento. Vacío lo elimina."
+      },
+      "author": {
+        "label": "Autor",
+        "help": "Autor del documento. Vacío lo elimina."
+      },
+      "subject": {
+        "label": "Asunto",
+        "help": "Asunto del documento. Vacío lo elimina."
+      },
+      "keywords": {
+        "label": "Palabras clave",
+        "help": "Palabras clave del documento. Vacío las elimina."
+      }
+    },
+    "exhibit_combine": {
+      "exhibit_prefix": {
+        "label": "Etiqueta del anexo",
+        "help": "Palabra impresa en cada hoja separadora, p. ej., «Anexo»."
+      },
+      "bates_prefix": {
+        "label": "Prefijo Bates",
+        "help": "Prefijo de los números estampados, p. ej., «BATES» da BATES-000001."
+      },
+      "bates_start": {
+        "label": "Primer número Bates",
+        "help": "La numeración empieza aquí (entero positivo)."
+      },
+      "slip_sheets": {
+        "label": "Añadir hojas separadoras entre anexos",
+        "help": ""
+      }
+    },
+    "extract_text": {
+      "pages": {
+        "label": "Páginas",
+        "help": "Rangos con base 1 como «1-3,5». Déjalo vacío para todas las páginas."
+      }
+    },
+    "grayscale": {
+      "dpi": {
+        "label": "Resolución (DPI)",
+        "help": "Resolución de renderizado en puntos por pulgada (72–600)."
+      }
+    },
+    "merge": {
+      "page_order": {
+        "label": "Orden de páginas (JSON)",
+        "help": "Lista JSON opcional de pares [archivo, página] en orden de combinación, p. ej., «[[1,2],[0,1]]» combina primero la página 2 del archivo 2 y luego la página 1 del archivo 1. Los números de archivo empiezan en 0 y los de página en 1. Omítelo para combinar todas las páginas en el orden de subida."
+      }
+    },
+    "n_up": {
+      "layout": {
+        "label": "Páginas por hoja",
+        "help": "Cuántas páginas de origen colocar en cada hoja."
+      },
+      "sheet": {
+        "label": "Tamaño de hoja",
+        "help": "Tamaño de la hoja de salida."
+      },
+      "orientation": {
+        "label": "Orientación",
+        "help": "Orientación de la hoja.",
+        "choices": {
+          "portrait": "Vertical",
+          "landscape": "Horizontal"
+        }
+      }
+    },
+    "ocr": {
+      "language": {
+        "label": "Idioma",
+        "help": "Código de idioma de Tesseract, p. ej., «eng» o «eng+deu»."
+      }
+    },
+    "page_numbers": {
+      "vertical": {
+        "label": "Posición vertical",
+        "help": "",
+        "choices": {
+          "top": "Arriba",
+          "bottom": "Abajo"
+        }
+      },
+      "horizontal": {
+        "label": "Posición horizontal",
+        "help": "",
+        "choices": {
+          "left": "Izquierda",
+          "center": "Centro",
+          "right": "Derecha"
+        }
+      },
+      "start_number": {
+        "label": "Número inicial",
+        "help": "Primer número de página (entero positivo)."
+      },
+      "prefix": {
+        "label": "Prefijo",
+        "help": ""
+      },
+      "suffix": {
+        "label": "Sufijo",
+        "help": ""
+      },
+      "font_size": {
+        "label": "Tamaño de fuente",
+        "help": "De 6 a 48."
+      },
+      "pages": {
+        "label": "Páginas",
+        "help": "Rangos con base 1 como «1-3,5». Déjalo vacío para todas las páginas."
+      }
+    },
+    "password_protect": {
+      "password": {
+        "label": "Contraseña",
+        "help": null
+      }
+    },
+    "pdf_to_images": {
+      "format": {
+        "label": "Formato de imagen",
+        "help": "Formato de imagen de salida."
+      },
+      "dpi": {
+        "label": "Resolución (DPI)",
+        "help": null
+      },
+      "pages": {
+        "label": "Páginas",
+        "help": "Rangos con base 1 como «1-3,5». Déjalo vacío para todas las páginas."
+      }
+    },
+    "redact": {
+      "patterns": {
+        "label": "Texto a redactar",
+        "help": "Cadenas literales separadas por comas para tachar, p. ej., «SSN, john@example.com»."
+      },
+      "rasterise": {
+        "label": "Rasterizar páginas (redacción más fuerte)",
+        "help": "Convierte cada página en una imagen después de redactar, para que no sobreviva ninguna capa de texto en el archivo. El texto del resultado ya no se puede seleccionar ni buscar."
+      }
+    },
+    "reorder_pages": {
+      "order": {
+        "label": "Orden de páginas",
+        "help": "Permutación con base 1 de las páginas 1..N, p. ej., «3,1,2»."
+      }
+    },
+    "rotate_pages": {
+      "angle": {
+        "label": "Ángulo de rotación",
+        "help": "Rotación en sentido horario aplicada a las páginas seleccionadas."
+      },
+      "pages": {
+        "label": "Páginas",
+        "help": "Rangos con base 1 como «1-3,5». Vacío significa todas las páginas."
+      },
+      "rotations": {
+        "label": "Rotaciones por página (JSON)",
+        "help": "Objeto JSON opcional que asigna números de página con base 1 a ángulos, p. ej., '{\"1\": 90, \"3\": 180}'. Cuando está presente, reemplaza ángulo+páginas, así cada página puede girar de forma diferente."
+      }
+    },
+    "split": {
+      "mode": {
+        "label": "Modo de división",
+        "help": "«ranges»: un PDF por rango separado por comas. «every»: un PDF por página.",
+        "choices": {
+          "ranges": "Rangos",
+          "every": "Cada página"
+        }
+      },
+      "ranges": {
+        "label": "Rangos de páginas",
+        "help": "Rangos con base 1 como «1-3,5». Obligatorio cuando el modo es «ranges»."
+      }
+    },
+    "unlock_pdf": {
+      "password": {
+        "label": "Contraseña actual",
+        "help": "La contraseña que protege actualmente el PDF."
+      }
+    },
+    "watermark": {
+      "text": {
+        "label": "Texto de la marca de agua",
+        "help": null
+      },
+      "opacity": {
+        "label": "Opacidad",
+        "help": "0.1 (tenue) a 0.5 (fuerte)."
+      }
+    }
+  },
+  "lawyers": {
+    "title": "Herramientas PDF para abogados",
+    "intro": "Redacta correctamente, elimina metadatos ocultos, ajusta el tamaño al límite de tu corte y combina anexos con números Bates. Gratis, sin registro, sin marcas de agua.",
+    "workflowTitle": "El flujo de presentación, en orden",
+    "workflow": [
+      {
+        "step": "Redactar",
+        "text": "texto confidencial: el texto se elimina del archivo y el resultado se verifica, no solo se cubre con negro."
+      },
+      {
+        "step": "Eliminar metadatos",
+        "text": "— quita el autor, las fechas y los detalles del software, con un informe de antes y después."
+      },
+      {
+        "step": "Comprimir",
+        "text": "al límite de tamaño de tu corte."
+      },
+      {
+        "step": "Combinar anexos",
+        "text": "con hojas separadoras y números Bates en un solo PDF listo para presentar."
+      }
+    ],
+    "guides": [
+      {
+        "title": "Redactar un anexo de declaración",
+        "answer": "La redacción aquí elimina el texto del archivo, no solo lo cubre con un cuadro negro, y el resultado se vuelve a comprobar para que las palabras redactadas no se puedan extraer. Para la máxima seguridad, activa Rasterizar páginas: cada página se convierte en una imagen, así no sobrevive ninguna capa de texto.",
+        "tool": "/tools/redact",
+        "toolName": "Redactar PDF"
+      },
+      {
+        "title": "Combinar anexos en un PDF listo para presentar",
+        "answer": "Sube tus anexos en orden y recibe un solo documento: una hoja separadora antes de cada anexo (Anexo A, B, C… con el nombre del archivo y el número de páginas) y números Bates estampados de forma continua en todas las páginas de los anexos.",
+        "tool": "/tools/exhibit_combine",
+        "toolName": "Combinar anexos"
+      },
+      {
+        "title": "Comprimir un escrito por debajo del límite de tu corte",
+        "answer": "Elige el límite de tamaño de tu corte: 25 MB es el límite CM/ECF más común, pero las cortes varían de unos 3 a 200 MB, así que revisa tu norma local. La herramienta reduce el archivo para que quepa y el ZIP incluye un informe con el tamaño antes y después.",
+        "tool": "/tools/compress",
+        "toolName": "Comprimir PDF"
+      },
+      {
+        "title": "Eliminar metadatos antes de enviar un documento a la otra parte",
+        "answer": "Un PDF puede llevar el nombre de su autor, las fechas de creación y el software que lo creó. Eliminar metadatos quita todo eso con un clic y te da un informe de antes y después que demuestra lo que se eliminó.",
+        "tool": "/tools/strip_metadata",
+        "toolName": "Eliminar metadatos"
+      },
+      {
+        "title": "Quitar los datos de ubicación de las fotos del caso",
+        "answer": "Las fotos suelen llevar coordenadas GPS y detalles de la cámara en sus datos EXIF. Eliminar metadatos de imágenes muestra lo que lleva cada foto, lo elimina e informa lo que se quitó. Nota: no verifica la eliminación de marcadores C2PA o de IA; usa ClearMark para eso.",
+        "tool": "/tools/strip_image_metadata",
+        "toolName": "Eliminar metadatos de imágenes"
+      },
+      {
+        "title": "Ver qué metadatos contiene un PDF que recibiste",
+        "answer": "Antes de confiar en un documento, mira lo que esconde. Ver metadatos lee el título, el autor, las fechas, el creador y el productor, y te da el resultado como JSON.",
+        "tool": "/tools/metadata",
+        "toolName": "Ver metadatos"
+      },
+      {
+        "title": "Corregir el título o el autor de un documento antes de presentarlo",
+        "answer": "Si el título o el autor guardados de un PDF están mal, o nombran a alguien que no deberían, Editar metadatos te permite establecer o borrar el título, el autor, el asunto y las palabras clave sin tocar las páginas.",
+        "tool": "/tools/edit_metadata",
+        "toolName": "Editar metadatos"
+      },
+      {
+        "title": "Numerar las páginas de una presentación",
+        "answer": "Añade números de página en cualquier esquina, empezando por cualquier número, con un prefijo o sufijo si tu corte lo pide. Puedes numerar solo rangos de páginas seleccionados y dejar el resto como está.",
+        "tool": "/tools/page_numbers",
+        "toolName": "Añadir números de página"
+      },
+      {
+        "title": "Combinar documentos de apoyo en un solo paquete",
+        "answer": "Combina de 2 a 20 PDF en un solo archivo, en el orden en que los subes: escritos, adjuntos y documentos de apoyo como un solo paquete en lugar de muchos archivos.",
+        "tool": "/tools/merge",
+        "toolName": "Combinar PDF"
+      },
+      {
+        "title": "Sacar un documento de un paquete",
+        "answer": "Divide un PDF por rangos de páginas (por ejemplo 1–3, 5) o en un archivo por página, y descarga los resultados como ZIP. Útil cuando un paquete llega como un solo archivo y necesitas un solo anexo de él.",
+        "tool": "/tools/split",
+        "toolName": "Dividir PDF"
+      },
+      {
+        "title": "Proteger un documento confidencial con contraseña",
+        "answer": "Añade una contraseña a un PDF antes de enviarlo, para que solo alguien con la contraseña pueda abrirlo. Y si recibes un archivo protegido y conoces la contraseña, Desbloquear PDF quita la protección.",
+        "tool": "/tools/password_protect",
+        "toolName": "Proteger PDF"
+      },
+      {
+        "title": "Hacer que un documento escaneado se pueda buscar",
+        "answer": "Las páginas escaneadas son imágenes, no texto: no puedes buscar en ellas ni copiar de ellas. El OCR añade una capa de texto invisible para que el documento se pueda buscar sin cambiar su aspecto.",
+        "tool": "/tools/ocr",
+        "toolName": "OCR"
+      }
+    ],
+    "limitsTitle": "Una nota sobre los límites",
+    "limitsText": "PDFEDI es una herramienta, no un abogado. Los límites de presentación, las obligaciones de redacción y las reglas de divulgación varían según la corte y la jurisdicción: revisa las normas locales de tu corte y tus obligaciones profesionales antes de presentar. La redacción aquí elimina el texto que nombres; revisa siempre el resultado antes de presentarlo. Los archivos subidos a estas herramientas se procesan en nuestro servidor; consulta <link>cómo tratamos tus archivos</link>."
+  },
+  "privacy": {
+    "title": "Cómo tratamos tus archivos",
+    "intro": "Claro, sin los eslóganes de privacidad habituales. Hay dos tipos diferentes de herramientas en PDFEDI, y tratan tus archivos de forma diferente.",
+    "serverTitle": "Herramientas de servidor (la mayoría de las herramientas de este sitio)",
+    "serverText": "Cuando usas una herramienta como Combinar, Redactar o Comprimir, tu archivo se sube a nuestro servidor, se procesa allí y el resultado se te envía para descargarlo. Tu archivo sí sale de tu dispositivo; quien diga lo contrario sobre una herramienta procesada en servidor no está diciendo la verdad. Lo que sí prometemos:",
+    "serverPoints": [
+      "Sin cuenta, sin registro, sin pedir correo electrónico.",
+      "Los archivos se procesan automáticamente y se eliminan automáticamente.",
+      "El contenido de tu archivo no se conserva, no se comparte con nadie y no se usa para entrenar nada.",
+      "Contamos el uso anónimo (cuántas veces se ejecutó una herramienta) para mantener justos los límites gratuitos; no registramos lo que contienen tus archivos."
+    ],
+    "serverNote": "Como estas herramientas se ejecutan en un servidor, la «prueba del modo avión» no se aplica a ellas: si te desconectas de internet, una herramienta de servidor no puede funcionar en absoluto. Las comprobaciones que sí se aplican aquí son las integradas en las propias herramientas; por ejemplo, Redactar vuelve a comprobar su resultado para que el texto redactado no se pueda extraer, y Eliminar metadatos te da un informe de antes y después que muestra exactamente lo que se eliminó.",
+    "previewTitle": "Vistas previas en tu navegador",
+    "previewText": "En las herramientas organizadoras (Combinar, Dividir, Reordenar, Eliminar, Girar), las miniaturas de página que ves se muestran en tu navegador a partir del archivo en tu dispositivo; no se sube ninguna vista previa para mostrarlas. El procesamiento sigue ocurriendo en nuestro servidor: cuando pulsas el botón de procesar, el archivo se sube, se procesa y el resultado se envía para descargarlo.",
+    "checkTitle": "Cómo comprobar nuestras afirmaciones tú mismo",
+    "checkPoints": [
+      {
+        "title": "Redacción:",
+        "text": "después de redactar, intenta buscar las palabras redactadas en el PDF resultante; no deberían encontrarse. Activa «Rasterizar páginas» y el resultado no tiene ninguna capa de texto."
+      },
+      {
+        "title": "Metadatos:",
+        "text": "abre el archivo metadata_report.json que viene con Eliminar metadatos, o usa Ver metadatos en el archivo limpio, y compáralo con el original."
+      },
+      {
+        "title": "Vistas previas:",
+        "text": "abre la pestaña Red de tu navegador mientras reordenas las páginas; no se produce ninguna subida hasta que pulsas el botón de procesar."
+      }
+    ],
+    "dontTitle": "Lo que no hacemos",
+    "dontPoints": [
+      "No vendemos ni compartimos tus archivos.",
+      "No pedimos una cuenta para usar las herramientas gratuitas.",
+      "No afirmamos que los archivos procesados en servidor «nunca salgan de tu dispositivo»: sí salen, para procesarlos, y luego se eliminan."
+    ],
+    "backLink": "← Volver a todas las herramientas",
+    "localeNote": "Tu preferencia de idioma se guarda solo en tu propio navegador, para que podamos mostrarte el sitio en tu idioma la próxima vez. Nunca se envía a nuestros servidores."
+  },
+  "suggest": {
+    "title": "¿Quieres ver PDFEDI en {language}?",
+    "subtitle": "{nativeName} — Cambia la interfaz a {language}. Puedes volver a cambiarlo cuando quieras.",
+    "switch": "Cambiar a {language}",
+    "continue": "Seguir en inglés",
+    "dismiss": "Descartar"
+  },
+  "switcher": {
+    "label": "Idioma",
+    "current": "Idioma actual: {language}",
+    "choose": "Elegir idioma"
+  },
+  "seo": {
+    "whatItDoes": "{h1} — qué hace",
+    "howToUse": "Cómo usar {h1}",
+    "keyFeatures": "Funciones clave",
+    "whenToUse": "Cuándo usar {h1}",
+    "faq": "Preguntas frecuentes",
+    "relatedTools": "Herramientas relacionadas",
+    "privateByDesign": "Privado por diseño",
+    "privateNote": "Los archivos que subes se procesan de forma segura y se eliminan automáticamente después. PDFEDI nunca pide una cuenta: elige una herramienta y listo. Cada archivo puede tener hasta 50 MB, y cada herramienta es gratuita hasta 5 veces por hora.",
+    "breadcrumbHome": "Inicio"
+  }
+}
