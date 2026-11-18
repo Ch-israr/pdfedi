@@ -51,9 +51,13 @@ def _get_job_semaphore() -> threading.Semaphore:
 
 
 class UploadError(Exception):
-    def __init__(self, message: str, *, status_code: int = 422):
+    """API failure with an HTTP status and, optionally, a stable code
+    the frontend translates client-side (e.g. "quota_exceeded")."""
+
+    def __init__(self, message: str, *, status_code: int = 422, code: str | None = None):
         super().__init__(message)
         self.status_code = status_code
+        self.code = code
 
 
 def _extension_for(filename: str, mime: str) -> str:
@@ -69,6 +73,7 @@ def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
         raise UploadError(
             f"File exceeds the {settings.max_upload_mb} MB upload limit.",
             status_code=413,
+            code="file_too_large",
         )
     if not data:
         raise UploadError("Empty file.", status_code=422)
@@ -186,6 +191,7 @@ def create_job(db: Session, tool_key: str, file_ids: list[str], options: dict, c
         raise UploadError(
             f"Hourly limit reached for {spec.name} ({used}/{limit}). Try again later.",
             status_code=429,
+            code="quota_exceeded",
         )
 
     # Idempotency: if an identical job (same tool/files/options) is already
@@ -252,6 +258,7 @@ def _run_in_thread(job_id: str, client_ip: str) -> None:
             if job is not None and job.status == JobStatus.RUNNING.value:
                 job.status = enum_value(JobStatus.FAILED)
                 job.error = "Processing was interrupted unexpectedly. Please try again."
+                job.error_code = "server_restart"
                 job.updated_at = utcnow_iso()
                 db.commit()
         except Exception:  # noqa: BLE001 — best effort only
@@ -293,7 +300,7 @@ def run_job(db: Session, job_id: str, client_ip: str) -> Job:
         for fid in file_ids:
             f = db.query(File).filter(File.id == fid).first()
             if f is None:
-                raise ToolError("An input file is missing.")
+                raise ToolError("An input file is missing.", code="missing_input")
             inputs.append(ToolInput(
                 file_id=f.id, filename=f.filename, path=get_object_path(f.storage_key),
                 size=f.size_bytes, sha256=f.sha256, page_count=f.page_count,
@@ -304,7 +311,10 @@ def run_job(db: Session, job_id: str, client_ip: str) -> Job:
 
         settings = get_settings()
         if len(data) > settings.max_download_bytes:
-            raise ToolError(f"Output exceeds the {settings.max_download_mb} MB download limit.")
+            raise ToolError(
+                f"Output exceeds the {settings.max_download_mb} MB download limit.",
+                code="output_too_large",
+            )
 
         spec = tool.SPEC
         sha256 = hashlib.sha256(data).hexdigest()
@@ -326,14 +336,17 @@ def run_job(db: Session, job_id: str, client_ip: str) -> Job:
         job.output_file_id = out.id
         job.status = enum_value(JobStatus.SUCCEEDED)
         job.error = None
+        job.error_code = None
         quotas.record_success(db, client_ip, job.tool)
     except ToolError as e:
         job.status = enum_value(JobStatus.FAILED)
         job.error = str(e)
+        job.error_code = e.code
         log.info("job %s failed (user error): %s", job.id, e)
     except Exception as e:  # noqa: BLE001 — recorded, never leaked raw
         job.status = enum_value(JobStatus.FAILED)
         job.error = "Processing failed. Please try again."
+        job.error_code = "internal_error"
         log.exception("job %s failed (internal)", job.id)
     finally:
         job.updated_at = utcnow_iso()
@@ -367,10 +380,13 @@ def retry_job(db: Session, job_id: str, client_ip: str) -> Job:
     allowed, used, limit = quotas.check_quota(db, client_ip, job.tool)
     if not allowed:
         raise UploadError(
-            f"Hourly limit reached ({used}/{limit}). Try again later.", status_code=429
+            f"Hourly limit reached ({used}/{limit}). Try again later.",
+            status_code=429,
+            code="quota_exceeded",
         )
     job.status = enum_value(JobStatus.QUEUED)
     job.error = None
+    job.error_code = None
     job.updated_at = utcnow_iso()
     db.commit()
     db.refresh(job)
