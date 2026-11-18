@@ -2,6 +2,8 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
+import { PayloadError } from "../../../lib/canvas/payloads";
 import type { LoadedPdf } from "../../../lib/canvas/loadPdf";
 import type { OrganizerJob } from "../useOrganizerJob";
 
@@ -61,4 +63,16 @@ export function ToolButton({
       {children}
     </button>
   );
+}
+
+// Map a payload-builder failure to a translated message by stable code.
+// PayloadError carries the code; anything else falls back to its message.
+export function translatePayloadError(
+  e: unknown,
+  tErr: ReturnType<typeof useTranslations>,
+): string {
+  if (e instanceof PayloadError && tErr.has(e.code)) {
+    return tErr(e.code, e.params);
+  }
+  return e instanceof Error ? e.message : String(e);
 }
