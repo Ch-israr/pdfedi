@@ -1,0 +1,787 @@
+{
+  "meta": {
+    "siteTitle": "PDFEDI — 免费在线 PDF 工具：合并、拆分、压缩与编辑",
+    "siteDescription": "免费在线合并、拆分、转换和保护 PDF。26 个 PDF 工具——无需注册、无水印，注重隐私。",
+    "homeTitle": "PDFEDI — 免费在线 PDF 工具：合并、拆分、压缩与编辑",
+    "homeDescription": "免费在线合并、拆分、转换和保护 PDF。26 个 PDF 工具——无需注册、无水印，注重隐私。",
+    "lawyersTitle": "律师 PDF 工具 — 涂黑、归档与合并证据材料 | PDFEDI",
+    "lawyersDescription": "律师免费 PDF 工具：真正的涂黑处理、清除元数据、按法院要求压缩至指定大小、合并证据材料并添加贝茨编号。无需注册、无水印。",
+    "lawyersOgDescription": "涂黑、清除元数据、压缩至法院的提交大小上限、合并证据材料并添加贝茨编号——免费，无需注册。",
+    "privacyTitle": "我们如何处理您的文件 — 隐私 | PDFEDI",
+    "privacyDescription": "PDFEDI 如何处理您的文件：文件上传到我们的服务器进行处理后自动删除，无需账户，不会保留或分享文件内容。",
+    "privacyOgDescription": "上传到我们的服务器、处理后自动删除。无需账户，不保留文件内容。"
+  },
+  "chrome": {
+    "allTools": "全部工具",
+    "forLawyers": "律师专区",
+    "tagline": "PDFEDI——免费在线 PDF 工具。",
+    "footerNote": "无需注册。文件处理后自动删除。",
+    "home": "首页",
+    "language": "语言"
+  },
+  "home": {
+    "heroTitle": "您需要的所有 PDF 工具，尽在这里。",
+    "heroAccent": "免费。",
+    "heroSubtitle": "合并、拆分、转换、保护等功能，直接在浏览器中使用。无需注册、无水印。",
+    "privateTitle": "注重隐私",
+    "privateText": "文件在我们的服务器上处理，并自动删除。我们从不要求您注册账户——只需选择一个工具即可开始。",
+    "privateLink": "我们如何处理您的文件 →",
+    "lawyersTitle": "律师专区",
+    "lawyersText": "真正的涂黑处理、清除元数据、按法院要求压缩至指定大小、合并证据材料并添加贝茨编号——另有 12 篇提交文件相关的简短指南。",
+    "lawyersCta": "查看律师工具 →"
+  },
+  "categories": {
+    "organize": {
+      "name": "整理",
+      "tagline": "合并、拆分和重新排列页面"
+    },
+    "convert": {
+      "name": "转换",
+      "tagline": "将 PDF 转换为其他格式，或反向转换"
+    },
+    "edit": {
+      "name": "编辑",
+      "tagline": "调整内容和文档信息"
+    },
+    "optimize": {
+      "name": "优化",
+      "tagline": "让文件更小、加载更快"
+    },
+    "security": {
+      "name": "安全",
+      "tagline": "保护、解锁和定稿文档"
+    },
+    "legal": {
+      "name": "律师专区",
+      "tagline": "可提交的涂黑处理、证据材料和符合法院大小要求的文件"
+    }
+  },
+  "tools": {
+    "merge": {
+      "name": "合并 PDF",
+      "tagline": "将多个 PDF 合并为一个"
+    },
+    "split": {
+      "name": "拆分 PDF",
+      "tagline": "将 PDF 拆分为多个文件"
+    },
+    "rotate_pages": {
+      "name": "旋转页面",
+      "tagline": "旋转 PDF 页面"
+    },
+    "delete_pages": {
+      "name": "删除页面",
+      "tagline": "从 PDF 中删除页面"
+    },
+    "reorder_pages": {
+      "name": "重新排序页面",
+      "tagline": "重新排列页面顺序"
+    },
+    "n_up": {
+      "name": "多页合一 PDF",
+      "tagline": "每张纸打印多个页面"
+    },
+    "extract_text": {
+      "name": "提取文本",
+      "tagline": "从 PDF 中提取文本"
+    },
+    "pdf_to_images": {
+      "name": "PDF 转图片",
+      "tagline": "将页面转换为图片"
+    },
+    "images_to_pdf": {
+      "name": "图片转 PDF",
+      "tagline": "用图片制作 PDF"
+    },
+    "ocr": {
+      "name": "OCR 文字识别",
+      "tagline": "让扫描版 PDF 可以搜索"
+    },
+    "pdf_to_word": {
+      "name": "PDF 转 Word",
+      "tagline": "将 PDF 转换为可编辑的 Word 文档"
+    },
+    "metadata": {
+      "name": "查看元数据",
+      "tagline": "查看 PDF 元数据"
+    },
+    "edit_metadata": {
+      "name": "编辑元数据",
+      "tagline": "更新标题、作者等信息"
+    },
+    "watermark": {
+      "name": "添加水印",
+      "tagline": "在每一页加盖文字水印"
+    },
+    "page_numbers": {
+      "name": "添加页码",
+      "tagline": "添加页码"
+    },
+    "crop": {
+      "name": "裁剪 PDF",
+      "tagline": "裁剪页面边距"
+    },
+    "grayscale": {
+      "name": "灰度 PDF",
+      "tagline": "将页面转换为黑白"
+    },
+    "compress": {
+      "name": "压缩 PDF",
+      "tagline": "将 PDF 压缩到目标大小以便提交"
+    },
+    "repair": {
+      "name": "修复 PDF",
+      "tagline": "修复损坏或无法读取的 PDF"
+    },
+    "password_protect": {
+      "name": "保护 PDF",
+      "tagline": "为 PDF 添加密码"
+    },
+    "unlock_pdf": {
+      "name": "解锁 PDF",
+      "tagline": "移除密码保护"
+    },
+    "redact": {
+      "name": "涂黑 PDF",
+      "tagline": "永久涂黑文本"
+    },
+    "flatten": {
+      "name": "展平 PDF",
+      "tagline": "将注释合并到页面中"
+    },
+    "strip_image_metadata": {
+      "name": "清除图片元数据",
+      "tagline": "移除照片中的 EXIF 和 GPS 信息"
+    },
+    "exhibit_combine": {
+      "name": "合并证据材料",
+      "tagline": "带分隔页和贝茨编号、可直接提交的 PDF"
+    },
+    "strip_metadata": {
+      "name": "清除元数据",
+      "tagline": "移除隐藏的元数据，并提供报告"
+    }
+  },
+  "runner": {
+    "loading": "加载中…",
+    "loadFailed": "工具加载失败：{error}",
+    "description": "描述",
+    "quotaLeft": "{remaining, plural, other {本小时还剩 # 次免费使用（共 {limit} 次）}}",
+    "quotaResets": "· {time} 重置",
+    "steps": {
+      "uploading": "上传中",
+      "preparing": "准备中",
+      "processing": "处理中",
+      "converting": "转换中",
+      "optimizing": "优化中",
+      "finalizing": "完成中",
+      "completed": "已完成"
+    },
+    "choosePdf": "选择 PDF 文件",
+    "chooseImage": "选择图片文件",
+    "uploading": "上传中…",
+    "fileLimit": "最多 {max, plural, other {# 个文件}}，每个不超过 {mb} MB。无需注册。",
+    "atMost": "此工具最多接受 {max, plural, other {# 个文件}}。",
+    "atLeast": "请至少选择 {min, plural, other {# 个文件}}。",
+    "tooBig": "“{name}”超过了 {mb} MB 的上传上限。",
+    "startButton": "立即{tool}",
+    "starting": "开始处理…",
+    "preparing": "正在准备您的文件…",
+    "preparingSub": "您的任务已排队，即将开始。",
+    "activeSub": "通常只需几秒钟。",
+    "finalizing": "正在完成您的文件…",
+    "finalizingSub": "快好了。",
+    "failedTitle": "失败",
+    "failedFallback": "出了点问题。",
+    "tryAgain": "再试一次",
+    "startOver": "重新开始",
+    "completedTitle": "已完成",
+    "completedNote": "您的文件已在我们的服务器上处理，并会自动删除。文件不会被保留或分享。",
+    "completedLink": "我们如何处理您的文件 →",
+    "downloadResult": "下载结果",
+    "downloading": "下载中…",
+    "downloadingPct": "下载中…{pct}%",
+    "downloadFailed": "下载失败。"
+  },
+  "canvas": {
+    "startOver": "重新开始",
+    "uploadingToServer": "正在上传到服务器…",
+    "largeDoc": "大型文档（{count} 页）。缩略图会随滚动加载；拆分每次任务最多生成 200 个输出文件。",
+    "pagesScroll": "{count} 页——缩略图会随滚动加载。",
+    "dropTitle": "将 PDF 文件拖到此处，或点击选择",
+    "dropTitleUploading": "上传中…",
+    "dropSub": "最多 {max, plural, other {# 个文件}}，每个不超过 {mb} MB。无需注册。文件在我们的服务器上处理——下方的预览在您的浏览器中渲染。",
+    "dropAria": "选择 PDF 文件",
+    "dropAriaPlural": "选择 PDF 文件",
+    "fileLabelPages": "{count, plural, other {# 页}}",
+    "whatWillBeSent": "将发送的内容",
+    "starting": "开始处理…",
+    "processingSub": "通常只需几秒钟。",
+    "failedTitle": "失败",
+    "failedFallback": "出了点问题。",
+    "backToEditor": "返回编辑器",
+    "completedTitle": "已完成",
+    "completedNote": "您的文件已在我们的服务器上处理，并会自动删除。文件不会被保留或分享。",
+    "completedLink": "我们如何处理您的文件 →",
+    "downloadResult": "下载结果",
+    "downloadingPct": "下载中…{pct}%",
+    "undo": "撤销",
+    "redo": "重做",
+    "undoTitle": "撤销 (Ctrl+Z)",
+    "redoTitle": "重做 (Ctrl+Y)",
+    "selectAll": "全选",
+    "clearSelection": "清除选择",
+    "loadingThumb": "加载中…",
+    "willBeDeleted": "✕ 将被删除",
+    "removed": "已移除",
+    "markedForDeletion": "已标记为删除",
+    "previewClose": "关闭 ✕",
+    "previewRendering": "渲染中…",
+    "pageLabel": "第 {n} 页",
+    "merge": {
+      "addMoreFiles": "请再添加至少一个文件。",
+      "addAtLeast2": "请添加至少 2 个 PDF 文件进行合并。",
+      "summary": "{files, plural, other {正在合并 # 个文件}} · {pages, plural, other {# 页}}{removed} → 一个 PDF",
+      "summaryRemoved": " · {count, plural, other {已移除 # 个}}",
+      "processLabel": "立即合并",
+      "activity": "合并中",
+      "moveFileUp": "将文件上移",
+      "moveFileDown": "将文件下移",
+      "removeFile": "从合并中移除文件",
+      "fileRemoved": "（已移除）",
+      "restore": "恢复",
+      "addFiles": "+ 添加文件",
+      "previewFirstPage": "预览第一页",
+      "removeSelected": "移除所选（{count}）",
+      "restoreAllRemoved": "恢复所有已移除的文件",
+      "gridAria": "待合并的页面，按合并顺序排列",
+      "hint": "拖动页面可重新排序（也可跨文件拖动）· 点击选择，Shift+点击选择范围 · Delete 键移除所选页面 · 双击页面可查看大图预览 · 方向键移动选择，Ctrl+Z / Ctrl+Y 撤销和重做。",
+      "filePages": "{count, plural, other {# 页}}",
+      "moveFileUpAria": "将 {name} 上移",
+      "moveFileDownAria": "将 {name} 下移",
+      "removeFileFromMerge": "将 {name} 从合并中移除",
+      "removeFileTitle": "从合并中移除文件",
+      "removedFileLabel": "{name}（已移除）",
+      "addFilesLabel": "添加文件",
+      "removeSelectedCount": "移除所选（{count}）",
+      "removeSelectedTitle": "从合并中移除所选页面（Delete 键）",
+      "gridAriaOrder": "待合并的页面，按合并顺序排列",
+      "gridHint": "拖动页面可重新排序（也可跨文件拖动）· 点击选择，Shift+点击选择范围 · Delete 键移除所选页面 · 双击页面可查看大图预览 · 方向键移动选择，Ctrl+Z / Ctrl+Y 撤销和重做。"
+    },
+    "split": {
+      "summaryEvery": "{count, plural, other {# 个输出文件}}——每页一个 PDF，以 ZIP 形式交付。",
+      "summaryExtract": "{count, plural, other {# 个输出文件}}——每页选定的页面一个 PDF，以 ZIP 形式交付。",
+      "summaryExtractEmpty": "点击页面，将每一页提取为单独的 PDF。",
+      "summaryRanges": "{count, plural, other {# 个输出文件}}：{groups}，以 ZIP 形式交付。",
+      "processEvery": "按每页拆分",
+      "processExtract": "提取所选页面",
+      "processRanges": "立即拆分",
+      "activity": "拆分中",
+      "modeRanges": "页码范围",
+      "modeExtract": "提取页面",
+      "modeEvery": "每页",
+      "modeAria": "拆分模式",
+      "clearDividers": "清除分隔线",
+      "rangesLabel": "页码范围",
+      "rangesAria": "页码范围",
+      "rangesPlaceholder": "1-3,4-7",
+      "selectAllPages": "选择全部页面",
+      "rangesHint": "点击页面之间的空隙，可在该处添加拆分标记。每个彩色分组将成为一个输出文件。",
+      "extractHint": "点击页面进行选择——每个选定的页面将成为单独的 PDF。",
+      "rangesHintBottom": "点击空隙可添加或移除拆分标记 · 使用 Ctrl+Z / Ctrl+Y 撤销/重做 · 上方的页码范围输入框会保持同步。",
+      "extractHintBottom": "点击选择，Shift+点击选择范围 · 每个选定的页面将成为单独的文件。",
+      "everyHintBottom": "每页一个 PDF——无需选择。",
+      "splitAfter": "在第 {n} 页后拆分",
+      "removeSplitAfter": "移除第 {n} 页后的拆分",
+      "gridAria": "待拆分的页面",
+      "pageRangeExceeds": "页码超过了文档总页数（{count}）。"
+    },
+    "rotate": {
+      "summaryEmpty": "请选择页面进行旋转，或一次性旋转全部页面。",
+      "summary": "{count, plural, other {已旋转 # 页}}：{list}",
+      "processLabel": "立即旋转",
+      "activity": "旋转中",
+      "rotateLeft": "将所选内容逆时针旋转 90°",
+      "rotateRight": "将所选内容顺时针旋转 90°",
+      "rotateAll": "全部旋转 90°",
+      "resetAll": "全部重置",
+      "pagesLabel": "页面",
+      "pagesAria": "待旋转的页面",
+      "pagesPlaceholder": "1-3,5",
+      "angleLabel": "角度",
+      "angleAria": "旋转角度",
+      "applyToPages": "应用于页面",
+      "selectedWithAngle": "带有角度的所选页面：{ranges}",
+      "typePagesFirst": "请先输入页码，例如“1-3,5”。",
+      "pageExceeds": "页面 {pages} 超过了文档总页数（{count}）。",
+      "rotateCcw": "逆时针旋转 90°",
+      "rotateCw": "顺时针旋转 90°",
+      "gridAria": "待旋转的页面",
+      "hint": "点击选择，Shift+点击选择范围 · 页面上的 ⟲ / ⟳ 按钮仅旋转该页 · 缩略图会显示旋转后的预览；真正的旋转由服务器端应用。",
+      "rotatePageCcw": "将 {label} 逆时针旋转 90 度",
+      "rotatePageCw": "将 {label} 顺时针旋转 90 度"
+    },
+    "delete": {
+      "summaryEmpty": "点击页面以标记删除。至少须保留一页。",
+      "summary": "正在删除 {total} 页中的 {marked} 页 · 将保留 {remaining} 页。",
+      "processLabel": "删除 {count, plural, other {# 页}}",
+      "activity": "删除页面中",
+      "cannotDeleteAll": "不能删除全部页面；至少须保留一页。",
+      "pageExceeds": "页面 {pages} 超过了文档总页数（{count}）。",
+      "invertSelection": "反选",
+      "markSelected": "标记所选（{count}）",
+      "markSelectedTitle": "将所选页面标记为删除（Delete 键）",
+      "clearMarks": "清除标记",
+      "pagesToDelete": "待删除的页面",
+      "pagesToDeleteAria": "待删除的页面",
+      "pagesPlaceholder": "1,3,5-7",
+      "markForDeletion": "标记为删除",
+      "markedUndo": "✕ 已标记——撤销",
+      "markAria": "将 {label} 标记为删除",
+      "unmarkAria": "取消 {label} 的删除标记",
+      "gridAria": "待删除的页面",
+      "hint": "点击选择，Shift+点击选择范围 · “标记所选”或 Delete 键可标记所选内容 · 页面上的按钮仅标记该页 · 已标记的页面在处理前保持可见，且每个标记都可撤销。"
+    },
+    "reorder": {
+      "summaryOriginal": "页面为原始顺序——拖动缩略图可重新排列。",
+      "summaryMoved": "{count, plural, other {已移动 # 页}}：{list}{more}",
+      "summaryMore": "，另有 {count} 页",
+      "processLabel": "立即重新排序",
+      "activity": "重新排序中",
+      "reverseOrder": "反转顺序",
+      "resetOriginal": "重置为原始顺序",
+      "moveUp": "↑ 上移",
+      "moveUpTitle": "将所选内容向前移动一步 (Ctrl+←)",
+      "moveDown": "↓ 下移",
+      "moveDownTitle": "将所选内容向后移动一步 (Ctrl+→)",
+      "orderLabel": "顺序",
+      "orderAria": "页面顺序",
+      "orderError": "顺序必须是页面 1..{count} 的排列，例如“{example}”。",
+      "gridAria": "新顺序下的页面",
+      "hint": "拖动缩略图可重新排序（位置编号会实时更新）· 选择页面后按 Ctrl+← / Ctrl+→ 移动 · 上方的顺序输入框会保持同步，也可直接输入排列。",
+      "position": "第 {n} 位"
+    }
+  },
+  "errors": {
+    "tool_error": "出了点问题。请再试一次。",
+    "internal_error": "处理失败。请再试一次。",
+    "server_restart": "处理此任务期间服务器重启了。请再试一次。",
+    "invalid_option": "页码或选项无效。请检查页码后重试。",
+    "bad_option": "选项值无效。请检查数值后重试。",
+    "bad_options": "选项值无效。请检查数值后重试。",
+    "missing_input": "缺少必需的文件。请上传文件后重试。",
+    "missing_option": "缺少必需的选项。",
+    "invalid_input": "无法读取上传的文件。请确认它是有效的 PDF 后重试。",
+    "ocr_failed": "此文件的文字识别失败。",
+    "ocr_unavailable": "文字识别暂时不可用。请稍后再试。",
+    "wrong_password": "密码错误。请检查后重试。",
+    "quota_exceeded": "本小时的免费使用次数已用完。请于 {time} 后重试。",
+    "file_too_large": "文件过大。上传上限为 {mb} MB。",
+    "lost_contact": "与服务器失去连接。",
+    "download_failed": "下载失败。",
+    "not_loaded": "工具尚未加载。",
+    "failed_to_load": "工具加载失败。",
+    "invalid_page_range": "页码范围“{token}”无效。请使用“1-3,5”这样的格式。",
+    "invalid_range_start": "范围 {range} 无效：页码从 1 开始。",
+    "select_at_least_one_page": "请至少选择一页。",
+    "rotate_at_least_one_page": "请至少旋转一页。",
+    "cannot_delete_all": "不能删除全部页面；至少须保留一页。",
+    "nothing_to_reorder": "没有可重新排序的内容。",
+    "output_too_large": "结果过大，无法下载。",
+    "pdf_unreadable": "此文件无法作为 PDF 读取。",
+    "pdf_unreadable_one": "其中一个文件无法作为 PDF 读取。"
+  },
+  "toolOptions": {
+    "compress": {
+      "target_mb": {
+        "label": "目标大小 (MB)",
+        "help": "压缩至不超过此大小。法院电子提交（CM/ECF）的上限因法院而异，大约在 3–200 MB 之间——25 MB 最为常见。请查看您所在法院的地方法规。"
+      }
+    },
+    "crop": {
+      "top": {
+        "label": "顶部边距 (pt)",
+        "help": "从顶部边缘裁剪的点数。"
+      },
+      "bottom": {
+        "label": "底部边距 (pt)",
+        "help": "从底部边缘裁剪的点数。"
+      },
+      "left": {
+        "label": "左侧边距 (pt)",
+        "help": "从左侧边缘裁剪的点数。"
+      },
+      "right": {
+        "label": "右侧边距 (pt)",
+        "help": "从右侧边缘裁剪的点数。"
+      },
+      "pages": {
+        "label": "页面",
+        "help": "从 1 开始的范围，如“1-3,5”。留空表示全部页面。"
+      }
+    },
+    "delete_pages": {
+      "pages": {
+        "label": "待删除的页面",
+        "help": "从 1 开始的待删除页面，例如“1,3,5-7”。"
+      }
+    },
+    "edit_metadata": {
+      "title": {
+        "label": "标题",
+        "help": "文档标题。留空则移除。"
+      },
+      "author": {
+        "label": "作者",
+        "help": "文档作者。留空则移除。"
+      },
+      "subject": {
+        "label": "主题",
+        "help": "文档主题。留空则移除。"
+      },
+      "keywords": {
+        "label": "关键词",
+        "help": "文档关键词。留空则移除。"
+      }
+    },
+    "exhibit_combine": {
+      "exhibit_prefix": {
+        "label": "证据标签",
+        "help": "印在每张分隔页上的词，例如“Exhibit”。"
+      },
+      "bates_prefix": {
+        "label": "贝茨编号前缀",
+        "help": "编号的前缀，例如“BATES”会生成 BATES-000001。"
+      },
+      "bates_start": {
+        "label": "起始贝茨编号",
+        "help": "编号从此开始（正整数）。"
+      },
+      "slip_sheets": {
+        "label": "在证据材料之间添加分隔页",
+        "help": ""
+      }
+    },
+    "extract_text": {
+      "pages": {
+        "label": "页面",
+        "help": "从 1 开始的范围，如“1-3,5”。留空表示全部页面。"
+      }
+    },
+    "grayscale": {
+      "dpi": {
+        "label": "分辨率 (DPI)",
+        "help": "以每英寸点数表示的渲染分辨率（72–600）。"
+      }
+    },
+    "merge": {
+      "page_order": {
+        "label": "页面顺序 (JSON)",
+        "help": "可选的 [文件, 页面] 对组成的 JSON 列表，按合并顺序排列，例如“[[1,2],[0,1]]”表示先合并第 2 个文件的第 2 页，再合并第 1 个文件的第 1 页。文件编号从 0 开始，页码从 1 开始。省略则按上传顺序合并全部页面。"
+      }
+    },
+    "n_up": {
+      "layout": {
+        "label": "每张纸的页数",
+        "help": "每张纸上放置多少源页面。"
+      },
+      "sheet": {
+        "label": "纸张大小",
+        "help": "输出纸张大小。"
+      },
+      "orientation": {
+        "label": "方向",
+        "help": "纸张方向。",
+        "choices": {
+          "portrait": "纵向",
+          "landscape": "横向"
+        }
+      }
+    },
+    "ocr": {
+      "language": {
+        "label": "语言",
+        "help": "Tesseract 语言代码，例如“eng”或“eng+deu”。"
+      }
+    },
+    "page_numbers": {
+      "vertical": {
+        "label": "垂直位置",
+        "help": "",
+        "choices": {
+          "top": "顶部",
+          "bottom": "底部"
+        }
+      },
+      "horizontal": {
+        "label": "水平位置",
+        "help": "",
+        "choices": {
+          "left": "左侧",
+          "center": "居中",
+          "right": "右侧"
+        }
+      },
+      "start_number": {
+        "label": "起始页码",
+        "help": "第一个页码（正整数）。"
+      },
+      "prefix": {
+        "label": "前缀",
+        "help": ""
+      },
+      "suffix": {
+        "label": "后缀",
+        "help": ""
+      },
+      "font_size": {
+        "label": "字体大小",
+        "help": "6 至 48。"
+      },
+      "pages": {
+        "label": "页面",
+        "help": "从 1 开始的范围，如“1-3,5”。留空表示全部页面。"
+      }
+    },
+    "password_protect": {
+      "password": {
+        "label": "密码",
+        "help": null
+      }
+    },
+    "pdf_to_images": {
+      "format": {
+        "label": "图片格式",
+        "help": "输出图片格式。"
+      },
+      "dpi": {
+        "label": "分辨率 (DPI)",
+        "help": null
+      },
+      "pages": {
+        "label": "页面",
+        "help": "从 1 开始的范围，如“1-3,5”。留空表示全部页面。"
+      }
+    },
+    "redact": {
+      "patterns": {
+        "label": "待涂黑的文本",
+        "help": "用逗号分隔的、需要涂黑的原文字符串，例如“SSN, john@example.com”。"
+      },
+      "rasterise": {
+        "label": "栅格化页面（最强的涂黑处理）",
+        "help": "涂黑后将每一页渲染为图片，使文件中不再残留任何文本层。输出中的文本将无法再被选中或搜索。"
+      }
+    },
+    "reorder_pages": {
+      "order": {
+        "label": "页面顺序",
+        "help": "从 1 开始的页面 1..N 的排列，例如“3,1,2”。"
+      }
+    },
+    "rotate_pages": {
+      "angle": {
+        "label": "旋转角度",
+        "help": "应用于所选页面的顺时针旋转角度。"
+      },
+      "pages": {
+        "label": "页面",
+        "help": "从 1 开始的范围，如“1-3,5”。留空表示全部页面。"
+      },
+      "rotations": {
+        "label": "每页旋转角度 (JSON)",
+        "help": "可选的 JSON 对象，将从 1 开始的页码映射到角度，例如 '{\"1\": 90, \"3\": 180}'。如果填写，将取代角度+页面设置，使每一页可以按不同角度旋转。"
+      }
+    },
+    "split": {
+      "mode": {
+        "label": "拆分模式",
+        "help": "“ranges”：按逗号分隔的范围，每段一个 PDF。“every”：每页一个 PDF。",
+        "choices": {
+          "ranges": "页码范围",
+          "every": "每页"
+        }
+      },
+      "ranges": {
+        "label": "页码范围",
+        "help": "从 1 开始的范围，如“1-3,5”。模式为“ranges”时必填。"
+      }
+    },
+    "unlock_pdf": {
+      "password": {
+        "label": "当前密码",
+        "help": "当前保护该 PDF 的密码。"
+      }
+    },
+    "watermark": {
+      "text": {
+        "label": "水印文本",
+        "help": null
+      },
+      "opacity": {
+        "label": "不透明度",
+        "help": "0.1（浅）至 0.5（深）。"
+      }
+    }
+  },
+  "lawyers": {
+    "title": "律师 PDF 工具",
+    "intro": "正确涂黑、清除隐藏的元数据、按法院提交上限压缩文件、合并证据材料并添加贝茨编号。免费，无需注册、无水印。",
+    "workflowTitle": "提交流程，按顺序进行",
+    "workflow": [
+      {
+        "step": "涂黑",
+        "text": "敏感文本——文本会从文件中真正删除，并且输出经过验证，而不仅仅是涂黑遮盖。"
+      },
+      {
+        "step": "清除元数据",
+        "text": "——移除作者、日期和软件信息，并提供修改前后对比报告。"
+      },
+      {
+        "step": "压缩",
+        "text": "至法院的大小上限。"
+      },
+      {
+        "step": "合并证据材料",
+        "text": "添加分隔页和贝茨编号，合并为一个可直接提交的 PDF。"
+      }
+    ],
+    "guides": [
+      {
+        "title": "涂黑证词附件",
+        "answer": "这里的涂黑处理会将文本从文件中真正删除，而不仅仅是用黑框遮盖——并且输出会重新检查，确保被涂黑的词语无法被提取。如需最大程度的保障，请开启“栅格化页面”：每一页都会变成图片，文件中不再残留任何文本层。",
+        "tool": "/tools/redact",
+        "toolName": "涂黑 PDF"
+      },
+      {
+        "title": "将证据材料合并为可直接提交的 PDF",
+        "answer": "按顺序上传您的证据材料，即可得到一个文档：每件证据材料前有一张分隔页（证据 A、B、C……，含文件名和页数），贝茨编号在所有证据材料的每一页上连续加盖。",
+        "tool": "/tools/exhibit_combine",
+        "toolName": "合并证据材料"
+      },
+      {
+        "title": "将诉状压缩到法院的上限以下",
+        "answer": "请选择法院的大小上限——25 MB 是最常见的 CM/ECF 上限，但各法院从约 3 MB 到 200 MB 不等，请查看您所在法院的地方法规。该工具会缩小文件以符合上限，ZIP 中还包含一份报告，显示压缩前后的大小。",
+        "tool": "/tools/compress",
+        "toolName": "压缩 PDF"
+      },
+      {
+        "title": "在将文件发给对方之前清除元数据",
+        "answer": "PDF 可能包含作者姓名、创建日期和制作软件等信息。“清除元数据”可一键全部移除，并提供修改前后对比报告，证明已移除的内容。",
+        "tool": "/tools/strip_metadata",
+        "toolName": "清除元数据"
+      },
+      {
+        "title": "移除案件照片中的位置信息",
+        "answer": "照片通常在 EXIF 数据中包含 GPS 坐标和相机信息。“清除图片元数据”会列出每张照片携带的信息，将其移除，并报告已移除的内容。请注意：它不会验证 C2PA/AI 标记的移除——请使用 ClearMark 处理此类标记。",
+        "tool": "/tools/strip_image_metadata",
+        "toolName": "清除图片元数据"
+      },
+      {
+        "title": "查看收到的 PDF 包含哪些元数据",
+        "answer": "在使用一份文件之前，先看看其中隐藏了什么信息。“查看元数据”会读取标题、作者、日期、创建者和制作软件，并以 JSON 形式返回结果。",
+        "tool": "/tools/metadata",
+        "toolName": "查看元数据"
+      },
+      {
+        "title": "在提交前修正文件的标题或作者",
+        "answer": "如果 PDF 中存储的标题或作者有误——或提到了不该出现的人——“编辑元数据”可让您设置或清除标题、作者、主题和关键词，而不改动页面内容。",
+        "tool": "/tools/edit_metadata",
+        "toolName": "编辑元数据"
+      },
+      {
+        "title": "为提交文件添加页码",
+        "answer": "可在任意角落添加页码，从任意数字开始编号，如法院要求，还可添加前缀或后缀。您可以只为选定的页码范围编号，其余页面保持不变。",
+        "tool": "/tools/page_numbers",
+        "toolName": "添加页码"
+      },
+      {
+        "title": "将支持文件合并为一个文件包",
+        "answer": "将 2 到 20 个 PDF 按上传顺序合并为一个文件——诉状、附件和支持文件合为一个文件包，而不是多个文件。",
+        "tool": "/tools/merge",
+        "toolName": "合并 PDF"
+      },
+      {
+        "title": "从文件包中取出一份文件",
+        "answer": "按页码范围（例如 1–3、5）拆分 PDF，或将每页拆分为单独的文件，结果以 ZIP 形式下载。当文件包以单个文件形式到达，而您只需要其中一件证据材料时，这会很有用。",
+        "tool": "/tools/split",
+        "toolName": "拆分 PDF"
+      },
+      {
+        "title": "为敏感文件设置密码保护",
+        "answer": "在发送 PDF 之前为其添加密码，只有知道密码的人才能打开。如果您收到受保护的文件并且知道密码，“解锁 PDF”可以移除保护。",
+        "tool": "/tools/password_protect",
+        "toolName": "保护 PDF"
+      },
+      {
+        "title": "让扫描文件可以搜索",
+        "answer": "扫描页是图片，不是文本——无法搜索，也无法复制其中的内容。OCR 会添加一层不可见的文本层，使文档可以搜索，同时外观完全不变。",
+        "tool": "/tools/ocr",
+        "toolName": "OCR 文字识别"
+      }
+    ],
+    "limitsTitle": "关于限制的说明",
+    "limitsText": "PDFEDI 是一个工具，不是律师。法院的提交上限、涂黑义务和披露规则因法院和司法管辖区而异——提交前请查看您所在法院的地方法规和您的职业义务。这里的涂黑处理会移除您指定的文本；提交前请务必检查输出结果。上传到这些工具的文件会在我们的服务器上处理——请参阅<link>我们如何处理您的文件</link>。"
+  },
+  "privacy": {
+    "title": "我们如何处理您的文件",
+    "intro": "直截了当，不用常见的隐私口号。PDFEDI 上有两种处理文件方式不同的工具。",
+    "serverTitle": "服务器工具（本站大多数工具）",
+    "serverText": "当您使用合并、涂黑或压缩等工具时，您的文件会上传到我们的服务器，在那里处理，然后将结果发回给您下载。您的文件确实会离开您的设备——任何对服务器处理工具作出相反说法的人都没有说实话。我们承诺做到以下几点：",
+    "serverPoints": [
+      "无需账户、无需注册，不索要电子邮件地址。",
+      "文件自动处理、自动删除。",
+      "您的文件内容不会被保留、不会分享给任何人，也不会用于训练任何模型。",
+      "我们只统计匿名使用量（某个工具运行了多少次），以便保持免费额度公平——我们不会记录您的文件内容。"
+    ],
+    "serverNote": "由于这些工具在服务器上运行，“飞行模式测试”并不适用于它们：如果断开互联网连接，服务器工具完全无法工作。适用的是工具内置的检查——例如，涂黑工具会重新检查输出，确保被涂黑的文本无法被提取；清除元数据工具会提供修改前后对比报告，准确显示已移除的内容。",
+    "previewTitle": "浏览器中的预览",
+    "previewText": "在整理工具（合并、拆分、重新排序、删除、旋转）中，您看到的页面缩略图是在您的浏览器中根据您设备上的文件渲染的——显示预览时不会上传任何内容。处理仍在我们的服务器上进行：当您按下处理按钮时，文件会被上传、处理，结果发回供您下载。",
+    "checkTitle": "如何自行验证我们的说法",
+    "checkPoints": [
+      {
+        "title": "涂黑：",
+        "text": "涂黑后，尝试在输出的 PDF 中搜索被涂黑的词语——应该找不到。开启“栅格化页面”后，输出将完全没有文本层。"
+      },
+      {
+        "title": "元数据：",
+        "text": "打开“清除元数据”附带的 metadata_report.json，或对清理后的文件使用“查看元数据”，并与原始文件进行对比。"
+      },
+      {
+        "title": "预览：",
+        "text": "在整理页面时打开浏览器的“网络”选项卡——在按下处理按钮之前，不会发生任何上传。"
+      }
+    ],
+    "dontTitle": "我们不会做的事",
+    "dontPoints": [
+      "我们不会出售或分享您的文件。",
+      "使用免费工具时，我们不会要求您注册账户。",
+      "我们不会声称服务器处理的文件“从不离开您的设备”——它们确实会离开设备进行处理，然后被删除。"
+    ],
+    "backLink": "← 返回全部工具",
+    "localeNote": "您的语言偏好仅存储在您自己的浏览器中，以便下次以您的语言显示网站。它绝不会发送到我们的服务器。"
+  },
+  "suggest": {
+    "title": "是否要以{language}查看 PDFEDI？",
+    "subtitle": "{nativeName}——将界面切换为{language}。您可以随时切换回来。",
+    "switch": "切换为{language}",
+    "continue": "继续使用英文",
+    "dismiss": "关闭"
+  },
+  "switcher": {
+    "label": "语言",
+    "current": "当前语言：{language}",
+    "choose": "选择语言"
+  },
+  "seo": {
+    "whatItDoes": "{h1}——功能介绍",
+    "howToUse": "如何使用{h1}",
+    "keyFeatures": "主要功能",
+    "whenToUse": "何时使用{h1}",
+    "faq": "常见问题",
+    "relatedTools": "相关工具",
+    "privateByDesign": "注重隐私",
+    "privateNote": "您上传的文件会被安全处理，之后自动删除。PDFEDI 从不要求您注册账户——只需选择一个工具即可开始。每个文件最大 50MB，每个工具每小时可免费使用 5 次。",
+    "breadcrumbHome": "首页"
+  }
+}
