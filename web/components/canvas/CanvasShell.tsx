@@ -1,15 +1,12 @@
 // Canvas shell — the shared frame for the five organizer tools.
-//
-// Top bar (tool name, file name, reset), centre workspace (the tool's
-// toolbar + thumbnail grid, passed as children), sticky bottom action
-// bar (what-will-happen summary, the exact job payload in a
-// collapsible "What will be sent", and the Process button), plus the
-// upload dropzone and the processing/completed/failed views. Tier 0
-// tools keep the existing ToolRunner; this replaces its `max-w-2xl`
-// single column for canvas tools only.
+// All user-visible strings come from the canvas/runner messages
+// namespaces. The `locale` prop makes the privacy link locale-aware.
 "use client";
 
 import { useRef, useState, type ReactNode } from "react";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { toLocalePath } from "../../i18n/routing";
 import type { CanvasPhase } from "./useOrganizerJob";
 
 interface CanvasShellProps {
@@ -36,6 +33,7 @@ interface CanvasShellProps {
   downloadPct: number | null;
   activityLabel: string;
   error: string | null;
+  locale: string;
   children: ReactNode;
 }
 
@@ -63,8 +61,11 @@ export function CanvasShell({
   downloadPct,
   activityLabel,
   error,
+  locale,
   children,
 }: CanvasShellProps) {
+  const t = useTranslations("canvas");
+  const tRunner = useTranslations("runner");
   const inputRef = useRef<HTMLInputElement>(null);
   const [dragOver, setDragOver] = useState(false);
 
@@ -83,14 +84,14 @@ export function CanvasShell({
             onClick={onReset}
             className="rounded-lg border border-slate-300 px-3 py-1.5 text-sm text-slate-600 hover:border-brand-600 hover:text-brand-600"
           >
-            Start over
+            {t("startOver")}
           </button>
         )}
       </div>
       {quota && (
         <p className="mt-2 text-xs text-slate-500">
-          {quota.remaining} of {quota.limit} free uses left this hour
-          {uploadPending && <> · Uploading to server…</>}
+          {tRunner("quotaLeft", { remaining: quota.remaining, limit: quota.limit })}
+          {uploadPending && <> · {t("uploadingToServer")}</>}
         </p>
       )}
 
@@ -102,21 +103,18 @@ export function CanvasShell({
 
       {totalPages > 200 && showWorkspace && (
         <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-          Large document ({totalPages} pages). Thumbnails load as you scroll; Split
-          produces at most 200 output files per job.
+          {t("largeDoc", { count: totalPages })}
         </div>
       )}
       {totalPages > 50 && totalPages <= 200 && showWorkspace && (
-        <p className="mt-3 text-xs text-slate-500">
-          {totalPages} pages — thumbnails load as you scroll.
-        </p>
+        <p className="mt-3 text-xs text-slate-500">{t("pagesScroll", { count: totalPages })}</p>
       )}
 
       {showDropzone && (
         <div
           role="button"
           tabIndex={0}
-          aria-label={`Choose PDF file${maxFiles > 1 ? "s" : ""}`}
+          aria-label={maxFiles > 1 ? t("dropAriaPlural") : t("dropAria")}
           className={`mt-6 cursor-pointer rounded-2xl border-2 border-dashed px-6 py-14 text-center ${
             dragOver || phase === "uploading"
               ? "border-brand-500 bg-brand-50"
@@ -154,11 +152,10 @@ export function CanvasShell({
             }}
           />
           <p className="text-lg font-semibold">
-            {phase === "uploading" ? "Uploading…" : "Drop PDF file(s) here or click to choose"}
+            {phase === "uploading" ? t("dropTitleUploading") : t("dropTitle")}
           </p>
           <p className="mt-1 text-sm text-slate-500">
-            Up to {maxFiles} file(s), {maxUploadMb}&nbsp;MB each. No sign-up needed.
-            Files are processed on our server — previews below are rendered in your browser.
+            {t("dropSub", { max: maxFiles, mb: maxUploadMb })}
           </p>
         </div>
       )}
@@ -166,8 +163,10 @@ export function CanvasShell({
       {showWorkspace && (
         <>
           <p className="mt-4 text-sm text-slate-600">
-            <span className="font-semibold">{fileLabel}</span>
-            {totalPages > 0 && <> · {totalPages} page{totalPages === 1 ? "" : "s"}</>}
+            <span className="font-semibold">
+              <bdi>{fileLabel}</bdi>
+            </span>
+            {totalPages > 0 && <> · {t("fileLabelPages", { count: totalPages })}</>}
           </p>
           {children}
         </>
@@ -181,7 +180,7 @@ export function CanvasShell({
           )}
           <details className="mt-2 text-xs text-slate-500">
             <summary className="cursor-pointer font-medium text-slate-600">
-              What will be sent
+              {t("whatWillBeSent")}
             </summary>
             <pre
               data-testid="job-payload"
@@ -197,9 +196,9 @@ export function CanvasShell({
             className="mt-3 w-full rounded-xl bg-brand-600 px-4 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
           >
             {busy
-              ? "Starting…"
+              ? t("starting")
               : uploadPending
-                ? "Uploading to server…"
+                ? t("uploadingToServer")
                 : processLabel}
           </button>
         </div>
@@ -209,41 +208,43 @@ export function CanvasShell({
         <div className="mt-6 rounded-2xl bg-white p-8 text-center shadow-sm">
           <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-brand-600" />
           <p className="mt-4 font-semibold">{activityLabel}…</p>
-          <p className="mt-1 text-sm text-slate-500">This usually takes a few seconds.</p>
+          <p className="mt-1 text-sm text-slate-500">{t("processingSub")}</p>
         </div>
       )}
 
       {phase === "failed" && (
         <div className="mt-6 rounded-2xl border border-red-200 bg-white p-6 text-center shadow-sm">
-          <p className="text-lg font-semibold text-red-700">Failed</p>
-          <p className="mt-2 text-sm text-slate-600">{error || "Something went wrong."}</p>
+          <p className="text-lg font-semibold text-red-700">{t("failedTitle")}</p>
+          <p className="mt-2 text-sm text-slate-600">{error || t("failedFallback")}</p>
           <button
             onClick={onBackToOrganize}
             className="mt-4 rounded-xl bg-brand-600 px-5 py-2.5 font-semibold text-white hover:bg-brand-700"
           >
-            Back to editor
+            {t("backToEditor")}
           </button>
         </div>
       )}
 
       {phase === "completed" && (
         <div className="mt-6 rounded-2xl bg-white p-6 text-center shadow-sm">
-          <p className="text-lg font-semibold text-green-700">Completed</p>
+          <p className="text-lg font-semibold text-green-700">{t("completedTitle")}</p>
           <p className="mt-2 text-xs text-slate-500">
-            Your file was processed on our server and is deleted automatically.
-            Files are never kept or shared.{" "}
-            <a href="/how-we-handle-files" className="font-semibold text-brand-600 hover:text-brand-700">
-              How we handle your files →
-            </a>
+            {t("completedNote")}{" "}
+            <Link
+              href={toLocalePath("/how-we-handle-files", locale)}
+              className="font-semibold text-brand-600 hover:text-brand-700"
+            >
+              {t("completedLink")}
+            </Link>
           </p>
           <button
             onClick={onDownload}
             className="mt-4 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700 disabled:opacity-50"
           >
-            {downloadPct !== null && downloadPct > 0 ? `Downloading… ${downloadPct}%` : "Download result"}
+            {downloadPct !== null && downloadPct > 0 ? t("downloadingPct", { pct: downloadPct }) : t("downloadResult")}
           </button>
           <button onClick={onReset} className="mt-4 block w-full text-sm text-slate-500 hover:text-brand-600">
-            Start over
+            {t("startOver")}
           </button>
         </div>
       )}
