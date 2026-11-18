@@ -6,7 +6,8 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, type Job, type ToolSpec, type UploadedFile } from "../../lib/api";
+import { useTranslations } from "next-intl";
+import { ApiError, api, type Job, type ToolSpec, type UploadedFile } from "../../lib/api";
 
 export type CanvasPhase =
   | "pick"
@@ -18,7 +19,33 @@ export type CanvasPhase =
 
 export type OrganizerJob = ReturnType<typeof useOrganizerJob>;
 
+// The server resets quota windows on the clock hour.
+function quotaResetTime(): string {
+  const d = new Date();
+  d.setHours(d.getHours() + 1, 0, 0, 0);
+  return `${String(d.getHours()).padStart(2, "0")}:00`;
+}
+
 export function useOrganizerJob(toolKey: string) {
+  const tErr = useTranslations("errors");
+  const tRunner = useTranslations("runner");
+
+  // Translate an API failure by stable code; fall back to the English
+  // message only when no code is available (e.g. a network failure).
+  function resolveError(e: unknown): string {
+    if (e instanceof ApiError) {
+      if (e.status === 429) return tErr("quota_exceeded", { time: quotaResetTime() });
+      if (e.code && tErr.has(e.code)) return tErr(e.code);
+      return e.message;
+    }
+    return e instanceof Error ? e.message : String(e);
+  }
+
+  // Translate a failed job: prefer the backend error code.
+  function jobError(j: Job): string {
+    if (j.error_code && tErr.has(j.error_code)) return tErr(j.error_code);
+    return j.error || tErr("internal_error");
+  }
   const [spec, setSpec] = useState<ToolSpec | null>(null);
   const [specError, setSpecError] = useState<string | null>(null);
   const [phase, setPhase] = useState<CanvasPhase>("pick");
@@ -49,12 +76,12 @@ export function useOrganizerJob(toolKey: string) {
 
   const uploadFiles = useCallback(
     async (list: File[]): Promise<UploadedFile[]> => {
-      if (!spec) throw new Error("Tool not loaded yet.");
+      if (!spec) throw new Error(tErr("not_loaded"));
       const maxBytes = (limits?.max_upload_mb ?? 50) * 1024 * 1024;
       const tooBig = list.find((f) => f.size > maxBytes);
       if (tooBig) {
         throw new Error(
-          `"${tooBig.name}" exceeds the ${limits?.max_upload_mb ?? 50} MB upload limit.`,
+          tRunner("tooBig", { name: tooBig.name, mb: limits?.max_upload_mb ?? 50 }),
         );
       }
       setError(null);
@@ -99,19 +126,19 @@ export function useOrganizerJob(toolKey: string) {
               setPhase("completed");
             } else if (cur.status === "failed" || cur.status === "cancelled") {
               stopPolling();
-              setError(cur.error || "Processing failed. Please try again.");
+              setError(jobError(cur));
               setPhase("failed");
             }
           } catch (e) {
             stopPolling();
-            setError(e instanceof Error ? e.message : "Lost contact with the server.");
+            setError(resolveError(e));
             setPhase("failed");
           }
         };
         await tick();
         pollRef.current = setInterval(tick, 800);
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        setError(resolveError(e));
         api.quota(toolKey).then(setQuota).catch(() => {});
         setPhase("organize");
       } finally {
@@ -127,7 +154,7 @@ export function useOrganizerJob(toolKey: string) {
     setError(null);
     try {
       const res = await fetch(api.downloadUrl(job.output_file_id));
-      if (!res.ok || !res.body) throw new Error(`Download failed (${res.status})`);
+      if (!res.ok || !res.body) throw new Error(tErr("download_failed"));
       const total = Number(res.headers.get("content-length") || 0);
       const reader = res.body.getReader();
       const chunks: Uint8Array[] = [];
@@ -149,7 +176,7 @@ export function useOrganizerJob(toolKey: string) {
       a.remove();
       setTimeout(() => URL.revokeObjectURL(url), 5000);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Download failed.");
+      setError(e instanceof Error ? e.message : tErr("download_failed"));
     } finally {
       setDownloadPct(null);
     }
