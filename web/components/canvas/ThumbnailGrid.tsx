@@ -14,6 +14,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 export interface GridCell {
   id: string;
@@ -68,6 +69,7 @@ function LazyThumb({
   loadThumb: (item: GridCell) => Promise<string | null>;
   angle: number;
 }) {
+  const t = useTranslations("canvas");
   const [src, setSrc] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -109,10 +111,17 @@ function LazyThumb({
           style={rotated ? { transform: `rotate(${angle}deg) scale(0.72)` } : undefined}
         />
       ) : (
-        <span className="text-xs text-slate-400">Loading…</span>
+        <span className="text-xs text-slate-400">{t("loadingThumb")}</span>
       )}
     </div>
   );
+}
+
+// In RTL locales the grid flows right-to-left: ArrowRight moves to the
+// visually-right (earlier-index) cell, and the drop side flips too.
+// The PDF thumbnails themselves are never mirrored.
+function isRtlDoc(): boolean {
+  return typeof document !== "undefined" && document.documentElement.dir === "rtl";
 }
 
 export function ThumbnailGrid({
@@ -128,6 +137,7 @@ export function ThumbnailGrid({
   onPreview,
   ariaLabel,
 }: ThumbnailGridProps) {
+  const t = useTranslations("canvas");
   const [dragId, setDragId] = useState<string | null>(null);
   const [dropIndex, setDropIndex] = useState<number | null>(null);
   const dragState = useRef<{
@@ -161,7 +171,9 @@ export function ThumbnailGrid({
       if (cell) {
         const idx = Number((cell as HTMLElement).dataset.index);
         const rect = cell.getBoundingClientRect();
-        const after = e.clientX > rect.left + rect.width / 2;
+        const mid = rect.left + rect.width / 2;
+        // In RTL, the right half of a cell is *before* it in reading order.
+        const after = isRtlDoc() ? e.clientX < mid : e.clientX > mid;
         di = after ? idx + 1 : idx;
       }
       dropIndexRef.current = di;
@@ -210,7 +222,9 @@ export function ThumbnailGrid({
     if ((e.ctrlKey || e.metaKey) && (e.key === "ArrowLeft" || e.key === "ArrowRight")) {
       if (selected.length > 0 && onMoveSelected) {
         e.preventDefault();
-        onMoveSelected(e.key === "ArrowRight" ? 1 : -1);
+        // In RTL, ArrowRight moves toward the visually-right (earlier) position.
+        const right = e.key === "ArrowRight";
+        onMoveSelected(isRtlDoc() ? (right ? -1 : 1) : right ? 1 : -1);
       }
       return;
     }
@@ -219,8 +233,9 @@ export function ThumbnailGrid({
       const cur = selected.length > 0 ? ids.indexOf(selected[selected.length - 1]) : -1;
       const cols = Math.max(1, Math.floor((gridRef.current?.clientWidth ?? 600) / 160));
       let next = cur;
-      if (e.key === "ArrowRight") next = Math.min(ids.length - 1, cur + 1);
-      if (e.key === "ArrowLeft") next = Math.max(0, cur - 1);
+      const rtl = isRtlDoc();
+      if (e.key === "ArrowRight") next = rtl ? Math.max(0, cur - 1) : Math.min(ids.length - 1, cur + 1);
+      if (e.key === "ArrowLeft") next = rtl ? Math.min(ids.length - 1, cur + 1) : Math.max(0, cur - 1);
       if (e.key === "ArrowDown") next = Math.min(ids.length - 1, cur + cols);
       if (e.key === "ArrowUp") next = Math.max(0, cur - cols);
       if (next !== cur && next >= 0) {
@@ -259,7 +274,7 @@ export function ThumbnailGrid({
               data-index={index}
               role="gridcell"
               aria-selected={isSelected}
-              aria-label={`${item.label}${item.sublabel ? `, ${item.sublabel}` : ""}${item.markedDelete ? ", marked for deletion" : ""}${item.removed ? ", removed" : ""}`}
+              aria-label={`${item.label}${item.sublabel ? `, ${item.sublabel}` : ""}${item.markedDelete ? `, ${t("markedForDeletion")}` : ""}${item.removed ? `, ${t("removed")}` : ""}`}
               tabIndex={-1}
               onPointerDown={(e) => {
                 // A stale suppression flag (drag ended outside the grid,
@@ -294,23 +309,23 @@ export function ThumbnailGrid({
               <div className="relative">
                 <LazyThumb item={item} loadThumb={loadThumb} angle={item.angle ?? 0} />
                 {item.position !== undefined && (
-                  <span className="absolute left-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white">
+                  <span className="absolute start-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-slate-800 text-xs font-bold text-white">
                     {item.position}
                   </span>
                 )}
                 {item.angle !== undefined && item.angle % 360 !== 0 && (
-                  <span className="absolute right-1 top-1 rounded-full bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
+                  <span className="absolute end-1 top-1 rounded-full bg-brand-600 px-2 py-0.5 text-xs font-bold text-white">
                     {item.angle}°
                   </span>
                 )}
                 {item.markedDelete && (
                   <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-red-600/90 px-2 py-1 text-center text-xs font-bold text-white">
-                    ✕ Will be deleted
+                    {t("willBeDeleted")}
                   </span>
                 )}
                 {item.removed && (
                   <span className="absolute inset-x-0 top-1/2 -translate-y-1/2 bg-slate-700/90 px-2 py-1 text-center text-xs font-bold text-white">
-                    Removed
+                    {t("removed")}
                   </span>
                 )}
               </div>
