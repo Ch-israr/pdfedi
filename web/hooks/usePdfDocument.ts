@@ -9,6 +9,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { loadPdfFile, type LoadedPdf } from "../lib/canvas/loadPdf";
 
 export type { LoadedPdf };
@@ -24,6 +25,7 @@ export function usePdfDocument(file: File | null): {
   state: PdfLoadState;
   reload: () => void;
 } {
+  const tErr = useTranslations("errors");
   const [state, setState] = useState<PdfLoadState>({ status: "idle" });
   const pdfRef = useRef<LoadedPdf | null>(null);
   const cancelledRef = useRef(false);
@@ -43,16 +45,13 @@ export function usePdfDocument(file: File | null): {
       if (!cancelledRef.current) {
         // Log the stack: a failed load is otherwise a bare message.
         console.error("[usePdfDocument] load failed:", e instanceof Error ? e.stack : e);
-        setState({
-          status: "error",
-          message:
-            e instanceof Error
-              ? e.message
-              : "This file could not be read as a PDF.",
-        });
+        // pdf.js error text is English library detail; show the
+        // translated generic message instead (the original stays in
+        // the console log above for debugging).
+        setState({ status: "error", message: tErr("pdf_unreadable") });
       }
     }
-  }, []);
+  }, [tErr]);
 
   useEffect(() => {
     if (!file) {
@@ -83,6 +82,7 @@ export type PdfFilesState =
 
 /** Load several Files into pdf.js documents, in order. */
 export function usePdfFiles(files: File[]): { state: PdfFilesState } {
+  const tErr = useTranslations("errors");
   const [state, setState] = useState<PdfFilesState>({ status: "idle" });
   const pdfsRef = useRef<LoadedPdf[]>([]);
   const key = files.map((f) => `${f.name}:${f.size}:${f.lastModified}`).join("|");
@@ -105,11 +105,7 @@ export function usePdfFiles(files: File[]): { state: PdfFilesState } {
         setState({ status: "ready", pdfs: loaded });
       } catch (e) {
         if (!cancelled) {
-          setState({
-            status: "error",
-            message:
-              e instanceof Error ? e.message : "One of the files could not be read as a PDF.",
-          });
+          setState({ status: "error", message: tErr("pdf_unreadable_one") });
         }
       }
     })();
