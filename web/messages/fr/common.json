@@ -1,0 +1,787 @@
+{
+  "meta": {
+    "siteTitle": "PDFEDI — Outils PDF gratuits en ligne : fusionner, diviser, compresser et modifier",
+    "siteDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 26 outils PDF — sans inscription, sans filigrane, privés par conception.",
+    "homeTitle": "PDFEDI — Outils PDF gratuits en ligne : fusionner, diviser, compresser et modifier",
+    "homeDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 26 outils PDF — sans inscription, sans filigrane, privés par conception.",
+    "lawyersTitle": "Outils PDF pour avocats — Caviarder, déposer et combiner des pièces | PDFEDI",
+    "lawyersDescription": "Outils PDF gratuits pour avocats : caviardage véritable, suppression des métadonnées, compression à la taille limite du tribunal, combinaison de pièces avec numéros Bates. Sans inscription, sans filigrane.",
+    "lawyersOgDescription": "Caviardez, supprimez les métadonnées, compressez à la limite de dépôt de votre tribunal et combinez des pièces avec numéros Bates — gratuit, sans inscription.",
+    "privacyTitle": "Comment nous traitons vos fichiers — Confidentialité | PDFEDI",
+    "privacyDescription": "Ce qu'il advient de vos fichiers sur PDFEDI : envoyés sur notre serveur pour être traités, supprimés automatiquement, aucun compte, aucun contenu de fichier conservé ou partagé.",
+    "privacyOgDescription": "Envoyés sur notre serveur, traités, supprimés automatiquement. Aucun compte, aucun contenu de fichier conservé."
+  },
+  "chrome": {
+    "allTools": "Tous les outils",
+    "forLawyers": "Pour les avocats",
+    "tagline": "PDFEDI — outils PDF gratuits en ligne.",
+    "footerNote": "Sans inscription. Les fichiers sont traités puis supprimés automatiquement.",
+    "home": "Accueil",
+    "language": "Langue"
+  },
+  "home": {
+    "heroTitle": "Tous les outils PDF dont vous avez besoin.",
+    "heroAccent": "Gratuits.",
+    "heroSubtitle": "Fusionnez, divisez, convertissez, protégez et bien plus — directement dans votre navigateur. Sans inscription, sans filigrane.",
+    "privateTitle": "Privé par conception",
+    "privateText": "Les fichiers sont traités sur nos serveurs puis supprimés automatiquement. Nous ne demandons jamais de compte — choisissez simplement un outil et c'est parti.",
+    "privateLink": "Comment nous traitons vos fichiers →",
+    "lawyersTitle": "Pour les avocats",
+    "lawyersText": "Caviardage véritable, suppression des métadonnées, compression à la taille du tribunal et combinaison de pièces avec numéros Bates — plus 12 guides courts pour le travail de dépôt.",
+    "lawyersCta": "Voir les outils pour avocats →"
+  },
+  "categories": {
+    "organize": {
+      "name": "Organiser",
+      "tagline": "Fusionner, diviser et réorganiser les pages"
+    },
+    "convert": {
+      "name": "Convertir",
+      "tagline": "Convertir des PDF vers d'autres formats et inversement"
+    },
+    "edit": {
+      "name": "Modifier",
+      "tagline": "Retoucher le contenu et les informations du document"
+    },
+    "optimize": {
+      "name": "Optimiser",
+      "tagline": "Rendre les fichiers plus petits et plus rapides"
+    },
+    "security": {
+      "name": "Sécurité",
+      "tagline": "Protéger, déverrouiller et finaliser les documents"
+    },
+    "legal": {
+      "name": "Pour les avocats",
+      "tagline": "Caviardage, pièces et fichiers à la taille du tribunal, prêts à déposer"
+    }
+  },
+  "tools": {
+    "merge": {
+      "name": "Fusionner des PDF",
+      "tagline": "Combiner plusieurs PDF en un seul"
+    },
+    "split": {
+      "name": "Diviser un PDF",
+      "tagline": "Diviser un PDF en fichiers séparés"
+    },
+    "rotate_pages": {
+      "name": "Faire pivoter les pages",
+      "tagline": "Faire pivoter les pages d'un PDF"
+    },
+    "delete_pages": {
+      "name": "Supprimer des pages",
+      "tagline": "Supprimer des pages d'un PDF"
+    },
+    "reorder_pages": {
+      "name": "Réorganiser les pages",
+      "tagline": "Réorganiser l'ordre des pages"
+    },
+    "n_up": {
+      "name": "N-Up PDF",
+      "tagline": "Imprimer plusieurs pages par feuille"
+    },
+    "extract_text": {
+      "name": "Extraire le texte",
+      "tagline": "Extraire le texte d'un PDF"
+    },
+    "pdf_to_images": {
+      "name": "PDF vers images",
+      "tagline": "Convertir des pages en images"
+    },
+    "images_to_pdf": {
+      "name": "Images vers PDF",
+      "tagline": "Créer un PDF à partir d'images"
+    },
+    "ocr": {
+      "name": "OCR",
+      "tagline": "Rendre les PDF numérisés consultables"
+    },
+    "pdf_to_word": {
+      "name": "PDF vers Word",
+      "tagline": "Convertir un PDF en document Word modifiable"
+    },
+    "metadata": {
+      "name": "Afficher les métadonnées",
+      "tagline": "Inspecter les métadonnées d'un PDF"
+    },
+    "edit_metadata": {
+      "name": "Modifier les métadonnées",
+      "tagline": "Mettre à jour le titre, l'auteur et plus encore"
+    },
+    "watermark": {
+      "name": "Filigrane",
+      "tagline": "Apposer du texte sur chaque page"
+    },
+    "page_numbers": {
+      "name": "Numéros de page",
+      "tagline": "Ajouter des numéros de page"
+    },
+    "crop": {
+      "name": "Recadrer un PDF",
+      "tagline": "Rogner les marges des pages"
+    },
+    "grayscale": {
+      "name": "PDF en niveaux de gris",
+      "tagline": "Convertir les pages en noir et blanc"
+    },
+    "compress": {
+      "name": "Compresser un PDF",
+      "tagline": "Réduire un PDF à une taille cible pour le dépôt"
+    },
+    "repair": {
+      "name": "Réparer un PDF",
+      "tagline": "Réparer les PDF corrompus ou illisibles"
+    },
+    "password_protect": {
+      "name": "Protéger un PDF",
+      "tagline": "Ajouter un mot de passe à un PDF"
+    },
+    "unlock_pdf": {
+      "name": "Déverrouiller un PDF",
+      "tagline": "Supprimer la protection par mot de passe"
+    },
+    "redact": {
+      "name": "Caviarder",
+      "tagline": "Noircir définitivement du texte"
+    },
+    "flatten": {
+      "name": "Aplatir un PDF",
+      "tagline": "Intégrer les annotations dans les pages"
+    },
+    "strip_image_metadata": {
+      "name": "Supprimer les métadonnées des images",
+      "tagline": "Supprimer les données EXIF et GPS des photos"
+    },
+    "exhibit_combine": {
+      "name": "Combiner des pièces",
+      "tagline": "PDF prêt à déposer avec intercalaires et numéros Bates"
+    },
+    "strip_metadata": {
+      "name": "Supprimer les métadonnées",
+      "tagline": "Supprimer les métadonnées cachées, avec un rapport"
+    }
+  },
+  "runner": {
+    "loading": "Chargement…",
+    "loadFailed": "Échec du chargement de l'outil : {error}",
+    "description": "description",
+    "quotaLeft": "{remaining, plural, one {# utilisation gratuite sur {limit} restante cette heure-ci} other {# utilisations gratuites sur {limit} restantes cette heure-ci}}",
+    "quotaResets": "· Réinitialisation à {time}",
+    "steps": {
+      "uploading": "Envoi en cours",
+      "preparing": "Préparation",
+      "processing": "Traitement",
+      "converting": "Conversion",
+      "optimizing": "Optimisation",
+      "finalizing": "Finalisation",
+      "completed": "Terminé"
+    },
+    "choosePdf": "Choisir le(s) fichier(s) PDF",
+    "chooseImage": "Choisir le(s) fichier(s) image",
+    "uploading": "Envoi en cours…",
+    "fileLimit": "Jusqu'à {max, plural, one {# fichier} other {# fichiers}}, {mb} Mo chacun. Aucune inscription nécessaire.",
+    "atMost": "Cet outil accepte au maximum {max, plural, one {# fichier} other {# fichiers}}.",
+    "atLeast": "Sélectionnez au moins {min, plural, one {# fichier} other {# fichiers}}.",
+    "tooBig": "« {name} » dépasse la limite d'envoi de {mb} Mo.",
+    "startButton": "{tool} maintenant",
+    "starting": "Démarrage…",
+    "preparing": "Préparation de vos fichiers…",
+    "preparingSub": "Votre tâche est en file d'attente et va bientôt démarrer.",
+    "activeSub": "Cela prend généralement quelques secondes.",
+    "finalizing": "Finalisation de votre fichier…",
+    "finalizingSub": "Presque terminé.",
+    "failedTitle": "Échec",
+    "failedFallback": "Une erreur s'est produite.",
+    "tryAgain": "Réessayer",
+    "startOver": "Recommencer",
+    "completedTitle": "Terminé",
+    "completedNote": "Votre fichier a été traité sur notre serveur et est supprimé automatiquement. Les fichiers ne sont jamais conservés ni partagés.",
+    "completedLink": "Comment nous traitons vos fichiers →",
+    "downloadResult": "Télécharger le résultat",
+    "downloading": "Téléchargement…",
+    "downloadingPct": "Téléchargement… {pct} %",
+    "downloadFailed": "Échec du téléchargement."
+  },
+  "canvas": {
+    "startOver": "Recommencer",
+    "uploadingToServer": "Envoi vers le serveur…",
+    "largeDoc": "Document volumineux ({count} pages). Les miniatures se chargent au fur et à mesure du défilement ; la division produit au maximum 200 fichiers de sortie par tâche.",
+    "pagesScroll": "{count} pages — les miniatures se chargent au fur et à mesure du défilement.",
+    "dropTitle": "Déposez vos fichiers PDF ici ou cliquez pour choisir",
+    "dropTitleUploading": "Envoi en cours…",
+    "dropSub": "Jusqu'à {max, plural, one {# fichier} other {# fichiers}}, {mb} Mo chacun. Aucune inscription nécessaire. Les fichiers sont traités sur notre serveur — les aperçus ci-dessous sont générés dans votre navigateur.",
+    "dropAria": "Choisir un fichier PDF",
+    "dropAriaPlural": "Choisir des fichiers PDF",
+    "fileLabelPages": "{count, plural, one {# page} other {# pages}}",
+    "whatWillBeSent": "Ce qui sera envoyé",
+    "starting": "Démarrage…",
+    "processingSub": "Cela prend généralement quelques secondes.",
+    "failedTitle": "Échec",
+    "failedFallback": "Une erreur s'est produite.",
+    "backToEditor": "Retour à l'éditeur",
+    "completedTitle": "Terminé",
+    "completedNote": "Votre fichier a été traité sur notre serveur et est supprimé automatiquement. Les fichiers ne sont jamais conservés ni partagés.",
+    "completedLink": "Comment nous traitons vos fichiers →",
+    "downloadResult": "Télécharger le résultat",
+    "downloadingPct": "Téléchargement… {pct} %",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "undoTitle": "Annuler (Ctrl+Z)",
+    "redoTitle": "Rétablir (Ctrl+Y)",
+    "selectAll": "Tout sélectionner",
+    "clearSelection": "Effacer la sélection",
+    "loadingThumb": "Chargement…",
+    "willBeDeleted": "✕ Sera supprimée",
+    "removed": "Supprimée",
+    "markedForDeletion": "marquée pour suppression",
+    "previewClose": "Fermer ✕",
+    "previewRendering": "Rendu en cours…",
+    "pageLabel": "Page {n}",
+    "merge": {
+      "addMoreFiles": "Ajoutez au moins un fichier supplémentaire.",
+      "addAtLeast2": "Ajoutez au moins 2 fichiers PDF à fusionner.",
+      "summary": "{files, plural, one {Fusion de # fichier} other {Fusion de # fichiers}} · {pages, plural, one {# page} other {# pages}}{removed} → un seul PDF",
+      "summaryRemoved": " · {count, plural, one {# supprimée} other {# supprimées}}",
+      "processLabel": "Fusionner maintenant",
+      "activity": "Fusion en cours",
+      "moveFileUp": "Déplacer le fichier vers le haut",
+      "moveFileDown": "Déplacer le fichier vers le bas",
+      "removeFile": "Retirer le fichier de la fusion",
+      "fileRemoved": "(supprimé)",
+      "restore": "Restaurer",
+      "addFiles": "+ Ajouter des fichiers",
+      "previewFirstPage": "Aperçu de la première page",
+      "removeSelected": "Supprimer la sélection ({count})",
+      "restoreAllRemoved": "Restaurer tous les fichiers supprimés",
+      "gridAria": "Pages à fusionner, dans l'ordre de fusion",
+      "hint": "Faites glisser les pages pour les réorganiser (entre fichiers aussi) · Cliquez pour sélectionner, Maj+clic pour une plage · La touche Suppr retire les pages sélectionnées · Double-cliquez sur une page pour un grand aperçu · Les flèches déplacent la sélection, Ctrl+Z / Ctrl+Y annulent et rétablissent.",
+      "filePages": "{count, plural, one {# page} other {# pages}}",
+      "moveFileUpAria": "Déplacer {name} vers le haut",
+      "moveFileDownAria": "Déplacer {name} vers le bas",
+      "removeFileFromMerge": "Retirer {name} de la fusion",
+      "removeFileTitle": "Retirer le fichier de la fusion",
+      "removedFileLabel": "{name} (supprimé)",
+      "addFilesLabel": "Ajouter des fichiers",
+      "removeSelectedCount": "Supprimer la sélection ({count})",
+      "removeSelectedTitle": "Retirer les pages sélectionnées de la fusion (touche Suppr)",
+      "gridAriaOrder": "Pages à fusionner, dans l'ordre de fusion",
+      "gridHint": "Faites glisser les pages pour les réorganiser (entre fichiers aussi) · Cliquez pour sélectionner, Maj+clic pour une plage · La touche Suppr retire les pages sélectionnées · Double-cliquez sur une page pour un grand aperçu · Les flèches déplacent la sélection, Ctrl+Z / Ctrl+Y annulent et rétablissent."
+    },
+    "split": {
+      "summaryEvery": "{count, plural, one {# fichier de sortie} other {# fichiers de sortie}} — un PDF par page, livrés dans un ZIP.",
+      "summaryExtract": "{count, plural, one {# fichier de sortie} other {# fichiers de sortie}} — un PDF par page sélectionnée, livrés dans un ZIP.",
+      "summaryExtractEmpty": "Cliquez sur les pages pour extraire chacune d'elles dans son propre PDF.",
+      "summaryRanges": "{count, plural, one {# fichier de sortie} other {# fichiers de sortie}} : {groups}, livrés dans un ZIP.",
+      "processEvery": "Diviser en pages individuelles",
+      "processExtract": "Extraire les pages sélectionnées",
+      "processRanges": "Diviser maintenant",
+      "activity": "Division en cours",
+      "modeRanges": "Plages",
+      "modeExtract": "Extraire des pages",
+      "modeEvery": "Chaque page",
+      "modeAria": "Mode de division",
+      "clearDividers": "Effacer les séparateurs",
+      "rangesLabel": "Plages",
+      "rangesAria": "Plages de pages",
+      "rangesPlaceholder": "1-3,4-7",
+      "selectAllPages": "Sélectionner toutes les pages",
+      "rangesHint": "Cliquez sur un espace entre les pages pour y placer un marqueur de division. Chaque groupe coloré devient un fichier de sortie.",
+      "extractHint": "Cliquez sur les pages pour les sélectionner — chaque page sélectionnée devient son propre PDF.",
+      "rangesHintBottom": "Cliquez sur un espace pour ajouter ou retirer un marqueur de division · Annuler/rétablir avec Ctrl+Z / Ctrl+Y · Le champ des plages ci-dessus reste synchronisé.",
+      "extractHintBottom": "Cliquez pour sélectionner, Maj+clic pour une plage · Chaque page sélectionnée devient son propre fichier.",
+      "everyHintBottom": "Un PDF par page — aucune sélection nécessaire.",
+      "splitAfter": "Diviser après la page {n}",
+      "removeSplitAfter": "Retirer la division après la page {n}",
+      "gridAria": "Pages à diviser",
+      "pageRangeExceeds": "Les numéros de page dépassent le nombre de pages du document ({count})."
+    },
+    "rotate": {
+      "summaryEmpty": "Sélectionnez des pages, puis faites-les pivoter — ou faites pivoter toutes les pages à la fois.",
+      "summary": "{count, plural, one {# page pivotée} other {# pages pivotées}} : {list}",
+      "processLabel": "Faire pivoter maintenant",
+      "activity": "Rotation en cours",
+      "rotateLeft": "Faire pivoter la sélection de 90° dans le sens antihoraire",
+      "rotateRight": "Faire pivoter la sélection de 90° dans le sens horaire",
+      "rotateAll": "Tout pivoter de 90°",
+      "resetAll": "Tout réinitialiser",
+      "pagesLabel": "Pages",
+      "pagesAria": "Pages à faire pivoter",
+      "pagesPlaceholder": "1-3,5",
+      "angleLabel": "Angle",
+      "angleAria": "Angle de rotation",
+      "applyToPages": "Appliquer aux pages",
+      "selectedWithAngle": "Pages sélectionnées avec un angle : {ranges}",
+      "typePagesFirst": "Saisissez d'abord les numéros de page, par ex. « 1-3,5 ».",
+      "pageExceeds": "Les pages {pages} dépassent le nombre de pages du document ({count}).",
+      "rotateCcw": "Pivoter de 90° dans le sens antihoraire",
+      "rotateCw": "Pivoter de 90° dans le sens horaire",
+      "gridAria": "Pages à faire pivoter",
+      "hint": "Cliquez pour sélectionner, Maj+clic pour une plage · Les boutons ⟲ / ⟳ sur une page font pivoter uniquement cette page · Les miniatures montrent l'aperçu pivoté ; la rotation réelle est appliquée côté serveur.",
+      "rotatePageCcw": "Faire pivoter {label} de 90 degrés dans le sens antihoraire",
+      "rotatePageCw": "Faire pivoter {label} de 90 degrés dans le sens horaire"
+    },
+    "delete": {
+      "summaryEmpty": "Cliquez sur les pages pour les marquer pour suppression. Au moins une page doit rester.",
+      "summary": "Suppression de {marked} pages sur {total} · il en restera {remaining}.",
+      "processLabel": "Supprimer {count, plural, one {# page} other {# pages}}",
+      "activity": "Suppression des pages",
+      "cannotDeleteAll": "Impossible de supprimer toutes les pages ; au moins une page doit rester.",
+      "pageExceeds": "Les pages {pages} dépassent le nombre de pages du document ({count}).",
+      "invertSelection": "Inverser la sélection",
+      "markSelected": "Marquer la sélection ({count})",
+      "markSelectedTitle": "Marquer les pages sélectionnées pour suppression (touche Suppr)",
+      "clearMarks": "Effacer les marques",
+      "pagesToDelete": "Pages à supprimer",
+      "pagesToDeleteAria": "Pages à supprimer",
+      "pagesPlaceholder": "1,3,5-7",
+      "markForDeletion": "Marquer pour suppression",
+      "markedUndo": "✕ Marquée — annuler",
+      "markAria": "Marquer {label} pour suppression",
+      "unmarkAria": "Retirer la marque de {label}",
+      "gridAria": "Pages à supprimer",
+      "hint": "Cliquez pour sélectionner, Maj+clic pour une plage · « Marquer la sélection » ou la touche Suppr marque la sélection · Le bouton sur une page marque uniquement cette page · Les pages marquées restent visibles jusqu'au traitement, et chaque marque peut être annulée."
+    },
+    "reorder": {
+      "summaryOriginal": "Les pages sont dans leur ordre d'origine — faites glisser les miniatures pour les réorganiser.",
+      "summaryMoved": "{count, plural, one {# page déplacée} other {# pages déplacées}} : {list}{more}",
+      "summaryMore": ", +{count} de plus",
+      "processLabel": "Réorganiser maintenant",
+      "activity": "Réorganisation en cours",
+      "reverseOrder": "Inverser l'ordre",
+      "resetOriginal": "Revenir à l'ordre d'origine",
+      "moveUp": "↑ Déplacer vers le haut",
+      "moveUpTitle": "Déplacer la sélection d'un cran vers le début (Ctrl+←)",
+      "moveDown": "↓ Déplacer vers le bas",
+      "moveDownTitle": "Déplacer la sélection d'un cran vers la fin (Ctrl+→)",
+      "orderLabel": "Ordre",
+      "orderAria": "Ordre des pages",
+      "orderError": "L'ordre doit être une permutation des pages 1..{count}, par ex. « {example} ».",
+      "gridAria": "Pages dans le nouvel ordre",
+      "hint": "Faites glisser les miniatures pour réorganiser (les badges de position se mettent à jour en direct) · Sélectionnez une page et appuyez sur Ctrl+← / Ctrl+→ pour la déplacer · Le champ d'ordre ci-dessus reste synchronisé et accepte une permutation saisie au clavier.",
+      "position": "position {n}"
+    }
+  },
+  "errors": {
+    "tool_error": "Une erreur s'est produite. Veuillez réessayer.",
+    "internal_error": "Échec du traitement. Veuillez réessayer.",
+    "server_restart": "Le serveur a redémarré pendant le traitement de cette tâche. Veuillez réessayer.",
+    "invalid_option": "Un numéro de page ou une option n'est pas valide. Vérifiez les numéros de page et réessayez.",
+    "bad_option": "Une valeur d'option n'est pas valide. Vérifiez les valeurs et réessayez.",
+    "bad_options": "Une valeur d'option n'est pas valide. Vérifiez les valeurs et réessayez.",
+    "missing_input": "Un fichier requis est manquant. Envoyez le fichier et réessayez.",
+    "missing_option": "Une option requise est manquante.",
+    "invalid_input": "Le fichier envoyé n'a pas pu être lu. Vérifiez qu'il s'agit bien d'un PDF valide et réessayez.",
+    "ocr_failed": "La reconnaissance de texte a échoué pour ce fichier.",
+    "ocr_unavailable": "La reconnaissance de texte est temporairement indisponible. Réessayez plus tard.",
+    "wrong_password": "Le mot de passe est incorrect. Vérifiez-le et réessayez.",
+    "quota_exceeded": "Vous avez utilisé toutes les utilisations gratuites de cette heure. Réessayez après {time}.",
+    "file_too_large": "Le fichier est trop volumineux. La limite d'envoi est de {mb} Mo.",
+    "lost_contact": "Contact perdu avec le serveur.",
+    "download_failed": "Échec du téléchargement.",
+    "not_loaded": "Outil pas encore chargé.",
+    "failed_to_load": "Échec du chargement de l'outil.",
+    "invalid_page_range": "Plage de pages « {token} » non valide. Utilisez des formes comme « 1-3,5 ».",
+    "invalid_range_start": "Plage {range} non valide : les numéros de page commencent à 1.",
+    "select_at_least_one_page": "Sélectionnez au moins une page.",
+    "rotate_at_least_one_page": "Faites pivoter au moins une page.",
+    "cannot_delete_all": "Impossible de supprimer toutes les pages ; au moins une page doit rester.",
+    "nothing_to_reorder": "Rien à réorganiser.",
+    "output_too_large": "Le résultat est trop volumineux pour être téléchargé.",
+    "pdf_unreadable": "Ce fichier n'a pas pu être lu en tant que PDF.",
+    "pdf_unreadable_one": "L'un des fichiers n'a pas pu être lu en tant que PDF."
+  },
+  "toolOptions": {
+    "compress": {
+      "target_mb": {
+        "label": "Taille cible (Mo)",
+        "help": "Compresser jusqu'à cette taille au maximum. Les limites de dépôt électronique des tribunaux (CM/ECF) varient selon le tribunal, environ 3 à 200 Mo — 25 Mo est la plus courante. Vérifiez la règle locale de votre tribunal."
+      }
+    },
+    "crop": {
+      "top": {
+        "label": "Marge supérieure (pt)",
+        "help": "Points à rogner sur le bord supérieur."
+      },
+      "bottom": {
+        "label": "Marge inférieure (pt)",
+        "help": "Points à rogner sur le bord inférieur."
+      },
+      "left": {
+        "label": "Marge gauche (pt)",
+        "help": "Points à rogner sur le bord gauche."
+      },
+      "right": {
+        "label": "Marge droite (pt)",
+        "help": "Points à rogner sur le bord droit."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "Plages à base 1 comme « 1-3,5 ». Laisser vide pour toutes les pages."
+      }
+    },
+    "delete_pages": {
+      "pages": {
+        "label": "Pages à supprimer",
+        "help": "Pages à supprimer, à base 1, par ex. « 1,3,5-7 »."
+      }
+    },
+    "edit_metadata": {
+      "title": {
+        "label": "Titre",
+        "help": "Titre du document. Vide le supprime."
+      },
+      "author": {
+        "label": "Auteur",
+        "help": "Auteur du document. Vide le supprime."
+      },
+      "subject": {
+        "label": "Sujet",
+        "help": "Sujet du document. Vide le supprime."
+      },
+      "keywords": {
+        "label": "Mots-clés",
+        "help": "Mots-clés du document. Vide les supprime."
+      }
+    },
+    "exhibit_combine": {
+      "exhibit_prefix": {
+        "label": "Libellé de pièce",
+        "help": "Mot imprimé sur chaque intercalaire, par ex. « Pièce »."
+      },
+      "bates_prefix": {
+        "label": "Préfixe Bates",
+        "help": "Préfixe des numéros estampillés, par ex. « BATES » donne BATES-000001."
+      },
+      "bates_start": {
+        "label": "Premier numéro Bates",
+        "help": "La numérotation commence ici (entier positif)."
+      },
+      "slip_sheets": {
+        "label": "Ajouter des intercalaires entre les pièces",
+        "help": ""
+      }
+    },
+    "extract_text": {
+      "pages": {
+        "label": "Pages",
+        "help": "Plages à base 1 comme « 1-3,5 ». Laisser vide pour toutes les pages."
+      }
+    },
+    "grayscale": {
+      "dpi": {
+        "label": "Résolution (PPP)",
+        "help": "Résolution de rendu en points par pouce (72–600)."
+      }
+    },
+    "merge": {
+      "page_order": {
+        "label": "Ordre des pages (JSON)",
+        "help": "Liste JSON facultative de paires [fichier, page] dans l'ordre de fusion, par ex. « [[1,2],[0,1]] » fusionne d'abord la page 2 du fichier 2, puis la page 1 du fichier 1. Les numéros de fichier commencent à 0, ceux des pages à 1. Omettre pour fusionner toutes les pages dans l'ordre d'envoi."
+      }
+    },
+    "n_up": {
+      "layout": {
+        "label": "Pages par feuille",
+        "help": "Nombre de pages sources à placer sur chaque feuille."
+      },
+      "sheet": {
+        "label": "Format de feuille",
+        "help": "Format de la feuille de sortie."
+      },
+      "orientation": {
+        "label": "Orientation",
+        "help": "Orientation de la feuille.",
+        "choices": {
+          "portrait": "Portrait",
+          "landscape": "Paysage"
+        }
+      }
+    },
+    "ocr": {
+      "language": {
+        "label": "Langue",
+        "help": "Code de langue Tesseract, par ex. « eng » ou « eng+deu »."
+      }
+    },
+    "page_numbers": {
+      "vertical": {
+        "label": "Position verticale",
+        "help": "",
+        "choices": {
+          "top": "Haut",
+          "bottom": "Bas"
+        }
+      },
+      "horizontal": {
+        "label": "Position horizontale",
+        "help": "",
+        "choices": {
+          "left": "Gauche",
+          "center": "Centre",
+          "right": "Droite"
+        }
+      },
+      "start_number": {
+        "label": "Numéro de départ",
+        "help": "Premier numéro de page (entier positif)."
+      },
+      "prefix": {
+        "label": "Préfixe",
+        "help": ""
+      },
+      "suffix": {
+        "label": "Suffixe",
+        "help": ""
+      },
+      "font_size": {
+        "label": "Taille de police",
+        "help": "De 6 à 48."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "Plages à base 1 comme « 1-3,5 ». Laisser vide pour toutes les pages."
+      }
+    },
+    "password_protect": {
+      "password": {
+        "label": "Mot de passe",
+        "help": null
+      }
+    },
+    "pdf_to_images": {
+      "format": {
+        "label": "Format d'image",
+        "help": "Format de l'image de sortie."
+      },
+      "dpi": {
+        "label": "Résolution (PPP)",
+        "help": null
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "Plages à base 1 comme « 1-3,5 ». Laisser vide pour toutes les pages."
+      }
+    },
+    "redact": {
+      "patterns": {
+        "label": "Texte à caviarder",
+        "help": "Chaînes littérales à noircir, séparées par des virgules, par ex. « SSN, john@example.com »."
+      },
+      "rasterise": {
+        "label": "Rastériser les pages (caviardage le plus fort)",
+        "help": "Convertir chaque page en image après le caviardage, afin qu'aucune couche de texte ne subsiste dans le fichier. Le texte de sortie n'est plus sélectionnable ni consultable."
+      }
+    },
+    "reorder_pages": {
+      "order": {
+        "label": "Ordre des pages",
+        "help": "Permutation des pages 1..N, à base 1, par ex. « 3,1,2 »."
+      }
+    },
+    "rotate_pages": {
+      "angle": {
+        "label": "Angle de rotation",
+        "help": "Rotation horaire appliquée aux pages sélectionnées."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "Plages à base 1 comme « 1-3,5 ». Vide signifie toutes les pages."
+      },
+      "rotations": {
+        "label": "Rotations par page (JSON)",
+        "help": "Objet JSON facultatif associant les numéros de page (à base 1) aux angles, par ex. « '{\"1\": 90, \"3\": 180} ». Lorsqu'il est présent, il remplace angle+pages, afin que chaque page puisse pivoter différemment."
+      }
+    },
+    "split": {
+      "mode": {
+        "label": "Mode de division",
+        "help": "« ranges » : un PDF par plage séparée par des virgules. « every » : un PDF par page.",
+        "choices": {
+          "ranges": "Plages",
+          "every": "Chaque page"
+        }
+      },
+      "ranges": {
+        "label": "Plages de pages",
+        "help": "Plages à base 1 comme « 1-3,5 ». Requises lorsque le mode est « ranges »."
+      }
+    },
+    "unlock_pdf": {
+      "password": {
+        "label": "Mot de passe actuel",
+        "help": "Le mot de passe protégeant actuellement le PDF."
+      }
+    },
+    "watermark": {
+      "text": {
+        "label": "Texte du filigrane",
+        "help": null
+      },
+      "opacity": {
+        "label": "Opacité",
+        "help": "0,1 (discret) à 0,5 (prononcé)."
+      }
+    }
+  },
+  "lawyers": {
+    "title": "Outils PDF pour avocats",
+    "intro": "Caviardez correctement, supprimez les métadonnées cachées, respectez la limite de taille de dépôt de votre tribunal et combinez des pièces avec numéros Bates. Gratuit, sans inscription, sans filigrane.",
+    "workflowTitle": "Le flux de dépôt, dans l'ordre",
+    "workflow": [
+      {
+        "step": "Caviarder",
+        "text": "le texte sensible — le texte est supprimé du fichier et le résultat est vérifié, pas seulement masqué par du noir."
+      },
+      {
+        "step": "Supprimer les métadonnées",
+        "text": "— retirez l'auteur, les dates et les détails du logiciel, avec un rapport avant/après."
+      },
+      {
+        "step": "Compresser",
+        "text": "à la limite de taille de votre tribunal."
+      },
+      {
+        "step": "Combiner des pièces",
+        "text": "avec intercalaires et numéros Bates dans un seul PDF prêt à déposer."
+      }
+    ],
+    "guides": [
+      {
+        "title": "Caviarder une pièce de déposition",
+        "answer": "Le caviardage ici supprime le texte du fichier, au lieu de le recouvrir d'un rectangle noir — et le résultat est revérifié afin que les mots caviardés ne puissent pas être extraits. Pour une certitude maximale, activez « Rastériser les pages » : chaque page devient une image, si bien qu'aucune couche de texte ne subsiste.",
+        "tool": "/tools/redact",
+        "toolName": "Caviarder un PDF"
+      },
+      {
+        "title": "Combiner des pièces dans un PDF prêt à déposer",
+        "answer": "Envoyez vos pièces dans l'ordre et recevez un seul document : un intercalaire avant chaque pièce (Pièce A, B, C… avec le nom du fichier et le nombre de pages) et des numéros Bates estampillés en continu sur chaque page de pièce.",
+        "tool": "/tools/exhibit_combine",
+        "toolName": "Combiner des pièces"
+      },
+      {
+        "title": "Compresser un mémoire sous la limite de votre tribunal",
+        "answer": "Choisissez la limite de taille de votre tribunal — 25 Mo est la limite CM/ECF la plus courante, mais les tribunaux varient d'environ 3 à 200 Mo, alors vérifiez votre règle locale. L'outil réduit le fichier pour qu'il tienne dans la limite et le ZIP inclut un rapport indiquant la taille avant et après.",
+        "tool": "/tools/compress",
+        "toolName": "Compresser un PDF"
+      },
+      {
+        "title": "Supprimer les métadonnées avant d'envoyer un document à la partie adverse",
+        "answer": "Un PDF peut contenir le nom de son auteur, les dates de création et le logiciel qui l'a produit. « Supprimer les métadonnées » retire tout cela en un clic et vous donne un rapport avant/après prouvant ce qui a été supprimé.",
+        "tool": "/tools/strip_metadata",
+        "toolName": "Supprimer les métadonnées"
+      },
+      {
+        "title": "Supprimer les données de localisation des photos d'un dossier",
+        "answer": "Les photos contiennent souvent des coordonnées GPS et des détails sur l'appareil dans leurs données EXIF. « Supprimer les métadonnées des images » indique ce que chaque photo contient, le supprime et rapporte ce qui a été retiré. Remarque : l'outil ne vérifie pas la suppression des marqueurs C2PA/IA — utilisez ClearMark pour cela.",
+        "tool": "/tools/strip_image_metadata",
+        "toolName": "Supprimer les métadonnées des images"
+      },
+      {
+        "title": "Vérifier quelles métadonnées contient un PDF reçu",
+        "answer": "Avant de vous fier à un document, voyez ce qui s'y cache. « Afficher les métadonnées » lit le titre, l'auteur, les dates, le créateur et le producteur, et vous donne le résultat en JSON.",
+        "tool": "/tools/metadata",
+        "toolName": "Afficher les métadonnées"
+      },
+      {
+        "title": "Corriger le titre ou l'auteur d'un document avant le dépôt",
+        "answer": "Si le titre ou l'auteur enregistré d'un PDF est erroné — ou nomme quelqu'un qu'il ne devrait pas — « Modifier les métadonnées » vous permet de définir ou d'effacer le titre, l'auteur, le sujet et les mots-clés sans toucher aux pages.",
+        "tool": "/tools/edit_metadata",
+        "toolName": "Modifier les métadonnées"
+      },
+      {
+        "title": "Numéroter les pages d'un dépôt",
+        "answer": "Ajoutez des numéros de page dans n'importe quel coin, à partir de n'importe quel nombre, avec un préfixe ou un suffixe si votre tribunal l'exige. Vous pouvez numéroter uniquement certaines plages de pages et laisser les autres intactes.",
+        "tool": "/tools/page_numbers",
+        "toolName": "Ajouter des numéros de page"
+      },
+      {
+        "title": "Fusionner des documents justificatifs en un seul dossier",
+        "answer": "Combinez de 2 à 20 PDF en un seul fichier dans l'ordre où vous les envoyez — plaidoiries, pièces jointes et documents justificatifs en un seul dossier au lieu de nombreux fichiers.",
+        "tool": "/tools/merge",
+        "toolName": "Fusionner des PDF"
+      },
+      {
+        "title": "Extraire un document d'un dossier",
+        "answer": "Divisez un PDF par plages de pages (par exemple 1–3, 5) ou en un fichier par page, et téléchargez les résultats dans un ZIP. Utile lorsqu'un dossier arrive en un seul fichier et que vous avez besoin d'une seule pièce.",
+        "tool": "/tools/split",
+        "toolName": "Diviser un PDF"
+      },
+      {
+        "title": "Protéger un document sensible par mot de passe",
+        "answer": "Ajoutez un mot de passe à un PDF avant de l'envoyer, afin que seule une personne connaissant le mot de passe puisse l'ouvrir. Et si vous recevez un fichier protégé dont vous connaissez le mot de passe, « Déverrouiller un PDF » supprime la protection.",
+        "tool": "/tools/password_protect",
+        "toolName": "Protéger un PDF"
+      },
+      {
+        "title": "Rendre un document numérisé consultable",
+        "answer": "Les pages numérisées sont des images, pas du texte — vous ne pouvez ni les rechercher ni en copier le contenu. L'OCR ajoute une couche de texte invisible pour que le document devienne consultable tout en ayant exactement la même apparence.",
+        "tool": "/tools/ocr",
+        "toolName": "OCR"
+      }
+    ],
+    "limitsTitle": "Une remarque sur les limites",
+    "limitsText": "PDFEDI est un outil, pas un avocat. Les limites de dépôt des tribunaux, les obligations de caviardage et les règles de divulgation varient selon le tribunal et la juridiction — vérifiez les règles locales de votre tribunal et vos obligations professionnelles avant de déposer. Le caviardage ici supprime le texte que vous nommez ; vérifiez toujours le résultat avant de le déposer. Les fichiers envoyés à ces outils sont traités sur notre serveur — voir <link>comment nous traitons vos fichiers</link>."
+  },
+  "privacy": {
+    "title": "Comment nous traitons vos fichiers",
+    "intro": "Clairement, sans les slogans habituels sur la confidentialité. Il existe deux types d'outils différents sur PDFEDI, et ils traitent vos fichiers différemment.",
+    "serverTitle": "Outils serveur (la plupart des outils de ce site)",
+    "serverText": "Lorsque vous utilisez un outil comme Fusionner, Caviarder ou Compresser, votre fichier est envoyé sur notre serveur, traité là-bas, et le résultat vous est renvoyé pour téléchargement. Votre fichier quitte bien votre appareil — quiconque prétend le contraire au sujet d'un outil traité sur serveur ne vous dit pas la vérité. Ce que nous promettons :",
+    "serverPoints": [
+      "Aucun compte, aucune inscription, aucune adresse e-mail demandée.",
+      "Les fichiers sont traités automatiquement et supprimés automatiquement.",
+      "Le contenu de vos fichiers n'est ni conservé, ni partagé avec qui que ce soit, ni utilisé pour entraîner quoi que ce soit.",
+      "Nous comptons l'utilisation anonyme (le nombre de fois qu'un outil a été exécuté) afin de maintenir des limites gratuites équitables — nous n'enregistrons pas le contenu de vos fichiers."
+    ],
+    "serverNote": "Comme ces outils fonctionnent sur un serveur, le « test du mode avion » ne s'applique pas à eux : si vous vous déconnectez d'Internet, un outil serveur ne peut pas du tout fonctionner. Les vérifications qui s'appliquent ici sont celles intégrées aux outils eux-mêmes — par exemple, le caviardage revérifie son résultat pour que le texte caviardé ne puisse pas être extrait, et « Supprimer les métadonnées » vous donne un rapport avant/après montrant exactement ce qui a été supprimé.",
+    "previewTitle": "Aperçus dans votre navigateur",
+    "previewText": "Sur les outils d'organisation (Fusionner, Diviser, Réorganiser, Supprimer, Faire pivoter), les miniatures de pages que vous voyez sont générées dans votre navigateur à partir du fichier présent sur votre appareil — aucun aperçu n'est envoyé pour les afficher. Le traitement a toujours lieu sur notre serveur : lorsque vous appuyez sur le bouton de traitement, le fichier est envoyé, traité, et le résultat vous est renvoyé pour téléchargement.",
+    "checkTitle": "Comment vérifier nos affirmations vous-même",
+    "checkPoints": [
+      {
+        "title": "Caviardage :",
+        "text": "après le caviardage, essayez de rechercher les mots caviardés dans le PDF de sortie — ils ne devraient pas être trouvés. Activez « Rastériser les pages » et le résultat n'a plus aucune couche de texte."
+      },
+      {
+        "title": "Métadonnées :",
+        "text": "ouvrez le fichier metadata_report.json fourni avec « Supprimer les métadonnées », ou utilisez « Afficher les métadonnées » sur le fichier nettoyé, et comparez avec l'original."
+      },
+      {
+        "title": "Aperçus :",
+        "text": "ouvrez l'onglet Réseau de votre navigateur pendant que vous organisez les pages — aucun envoi n'a lieu avant d'appuyer sur le bouton de traitement."
+      }
+    ],
+    "dontTitle": "Ce que nous ne faisons pas",
+    "dontPoints": [
+      "Nous ne vendons ni ne partageons vos fichiers.",
+      "Nous ne demandons pas de compte pour utiliser les outils gratuits.",
+      "Nous ne prétendons pas que les fichiers traités sur serveur « ne quittent jamais votre appareil » — ils le quittent, pour le traitement, puis ils sont supprimés."
+    ],
+    "backLink": "← Retour à tous les outils",
+    "localeNote": "Votre préférence de langue est enregistrée uniquement dans votre propre navigateur, afin que nous puissions vous montrer le site dans votre langue la prochaine fois. Elle n'est jamais envoyée à nos serveurs."
+  },
+  "suggest": {
+    "title": "Souhaitez-vous afficher PDFEDI en {language} ?",
+    "subtitle": "{nativeName} — Basculez l'interface vers {language}. Vous pourrez revenir en arrière à tout moment.",
+    "switch": "Basculer vers {language}",
+    "continue": "Continuer en anglais",
+    "dismiss": "Ignorer"
+  },
+  "switcher": {
+    "label": "Langue",
+    "current": "Langue actuelle : {language}",
+    "choose": "Choisir la langue"
+  },
+  "seo": {
+    "whatItDoes": "{h1} — ce que fait l'outil",
+    "howToUse": "Comment utiliser {h1}",
+    "keyFeatures": "Fonctionnalités principales",
+    "whenToUse": "Quand utiliser {h1}",
+    "faq": "Questions fréquentes",
+    "relatedTools": "Outils associés",
+    "privateByDesign": "Privé par conception",
+    "privateNote": "Les fichiers que vous envoyez sont traités en toute sécurité puis supprimés automatiquement. PDFEDI ne demande jamais de compte — choisissez un outil et c'est parti. Chaque fichier peut peser jusqu'à 50 Mo, et chaque outil est gratuit jusqu'à 5 utilisations par heure.",
+    "breadcrumbHome": "Accueil"
+  }
+}
