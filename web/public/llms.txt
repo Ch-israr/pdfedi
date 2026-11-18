@@ -1,11 +1,8 @@
 # PDFEDI
 
-> PDFEDI is a free online PDF toolkit. 26 PDF tools plus a full in-browser PDF editor.
+> PDFEDI is a free online PDF toolkit. 26 PDF tools with in-browser page previews.
 > No sign-up, no watermarks. Files are processed securely and deleted automatically.
 > Each tool is free up to 5 times per hour; max file size 50MB.
-
-## PDF Editor
-
 
 ## Organize
 
@@ -50,7 +47,7 @@
 ## Privacy
 
 - Server-side tool uploads are processed and deleted automatically; no account required.
-- The PDF editor runs in the browser; files stay on the user's device.
+- Page previews are rendered in your browser; tool processing runs on the server and files are deleted automatically.
 - Admin (`/admin`) and API (`/api/`) routes are not public content.
 
 ## Sitemap
