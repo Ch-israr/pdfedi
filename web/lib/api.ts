@@ -46,21 +46,43 @@ export interface Job {
   options: Record<string, unknown>;
   output_file_id: string | null;
   error: string | null;
+  /** Stable backend error code (ToolError.code), for client-side translation. */
+  error_code: string | null;
   created_at: string;
   updated_at: string;
+}
+
+/** API failure carrying the HTTP status and, when the backend provides
+ * one, a stable machine-readable error code. The frontend translates
+ * by code and never matches on the English message text. */
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  constructor(message: string, status: number, code?: string) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.code = code;
+  }
 }
 
 async function req(path: string, init?: RequestInit) {
   const res = await fetch(`${BASE}${path}`, init);
   if (!res.ok) {
-    let detail = `${res.status}`;
+    let detail: unknown = `${res.status}`;
+    let code: string | undefined;
     try {
       const body = await res.json();
-      detail = body.detail || detail;
+      detail = body.detail ?? detail;
+      if (typeof detail === "object" && detail !== null) {
+        const d = detail as Record<string, unknown>;
+        code = typeof d.code === "string" ? d.code : undefined;
+        detail = (d.message as string) ?? `${res.status}`;
+      }
     } catch {
       /* ignore */
     }
-    throw new Error(detail);
+    throw new ApiError(String(detail), res.status, code);
   }
   return res.json();
 }
