@@ -80,6 +80,10 @@ class Job(Base):
     options: Mapped[str] = mapped_column(Text, nullable=False, default="{}")   # JSON object
     output_file_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
+    # Stable machine-readable failure code (ToolError.code) so the
+    # frontend can translate job failures client-side. NULL for jobs
+    # that never failed. Added by migration 2.
+    error_code: Mapped[str | None] = mapped_column(String(32), nullable=True)
     created_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
     updated_at: Mapped[str] = mapped_column(String(32), nullable=False, default=utcnow_iso)
 
