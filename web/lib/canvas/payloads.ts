@@ -34,6 +34,18 @@ export function pagesToRanges(pages: number[]): string {
   return parts.join(",");
 }
 
+/** Sorted unique page list -> contiguous runs, e.g. [1,2,3,8,9,10] -> [[1,3],[8,10]]. */
+export function pagesToGroups(pages: number[]): Array<[number, number]> {
+  const sorted = [...new Set(pages)].sort((a, b) => a - b);
+  const groups: Array<[number, number]> = [];
+  for (const p of sorted) {
+    const last = groups[groups.length - 1];
+    if (last && p === last[1] + 1) last[1] = p;
+    else groups.push([p, p]);
+  }
+  return groups;
+}
+
 /** "1-3,5" -> [1,2,3,5]. Throws on malformed tokens (mirrors the backend). */
 // Errors with a stable code so the UI can translate them instead of
 // showing the English message text. `params` feeds the ICU message.
@@ -57,8 +69,15 @@ export function rangesToPages(spec: string): number[] {
     if (!m) throw new PayloadError("invalid_page_range", `Invalid page range token ${token}.`, { token });
     const start = parseInt(m[1], 10);
     const end = m[2] ? parseInt(m[2], 10) : start;
-    if (start < 1 || end < start) {
+    if (start < 1) {
       throw new PayloadError("invalid_range_start", `Invalid range ${start}-${end}.`, { range: `${start}-${end}` });
+    }
+    // Reversed ranges get their own code so the UI can state the real
+    // reason ("start after end") instead of blaming page 1.
+    if (end < start) {
+      throw new PayloadError("reversed_range", `Invalid range ${start}-${end}: end is before start.`, {
+        range: `${start}-${end}`,
+      });
     }
     for (let p = start; p <= end; p++) pages.add(p);
   }
@@ -114,18 +133,24 @@ export interface SplitPayload {
  * 12-page doc -> "1-3,4-7,8-12"). `mode` "every" ignores dividers.
  * `extractPages` (Extract mode) makes one single-page group per
  * selected page.
+ * `explicitRanges` is the literal ranges string the user typed when it
+ * contains gaps ("1-3,8-10"): dividers can only express a contiguous
+ * partition, so the typed ranges are sent verbatim and the backend
+ * (which groups per comma token) returns one file per run.
  */
 export function buildSplitPayload(
   pageCount: number,
   mode: "ranges" | "every" | "extract",
   dividers: number[],
   extractPages: number[] = [],
+  explicitRanges?: string | null,
 ): SplitPayload {
   if (mode === "every") return { config: { mode: "every" } };
   if (mode === "extract") {
     if (extractPages.length === 0) throw new PayloadError("select_at_least_one_page", "Select at least one page to extract.");
     return { config: { mode: "ranges", ranges: pagesToRanges(extractPages) } };
   }
+  if (explicitRanges) return { config: { mode: "ranges", ranges: explicitRanges } };
   const cuts = [...new Set(dividers)]
     .filter((d) => d >= 1 && d < pageCount)
     .sort((a, b) => a - b);
