@@ -9,7 +9,19 @@
     "lawyersOgDescription": "Caviardez, supprimez les métadonnées, compressez à la limite de dépôt de votre tribunal et combinez des pièces avec numéros Bates — gratuit, sans inscription.",
     "privacyTitle": "Comment nous traitons vos fichiers — Confidentialité | PDFEDI",
     "privacyDescription": "Ce qu'il advient de vos fichiers sur PDFEDI : envoyés sur notre serveur pour être traités, supprimés automatiquement, aucun compte, aucun contenu de fichier conservé ou partagé.",
-    "privacyOgDescription": "Envoyés sur notre serveur, traités, supprimés automatiquement. Aucun compte, aucun contenu de fichier conservé."
+    "privacyOgDescription": "Envoyés sur notre serveur, traités, supprimés automatiquement. Aucun compte, aucun contenu de fichier conservé.",
+    "privacyPageTitle": "Politique de confidentialité | PDFEDI",
+    "privacyPageDescription": "Comment PDFEDI traite vos fichiers : ils sont téléversés sur notre serveur pour être traités, supprimés après le traitement, et ne sont jamais vendus ni partagés.",
+    "privacyPageOgDescription": "Vos fichiers sont téléversés pour être traités, supprimés ensuite, et ne sont jamais vendus ni partagés.",
+    "termsPageTitle": "Conditions d'utilisation | PDFEDI",
+    "termsPageDescription": "Les conditions d'utilisation des outils PDF gratuits en ligne de PDFEDI : utilisation acceptable, service tel quel, et vos fichiers.",
+    "termsPageOgDescription": "Conditions d'utilisation acceptable et sans garantie pour les outils PDF gratuits de PDFEDI.",
+    "aboutPageTitle": "À propos de PDFEDI — Outils PDF gratuits en ligne",
+    "aboutPageDescription": "PDFEDI est un service PDF gratuit en ligne : 26 outils pour travailler avec des fichiers PDF, en 10 langues, sans inscription.",
+    "aboutPageOgDescription": "26 outils PDF gratuits en 10 langues. Sans inscription.",
+    "contactPageTitle": "Contacter PDFEDI",
+    "contactPageDescription": "Comment contacter PDFEDI pour une question, une suggestion ou un problème avec un outil.",
+    "contactPageOgDescription": "Contactez PDFEDI au sujet d'un outil, d'une question ou d'une suggestion."
   },
   "chrome": {
     "allTools": "Tous les outils",
@@ -17,7 +29,14 @@
     "tagline": "PDFEDI — outils PDF gratuits en ligne.",
     "footerNote": "Sans inscription. Les fichiers sont traités puis supprimés automatiquement.",
     "home": "Accueil",
-    "language": "Langue"
+    "language": "Langue",
+    "privacy": "Confidentialité",
+    "terms": "Conditions",
+    "about": "À propos",
+    "contact": "Contact",
+    "howWeHandleFiles": "Comment nous traitons vos fichiers",
+    "menu": "Menu",
+    "closeMenu": "Fermer le menu"
   },
   "home": {
     "heroTitle": "Tous les outils PDF dont vous avez besoin.",
@@ -294,7 +313,9 @@
       "splitAfter": "Diviser après la page {n}",
       "removeSplitAfter": "Retirer la division après la page {n}",
       "gridAria": "Pages à diviser",
-      "pageRangeExceeds": "Les numéros de page dépassent le nombre de pages du document ({count})."
+      "pageRangeExceeds": "Les numéros de page dépassent le nombre de pages du document ({count}).",
+      "rangesEmpty": "Saisissez au moins une plage de pages, par ex. 1-3,5.",
+      "rangesReversed": "Plage non valide {range} : la page de début est après la page de fin."
     },
     "rotate": {
       "summaryEmpty": "Sélectionnez des pages, puis faites-les pivoter — ou faites pivoter toutes les pages à la fois.",
@@ -783,5 +804,64 @@
     "privateByDesign": "Privé par conception",
     "privateNote": "Les fichiers que vous envoyez sont traités en toute sécurité puis supprimés automatiquement. PDFEDI ne demande jamais de compte — choisissez un outil et c'est parti. Chaque fichier peut peser jusqu'à 50 Mo, et chaque outil est gratuit jusqu'à 5 utilisations par heure.",
     "breadcrumbHome": "Accueil"
+  },
+  "privacyPage": {
+    "title": "Politique de confidentialité",
+    "intro": "PDFEDI est un service PDF gratuit en ligne. Cette politique explique ce qu'il advient des fichiers que vous téléversez.",
+    "uploadTitle": "Ce qu'il advient de vos fichiers",
+    "uploadText": "Lorsque vous utilisez un outil, votre fichier est téléversé sur notre serveur, traité là-bas, puis le résultat vous est renvoyé pour téléchargement. Votre fichier quitte bien votre appareil — c'est ainsi que fonctionne tout outil traité sur un serveur.",
+    "uploadPoints": [
+      "Aucun compte, aucune inscription, et aucune adresse e-mail demandée.",
+      "Les fichiers traités sont supprimés après le traitement.",
+      "Le contenu de vos fichiers n'est ni vendu, ni partagé avec qui que ce soit, ni utilisé pour entraîner quoi que ce soit.",
+      "Nous comptons l'utilisation anonyme — le nombre de fois qu'un outil a été exécuté — pour que les limites gratuites restent équitables. Nous n'enregistrons pas le contenu de vos fichiers."
+    ],
+    "dataTitle": "Autres informations",
+    "dataText": "Nous comptons les visites de pages anonymes pour nos propres statistiques, afin de voir quels outils les gens utilisent. Nous n'utilisons pas de traqueurs publicitaires et nous ne vendons pas de données de navigation.",
+    "contactText": "Les questions sur cette politique peuvent être envoyées via notre <link>page de contact</link>.",
+    "backLink": "← Retour à tous les outils",
+    "updated": "Dernière mise à jour : novembre 2026."
+  },
+  "termsPage": {
+    "title": "Conditions d'utilisation",
+    "intro": "Ces conditions régissent votre utilisation des outils PDF gratuits en ligne de PDFEDI.",
+    "useTitle": "Utilisation acceptable",
+    "usePoints": [
+      "Utilisez les outils uniquement pour des fichiers que vous avez le droit de traiter.",
+      "Ne téléversez pas de fichiers illégaux et n'utilisez pas le service pour enfreindre la loi.",
+      "N'abusez pas du service — par exemple en envoyant des requêtes automatisées qui le surchargent.",
+      "Vous êtes responsable de conserver une copie de tout fichier important."
+    ],
+    "serviceTitle": "Le service",
+    "serviceText": "Les outils sont fournis gratuitement, tels quels, sans aucune garantie. Nous pouvons modifier, limiter ou arrêter n'importe quel outil à tout moment. Nous ne sommes pas responsables des fichiers perdus ni d'aucune perte causée par l'utilisation du service.",
+    "filesTitle": "Vos fichiers",
+    "filesText": "Vos fichiers sont téléversés sur notre serveur pour être traités et supprimés après le traitement. Conservez votre propre sauvegarde — ne téléversez pas un fichier dont vous ne pouvez pas supporter la perte.",
+    "backLink": "← Retour à tous les outils",
+    "updated": "Dernière mise à jour : novembre 2026."
+  },
+  "aboutPage": {
+    "title": "À propos de PDFEDI",
+    "intro": "PDFEDI est un service PDF gratuit en ligne : 26 outils pour travailler avec des fichiers PDF, en 10 langues, sans inscription.",
+    "whatTitle": "Ce que vous pouvez faire",
+    "whatPoints": [
+      "Fusionner, diviser, réorganiser, pivoter et supprimer des pages.",
+      "Convertir des PDF en images, en texte ou en documents Word, et des images en PDF.",
+      "Compresser, réparer, ajouter des filigranes et des numéros de page, et protéger les PDF par mot de passe.",
+      "Caviarder du texte, supprimer les métadonnées et préparer des fichiers pour un dépôt au tribunal."
+    ],
+    "howTitle": "Comment ça marche",
+    "howText": "Choisissez un outil, téléversez votre PDF et téléchargez le résultat. Les fichiers sont téléversés sur notre serveur pour être traités et supprimés après le traitement. Dans les outils d'organisation, les aperçus des pages sont générés dans votre navigateur avant d'appuyer sur le bouton de traitement.",
+    "freeTitle": "Gratuit, sans inscription",
+    "freeText": "Les 26 outils sont gratuits et ne nécessitent aucun compte. Certains ont une limite horaire d'utilisation raisonnable pour que le service reste rapide pour tout le monde.",
+    "backLink": "← Retour à tous les outils"
+  },
+  "contactPage": {
+    "title": "Contact",
+    "intro": "Des questions, des suggestions ou un problème avec un outil ? Voici comment nous joindre.",
+    "emailTitle": "E-mail",
+    "emailText": "Notre adresse e-mail professionnelle sera indiquée ici prochainement.",
+    "noteTitle": "Avant d'écrire",
+    "noteText": "Veuillez ne pas envoyer par e-mail de fichiers contenant des informations privées ou sensibles. Si un outil a échoué, dites-nous quel outil vous avez utilisé et ce qui s'est passé — c'est généralement suffisant pour corriger le problème.",
+    "backLink": "← Retour à tous les outils"
   }
 }
