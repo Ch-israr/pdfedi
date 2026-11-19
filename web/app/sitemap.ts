@@ -7,8 +7,8 @@ import { LOCALES, LOCALE_SEGMENTS, localeUrl } from "../i18n/routing";
 // added here manually — it will NOT appear in sitemap.xml otherwise.
 // Do NOT add /admin or any non-public routes.
 //
-// Multilingual: every public page is emitted once per locale (29 pages
-// x 10 locales = 290 URLs), each carrying the full hreflang alternate
+// Multilingual: every public page is emitted once per locale (33 pages
+// x 10 locales = 330 URLs), each carrying the full hreflang alternate
 // set with x-default pointing at the English URL.
 const PAGES: { path: string; changeFrequency: "weekly" | "monthly"; priority: number }[] = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
@@ -19,6 +19,10 @@ const PAGES: { path: string; changeFrequency: "weekly" | "monthly"; priority: nu
   })),
   { path: "/lawyers", changeFrequency: "monthly", priority: 0.9 },
   { path: "/how-we-handle-files", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/privacy", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/terms", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/about", changeFrequency: "monthly", priority: 0.5 },
+  { path: "/contact", changeFrequency: "monthly", priority: 0.5 },
 ];
 
 function alternates(path: string): Record<string, string> {
