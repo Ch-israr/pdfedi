@@ -103,3 +103,56 @@ export async function privacyMetadata(locale: LocaleSegment): Promise<Metadata> 
     ...ogMeta(locale, title, t("privacyOgDescription"), path),
   };
 }
+
+// Metadata for the four legal/info pages (DISC-01 fix). Each reads its own
+// title/description/og-description keys from the "meta" namespace so the
+// pages get per-locale titles, canonicals and the full hreflang set, like
+// lawyersMetadata above. "privacy" here is the Privacy Policy (/privacy);
+// the "How we handle files" page keeps privacyMetadata above.
+function infoPageMetadata(
+  path: string,
+  titleKey: string,
+  descriptionKey: string,
+  ogDescriptionKey: string,
+) {
+  return async function (locale: LocaleSegment): Promise<Metadata> {
+    setRequestLocale(locale);
+    const t = await getTranslations({ locale, namespace: "meta" });
+    const title = t(titleKey);
+    const description = t(descriptionKey);
+    return {
+      title,
+      description,
+      alternates: { canonical: localeUrl(path, locale), languages: hreflangAlternates(path) },
+      ...ogMeta(locale, title, t(ogDescriptionKey), path),
+    };
+  };
+}
+
+export const privacyPageMetadata = infoPageMetadata(
+  "/privacy",
+  "privacyPageTitle",
+  "privacyPageDescription",
+  "privacyPageOgDescription",
+);
+
+export const termsPageMetadata = infoPageMetadata(
+  "/terms",
+  "termsPageTitle",
+  "termsPageDescription",
+  "termsPageOgDescription",
+);
+
+export const aboutPageMetadata = infoPageMetadata(
+  "/about",
+  "aboutPageTitle",
+  "aboutPageDescription",
+  "aboutPageOgDescription",
+);
+
+export const contactPageMetadata = infoPageMetadata(
+  "/contact",
+  "contactPageTitle",
+  "contactPageDescription",
+  "contactPageOgDescription",
+);
