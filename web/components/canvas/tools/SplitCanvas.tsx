@@ -14,7 +14,10 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   buildSplitPayload,
+  pagesToGroups,
+  pagesToRanges,
   rangesToPages,
+  PayloadError,
 } from "../../../lib/canvas/payloads";
 import { makeItem, splitGroups, type OrganizerItem } from "../../../lib/canvas/organizer";
 import { useOrganizer } from "../../../hooks/useOrganizer";
@@ -50,6 +53,11 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
   const [preview, setPreview] = useState<{ page: number } | null>(null);
   const [rangesText, setRangesText] = useState<string | null>(null);
   const [rangesError, setRangesError] = useState<string | null>(null);
+  // Literal ranges the user typed when they contain a gap
+  // ("1-3,8-10"). Dividers can only express a contiguous partition,
+  // so the typed ranges are kept verbatim as the payload and the
+  // pages between the runs are shown dimmed as excluded.
+  const [gapRanges, setGapRanges] = useState<string | null>(null);
   const loadThumb = useMemo(() => thumbLoaderFor(pdfs), [pdfs]);
 
   const pageCount = pdf?.pageCount ?? 0;
@@ -62,18 +70,49 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
   const groupOf = (pageNum: number) =>
     mode === "ranges" ? doc.dividers.filter((d) => d < pageNum).length : undefined;
 
+  // A gap selection is live only while the dividers still match the
+  // run boundaries of the typed ranges. Any divider edit, mode change
+  // or undo that moves the dividers deactivates it by itself, so the
+  // payload can never disagree with the visual state.
+  const gapGroups = useMemo(
+    () => (gapRanges ? pagesToGroups(rangesToPages(gapRanges)) : []),
+    [gapRanges],
+  );
+  const gapActive = useMemo(() => {
+    if (!gapRanges || gapGroups.length < 2) return false;
+    const boundaries = gapGroups.map(([, e]) => e).filter((e) => e < pageCount);
+    return (
+      boundaries.length === doc.dividers.length &&
+      boundaries.every((b, i) => b === doc.dividers[i])
+    );
+  }, [gapRanges, gapGroups, pageCount, doc.dividers]);
+  const excludedPages = useMemo(() => {
+    if (!gapActive) return new Set<number>();
+    const included = new Set(gapGroups.flatMap(([s, e]) => Array.from({ length: e - s + 1 }, (_, i) => s + i)));
+    const excluded = new Set<number>();
+    for (let p = 1; p <= pageCount; p++) if (!included.has(p)) excluded.add(p);
+    return excluded;
+  }, [gapActive, gapGroups, pageCount]);
+  const displayGroups = gapActive ? gapGroups : groups;
+
   const payload = useMemo(() => {
     try {
       const extractPages =
         mode === "extract"
           ? org.selected.map((id) => Number(id.split(":")[1])).sort((a, b) => a - b)
           : [];
-      const built = buildSplitPayload(pageCount, mode, doc.dividers, extractPages);
+      const built = buildSplitPayload(
+        pageCount,
+        mode,
+        doc.dividers,
+        extractPages,
+        mode === "ranges" && gapActive ? gapRanges : null,
+      );
       return { ...built, error: null as string | null };
     } catch (e) {
       return { config: {}, error: translatePayloadError(e, tErr) };
     }
-  }, [pageCount, mode, doc.dividers, org.selected]);
+  }, [pageCount, mode, doc.dividers, org.selected, gapActive, gapRanges]);
 
   const summary =
     mode === "every"
@@ -82,10 +121,10 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
         ? org.selected.length > 0
           ? t("split.summaryExtract", { count: org.selected.length })
           : t("split.summaryExtractEmpty")
-        : groups.length > 0
+        : displayGroups.length > 0
           ? t("split.summaryRanges", {
-              count: groups.length,
-              groups: groups
+              count: displayGroups.length,
+              groups: displayGroups
                 .map(([s, e]) => (s === e ? `p. ${s}` : `pp. ${s}–${e}`))
                 .join(", "),
             })
@@ -97,46 +136,69 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
         id: it.id,
         label: t("pageLabel", { n: it.page }),
         groupIndex: groupOf(it.page),
+        // Pages between the typed runs are excluded from every output
+        // file: dim them (the grid's "Removed" badge) so the visual
+        // state stays truthful about what will be sent.
+        removed: excludedPages.has(it.page),
       })),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [doc.items, doc.dividers, mode],
+    [doc.items, doc.dividers, mode, excludedPages],
   );
   const allIds = doc.items.map((it) => it.id);
 
   // Ranges text field: shown value is the visual state unless the user
-  // is editing; committing parses it back into dividers.
+  // is editing; committing parses it back into dividers. While a gap
+  // selection is live the field shows the literal typed ranges.
   const rangesValue =
     rangesText ??
     (mode === "ranges"
-      ? groups.map(([s, e]) => (s === e ? `${s}` : `${s}-${e}`)).join(",")
+      ? gapActive && gapRanges
+        ? gapRanges
+        : displayGroups.map(([s, e]) => (s === e ? `${s}` : `${s}-${e}`)).join(",")
       : "");
   function commitRanges(text: string) {
-    setRangesText(null);
-    try {
-      const pages = rangesToPages(text);
-      // A divider after the last page of each contiguous run, except
-      // the document end (a trailing divider would be a no-op).
-      const dividers: number[] = [];
-      let prev = pages[0];
-      for (let i = 1; i <= pages.length; i++) {
-        const cur = pages[i];
-        if (cur === prev + 1) {
-          prev = cur;
-          continue;
-        }
-        if (prev < pageCount) dividers.push(prev);
-        prev = cur;
-      }
-      if (pages.some((p) => p > pageCount)) {
-        setRangesError(t("split.pageRangeExceeds", { count: pageCount }));
-        return;
-      }
-      setRangesError(null);
-      // One undo step for the whole text commit.
-      dispatch({ type: "setDividers", dividers });
-    } catch (e) {
-      setRangesError(translatePayloadError(e, tErr));
+    // Empty input is an error, never a silent fallback to the whole
+    // document. The typed text stays visible while the error shows.
+    if (!text.trim()) {
+      setRangesError(t("split.rangesEmpty"));
+      setRangesText(text);
+      return;
     }
+    let pages: number[];
+    try {
+      pages = rangesToPages(text);
+    } catch (e) {
+      // Reversed ranges get the real reason, not "starts at 1".
+      if (e instanceof PayloadError && e.code === "reversed_range") {
+        setRangesError(t("split.rangesReversed", { range: String(e.params.range ?? text) }));
+      } else {
+        setRangesError(translatePayloadError(e, tErr));
+      }
+      setRangesText(text);
+      return;
+    }
+    if (pages.length === 0) {
+      setRangesError(t("split.rangesEmpty"));
+      setRangesText(text);
+      return;
+    }
+    if (pages.some((p) => p > pageCount)) {
+      setRangesError(t("split.pageRangeExceeds", { count: pageCount }));
+      setRangesText(text);
+      return;
+    }
+    const runs = pagesToGroups(pages);
+    // Dividers at every run end (except the document end): the grid
+    // then shows each run — and each excluded stretch between runs —
+    // as its own tinted group.
+    const dividers = runs.map(([, e]) => e).filter((e) => e < pageCount);
+    setRangesError(null);
+    setRangesText(null);
+    // Preserve gaps: keep the literal typed ranges as the payload so
+    // the backend returns one file per run instead of filling the gap.
+    setGapRanges(runs.length > 1 ? pagesToRanges(pages) : null);
+    // One undo step for the whole text commit.
+    dispatch({ type: "setDividers", dividers });
   }
 
   return (
@@ -161,8 +223,18 @@ export function SplitCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
             ? t("split.processExtract")
             : t("split.processRanges")
       }
-      canProcess={payload.error === null && job.files.length === 1}
-      onProcess={() => void job.startJob(job.files, payload.config)}
+      canProcess={payload.error === null && rangesError === null && job.files.length === 1}
+      onProcess={() => {
+        // Safety net: if the ranges field still holds an uncommitted
+        // edit (blur normally commits it first), commit it now and
+        // wait for the next click instead of running stale ranges.
+        if (mode === "ranges" && rangesText !== null) {
+          commitRanges(rangesText);
+          return;
+        }
+        if (rangesError !== null) return;
+        void job.startJob(job.files, payload.config);
+      }}
       onPick={onPick}
       onReset={job.reset}
       onBackToOrganize={() => job.setPhase("organize")}
