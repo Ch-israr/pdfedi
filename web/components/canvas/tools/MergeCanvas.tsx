@@ -16,6 +16,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { buildMergePayload, type MergePageRef } from "../../../lib/canvas/payloads";
+import type { LoadedPdf } from "../../../lib/canvas/loadPdf";
 import { makeItem, type OrganizerItem } from "../../../lib/canvas/organizer";
 import { useOrganizer } from "../../../hooks/useOrganizer";
 import { CanvasShell } from "../CanvasShell";
@@ -61,7 +62,7 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
   const payload = useMemo(() => {
     try {
       const fileIds = includedFileOrder.map((fi) => job.files[fi]?.id).filter(Boolean) as string[];
-      if (fileIds.length < 2) return { fileIds, config: {}, error: "Add at least one more file." };
+      if (fileIds.length < 2) return { fileIds, config: {}, error: t("merge.addMoreFiles") };
       const counts = includedFileOrder.map((fi) => pdfs[fi]?.pageCount ?? 0);
       const refs: MergePageRef[] = doc.items
         .filter((it) => !it.removed)
@@ -71,7 +72,7 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
     } catch (e) {
       return { fileIds: [], config: {}, error: e instanceof Error ? e.message : String(e) };
     }
-  }, [doc.items, includedFileOrder, job.files, pdfs]);
+  }, [doc.items, includedFileOrder, job.files, pdfs, t]);
 
   const totalPages = doc.items.filter((it) => !it.removed).length;
   const removedCount = doc.items.length - totalPages;
@@ -124,12 +125,21 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
     org.clearSelection();
   }
 
-  const fileCards = includedFileOrder.map((fi) => {
-    const pdf = pdfs[fi];
-    const count = doc.items.filter((it) => it.fileIndex === fi && !it.removed).length;
-    const pos = includedFileOrder.indexOf(fi);
-    return { fi, pdf, count, pos };
-  });
+  // The canvas children are evaluated even while the shell shows the
+  // dropzone, so a file index whose document is not (yet) loaded must
+  // never be dereferenced: skip its card until its pdf arrives
+  // (during an incremental add, or on the remount after Start over).
+  const fileCards = includedFileOrder
+    .map((fi) => {
+      const pdf = pdfs[fi];
+      if (!pdf) return null;
+      const count = doc.items.filter((it) => it.fileIndex === fi && !it.removed).length;
+      const pos = includedFileOrder.indexOf(fi);
+      return { fi, pdf, count, pos };
+    })
+    .filter(
+      (c): c is { fi: number; pdf: LoadedPdf; count: number; pos: number } => c !== null,
+    );
   const removedFiles = pdfs
     .map((pdf, fi) => ({ fi, pdf }))
     .filter(({ fi }) => !includedFileOrder.includes(fi));
