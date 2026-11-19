@@ -9,7 +9,19 @@
     "lawyersOgDescription": "Redact, strip metadata, compress to your court's filing limit and combine exhibits with Bates numbers — free, no sign-up.",
     "privacyTitle": "How We Handle Your Files — Privacy | PDFEDI",
     "privacyDescription": "What happens to your files on PDFEDI: uploaded to our server to be processed, deleted automatically, no account, no file content kept or shared.",
-    "privacyOgDescription": "Uploaded to our server, processed, deleted automatically. No account, no file content kept."
+    "privacyOgDescription": "Uploaded to our server, processed, deleted automatically. No account, no file content kept.",
+    "privacyPageTitle": "Privacy Policy | PDFEDI",
+    "privacyPageDescription": "How PDFEDI handles your files: uploaded to our server for processing, removed after processing, never sold or shared.",
+    "privacyPageOgDescription": "Your files are uploaded for processing, removed after processing, and never sold or shared.",
+    "termsPageTitle": "Terms of Service | PDFEDI",
+    "termsPageDescription": "The terms for using PDFEDI's free online PDF tools: acceptable use, the service as it is, and your files.",
+    "termsPageOgDescription": "Acceptable use and no-warranty terms for PDFEDI's free PDF tools.",
+    "aboutPageTitle": "About PDFEDI — Free Online PDF Tools",
+    "aboutPageDescription": "PDFEDI is a free online PDF service: 26 tools for working with PDF files, in 10 languages, with no sign-up.",
+    "aboutPageOgDescription": "26 free PDF tools in 10 languages. No sign-up.",
+    "contactPageTitle": "Contact PDFEDI",
+    "contactPageDescription": "How to contact PDFEDI with a question, a suggestion, or a problem with a tool.",
+    "contactPageOgDescription": "Contact PDFEDI about a tool, a question, or a suggestion."
   },
   "chrome": {
     "allTools": "All tools",
@@ -17,7 +29,14 @@
     "tagline": "PDFEDI — free online PDF tools.",
     "footerNote": "No sign-up. Files are processed and deleted automatically.",
     "home": "Home",
-    "language": "Language"
+    "language": "Language",
+    "privacy": "Privacy",
+    "terms": "Terms",
+    "about": "About",
+    "contact": "Contact",
+    "howWeHandleFiles": "How we handle files",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
   },
   "home": {
     "heroTitle": "Every PDF tool you need.",
@@ -294,7 +313,9 @@
       "splitAfter": "Split after page {n}",
       "removeSplitAfter": "Remove split after page {n}",
       "gridAria": "Pages to split",
-      "pageRangeExceeds": "Page numbers exceed the document page count ({count})."
+      "pageRangeExceeds": "Page numbers exceed the document page count ({count}).",
+      "rangesEmpty": "Enter at least one page range, e.g. 1-3,5.",
+      "rangesReversed": "Invalid range {range}: the start page comes after the end page."
     },
     "rotate": {
       "summaryEmpty": "Select pages, then rotate them — or rotate all pages at once.",
@@ -783,5 +804,64 @@
     "privateByDesign": "Private by design",
     "privateNote": "Files you upload are processed securely and deleted automatically afterwards. PDFEDI never asks for an account — pick a tool and go. Each file can be up to 50MB, and every tool is free to use up to 5 times per hour.",
     "breadcrumbHome": "Home"
+  },
+  "privacyPage": {
+    "title": "Privacy Policy",
+    "intro": "PDFEDI is a free online PDF service. This policy explains what happens to the files you upload.",
+    "uploadTitle": "What happens to your files",
+    "uploadText": "When you use a tool, your file is uploaded to our server, processed there, and the result is sent back to you to download. Your file does leave your device — that is how any server-processed tool works.",
+    "uploadPoints": [
+      "No account, no sign-up, and no email address is asked for.",
+      "Processed files are removed after processing.",
+      "Your file contents are not sold, not shared with anyone, and not used to train anything.",
+      "We count anonymous usage — how many times a tool ran — so we can keep the free limits fair. We do not record what your files contain."
+    ],
+    "dataTitle": "Other information",
+    "dataText": "We count anonymous page visits for our own statistics, so we can see which tools people use. We do not use advertising trackers, and we do not sell browsing data.",
+    "contactText": "Questions about this policy can be sent through our <link>Contact page</link>.",
+    "backLink": "← Back to all tools",
+    "updated": "Last updated: November 2026."
+  },
+  "termsPage": {
+    "title": "Terms of Service",
+    "intro": "These terms cover your use of PDFEDI's free online PDF tools.",
+    "useTitle": "Acceptable use",
+    "usePoints": [
+      "Use the tools only for files you have the right to process.",
+      "Do not upload files that are illegal, or use the service to break the law.",
+      "Do not abuse the service — for example, by sending automated requests that overload it.",
+      "You are responsible for keeping a copy of any file that matters to you."
+    ],
+    "serviceTitle": "The service",
+    "serviceText": "The tools are provided free of charge, as they are, without any warranty. We may change, limit, or stop any tool at any time. We are not responsible for lost files, or for any loss caused by using the service.",
+    "filesTitle": "Your files",
+    "filesText": "Your files are uploaded to our server for processing and removed after processing. Keep your own backup — do not upload a file you cannot afford to lose.",
+    "backLink": "← Back to all tools",
+    "updated": "Last updated: November 2026."
+  },
+  "aboutPage": {
+    "title": "About PDFEDI",
+    "intro": "PDFEDI is a free online PDF service: 26 tools for working with PDF files, in 10 languages, with no sign-up.",
+    "whatTitle": "What you can do",
+    "whatPoints": [
+      "Merge, split, reorder, rotate, and delete pages.",
+      "Convert PDFs to images, text, or Word documents, and images to PDF.",
+      "Compress, repair, watermark, add page numbers, and protect PDFs with a password.",
+      "Redact text, strip metadata, and prepare files for court filings."
+    ],
+    "howTitle": "How it works",
+    "howText": "Choose a tool, upload your PDF, and download the result. Files are uploaded to our server for processing and removed after processing. On the organizer tools, page previews are rendered in your browser before you press the process button.",
+    "freeTitle": "Free, no sign-up",
+    "freeText": "All 26 tools are free to use with no account. Some tools have a fair-use hourly limit so the service stays fast for everyone.",
+    "backLink": "← Back to all tools"
+  },
+  "contactPage": {
+    "title": "Contact",
+    "intro": "Questions, suggestions, or a problem with a tool? Here is how to reach us.",
+    "emailTitle": "Email",
+    "emailText": "Our business email address will be listed here soon.",
+    "noteTitle": "Before you write",
+    "noteText": "Please do not send files containing private or sensitive information by email. If a tool failed, tell us which tool you used and what happened — that is usually enough to fix it.",
+    "backLink": "← Back to all tools"
   }
 }
