@@ -9,7 +9,19 @@
     "lawyersOgDescription": "涂黑、清除元数据、压缩至法院的提交大小上限、合并证据材料并添加贝茨编号——免费，无需注册。",
     "privacyTitle": "我们如何处理您的文件 — 隐私 | PDFEDI",
     "privacyDescription": "PDFEDI 如何处理您的文件：文件上传到我们的服务器进行处理后自动删除，无需账户，不会保留或分享文件内容。",
-    "privacyOgDescription": "上传到我们的服务器、处理后自动删除。无需账户，不保留文件内容。"
+    "privacyOgDescription": "上传到我们的服务器、处理后自动删除。无需账户，不保留文件内容。",
+    "privacyPageTitle": "隐私政策 | PDFEDI",
+    "privacyPageDescription": "PDFEDI 如何处理您的文件：上传到我们的服务器进行处理，处理后删除，绝不出售或分享。",
+    "privacyPageOgDescription": "您的文件上传后进行处理，处理后删除，绝不出售或分享。",
+    "termsPageTitle": "服务条款 | PDFEDI",
+    "termsPageDescription": "使用 PDFEDI 免费在线 PDF 工具的条款：可接受使用、按现状提供服务以及您的文件。",
+    "termsPageOgDescription": "PDFEDI 免费 PDF 工具的可接受使用与无担保条款。",
+    "aboutPageTitle": "关于 PDFEDI — 免费在线 PDF 工具",
+    "aboutPageDescription": "PDFEDI 是一项免费在线 PDF 服务：26 个 PDF 处理工具，支持 10 种语言，无需注册。",
+    "aboutPageOgDescription": "26 个免费 PDF 工具，支持 10 种语言。无需注册。",
+    "contactPageTitle": "联系 PDFEDI",
+    "contactPageDescription": "如有问题、建议或某个工具出现故障，请通过以下方式联系 PDFEDI。",
+    "contactPageOgDescription": "就工具、问题或建议联系 PDFEDI。"
   },
   "chrome": {
     "allTools": "全部工具",
@@ -17,7 +29,14 @@
     "tagline": "PDFEDI——免费在线 PDF 工具。",
     "footerNote": "无需注册。文件处理后自动删除。",
     "home": "首页",
-    "language": "语言"
+    "language": "语言",
+    "privacy": "隐私",
+    "terms": "条款",
+    "about": "关于",
+    "contact": "联系",
+    "howWeHandleFiles": "我们如何处理您的文件",
+    "menu": "菜单",
+    "closeMenu": "关闭菜单"
   },
   "home": {
     "heroTitle": "您需要的所有 PDF 工具，尽在这里。",
@@ -294,7 +313,9 @@
       "splitAfter": "在第 {n} 页后拆分",
       "removeSplitAfter": "移除第 {n} 页后的拆分",
       "gridAria": "待拆分的页面",
-      "pageRangeExceeds": "页码超过了文档总页数（{count}）。"
+      "pageRangeExceeds": "页码超过了文档总页数（{count}）。",
+      "rangesEmpty": "请至少输入一个页码范围，例如 1-3,5。",
+      "rangesReversed": "范围无效 {range}：起始页在结束页之后。"
     },
     "rotate": {
       "summaryEmpty": "请选择页面进行旋转，或一次性旋转全部页面。",
@@ -783,5 +804,64 @@
     "privateByDesign": "注重隐私",
     "privateNote": "您上传的文件会被安全处理，之后自动删除。PDFEDI 从不要求您注册账户——只需选择一个工具即可开始。每个文件最大 50MB，每个工具每小时可免费使用 5 次。",
     "breadcrumbHome": "首页"
+  },
+  "privacyPage": {
+    "title": "隐私政策",
+    "intro": "PDFEDI 是一项免费在线 PDF 服务。本政策说明您上传的文件会如何处理。",
+    "uploadTitle": "您的文件会如何处理",
+    "uploadText": "使用某个工具时，您的文件会上传到我们的服务器，在服务器上处理，然后将结果返回给您下载。您的文件确实会离开您的设备——任何在服务器上处理的工具都是如此。",
+    "uploadPoints": [
+      "无需帐户、无需注册，也不会索要电子邮件地址。",
+      "处理后的文件会在处理完成后删除。",
+      "您的文件内容不会被出售，不会与任何人分享，也不会用于训练任何模型。",
+      "我们只统计匿名使用情况——某个工具被使用了多少次——以便公平地维持免费额度。我们不会记录您文件的内容。"
+    ],
+    "dataTitle": "其他信息",
+    "dataText": "我们会统计匿名的页面访问量，用于我们自己的统计，以了解人们使用哪些工具。我们不使用广告追踪器，也不出售浏览数据。",
+    "contactText": "关于本政策的问题可以通过我们的<link>联系页面</link>发送。",
+    "backLink": "← 返回所有工具",
+    "updated": "最后更新：2026 年 11 月。"
+  },
+  "termsPage": {
+    "title": "服务条款",
+    "intro": "这些条款适用于您对 PDFEDI 免费在线 PDF 工具的使用。",
+    "useTitle": "可接受使用",
+    "usePoints": [
+      "仅对您有权处理的文件使用这些工具。",
+      "请勿上传非法文件，也不得利用本服务违法。",
+      "请勿滥用本服务——例如发送使服务过载的自动请求。",
+      "请自行妥善保存任何重要文件的副本。"
+    ],
+    "serviceTitle": "服务",
+    "serviceText": "这些工具免费提供，按现状提供，不作任何担保。我们可能随时更改、限制或停止任何工具。对于文件丢失或因使用本服务造成的任何损失，我们不承担责任。",
+    "filesTitle": "您的文件",
+    "filesText": "您的文件会上传到我们的服务器进行处理，并在处理后删除。请自行备份——不要上传您无法承受丢失的文件。",
+    "backLink": "← 返回所有工具",
+    "updated": "最后更新：2026 年 11 月。"
+  },
+  "aboutPage": {
+    "title": "关于 PDFEDI",
+    "intro": "PDFEDI 是一项免费在线 PDF 服务：26 个 PDF 处理工具，支持 10 种语言，无需注册。",
+    "whatTitle": "您可以做什么",
+    "whatPoints": [
+      "合并、拆分、重新排序、旋转和删除页面。",
+      "将 PDF 转换为图片、文本或 Word 文档，将图片转换为 PDF。",
+      "压缩、修复、添加水印、添加页码，并用密码保护 PDF。",
+      "涂黑文本、清除元数据，并为法庭提交准备文件。"
+    ],
+    "howTitle": "工作原理",
+    "howText": "选择一个工具，上传您的 PDF，然后下载结果。文件会上传到我们的服务器进行处理，并在处理后删除。在整理工具中，页面预览会在您点击处理按钮之前于浏览器中生成。",
+    "freeTitle": "免费，无需注册",
+    "freeText": "全部 26 个工具均可免费使用，无需帐户。部分工具有每小时的合理使用限制，以便服务对每个人都保持快速。",
+    "backLink": "← 返回所有工具"
+  },
+  "contactPage": {
+    "title": "联系",
+    "intro": "有问题、建议，或某个工具出现故障？请通过以下方式联系我们。",
+    "emailTitle": "电子邮件",
+    "emailText": "我们的商务电子邮件地址即将在此公布。",
+    "noteTitle": "写信之前",
+    "noteText": "请勿通过电子邮件发送包含私人或敏感信息的文件。如果某个工具失败了，请告诉我们您使用了哪个工具以及发生了什么——这通常足以让我们修复它。",
+    "backLink": "← 返回所有工具"
   }
 }
