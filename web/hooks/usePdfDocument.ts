@@ -76,44 +76,92 @@ export function usePdfDocument(file: File | null): {
 
 export type PdfFilesState =
   | { status: "idle" }
-  | { status: "loading" }
+  | { status: "loading"; pdfs: LoadedPdf[] }
   | { status: "ready"; pdfs: LoadedPdf[] }
   | { status: "error"; message: string };
 
-/** Load several Files into pdf.js documents, in order. */
+/** Load several Files into pdf.js documents, in order.
+ *
+ * Incremental: adding a file loads ONLY the new file(s) and keeps the
+ * already-loaded documents (and their ready state) in place. The old
+ * behaviour reloaded the whole set on every change, which left a
+ * window where `pdfs` was [] while the canvas still held items for
+ * the previous files — MergeCanvas then crashed reading
+ * `pdfs[fi].fileName` of an undefined entry. Documents for files that
+ * disappear are destroyed; everything is destroyed on unmount.
+ */
 export function usePdfFiles(files: File[]): { state: PdfFilesState } {
   const tErr = useTranslations("errors");
   const [state, setState] = useState<PdfFilesState>({ status: "idle" });
-  const pdfsRef = useRef<LoadedPdf[]>([]);
-  const key = files.map((f) => `${f.name}:${f.size}:${f.lastModified}`).join("|");
+  // Loaded docs keyed by file identity; the ref (not state) owns them
+  // so a re-render never drops a document mid-load.
+  const loadedRef = useRef<Map<string, LoadedPdf>>(new Map());
+  const keyOf = (f: File) => `${f.name}:${f.size}:${f.lastModified}`;
+  const key = files.map(keyOf).join("|");
+
+  // Destroy every loaded document on unmount.
+  useEffect(
+    () => () => {
+      const loaded = [...loadedRef.current.values()];
+      loadedRef.current.clear();
+      void Promise.all(loaded.map((p) => p.destroy()));
+    },
+    [],
+  );
 
   useEffect(() => {
     if (files.length === 0) {
+      const loaded = [...loadedRef.current.values()];
+      loadedRef.current.clear();
+      void Promise.all(loaded.map((p) => p.destroy()));
       setState({ status: "idle" });
       return;
     }
     let cancelled = false;
-    setState({ status: "loading" });
+    const wanted = files.map(keyOf);
+    // Drop documents for files no longer present.
+    for (const [k, pdf] of [...loadedRef.current.entries()]) {
+      if (!wanted.includes(k)) {
+        loadedRef.current.delete(k);
+        void pdf.destroy();
+      }
+    }
+    const missing = files.filter((f) => !loadedRef.current.has(keyOf(f)));
+    if (missing.length === 0) {
+      // Nothing new: report the current set as ready without a
+      // loading flash or a transient empty list for the canvas.
+      const ordered = files.map((f) => loadedRef.current.get(keyOf(f))!);
+      setState({ status: "ready", pdfs: ordered });
+      return;
+    }
+    // Keep previously loaded docs visible while the new files load:
+    // "loading" carries them, so the canvas never sees an empty list
+    // mid-add — and the OrganizerTool promotion effect still fires on
+    // the loading -> ready transition. Only flip to bare "loading"
+    // when nothing is ready yet.
+    const prevOrdered = files
+      .filter((f) => loadedRef.current.has(keyOf(f)))
+      .map((f) => loadedRef.current.get(keyOf(f))!);
+    setState({ status: "loading", pdfs: prevOrdered });
     (async () => {
       try {
-        const loaded = await Promise.all(files.map((f) => loadPdfFile(f)));
+        const fresh = await Promise.all(missing.map((f) => loadPdfFile(f)));
         if (cancelled) {
-          await Promise.all(loaded.map((p) => p.destroy()));
+          await Promise.all(fresh.map((p) => p.destroy()));
           return;
         }
-        pdfsRef.current = loaded;
-        setState({ status: "ready", pdfs: loaded });
+        missing.forEach((f, i) => loadedRef.current.set(keyOf(f), fresh[i]));
+        const ordered = files.map((f) => loadedRef.current.get(keyOf(f))!);
+        setState({ status: "ready", pdfs: ordered });
       } catch (e) {
         if (!cancelled) {
+          console.error("[usePdfFiles] load failed:", e instanceof Error ? e.stack : e);
           setState({ status: "error", message: tErr("pdf_unreadable_one") });
         }
       }
     })();
     return () => {
       cancelled = true;
-      const loaded = pdfsRef.current;
-      pdfsRef.current = [];
-      void Promise.all(loaded.map((p) => p.destroy()));
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
