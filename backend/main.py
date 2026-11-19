@@ -152,6 +152,66 @@ def _frontend_file(path: str, candidate: Path) -> FileResponse:
     return FileResponse(candidate)
 
 
+def _frontend_not_found(frontend: Path):
+    """The real 404 page (frontend 404/index.html, status 404), or a JSON
+    404 if the static export has no 404 page (e.g. frontend dir missing
+    it). Used for every unknown path — never the homepage."""
+    not_found = frontend / "404" / "index.html"
+    if not_found.is_file():
+        return FileResponse(not_found, status_code=404)
+    return JSONResponse(status_code=404, content={"detail": "Not found"})
+
+
+# Prefixed (non-English) locale segments, mirroring web/i18n/routing.ts.
+# English is prefix-free, so "en" is deliberately NOT in this set: /en/
+# has no page and must 404 like any other unknown path.
+_FRONTEND_LOCALES = {"es", "fr", "pt", "id", "zh-cn", "hi", "bn", "ar", "ur"}
+
+# Top-level public pages besides the homepage and tool pages (mirrors
+# web/app/sitemap.ts PAGES). /admin is included: it is a real generated
+# page, just not listed in the sitemap.
+_FRONTEND_TOP_PAGES = {
+    "lawyers",
+    "how-we-handle-files",
+    "privacy",
+    "terms",
+    "about",
+    "contact",
+    "admin",
+}
+
+
+def _is_known_frontend_route(norm: str) -> bool:
+    """True only for routes the static export actually generates, given a
+    normalized path (no leading/trailing slash). `norm` is "" for "/".
+    Tool slugs come from the backend tool registry (pdfedi.tools.TOOLS),
+    which is the same 26-tool set the frontend builds pages for — so a
+    removed tool (e.g. thumbnails) 404s here instead of soft-404ing.
+    Deliberately no fallback to the English page for a locale URL: a
+    locale URL must never return English content with a 200."""
+    if norm == "":
+        return True
+    parts = norm.split("/")
+    if len(parts) == 1:
+        # /<page> or /<locale> (locale homepage, e.g. /fr).
+        return parts[0] in _FRONTEND_TOP_PAGES or parts[0] in _FRONTEND_LOCALES
+    if len(parts) == 2:
+        # /tools/<slug> or /<locale>/<page>.
+        if parts[0] == "tools":
+            from pdfedi.tools import TOOLS
+
+            return parts[1] in TOOLS
+        return parts[0] in _FRONTEND_LOCALES and parts[1] in _FRONTEND_TOP_PAGES
+    if len(parts) == 3:
+        # /<locale>/tools/<slug>.
+        if parts[0] in _FRONTEND_LOCALES and parts[1] == "tools":
+            from pdfedi.tools import TOOLS
+
+            return parts[2] in TOOLS
+        return False
+    return False
+
+
 def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="PDFEDI", version="2.0.0", lifespan=lifespan,
@@ -213,61 +273,37 @@ def create_app() -> FastAPI:
 
         @app.get("/{path:path}")
         def serve_frontend(path: str):
+            # Normalize BEFORE any routing decision: strip trailing "/"
+            # (and any leading "/") so "fr/tools/nonexistent/" and
+            # "fr/tools/nonexistent" route identically. Previously the
+            # locale-tools check required exactly 3 parts, so the
+            # trailing-slash form (4 parts) slipped through to the
+            # homepage fallback and soft-404'd with a 200 (I18N-2).
+            norm = path.strip("/")
             # Unknown API routes are real 404s (JSON), not the SPA fallback.
-            if path == "api" or path.startswith("api/"):
+            if norm == "api" or norm.startswith("api/"):
                 return JSONResponse(status_code=404, content={"detail": "Not found"})
             # The PDF editor was removed (2026-10-15): its old route must
             # be a real 404, not the SPA fallback serving the homepage.
-            if path == "editor" or path.startswith("editor/"):
-                not_found = frontend / "404" / "index.html"
-                if not_found.is_file():
-                    return FileResponse(not_found, status_code=404)
-                return JSONResponse(status_code=404, content={"detail": "Not found"})
-            # API routes are matched before this catch-all.
-            candidate = frontend / path
-            if path and candidate.is_file():
-                return _frontend_file(path, candidate)
-            if (frontend / path / "index.html").is_file():
-                return FileResponse(frontend / path / "index.html")
-            # Locale-prefixed tool pages (es/tools/merge) are served by
-            # the index.html check above when they exist. Unknown slugs
-            # under a locale must 404 exactly like the English ones —
-            # otherwise the SPA fallback would serve the homepage with
-            # a 200 for a page that does not exist.
-            _LOCALES = {"es", "fr", "pt", "id", "zh-cn", "hi", "bn", "ar", "ur"}
-            _parts = path.split("/")
-            _is_locale_tools = (
-                len(_parts) == 3 and _parts[0] in _LOCALES and _parts[1] == "tools"
-            )
-            if path.startswith("tools/"):
-                tool_page = frontend / "tools" / path.split("/")[-1] / "index.html"
-                if tool_page.is_file():
-                    return FileResponse(tool_page)
-                # Unknown tool slug: real 404 page, not a silent homepage.
-                not_found = frontend / "404" / "index.html"
-                if not_found.is_file():
-                    return FileResponse(not_found, status_code=404)
-                return JSONResponse(status_code=404, content={"detail": "Not found"})
-            if _is_locale_tools:
-                # The localized file would already have been served by the
-                # index.html check above, so reaching here means the slug
-                # is unknown (or that locale was not generated): real 404.
-                # Deliberately no fallback to the English tool page — a
-                # locale URL must never return English content with a 200.
-                not_found = frontend / "404" / "index.html"
-                if not_found.is_file():
-                    return FileResponse(not_found, status_code=404)
-                return JSONResponse(status_code=404, content={"detail": "Not found"})
-            # Same for the removed editor under a locale prefix.
-            if len(_parts) == 2 and _parts[0] in _LOCALES and _parts[1] == "editor":
-                not_found = frontend / "404" / "index.html"
-                if not_found.is_file():
-                    return FileResponse(not_found, status_code=404)
-                return JSONResponse(status_code=404, content={"detail": "Not found"})
-            index = frontend / "index.html"
-            if index.is_file():
-                return FileResponse(index)
-            return {"service": "PDFEDI"}
+            # (Also covers <locale>/editor via the whitelist below.)
+            if norm == "editor" or norm.startswith("editor/"):
+                return _frontend_not_found(frontend)
+            # Real static files (logo, sitemap.xml, robots.txt, favicon,
+            # llms.txt, ...) are served as-is, exactly as before.
+            candidate = frontend / norm
+            if norm and candidate.is_file():
+                return _frontend_file(norm, candidate)
+            # Whitelist of known frontend routes (DISC-01 / I18N-2 fix).
+            # The old catch-all served the homepage with a 200 for EVERY
+            # unknown path, so search engines could index an infinite set
+            # of duplicate-homepage URLs and visitors never saw a 404.
+            # Only these routes serve a page (both slash forms, via norm);
+            # everything else gets the real 404 page below.
+            if _is_known_frontend_route(norm):
+                page = frontend / norm / "index.html" if norm else frontend / "index.html"
+                if page.is_file():
+                    return FileResponse(page)
+            return _frontend_not_found(frontend)
 
     return app
 
