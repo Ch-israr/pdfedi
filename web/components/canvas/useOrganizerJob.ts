@@ -74,6 +74,17 @@ export function useOrganizerJob(toolKey: string) {
     }
   }
 
+  // Mirror of `files` for async upload callbacks. `uploadFiles` must not
+  // close over the `files` state: OrganizerTool's pick handler is created
+  // before the first upload completes, so a stale closure would drop
+  // earlier files when a second batch is added ("Uploading to server…"
+  // forever, with job.files shorter than localFiles). The ref is always
+  // current, so sequential adds accumulate correctly.
+  const filesRef = useRef<UploadedFile[]>([]);
+  useEffect(() => {
+    filesRef.current = files;
+  }, [files]);
+
   const uploadFiles = useCallback(
     async (list: File[]): Promise<UploadedFile[]> => {
       if (!spec) throw new Error(tErr("not_loaded"));
@@ -90,7 +101,8 @@ export function useOrganizerJob(toolKey: string) {
       try {
         const uploaded: UploadedFile[] = [];
         for (const f of list) uploaded.push(await api.upload(f));
-        const all = [...files, ...uploaded];
+        const all = [...filesRef.current, ...uploaded];
+        filesRef.current = all;
         setFiles(all);
         // Phase stays "uploading": the caller promotes to "organize"
         // once the local pdf.js documents are ready, so the workspace
@@ -104,7 +116,7 @@ export function useOrganizerJob(toolKey: string) {
         setBusy(false);
       }
     },
-    [spec, limits, files],
+    [spec, limits],
   );
 
   const startJob = useCallback(
@@ -184,6 +196,7 @@ export function useOrganizerJob(toolKey: string) {
 
   const reset = useCallback(() => {
     stopPolling();
+    filesRef.current = [];
     setFiles([]);
     setJob(null);
     setError(null);
@@ -191,6 +204,7 @@ export function useOrganizerJob(toolKey: string) {
   }, []);
 
   const removeUploaded = useCallback((id: string) => {
+    filesRef.current = filesRef.current.filter((f) => f.id !== id);
     setFiles((fs) => fs.filter((f) => f.id !== id));
   }, []);
 
