@@ -72,12 +72,14 @@ export function OrganizerTool({ toolKey }: { toolKey: string }) {
       // through the job hook's error state.
       void job.uploadFiles(accepted).catch(() => {});
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [localFiles, job.spec?.max_files, toolKey],
+    [localFiles, job.spec?.max_files, job.uploadFiles, toolKey],
   );
 
   // Promote to the workspace once local documents are ready; a failed
-  // local load drops back to pick with an error.
+  // local load drops back to pick with an error. Depends on the whole
+  // load state and the phase: adding a file sets phase "uploading"
+  // while the load state may already be "ready" (e.g. re-adding the
+  // same file), and the promotion must still fire.
   useEffect(() => {
     if (pdfsState.status === "ready" && job.phase === "uploading") {
       job.setPhase("organize");
@@ -86,7 +88,7 @@ export function OrganizerTool({ toolKey }: { toolKey: string }) {
       job.setPhase("pick");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pdfsState.status]);
+  }, [pdfsState, job.phase]);
 
   const handleReset = useCallback(() => {
     setLocalFiles([]);
@@ -102,7 +104,20 @@ export function OrganizerTool({ toolKey }: { toolKey: string }) {
   const Canvas = CANVASES[toolKey as keyof typeof CANVASES];
   if (!Canvas) return <p className="text-red-600">{tErr("tool_error")}</p>;
 
-  const pdfs = pdfsState.status === "ready" ? pdfsState.pdfs : [];
+  // Never hand the canvas stale documents: after "Start over"
+  // localFiles is [] while the previous load state is still "ready"
+  // for one render, and a fresh canvas mounting with those stale
+  // pdfs would build organizer items for files that no longer exist
+  // (then crash once the load state drops to idle). While a new file
+  // is loading, the previously loaded documents stay available.
+  const pdfs =
+    localFiles.length === 0
+      ? []
+      : pdfsState.status === "ready"
+        ? pdfsState.pdfs
+        : pdfsState.status === "loading"
+          ? pdfsState.pdfs
+          : [];
   const effectiveJob = {
     ...job,
     // Never show the workspace before the local documents are ready.
