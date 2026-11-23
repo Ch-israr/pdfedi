@@ -16,8 +16,7 @@ from sqlalchemy.orm import Session
 from .. import jobs
 from ..config import get_settings
 from ..db import get_db
-from ..models import File, Job, enum_value
-from ..models import JobStatus
+from ..models import File, Job
 from ..storage import get_object_path, storage_dir
 from ..tools import list_specs
 
