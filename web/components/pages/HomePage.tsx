@@ -42,6 +42,10 @@ export async function HomePage({ locale }: { locale: LocaleSegment }) {
                 <Link
                   key={t.key}
                   href={toLocalePath(`/tools/${t.key}`, locale)}
+                  // PERF: no RSC prefetch — each prefetch carries the full
+                  // next-intl messages object (~184 KB × 34 cards ≈ 2 MB
+                  // on the homepage). Navigation fetches on click instead.
+                  prefetch={false}
                   className="group rounded-2xl border border-slate-200/70 bg-white p-6 shadow-[0_1px_3px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:shadow-lg"
                 >
                   <div className="flex items-center gap-3.5">
@@ -68,6 +72,7 @@ export async function HomePage({ locale }: { locale: LocaleSegment }) {
           {tHome("privateText")}{" "}
           <Link
             href={toLocalePath("/how-we-handle-files", locale)}
+            prefetch={false}
             className="font-semibold text-brand-600 hover:text-brand-700"
           >
             {tHome("privateLink")}
@@ -80,6 +85,7 @@ export async function HomePage({ locale }: { locale: LocaleSegment }) {
         <p className="mt-2 text-sm text-slate-500">{tHome("lawyersText")}</p>
         <Link
           href={toLocalePath("/lawyers", locale)}
+          prefetch={false}
           className="mt-4 inline-block rounded-xl bg-brand-600 px-6 py-3 font-semibold text-white hover:bg-brand-700"
         >
           {tHome("lawyersCta")}
