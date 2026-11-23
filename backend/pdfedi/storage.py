@@ -36,9 +36,6 @@ def get_object_path(key: str) -> Path:
     return storage_dir() / key
 
 
-def object_exists(key: str) -> bool:
-    return (storage_dir() / key).exists()
-
 
 def delete_file_record(db: Session, file: File) -> None:
     """Delete a file record; remove the storage object only if unreferenced."""
