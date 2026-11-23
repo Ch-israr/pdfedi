@@ -1156,5 +1156,354 @@
       "images_to_pdf",
       "redact"
     ]
+  },
+  "pdf_to_excel": {
+    "title": "PDF vers Excel en ligne gratuit — Convertir des tableaux PDF en XLSX | PDFEDI",
+    "description": "Convertissez des tableaux PDF en Excel en ligne gratuitement. Les tableaux encadrés s'extraient proprement ; les pages sans tableau reprennent leurs lignes de texte. Sans inscription.",
+    "h1": "PDF vers Excel",
+    "intro": "Transformez les tableaux de votre PDF en feuille de calcul que vous pouvez trier, filtrer et calculer. Chaque page contenant des tableaux devient une feuille ; les pages sans tableau reprennent leurs lignes de texte dans une seule colonne, pour que rien ne se perde en silence.",
+    "howTo": [
+      "Téléversez votre fichier PDF (jusqu'à 50 Mo, 50 pages maximum).",
+      "Choisissez si la première ligne de chaque tableau est un en-tête.",
+      "Cliquez sur Convertir et téléchargez le fichier .xlsx."
+    ],
+    "features": [
+      "Vrais tableaux extraits des mises en page avec ou sans bordures",
+      "Une feuille par page, avec les en-têtes en gras",
+      "Texte de repli pour les pages sans tableau",
+      "S'ouvre dans Excel, Google Sheets et LibreOffice Calc"
+    ],
+    "useCases": [
+      "Extraire des chiffres d'un rapport PDF vers un tableur",
+      "Réutiliser les lignes d'une facture pour la comptabilité",
+      "Transformer une liste de prix PDF en tableau triable",
+      "Extraire des résultats d'enquête pour les analyser"
+    ],
+    "faqs": [
+      {
+        "q": "Tous les tableaux s'extraient-ils parfaitement ?",
+        "a": "Les tableaux encadrés aux bordures nettes sortent propres. Les tableaux sans bordures sont détectés par l'alignement du texte et sont approximatifs — vérifiez les chiffres avant de vous y fier. Les cellules fusionnées, formules et graphiques ne sont pas conservés."
+      },
+      {
+        "q": "Qu'advient-il des pages sans tableau ?",
+        "a": "Leurs lignes de texte vont dans une feuille nommée « Page N (texte) » en une seule colonne : vous gardez le contenu, mais pas sous forme de tableau."
+      },
+      {
+        "q": "Mon PDF est un scan. Que se passe-t-il ?",
+        "a": "Les PDF scannés n'ont ni tableau ni texte à extraire, vous verrez donc une erreur claire. Utilisez d'abord l'outil OCR pour rendre le scan consultable, puis convertissez."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_pptx",
+      "extract_text",
+      "ocr"
+    ]
+  },
+  "pdf_to_pptx": {
+    "title": "PDF vers PowerPoint en ligne gratuit — Convertir un PDF en PPTX | PDFEDI",
+    "description": "Convertissez des pages PDF en diapositives PowerPoint en ligne gratuitement. Une diapositive par page, avec des zones de texte modifiables sur l'image de la page. Sans inscription.",
+    "h1": "PDF vers PowerPoint",
+    "intro": "Transformez votre PDF en présentation — une diapositive par page. Chaque diapositive montre une image rendue de sa page pour que la mise en page reste fidèle, avec des zones de texte modifiables sur les mots pour sélectionner et modifier le texte.",
+    "howTo": [
+      "Téléversez votre fichier PDF (jusqu'à 50 Mo, 50 pages maximum).",
+      "Cliquez sur Convertir : chaque page devient une diapositive au texte modifiable.",
+      "Téléchargez le .pptx et présentez-le ou modifiez-le dans PowerPoint, Google Slides ou Keynote."
+    ],
+    "features": [
+      "Une diapositive par page, écran large 16:9",
+      "Zones de texte modifiables placées sur les mots",
+      "L'image de la page conserve la mise en page visuelle",
+      "S'ouvre dans PowerPoint, Google Slides et Keynote"
+    ],
+    "useCases": [
+      "Transformer un rapport PDF en présentation pour une réunion",
+      "Réutiliser des pages PDF comme diapositives",
+      "Présenter un document qui n'existe qu'en PDF",
+      "Créer des diapositives à partir d'un document PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Puis-je modifier le texte des diapositives ?",
+        "a": "Oui : les mots sont de vraies zones de texte que vous pouvez sélectionner, déplacer et retaper. L'image de la page conserve la mise en page, mais les zones de texte sont une surcouche qui peut dériver légèrement sur les mises en page très complexes."
+      },
+      {
+        "q": "Les images et graphiques sont-ils modifiables ?",
+        "a": "Non : les images et graphiques vectoriels restent dans l'image de la page. Seul le texte est reconstruit en zones modifiables."
+      },
+      {
+        "q": "Mon PDF est un scan. Que se passe-t-il ?",
+        "a": "Les pages scannées deviennent des diapositives uniquement composées d'images, sans zone de texte. Utilisez d'abord l'outil OCR si vous avez besoin de texte modifiable."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_excel",
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "sign_pdf": {
+    "title": "Signer un PDF en ligne gratuit — Dessinez votre signature sur un PDF | PDFEDI",
+    "description": "Signez un PDF en ligne gratuitement. Dessinez ou tapez votre signature et placez-la sur les pages de votre choix. Image de signature visible, pas un certificat numérique. Sans inscription.",
+    "h1": "Signer un PDF",
+    "intro": "Ajoutez votre signature à un PDF en quelques secondes. Dessinez-la à la souris ou au doigt, ou tapez votre nom dans un style manuscrit, puis cliquez sur la page pour la placer et choisissez les pages à signer. La signature est ajoutée comme une image visible sur la page.",
+    "howTo": [
+      "Téléversez votre fichier PDF (jusqu'à 50 Mo).",
+      "Dessinez votre signature — ou tapez votre nom et choisissez un style manuscrit.",
+      "Cliquez sur une page pour placer la signature, choisissez les pages et téléchargez le PDF signé."
+    ],
+    "features": [
+      "Dessin à la souris, au tactile ou au stylet",
+      "Tapez votre nom dans un style manuscrit",
+      "Placement sur n'importe quelle page, à n'importe quelle taille",
+      "Signez une page ou toutes les pages à la fois"
+    ],
+    "useCases": [
+      "Signer un contrat envoyé en PDF",
+      "Ajouter votre signature à un formulaire d'autorisation",
+      "Signer une facture avant de la renvoyer",
+      "Approuver un document sans l'imprimer"
+    ],
+    "faqs": [
+      {
+        "q": "S'agit-il d'une signature numérique juridiquement contraignante ?",
+        "a": "Non : cela ajoute une image de signature visible, pas une signature numérique cryptographique avec certificat. Pour de nombreux usages quotidiens (formulaires, approbations, validation interne), cela suffit, mais pour les contrats exigeant une signature certifiée, utilisez un service de signature dédié."
+      },
+      {
+        "q": "Puis-je déplacer la signature après l'avoir placée ?",
+        "a": "Oui : faites-la glisser vers un nouvel endroit ou redimensionnez-la avant de cliquer sur Signer. Une fois le fichier téléchargé, la signature est intégrée au PDF."
+      },
+      {
+        "q": "La signature fonctionne-t-elle sur toutes les pages ?",
+        "a": "C'est vous qui choisissez : la page actuelle seulement, une plage comme 1-3,5, ou toutes les pages. La même signature et la même position sont utilisées sur chaque page choisie."
+      }
+    ],
+    "related": [
+      "edit_pdf",
+      "flatten",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "edit_pdf": {
+    "title": "Modifier un PDF en ligne gratuit — Ajouter du texte et du blanc correcteur | PDFEDI",
+    "description": "Modifiez un PDF en ligne gratuitement. Ajoutez des annotations de texte et des rectangles de blanc correcteur sur n'importe quelle page. Édition honnête : le nouveau texte se pose par-dessus, le texte d'origine n'est pas redistribué. Sans inscription.",
+    "h1": "Modifier un PDF",
+    "intro": "Apportez des modifications rapides à un PDF sans application de bureau. Cliquez n'importe où pour ajouter une ligne de texte, ou tracez un cadre blanc sur ce que vous voulez masquer avant d'écrire le texte de remplacement. C'est la partie honnête de l'édition : le nouveau texte se pose sur la page, et le texte d'origine n'est ni redistribué ni supprimé.",
+    "howTo": [
+      "Téléversez votre fichier PDF (jusqu'à 50 Mo).",
+      "Cliquez sur une page pour ajouter du texte, ou tracez un rectangle de blanc correcteur.",
+      "Téléchargez le PDF modifié : vos ajouts sont intégrés aux pages."
+    ],
+    "features": [
+      "Ajoutez du texte partout, de 6 à 72 pt",
+      "Les rectangles de blanc masquent le texte avant réécriture",
+      "Jusqu'à 200 annotations par tâche",
+      "Fonctionne sur n'importe quelle page du document"
+    ],
+    "useCases": [
+      "Corriger une coquille sur un PDF impossible à régénérer",
+      "Ajouter une note ou une correction à un document partagé",
+      "Masquer un ancien prix avant d'écrire le nouveau",
+      "Ajouter une légende ou une étiquette à une page PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Puis-je modifier le texte existant du PDF ?",
+        "a": "Non : cet outil ajoute du nouveau texte par-dessus la page ; il ne modifie pas les mots d'origine et ne redistribue pas la mise en page. Pour modifier correctement le texte existant, il faut le document d'origine. Pour supprimer du contenu pour de bon, utilisez l'outil Caviarder."
+      },
+      {
+        "q": "Le blanc correcteur supprime-t-il le texte en dessous ?",
+        "a": "Non : il le masque seulement visuellement avec un cadre blanc. Le texte d'origine reste dans le fichier et pourrait être révélé en retirant le cadre. Utilisez Caviarder pour une vraie suppression."
+      },
+      {
+        "q": "Combien de modifications puis-je faire à la fois ?",
+        "a": "Jusqu'à 200 annotations par tâche — notes de texte et rectangles de blanc combinés."
+      }
+    ],
+    "related": [
+      "sign_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "html_to_pdf": {
+    "title": "HTML vers PDF en ligne gratuit — Convertir du code HTML en PDF | PDFEDI",
+    "description": "Convertissez du code HTML en PDF en ligne gratuitement. Collez votre HTML ou importez un fichier .html. Taille de page, orientation et marges incluses. Sans inscription.",
+    "h1": "HTML vers PDF",
+    "intro": "Transformez du code HTML en un fichier PDF à partager ou à imprimer. Collez votre HTML dans le champ ou importez un fichier .html, puis choisissez la taille de page, l'orientation et les marges, et téléchargez le PDF.",
+    "howTo": [
+      "Collez votre code HTML ou importez un fichier .html (jusqu'à 50 Mo).",
+      "Choisissez la taille de page (A4 ou Lettre), l'orientation et les marges.",
+      "Cliquez sur Convertir et téléchargez le PDF.",
+      "Vérifiez le résultat : les styles CSS, JavaScript et les images ne sont pas pris en charge."
+    ],
+    "features": [
+      "Collez du HTML ou importez un fichier .html",
+      "Page A4 ou Lettre, portrait ou paysage",
+      "Marges réglables (0–50 mm)",
+      "Sans inscription, fichiers supprimés automatiquement"
+    ],
+    "useCases": [
+      "Transformer un modèle de facture en PDF imprimable",
+      "Enregistrer la maquette d'une page web en PDF à partager",
+      "Convertir des pages de documentation pour les lire hors ligne",
+      "Imprimer des rapports HTML sans navigateur"
+    ],
+    "faqs": [
+      {
+        "q": "Comment convertir du HTML en PDF ?",
+        "a": "Collez votre HTML dans le champ ou importez un fichier .html, puis cliquez sur Convertir. Vous obtiendrez un fichier PDF à télécharger."
+      },
+      {
+        "q": "Puis-je convertir l'adresse d'un site web en PDF ?",
+        "a": "Non : cet outil ne télécharge pas d'adresses web. Collez le code HTML de la page ou enregistrez la page en fichier .html et importez-la."
+      },
+      {
+        "q": "JavaScript est-il exécuté ?",
+        "a": "Non. Les styles CSS, JavaScript et les images ne sont pas pris en charge, donc les pages stylées s'affichent comme du texte formaté simple."
+      }
+    ],
+    "related": [
+      "pdf_to_html",
+      "pdf_to_word",
+      "extract_text",
+      "compress"
+    ]
+  },
+  "pdf_to_html": {
+    "title": "PDF vers HTML en ligne gratuit — Convertir un PDF en page web | PDFEDI",
+    "description": "Convertissez un PDF en un fichier HTML autonome en ligne gratuitement. Le texte conserve sa position sur la page, donc la mise en page ressemble à l'original. Sans inscription.",
+    "h1": "PDF vers HTML",
+    "intro": "Transformez un PDF en un seul fichier .html ouvrable dans n'importe quel navigateur. Le texte conserve sa position sur la page, donc le résultat ressemble au document original.",
+    "howTo": [
+      "Importez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez d'afficher ou non des séparateurs de page.",
+      "Cliquez sur Convertir et téléchargez le fichier .html.",
+      "Ouvrez le fichier dans n'importe quel navigateur : aucun serveur ni fichier supplémentaire n'est nécessaire."
+    ],
+    "features": [
+      "Fichier .html autonome, sans fichiers supplémentaires",
+      "Le texte conserve sa position sur la page",
+      "Séparateurs de page facultatifs",
+      "Fonctionne avec les PDF textuels jusqu'à 500 pages"
+    ],
+    "useCases": [
+      "Publier un rapport PDF sous forme de page web",
+      "Archiver un document dans un format ouvrable par les navigateurs",
+      "Partager un PDF avec quelqu'un sans lecteur PDF",
+      "Extraire le texte d'un PDF en conservant sa mise en page"
+    ],
+    "faqs": [
+      {
+        "q": "Le HTML ressemblera-t-il exactement au PDF ?",
+        "a": "Presque, mais pas exactement. Le texte conserve sa position sur la page, mais les images, les graphiques vectoriels et les polices exactes ne sont pas reproduits."
+      },
+      {
+        "q": "Cela fonctionne-t-il avec les PDF numérisés ?",
+        "a": "Non : les pages numérisées n'ont pas de couche de texte, donc elles deviennent des pages vides. Lancez d'abord l'OCR pour ajouter une couche de texte interrogeable, puis convertissez."
+      },
+      {
+        "q": "Quelle taille maximale pour le PDF ?",
+        "a": "Jusqu'à 500 pages. Les fichiers plus volumineux sont rejetés avec une erreur claire."
+      }
+    ],
+    "related": [
+      "html_to_pdf",
+      "extract_text",
+      "pdf_to_word",
+      "ocr"
+    ]
+  },
+  "header_footer": {
+    "title": "Ajouter un en-tête et un pied de page au PDF en ligne gratuit | PDFEDI",
+    "description": "Ajoutez un en-tête ou un pied de page aux pages d'un PDF en ligne gratuitement. Texte personnalisé avec numéros de page, toutes positions, taille de police réglable. Sans inscription.",
+    "h1": "Ajouter un en-tête / pied de page",
+    "intro": "Ajoutez une ligne d'en-tête ou de pied de page aux pages de votre PDF. Écrivez votre propre texte, utilisez la numérotation Page X sur Y, et choisissez la position et la taille de police — idéal pour les rapports, contrats et dossiers.",
+    "howTo": [
+      "Importez votre fichier PDF (jusqu'à 50 Mo).",
+      "Écrivez le texte de l'en-tête ou du pied de page, avec numérotation automatique des pages.",
+      "Choisissez la position (haut ou bas), l'alignement et la taille de police.",
+      "Choisissez les pages, cliquez sur Ajouter et téléchargez."
+    ],
+    "features": [
+      "Texte d'en-tête ou de pied de page personnalisé",
+      "Numérotation automatique Page X sur Y",
+      "Position haut ou bas ; gauche, centre ou droite",
+      "Taille de police réglable (6–48 pt)",
+      "S'applique à toutes les pages ou aux plages sélectionnées"
+    ],
+    "useCases": [
+      "Ajouter « Confidentiel » à chaque page d'un rapport",
+      "Numéroter les pages d'un contrat comme Page X sur Y",
+      "Tamponner la date de dépôt sur des documents judiciaires",
+      "Ajouter un en-tête de marque aux propositions sur chaque page"
+    ],
+    "faqs": [
+      {
+        "q": "Comment ajouter « Page 1 sur 10 » en pied de page ?",
+        "a": "Écrivez « Page {page} sur {total} » comme texte et choisissez la position basse. Chaque page reçoit son propre numéro."
+      },
+      {
+        "q": "Puis-je ajouter un en-tête au lieu d'un pied de page ?",
+        "a": "Oui : choisissez « haut » comme position et le même texte est tamponné en en-tête."
+      },
+      {
+        "q": "Puis-je tamponner seulement certaines pages ?",
+        "a": "Oui : saisissez des plages de pages comme 1-3,5 et seules ces pages reçoivent l'en-tête ou le pied."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "watermark",
+      "edit_metadata",
+      "crop"
+    ]
+  },
+  "pdf_to_epub": {
+    "title": "PDF vers EPUB en ligne gratuit — Convertir un PDF en livre numérique | PDFEDI",
+    "description": "Convertissez un PDF en livre numérique EPUB à mise en page fluide en ligne gratuitement. Le texte s'adapte à la police et à la taille d'écran de votre lecteur. Sans inscription.",
+    "h1": "PDF vers EPUB",
+    "intro": "Transformez un PDF en livre numérique EPUB lisible sur n'importe quelle liseuse, téléphone ou tablette. Le texte s'adapte à votre écran, donc vous pouvez changer la taille de police et continuer à lire confortablement.",
+    "howTo": [
+      "Importez votre fichier PDF (jusqu'à 50 Mo).",
+      "Cliquez sur Convertir et téléchargez le fichier .epub.",
+      "Ouvrez-le dans votre application de lecture : Apple Books, Kindle, Kobo ou tout lecteur EPUB.",
+      "Ajustez la taille de police dans votre lecteur ; le texte s'adapte automatiquement."
+    ],
+    "features": [
+      "Texte à mise en page fluide pour tout écran",
+      "Chapitres regroupés par plage de pages",
+      "Titre et auteur repris du PDF quand ils sont disponibles",
+      "Fonctionne avec les PDF textuels jusqu'à 500 pages"
+    ],
+    "useCases": [
+      "Lire un rapport PDF sur une liseuse",
+      "Transformer un long guide PDF en livre numérique",
+      "Archiver des documents dans un format de livre ouvert",
+      "Partager un PDF avec quelqu'un qui lit sur téléphone"
+    ],
+    "faqs": [
+      {
+        "q": "L'EPUB ressemblera-t-il au PDF ?",
+        "a": "Non : l'EPUB adapte le texte à votre écran et à votre taille de police. Les mots restent dans l'ordre, mais la mise en page d'origine n'est pas conservée."
+      },
+      {
+        "q": "Cela fonctionne-t-il avec les PDF numérisés ?",
+        "a": "Non : les pages numérisées n'ont pas de couche de texte. Lancez d'abord l'OCR pour ajouter du texte interrogeable, puis convertissez."
+      },
+      {
+        "q": "Les images sont-elles incluses ?",
+        "a": "Non : seul le texte est repris. Les images, tableaux et graphiques vectoriels ne sont pas inclus."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "extract_text",
+      "pdf_to_html",
+      "ocr"
+    ]
   }
 }

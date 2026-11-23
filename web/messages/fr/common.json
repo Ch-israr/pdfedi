@@ -1,9 +1,9 @@
 {
   "meta": {
     "siteTitle": "PDFEDI — Outils PDF gratuits en ligne : fusionner, diviser, compresser et modifier",
-    "siteDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 26 outils PDF — sans inscription, sans filigrane, privés par conception.",
+    "siteDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 34 outils PDF — sans inscription, sans filigrane, privés par conception.",
     "homeTitle": "PDFEDI — Outils PDF gratuits en ligne : fusionner, diviser, compresser et modifier",
-    "homeDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 26 outils PDF — sans inscription, sans filigrane, privés par conception.",
+    "homeDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 34 outils PDF — sans inscription, sans filigrane, privés par conception.",
     "lawyersTitle": "Outils PDF pour avocats — Caviarder, déposer et combiner des pièces | PDFEDI",
     "lawyersDescription": "Outils PDF gratuits pour avocats : caviardage véritable, suppression des métadonnées, compression à la taille limite du tribunal, combinaison de pièces avec numéros Bates. Sans inscription, sans filigrane.",
     "lawyersOgDescription": "Caviardez, supprimez les métadonnées, compressez à la limite de dépôt de votre tribunal et combinez des pièces avec numéros Bates — gratuit, sans inscription.",
@@ -17,8 +17,8 @@
     "termsPageDescription": "Les conditions d'utilisation des outils PDF gratuits en ligne de PDFEDI : utilisation acceptable, service tel quel, et vos fichiers.",
     "termsPageOgDescription": "Conditions d'utilisation acceptable et sans garantie pour les outils PDF gratuits de PDFEDI.",
     "aboutPageTitle": "À propos de PDFEDI — Outils PDF gratuits en ligne",
-    "aboutPageDescription": "PDFEDI est un service PDF gratuit en ligne : 26 outils pour travailler avec des fichiers PDF, en 10 langues, sans inscription.",
-    "aboutPageOgDescription": "26 outils PDF gratuits en 10 langues. Sans inscription.",
+    "aboutPageDescription": "PDFEDI est un service PDF gratuit en ligne : 34 outils pour travailler avec des fichiers PDF, en 10 langues, sans inscription.",
+    "aboutPageOgDescription": "34 outils PDF gratuits en 10 langues. Sans inscription.",
     "contactPageTitle": "Contacter PDFEDI",
     "contactPageDescription": "Comment contacter PDFEDI pour une question, une suggestion ou un problème avec un outil.",
     "contactPageOgDescription": "Contactez PDFEDI au sujet d'un outil, d'une question ou d'une suggestion."
@@ -179,6 +179,38 @@
     "strip_metadata": {
       "name": "Supprimer les métadonnées",
       "tagline": "Supprimer les métadonnées cachées, avec un rapport"
+    },
+    "pdf_to_excel": {
+      "name": "PDF vers Excel",
+      "tagline": "Extraire des tableaux d'un PDF vers un tableur"
+    },
+    "pdf_to_pptx": {
+      "name": "PDF vers PowerPoint",
+      "tagline": "Transformer des pages PDF en diapositives modifiables"
+    },
+    "sign_pdf": {
+      "name": "Signer un PDF",
+      "tagline": "Dessinez une signature et placez-la sur votre PDF"
+    },
+    "edit_pdf": {
+      "name": "Modifier un PDF",
+      "tagline": "Ajouter du texte et masquer des zones de votre PDF"
+    },
+    "html_to_pdf": {
+      "name": "HTML vers PDF",
+      "tagline": "Convertir du code HTML en PDF"
+    },
+    "pdf_to_html": {
+      "name": "PDF vers HTML",
+      "tagline": "Convertir un PDF en page web"
+    },
+    "header_footer": {
+      "name": "Ajouter un en-tête / pied de page",
+      "tagline": "Apposer du texte sur chaque page"
+    },
+    "pdf_to_epub": {
+      "name": "PDF vers EPUB",
+      "tagline": "Convertir un PDF en livre numérique"
     }
   },
   "runner": {
@@ -220,7 +252,8 @@
     "downloadResult": "Télécharger le résultat",
     "downloading": "Téléchargement…",
     "downloadingPct": "Téléchargement… {pct} %",
-    "downloadFailed": "Échec du téléchargement."
+    "downloadFailed": "Échec du téléchargement.",
+    "chooseHtml": "Choisissez un fichier HTML (facultatif)"
   },
   "canvas": {
     "startOver": "Recommencer",
@@ -381,6 +414,51 @@
       "gridAria": "Pages dans le nouvel ordre",
       "hint": "Faites glisser les miniatures pour réorganiser (les badges de position se mettent à jour en direct) · Sélectionnez une page et appuyez sur Ctrl+← / Ctrl+→ pour la déplacer · Le champ d'ordre ci-dessus reste synchronisé et accepte une permutation saisie au clavier.",
       "position": "position {n}"
+    },
+    "sign": {
+      "summary": "Signature sur {pages} — {x}% en largeur, {y}% vers le bas, {w}% de large",
+      "summaryAll": "Signature sur toutes les pages — {x}% en largeur, {y}% vers le bas, {w}% de large",
+      "summaryEmpty": "Dessinez ou tapez votre signature, puis cliquez sur une page pour la placer.",
+      "processLabel": "Signer",
+      "activity": "Signature en cours",
+      "modeDraw": "Dessiner",
+      "modeType": "Taper",
+      "typePlaceholder": "Tapez votre nom",
+      "typeApply": "Utiliser cette signature",
+      "clearPad": "Effacer",
+      "padLabel": "Pavé de signature",
+      "padHint": "Dessinez à la souris, au doigt ou au stylet — ou tapez votre nom ci-dessus.",
+      "clickToPlace": "Cliquez sur l'aperçu de la page pour placer la signature ; faites-la glisser pour la déplacer.",
+      "widthLabel": "Largeur",
+      "pagesLabel": "Pages",
+      "pagesPlaceholder": "1-3,5",
+      "pagesAll": "Toutes les pages",
+      "noSignature": "Dessinez ou tapez d'abord une signature.",
+      "invalidPages": "Ces pages dépassent ce document.",
+      "notDigital": "Ceci ajoute une image de signature visible, pas une signature numérique certifiée.",
+      "previewLabel": "Aperçu de la page {n}",
+      "selectPageHint": "Choisissez une page à signer"
+    },
+    "edit": {
+      "summary": "{count, plural, one {# annotation} other {# annotations}} sur {pages, plural, one {# page} other {# pages}}",
+      "summaryEmpty": "Ajoutez une note de texte ou tracez un rectangle de blanc correcteur.",
+      "processLabel": "Enregistrer",
+      "activity": "Enregistrement en cours",
+      "modeText": "Ajouter du texte",
+      "modeWhiteout": "Blanc correcteur",
+      "textPlaceholder": "Texte à ajouter",
+      "sizeLabel": "Taille",
+      "addTextHint": "Tapez le texte ci-dessus, puis cliquez sur la page où il doit aller.",
+      "drawHint": "Tracez un rectangle sur la zone à masquer en blanc.",
+      "annotationsLabel": "Annotations",
+      "annotationItem": "#{n} · p. {page} · {kind}",
+      "deleteAnnotation": "Supprimer l'annotation {n}",
+      "whiteoutLabel": "blanc correcteur",
+      "clearAll": "Tout effacer",
+      "noAnnotations": "Ajoutez d'abord au moins une annotation.",
+      "notRealEdit": "Le nouveau texte se pose sur la page : le texte d'origine n'est pas modifié. Le blanc correcteur ne fait que masquer le contenu ; utilisez Caviarder pour le supprimer pour de bon.",
+      "previewLabel": "Aperçu de la page {n}",
+      "selectPageHint": "Choisissez une page à modifier"
     }
   },
   "errors": {
@@ -643,6 +721,75 @@
         "label": "Opacité",
         "help": "0,1 (discret) à 0,5 (prononcé)."
       }
+    },
+    "pdf_to_excel": {
+      "first_row_header": {
+        "label": "La première ligne est un en-tête",
+        "help": "Met en gras la première ligne de chaque tableau détecté."
+      }
+    },
+    "html_to_pdf": {
+      "html": {
+        "label": "Code HTML",
+        "help": "Collez votre HTML ici. Laissez vide pour utiliser le fichier .html téléversé."
+      },
+      "page_size": {
+        "label": "Taille de page",
+        "help": "",
+        "choices": {
+          "A4": "A4",
+          "Letter": "Letter"
+        }
+      },
+      "orientation": {
+        "label": "Orientation",
+        "help": "",
+        "choices": {
+          "portrait": "Portrait",
+          "landscape": "Paysage"
+        }
+      },
+      "margin_mm": {
+        "label": "Marge (mm)",
+        "help": "0 à 50."
+      }
+    },
+    "pdf_to_html": {
+      "include_page_numbers": {
+        "label": "Afficher les séparateurs de page",
+        "help": "Ajouter un séparateur visible « Page N » entre les pages."
+      }
+    },
+    "header_footer": {
+      "text": {
+        "label": "Texte d'en-tête / de pied de page",
+        "help": "Utilisez {page} pour le numéro de page et {total} pour le nombre total de pages."
+      },
+      "vertical": {
+        "label": "Position",
+        "help": "« top » appose un en-tête, « bottom » appose un pied de page.",
+        "choices": {
+          "top": "Haut",
+          "bottom": "Bas"
+        }
+      },
+      "horizontal": {
+        "label": "Alignement",
+        "help": "",
+        "choices": {
+          "left": "Gauche",
+          "center": "Centré",
+          "right": "Droite"
+        }
+      },
+      "font_size": {
+        "label": "Taille de police",
+        "help": "6 à 48."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "Plages à partir de 1 comme « 1-3,5 ». Laissez vide pour toutes les pages."
+      }
     }
   },
   "lawyers": {
@@ -841,7 +988,7 @@
   },
   "aboutPage": {
     "title": "À propos de PDFEDI",
-    "intro": "PDFEDI est un service PDF gratuit en ligne : 26 outils pour travailler avec des fichiers PDF, en 10 langues, sans inscription.",
+    "intro": "PDFEDI est un service PDF gratuit en ligne : 34 outils pour travailler avec des fichiers PDF, en 10 langues, sans inscription.",
     "whatTitle": "Ce que vous pouvez faire",
     "whatPoints": [
       "Fusionner, diviser, réorganiser, pivoter et supprimer des pages.",
@@ -852,7 +999,7 @@
     "howTitle": "Comment ça marche",
     "howText": "Choisissez un outil, téléversez votre PDF et téléchargez le résultat. Les fichiers sont téléversés sur notre serveur pour être traités et supprimés après le traitement. Dans les outils d'organisation, les aperçus des pages sont générés dans votre navigateur avant d'appuyer sur le bouton de traitement.",
     "freeTitle": "Gratuit, sans inscription",
-    "freeText": "Les 26 outils sont gratuits et ne nécessitent aucun compte. Certains ont une limite horaire d'utilisation raisonnable pour que le service reste rapide pour tout le monde.",
+    "freeText": "Les 34 outils sont gratuits et ne nécessitent aucun compte. Certains ont une limite horaire d'utilisation raisonnable pour que le service reste rapide pour tout le monde.",
     "backLink": "← Retour à tous les outils"
   },
   "contactPage": {
