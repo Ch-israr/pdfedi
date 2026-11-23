@@ -148,7 +148,7 @@ export function useOrganizerJob(toolKey: string) {
           }
         };
         await tick();
-        pollRef.current = setInterval(tick, 800);
+        pollRef.current = setInterval(tick, 400);
       } catch (e) {
         setError(resolveError(e));
         api.quota(toolKey).then(setQuota).catch(() => {});

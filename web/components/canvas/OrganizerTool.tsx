@@ -42,6 +42,12 @@ const RotateCanvas = dynamic(() => import("./tools/RotateCanvas").then((m) => m.
 const SplitCanvas = dynamic(() => import("./tools/SplitCanvas").then((m) => m.SplitCanvas), {
   loading: () => <CanvasLoading />,
 });
+const SignCanvas = dynamic(() => import("./tools/SignCanvas").then((m) => m.SignCanvas), {
+  loading: () => <CanvasLoading />,
+});
+const EditCanvas = dynamic(() => import("./tools/EditCanvas").then((m) => m.EditCanvas), {
+  loading: () => <CanvasLoading />,
+});
 
 const CANVASES = {
   merge: MergeCanvas,
@@ -49,6 +55,8 @@ const CANVASES = {
   rotate_pages: RotateCanvas,
   delete_pages: DeleteCanvas,
   reorder_pages: ReorderCanvas,
+  sign_pdf: SignCanvas,
+  edit_pdf: EditCanvas,
 } as const;
 
 export const ORGANIZER_TOOLS: readonly string[] = ORGANIZER_TOOL_SLUGS;
