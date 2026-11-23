@@ -1,6 +1,5 @@
 {
   "meta": {
-    "siteTitle": "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
     "siteDescription": "Merge, split, convert and protect PDFs free online. 34 PDF tools — no sign-up, no watermarks, private by design.",
     "homeTitle": "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
     "homeDescription": "Merge, split, convert and protect PDFs free online. 34 PDF tools — no sign-up, no watermarks, private by design.",
@@ -28,8 +27,6 @@
     "forLawyers": "For lawyers",
     "tagline": "PDFEDI — free online PDF tools.",
     "footerNote": "No sign-up. Files are processed and deleted automatically.",
-    "home": "Home",
-    "language": "Language",
     "privacy": "Privacy",
     "terms": "Terms",
     "about": "About",
@@ -216,7 +213,6 @@
   "runner": {
     "loading": "Loading…",
     "loadFailed": "Failed to load tool: {error}",
-    "description": "description",
     "quotaLeft": "{remaining, plural, one {# of {limit} free use left this hour} other {# of {limit} free uses left this hour}}",
     "quotaResets": "· Resets at {time}",
     "steps": {
@@ -252,7 +248,6 @@
     "downloadResult": "Download result",
     "downloading": "Downloading…",
     "downloadingPct": "Downloading… {pct}%",
-    "downloadFailed": "Download failed.",
     "chooseHtml": "Choose an HTML file (optional)"
   },
   "canvas": {
@@ -287,7 +282,6 @@
     "willBeDeleted": "✕ Will be deleted",
     "removed": "Removed",
     "markedForDeletion": "marked for deletion",
-    "previewClose": "Close ✕",
     "previewRendering": "Rendering…",
     "pageLabel": "Page {n}",
     "merge": {
@@ -299,15 +293,9 @@
       "activity": "Merging",
       "moveFileUp": "Move file up",
       "moveFileDown": "Move file down",
-      "removeFile": "Remove file from merge",
-      "fileRemoved": "(removed)",
       "restore": "Restore",
-      "addFiles": "+ Add files",
       "previewFirstPage": "Preview first page",
-      "removeSelected": "Remove selected ({count})",
       "restoreAllRemoved": "Restore all removed",
-      "gridAria": "Pages to merge, in merge order",
-      "hint": "Drag pages to reorder (across files too) · Click to select, Shift-click for a range · Delete key removes selected pages · Double-click a page for a large preview · Arrow keys move the selection, Ctrl+Z / Ctrl+Y undo and redo.",
       "filePages": "{count, plural, one {# page} other {# pages}}",
       "moveFileUpAria": "Move {name} up",
       "moveFileDownAria": "Move {name} down",
@@ -464,7 +452,6 @@
   "errors": {
     "tool_error": "Something went wrong. Please try again.",
     "internal_error": "Processing failed. Please try again.",
-    "server_restart": "The server restarted while this job was processing. Please try again.",
     "invalid_option": "A page number or option is not valid. Check the page numbers and try again.",
     "bad_option": "An option value is not valid. Check the values and try again.",
     "bad_options": "An option value is not valid. Check the values and try again.",
@@ -476,10 +463,8 @@
     "wrong_password": "The password is wrong. Check it and try again.",
     "quota_exceeded": "You have used all free uses for this hour. Try again after {time}.",
     "file_too_large": "The file is too large. The upload limit is {mb} MB.",
-    "lost_contact": "Lost contact with the server.",
     "download_failed": "Download failed.",
     "not_loaded": "Tool not loaded yet.",
-    "failed_to_load": "Failed to load tool.",
     "invalid_page_range": "Invalid page range “{token}”. Use forms like '1-3,5'.",
     "invalid_range_start": "Invalid range {range}: page numbers start at 1.",
     "select_at_least_one_page": "Select at least one page.",
@@ -937,8 +922,6 @@
     "dismiss": "Dismiss"
   },
   "switcher": {
-    "label": "Language",
-    "current": "Current language: {language}",
     "choose": "Choose language"
   },
   "seo": {
