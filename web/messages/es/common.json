@@ -1,6 +1,5 @@
 {
   "meta": {
-    "siteTitle": "PDFEDI — Herramientas PDF gratuitas en línea: combinar, dividir, comprimir y editar",
     "siteDescription": "Combina, divide, convierte y protege PDF gratis en línea. 34 herramientas PDF: sin registro, sin marcas de agua, privado por diseño.",
     "homeTitle": "PDFEDI — Herramientas PDF gratuitas en línea: combinar, dividir, comprimir y editar",
     "homeDescription": "Combina, divide, convierte y protege PDF gratis en línea. 34 herramientas PDF: sin registro, sin marcas de agua, privado por diseño.",
@@ -28,8 +27,6 @@
     "forLawyers": "Para abogados",
     "tagline": "PDFEDI — herramientas PDF gratuitas en línea.",
     "footerNote": "Sin registro. Los archivos se procesan y se eliminan automáticamente.",
-    "home": "Inicio",
-    "language": "Idioma",
     "privacy": "Privacidad",
     "terms": "Términos",
     "about": "Acerca de",
@@ -216,7 +213,6 @@
   "runner": {
     "loading": "Cargando…",
     "loadFailed": "No se pudo cargar la herramienta: {error}",
-    "description": "descripción",
     "quotaLeft": "{remaining, plural, one {# de {limit} uso gratuito restante esta hora} other {# de {limit} usos gratuitos restantes esta hora}}",
     "quotaResets": "· Se restablece a las {time}",
     "steps": {
@@ -252,7 +248,6 @@
     "downloadResult": "Descargar resultado",
     "downloading": "Descargando…",
     "downloadingPct": "Descargando… {pct}%",
-    "downloadFailed": "La descarga falló.",
     "chooseHtml": "Elige un archivo HTML (opcional)"
   },
   "canvas": {
@@ -287,7 +282,6 @@
     "willBeDeleted": "✕ Se eliminará",
     "removed": "Eliminado",
     "markedForDeletion": "marcado para eliminar",
-    "previewClose": "Cerrar ✕",
     "previewRendering": "Mostrando…",
     "pageLabel": "Página {n}",
     "merge": {
@@ -299,15 +293,9 @@
       "activity": "Combinando",
       "moveFileUp": "Subir archivo",
       "moveFileDown": "Bajar archivo",
-      "removeFile": "Quitar archivo de la combinación",
-      "fileRemoved": "(eliminado)",
       "restore": "Restaurar",
-      "addFiles": "+ Añadir archivos",
       "previewFirstPage": "Vista previa de la primera página",
-      "removeSelected": "Quitar seleccionadas ({count})",
       "restoreAllRemoved": "Restaurar todas las eliminadas",
-      "gridAria": "Páginas a combinar, en orden de combinación",
-      "hint": "Arrastra las páginas para reordenarlas (también entre archivos) · Haz clic para seleccionar, Mayús+clic para un rango · La tecla Supr quita las páginas seleccionadas · Doble clic en una página para una vista previa grande · Las flechas mueven la selección, Ctrl+Z / Ctrl+Y deshacen y rehacen.",
       "filePages": "{count, plural, one {# página} other {# páginas}}",
       "moveFileUpAria": "Subir {name}",
       "moveFileDownAria": "Bajar {name}",
@@ -464,7 +452,6 @@
   "errors": {
     "tool_error": "Algo salió mal. Inténtalo de nuevo.",
     "internal_error": "El procesamiento falló. Inténtalo de nuevo.",
-    "server_restart": "El servidor se reinició mientras se procesaba este trabajo. Inténtalo de nuevo.",
     "invalid_option": "Un número de página o una opción no es válido. Revisa los números de página e inténtalo de nuevo.",
     "bad_option": "Un valor de opción no es válido. Revisa los valores e inténtalo de nuevo.",
     "bad_options": "Un valor de opción no es válido. Revisa los valores e inténtalo de nuevo.",
@@ -476,10 +463,8 @@
     "wrong_password": "La contraseña es incorrecta. Revísala e inténtalo de nuevo.",
     "quota_exceeded": "Ya usaste todos los usos gratuitos de esta hora. Inténtalo de nuevo después de las {time}.",
     "file_too_large": "El archivo es demasiado grande. El límite de subida es de {mb} MB.",
-    "lost_contact": "Se perdió el contacto con el servidor.",
     "download_failed": "La descarga falló.",
     "not_loaded": "La herramienta aún no se ha cargado.",
-    "failed_to_load": "No se pudo cargar la herramienta.",
     "invalid_page_range": "Rango de páginas no válido «{token}». Usa formas como «1-3,5».",
     "invalid_range_start": "Rango no válido {range}: los números de página empiezan en 1.",
     "select_at_least_one_page": "Selecciona al menos una página.",
@@ -937,8 +922,6 @@
     "dismiss": "Descartar"
   },
   "switcher": {
-    "label": "Idioma",
-    "current": "Idioma actual: {language}",
     "choose": "Elegir idioma"
   },
   "seo": {
