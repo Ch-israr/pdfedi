@@ -1156,5 +1156,354 @@
       "images_to_pdf",
       "redact"
     ]
+  },
+  "pdf_to_excel": {
+    "title": "PDF a Excel en línea gratis — Convertir tablas PDF a XLSX | PDFEDI",
+    "description": "Convierte tablas de PDF a Excel en línea gratis. Las tablas con bordes se extraen limpias; las páginas sin tablas usan sus líneas de texto. Sin registro.",
+    "h1": "PDF a Excel",
+    "intro": "Convierte las tablas de tu PDF en una hoja de cálculo que puedes ordenar, filtrar y calcular. Cada página con tablas se convierte en una hoja; las páginas sin tablas usan sus líneas de texto en una sola columna, así nada se pierde en silencio.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB, 50 páginas como máximo).",
+      "Elige si la primera fila de cada tabla es un encabezado.",
+      "Haz clic en Convertir y descarga el archivo .xlsx."
+    ],
+    "features": [
+      "Tablas reales extraídas de diseños con y sin bordes",
+      "Una hoja por página, con encabezados en negrita",
+      "Texto alternativo para páginas sin tablas",
+      "Se abre en Excel, Google Sheets y LibreOffice Calc"
+    ],
+    "useCases": [
+      "Pasar cifras de un informe PDF a una hoja de cálculo",
+      "Reutilizar líneas de factura para la contabilidad",
+      "Convertir una lista de precios PDF en una tabla ordenable",
+      "Extraer resultados de encuestas para analizarlos"
+    ],
+    "faqs": [
+      {
+        "q": "¿Todas las tablas se extraen perfectamente?",
+        "a": "Las tablas con bordes claros salen limpias. Las tablas sin bordes se detectan por la alineación del texto y son aproximadas — revisa los números antes de confiar en ellos. No se conservan celdas combinadas, fórmulas ni gráficos."
+      },
+      {
+        "q": "¿Qué pasa con las páginas sin tablas?",
+        "a": "Sus líneas de texto van a una hoja llamada «Página N (texto)» en una sola columna, así sigues teniendo el contenido, aunque no como tabla."
+      },
+      {
+        "q": "Mi PDF es un escaneo. ¿Qué pasa?",
+        "a": "Los PDF escaneados no tienen tablas ni texto que extraer, así que verás un error claro. Usa primero la herramienta OCR para que el escaneo sea buscable y luego convierte."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_pptx",
+      "extract_text",
+      "ocr"
+    ]
+  },
+  "pdf_to_pptx": {
+    "title": "PDF a PowerPoint en línea gratis — Convertir PDF a PPTX | PDFEDI",
+    "description": "Convierte páginas PDF en diapositivas de PowerPoint en línea gratis. Una diapositiva por página, con cuadros de texto editables sobre la imagen de la página. Sin registro.",
+    "h1": "PDF a PowerPoint",
+    "intro": "Convierte tu PDF en una presentación: una diapositiva por página. Cada diapositiva muestra una imagen renderizada de su página para que el diseño siempre se vea bien, con cuadros de texto editables sobre las palabras para que puedas seleccionar y cambiar el texto.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB, 50 páginas como máximo).",
+      "Haz clic en Convertir: cada página se convierte en una diapositiva con su texto editable.",
+      "Descarga el .pptx y preséntalo o edítalo en PowerPoint, Google Slides o Keynote."
+    ],
+    "features": [
+      "Una diapositiva por página, panorámica 16:9",
+      "Cuadros de texto editables colocados sobre las palabras",
+      "La imagen de la página mantiene intacto el diseño visual",
+      "Se abre en PowerPoint, Google Slides y Keynote"
+    ],
+    "useCases": [
+      "Convertir un informe PDF en una presentación para una reunión",
+      "Reutilizar páginas PDF como diapositivas",
+      "Presentar un documento que solo existe como PDF",
+      "Crear diapositivas a partir de un folleto PDF"
+    ],
+    "faqs": [
+      {
+        "q": "¿Puedo editar el texto de las diapositivas?",
+        "a": "Sí: las palabras son cuadros de texto reales que puedes seleccionar, mover y volver a escribir. La imagen de la página mantiene el diseño, pero los cuadros de texto son una capa superpuesta y pueden desplazarse ligeramente en diseños muy complejos."
+      },
+      {
+        "q": "¿Las imágenes y los gráficos son editables?",
+        "a": "No: las imágenes y los gráficos vectoriales quedan dentro de la imagen de la página. Solo el texto se reconstruye como cuadros editables."
+      },
+      {
+        "q": "Mi PDF es un escaneo. ¿Qué pasa?",
+        "a": "Las páginas escaneadas se convierten en diapositivas solo de imagen, sin cuadros de texto. Usa primero la herramienta OCR si necesitas texto editable."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_excel",
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "sign_pdf": {
+    "title": "Firmar PDF en línea gratis — Dibuja tu firma en un PDF | PDFEDI",
+    "description": "Firma un PDF en línea gratis. Dibuja o escribe tu firma y colócala en las páginas que elijas. Imagen de firma visible, no un certificado digital. Sin registro.",
+    "h1": "Firmar PDF",
+    "intro": "Añade tu firma a un PDF en segundos. Dibújala con el ratón o el dedo, o escribe tu nombre con estilo manuscrito, luego haz clic en la página para colocarla y elige qué páginas se firman. La firma se añade como una imagen visible en la página.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB).",
+      "Dibuja tu firma, o escribe tu nombre y elige un estilo manuscrito.",
+      "Haz clic en una página para colocar la firma, elige las páginas y descarga el PDF firmado."
+    ],
+    "features": [
+      "Dibuja con ratón, táctil o lápiz",
+      "Escribe tu nombre con estilo manuscrito",
+      "Colócala en cualquier página y a cualquier tamaño",
+      "Firma una página o todas a la vez"
+    ],
+    "useCases": [
+      "Firmar un contrato enviado como PDF",
+      "Añadir tu firma a un formulario de permiso",
+      "Firmar una factura antes de devolverla",
+      "Aprobar un documento sin imprimirlo"
+    ],
+    "faqs": [
+      {
+        "q": "¿Es una firma digital legalmente vinculante?",
+        "a": "No: esto añade una imagen de firma visible, no una firma digital criptográfica con certificado. Para muchos usos cotidianos (formularios, aprobaciones, visto bueno interno) es suficiente, pero para contratos que exigen una firma certificada, usa un servicio de firma dedicado."
+      },
+      {
+        "q": "¿Puedo mover la firma después de colocarla?",
+        "a": "Sí: arrástrala a otro lugar o cambia su tamaño antes de hacer clic en Firmar. Una vez descargado el archivo, la firma queda integrada en el PDF."
+      },
+      {
+        "q": "¿La firma funciona en todas las páginas?",
+        "a": "Tú eliges: solo la página actual, un rango como 1-3,5 o todas las páginas. Se usan la misma firma y posición en cada página elegida."
+      }
+    ],
+    "related": [
+      "edit_pdf",
+      "flatten",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "edit_pdf": {
+    "title": "Editar PDF en línea gratis — Añadir texto y corrector a un PDF | PDFEDI",
+    "description": "Edita un PDF en línea gratis. Añade anotaciones de texto y rectángulos de corrección en cualquier página. Edición honesta: el texto nuevo queda encima, el original no se redistribuye. Sin registro.",
+    "h1": "Editar PDF",
+    "intro": "Haz cambios rápidos en un PDF sin una aplicación de escritorio. Haz clic en cualquier lugar para añadir una línea de texto, o arrastra un cuadro blanco sobre algo que quieras tapar antes de escribir el texto de reemplazo. Esta es la parte honesta de la edición: el texto nuevo queda encima de la página y el texto original no se redistribuye ni se elimina.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB).",
+      "Haz clic en una página para añadir texto, o arrastra para dibujar un rectángulo de corrección.",
+      "Descarga el PDF editado: tus añadidos quedan integrados en las páginas."
+    ],
+    "features": [
+      "Añade texto en cualquier lugar, de 6 a 72 pt",
+      "Los rectángulos de corrección tapan el texto antes de reescribirlo",
+      "Hasta 200 anotaciones por trabajo",
+      "Funciona en cualquier página del documento"
+    ],
+    "useCases": [
+      "Corregir una errata en un PDF que no puedes regenerar",
+      "Añadir una nota o corrección a un documento compartido",
+      "Tapar un precio antiguo antes de escribir el nuevo",
+      "Añadir un pie o una etiqueta a una página PDF"
+    ],
+    "faqs": [
+      {
+        "q": "¿Puedo editar el texto existente del PDF?",
+        "a": "No: esta herramienta añade texto nuevo encima de la página; no cambia las palabras originales ni redistribuye el diseño. Para cambiar el texto existente correctamente necesitas el documento original. Para eliminar contenido de verdad, usa la herramienta Redactar."
+      },
+      {
+        "q": "¿El corrector elimina el texto que hay debajo?",
+        "a": "No: el corrector solo lo tapa visualmente con un cuadro blanco. El texto original sigue en el archivo y podría revelarse quitando el cuadro. Usa Redactar para eliminarlo de verdad."
+      },
+      {
+        "q": "¿Cuántos cambios puedo hacer a la vez?",
+        "a": "Hasta 200 anotaciones por trabajo: notas de texto y rectángulos de corrección combinados."
+      }
+    ],
+    "related": [
+      "sign_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "html_to_pdf": {
+    "title": "HTML a PDF en línea gratis — Convertir código HTML a PDF | PDFEDI",
+    "description": "Convierte código HTML a PDF en línea y gratis. Pega tu HTML o sube un archivo .html. Tamaño de página, orientación y márgenes incluidos. Sin registro.",
+    "h1": "HTML a PDF",
+    "intro": "Convierte código HTML en un archivo PDF para compartir o imprimir. Pega tu HTML en el cuadro o sube un archivo .html; luego elige el tamaño de página, la orientación y los márgenes, y descarga el PDF.",
+    "howTo": [
+      "Pega tu código HTML o sube un archivo .html (hasta 50 MB).",
+      "Elige el tamaño de página (A4 o Carta), la orientación y los márgenes.",
+      "Haz clic en Convertir y descarga el PDF.",
+      "Revisa el resultado: los estilos CSS, JavaScript y las imágenes no son compatibles."
+    ],
+    "features": [
+      "Pega HTML o sube un archivo .html",
+      "Página A4 o Carta, vertical u horizontal",
+      "Márgenes ajustables (0–50 mm)",
+      "Sin registro, archivos eliminados automáticamente"
+    ],
+    "useCases": [
+      "Convertir una plantilla de factura en un PDF imprimible",
+      "Guardar el diseño de una página web como PDF para compartir",
+      "Convertir páginas de documentación para leer sin conexión",
+      "Imprimir informes HTML sin usar el navegador"
+    ],
+    "faqs": [
+      {
+        "q": "¿Cómo convierto HTML a PDF?",
+        "a": "Pega tu HTML en el cuadro o sube un archivo .html y haz clic en Convertir. Recibirás un archivo PDF para descargar."
+      },
+      {
+        "q": "¿Puedo convertir la URL de un sitio web a PDF?",
+        "a": "No: esta herramienta no descarga direcciones web. Pega el código HTML de la página o guarda la página como archivo .html y súbela."
+      },
+      {
+        "q": "¿Ejecuta JavaScript?",
+        "a": "No. Los estilos CSS, JavaScript y las imágenes no son compatibles, así que las páginas con estilo se muestran como texto con formato simple."
+      }
+    ],
+    "related": [
+      "pdf_to_html",
+      "pdf_to_word",
+      "extract_text",
+      "compress"
+    ]
+  },
+  "pdf_to_html": {
+    "title": "PDF a HTML en línea gratis — Convertir PDF a página web | PDFEDI",
+    "description": "Convierte un PDF en un archivo HTML independiente en línea y gratis. El texto mantiene su posición en la página, así que el diseño se parece al original. Sin registro.",
+    "h1": "PDF a HTML",
+    "intro": "Convierte un PDF en un único archivo .html que puedes abrir en cualquier navegador. El texto mantiene su posición en la página, así que el resultado se parece al documento original.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB).",
+      "Elige si quieres mostrar divisores de página.",
+      "Haz clic en Convertir y descarga el archivo .html.",
+      "Abre el archivo en cualquier navegador: no necesita servidor ni archivos adicionales."
+    ],
+    "features": [
+      "Archivo .html independiente, sin archivos adicionales",
+      "El texto mantiene su posición en la página",
+      "Divisores de página opcionales",
+      "Funciona con PDF basados en texto de hasta 500 páginas"
+    ],
+    "useCases": [
+      "Publicar un informe PDF como página web",
+      "Archivar un documento en un formato que los navegadores pueden abrir",
+      "Compartir un PDF con alguien que no tiene lector de PDF",
+      "Extraer el texto de un PDF conservando su diseño"
+    ],
+    "faqs": [
+      {
+        "q": "¿El HTML se verá exactamente como el PDF?",
+        "a": "Casi, pero no exacto. El texto mantiene su posición en la página, pero las imágenes, los gráficos vectoriales y las fuentes exactas no se reproducen."
+      },
+      {
+        "q": "¿Funciona con PDF escaneados?",
+        "a": "No: las páginas escaneadas no tienen capa de texto, así que se convierten en páginas vacías. Usa OCR primero para añadir una capa de texto buscable y luego convierte."
+      },
+      {
+        "q": "¿Qué tamaño puede tener el PDF?",
+        "a": "Hasta 500 páginas. Los archivos más grandes se rechazan con un error claro."
+      }
+    ],
+    "related": [
+      "html_to_pdf",
+      "extract_text",
+      "pdf_to_word",
+      "ocr"
+    ]
+  },
+  "header_footer": {
+    "title": "Añadir encabezado y pie de página a PDF en línea gratis | PDFEDI",
+    "description": "Añade un encabezado o pie de página a las páginas de un PDF en línea y gratis. Texto personalizado con números de página, cualquier posición, tamaño de fuente ajustable. Sin registro.",
+    "h1": "Añadir encabezado / pie de página",
+    "intro": "Añade una línea de encabezado o pie de página a las páginas de tu PDF. Escribe tu propio texto, usa numeración de Página X de Y, y elige la posición y el tamaño de fuente; ideal para informes, contratos y expedientes.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB).",
+      "Escribe el texto del encabezado o pie de página, con numeración automática de páginas.",
+      "Elige la posición (arriba o abajo), la alineación y el tamaño de fuente.",
+      "Elige las páginas, haz clic en Añadir y descarga."
+    ],
+    "features": [
+      "Texto de encabezado o pie de página personalizado",
+      "Numeración automática de Página X de Y",
+      "Posición arriba o abajo; izquierda, centro o derecha",
+      "Tamaño de fuente ajustable (6–48 pt)",
+      "Se aplica a todas las páginas o a rangos seleccionados"
+    ],
+    "useCases": [
+      "Añadir «Confidencial» a todas las páginas de un informe",
+      "Numerar las páginas de un contrato como Página X de Y",
+      "Estampar la fecha de presentación en documentos judiciales",
+      "Añadir un encabezado con la marca a propuestas en cada página"
+    ],
+    "faqs": [
+      {
+        "q": "¿Cómo añado «Página 1 de 10» como pie de página?",
+        "a": "Escribe «Página {page} de {total}» como texto y elige la posición inferior. Cada página recibe su propio número."
+      },
+      {
+        "q": "¿Puedo añadir un encabezado en lugar de un pie de página?",
+        "a": "Sí: elige «arriba» como posición y el mismo texto se estampa como encabezado."
+      },
+      {
+        "q": "¿Puedo estampar solo algunas páginas?",
+        "a": "Sí: escribe rangos de páginas como 1-3,5 y solo esas páginas reciben el encabezado o pie."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "watermark",
+      "edit_metadata",
+      "crop"
+    ]
+  },
+  "pdf_to_epub": {
+    "title": "PDF a EPUB en línea gratis — Convertir PDF a libro electrónico | PDFEDI",
+    "description": "Convierte un PDF en un libro EPUB reutilizable en línea y gratis. El texto se adapta a la fuente y al tamaño de pantalla de tu lector. Sin registro.",
+    "h1": "PDF a EPUB",
+    "intro": "Convierte un PDF en un libro EPUB que puedes leer en cualquier lector electrónico, teléfono o tableta. El texto se adapta a tu pantalla, así que puedes cambiar el tamaño de fuente y seguir leyendo cómodamente.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB).",
+      "Haz clic en Convertir y descarga el archivo .epub.",
+      "Ábrelo en tu aplicación de lectura: Apple Books, Kindle, Kobo o cualquier lector de EPUB.",
+      "Ajusta el tamaño de fuente en tu lector; el texto se adapta automáticamente."
+    ],
+    "features": [
+      "Texto reutilizable para cualquier tamaño de pantalla",
+      "Capítulos agrupados por rango de páginas",
+      "Título y autor tomados del PDF cuando están disponibles",
+      "Funciona con PDF basados en texto de hasta 500 páginas"
+    ],
+    "useCases": [
+      "Leer un informe PDF en un lector electrónico",
+      "Convertir una guía PDF larga en un libro electrónico",
+      "Archivar documentos en un formato abierto de libro electrónico",
+      "Compartir un PDF con alguien que lee en el teléfono"
+    ],
+    "faqs": [
+      {
+        "q": "¿El EPUB se verá como el PDF?",
+        "a": "No: el EPUB adapta el texto a tu pantalla y tamaño de fuente. Las palabras se mantienen en orden, pero el diseño original de la página no se conserva."
+      },
+      {
+        "q": "¿Funciona con PDF escaneados?",
+        "a": "No: las páginas escaneadas no tienen capa de texto. Usa OCR primero para añadir texto buscable y luego convierte."
+      },
+      {
+        "q": "¿Se incluyen las imágenes?",
+        "a": "No: solo se transfiere el texto. Las imágenes, tablas y gráficos vectoriales no se incluyen."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "extract_text",
+      "pdf_to_html",
+      "ocr"
+    ]
   }
 }
