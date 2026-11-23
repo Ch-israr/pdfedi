@@ -4,7 +4,7 @@ const BASE =
 
 export interface ToolOption {
   name: string;
-  kind: "text" | "number" | "boolean" | "select" | "pages";
+  kind: "text" | "textarea" | "number" | "boolean" | "select" | "pages";
   label: string;
   required: boolean;
   default: unknown;

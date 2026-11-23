@@ -34,11 +34,19 @@ export const TOOL_CARDS: ToolCard[] = [
   { key: "images_to_pdf", icon: "📷", category: "convert" },
   { key: "ocr", icon: "👁️", category: "convert" },
   { key: "pdf_to_word", icon: "📘", category: "convert" },
+  { key: "pdf_to_excel", icon: "📊", category: "convert" },
+  { key: "pdf_to_pptx", icon: "📽️", category: "convert" },
+  { key: "html_to_pdf", icon: "🌐", category: "convert" },
+  { key: "pdf_to_html", icon: "💻", category: "convert" },
+  { key: "pdf_to_epub", icon: "📖", category: "convert" },
   { key: "metadata", icon: "🔍", category: "edit" },
   { key: "edit_metadata", icon: "✏️", category: "edit" },
   { key: "watermark", icon: "💧", category: "edit" },
   { key: "page_numbers", icon: "🔢", category: "edit" },
   { key: "crop", icon: "🔲", category: "edit" },
+  { key: "header_footer", icon: "📄", category: "edit" },
+  { key: "sign_pdf", icon: "✍️", category: "edit" },
+  { key: "edit_pdf", icon: "📝", category: "edit" },
   { key: "grayscale", icon: "🩶", category: "optimize" },
   { key: "compress", icon: "🗜️", category: "optimize" },
   { key: "repair", icon: "🛠️", category: "optimize" },
@@ -57,10 +65,14 @@ export const TOOL_SLUGS = TOOL_CARDS.map((t) => t.key);
 // render OrganizerTool instead of the generic ToolRunner. Kept here
 // (not in the client component) so the server tool page can branch on
 // it — importing a value out of a "use client" module is not allowed.
+// Sign/Edit joined later: they need the same pick + thumbnail + preview
+// flow, with their own placement canvases.
 export const ORGANIZER_TOOL_SLUGS = [
   "merge",
   "split",
   "rotate_pages",
   "delete_pages",
   "reorder_pages",
+  "sign_pdf",
+  "edit_pdf",
 ] as const;
