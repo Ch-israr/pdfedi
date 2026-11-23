@@ -348,7 +348,7 @@ def run_job(db: Session, job_id: str, client_ip: str) -> Job:
         job.error = str(e)
         job.error_code = e.code
         log.info("job %s failed (user error): %s", job.id, e)
-    except Exception as e:  # noqa: BLE001 — recorded, never leaked raw
+    except Exception:  # noqa: BLE001 — recorded, never leaked raw
         job.status = enum_value(JobStatus.FAILED)
         job.error = "Processing failed. Please try again."
         job.error_code = "internal_error"
