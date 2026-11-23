@@ -33,7 +33,7 @@ class ToolError(Exception):
 @dataclass
 class ToolOption:
     name: str
-    kind: str  # "text" | "number" | "boolean" | "select" | "pages"
+    kind: str  # "text" | "textarea" | "number" | "boolean" | "select" | "pages"
     label: str
     required: bool = False
     default: Any = None
