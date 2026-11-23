@@ -1,10 +1,9 @@
 """Crop PDF pages by trimming margins from each edge (in points)."""
 from __future__ import annotations
 
-import io
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 from pypdf.generic import RectangleObject
 
 from pdfedi.tools._helpers import open_pdf_reader, resolve_pages

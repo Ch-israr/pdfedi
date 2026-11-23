@@ -39,7 +39,6 @@ from pypdf.generic import (
     IndirectObject,
     NameObject,
     NumberObject,
-    TextStringObject,
 )
 
 from pdfedi.tools._helpers import open_pdf_reader

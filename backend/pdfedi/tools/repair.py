@@ -9,9 +9,7 @@ from pypdf import PdfReader, PdfWriter
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
-    ToolOption,
     ToolSpec,
-    get_option,
 )
 
 SPEC = ToolSpec(

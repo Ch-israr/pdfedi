@@ -23,7 +23,7 @@ from typing import Any
 
 from pypdf import PdfReader, PdfWriter
 
-from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._helpers import open_pdf_reader, text_or_none
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -64,18 +64,11 @@ SPEC = ToolSpec(
 )
 
 
-def _text(value: Any) -> str | None:
-    if value is None:
-        return None
-    text = str(value).strip()
-    return text or None
-
-
 def _read_report(reader: PdfReader) -> dict[str, Any]:
     report: dict[str, Any] = {}
     info = reader.metadata or {}
     for name, pdf_key in _FIELDS:
-        report[name] = _text(info.get(pdf_key))
+        report[name] = text_or_none(info.get(pdf_key))
     try:
         report["page_count"] = len(reader.pages)
     except Exception:

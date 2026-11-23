@@ -11,7 +11,6 @@ from pdfedi.tools.base import (
     ToolError,
     ToolOption,
     ToolSpec,
-    get_option,
     require_option,
 )
 

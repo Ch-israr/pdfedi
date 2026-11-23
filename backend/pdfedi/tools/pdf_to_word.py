@@ -19,9 +19,7 @@ from pdfedi.tools._helpers import _pil_from_xobject, open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
-    ToolOption,
     ToolSpec,
-    get_option,
 )
 
 SPEC = ToolSpec(

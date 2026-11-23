@@ -7,14 +7,13 @@ number and ``{total}`` with the total page count, so "Page {page} of
 from __future__ import annotations
 
 import io
-import re
 from pathlib import Path
 
 from pypdf import PdfReader, PdfWriter
 from reportlab.lib.colors import black
 from reportlab.pdfgen import canvas
 
-from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._helpers import coerce_int, open_pdf_reader, resolve_pages
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -25,7 +24,6 @@ from pdfedi.tools.base import (
 
 _VALID_VERTICAL = ("top", "bottom")
 _VALID_HORIZONTAL = ("left", "center", "right")
-_RANGE_TOKEN_RE = re.compile(r"^\s*(\d+)\s*(?:-\s*(\d+)\s*)?$")
 _MARGIN = 36.0  # 0.5 inch
 
 
@@ -62,51 +60,6 @@ SPEC = ToolSpec(
 )
 
 
-def _coerce_int(value, name: str, minimum: int, maximum: int | None = None) -> int:
-    if isinstance(value, bool):
-        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
-    try:
-        ivalue = int(value)
-    except (TypeError, ValueError):
-        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
-    if isinstance(value, float) and not value.is_integer():
-        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
-    if ivalue < minimum or (maximum is not None and ivalue > maximum):
-        bound = f"at least {minimum}" if maximum is None else f"between {minimum} and {maximum}"
-        raise ToolError(f"Option '{name}' must be {bound}.", code="invalid_option")
-    return ivalue
-
-
-def _parse_page_ranges(spec: str | None, page_count: int) -> list[int]:
-    """Parse '1-3,5' into sorted 1-based page numbers; None/empty = all pages."""
-    if spec is None or (isinstance(spec, str) and not spec.strip()):
-        return list(range(1, page_count + 1))
-    if not isinstance(spec, str):
-        raise ToolError("Option 'pages' must be a string like '1-3,5'.", code="invalid_option")
-    pages: set[int] = set()
-    for token in spec.split(","):
-        match = _RANGE_TOKEN_RE.match(token)
-        if not match:
-            raise ToolError(
-                f"Invalid page range {token.strip()!r}. Use forms like '1-3,5'.",
-                code="invalid_option",
-            )
-        start = int(match.group(1))
-        end = int(match.group(2)) if match.group(2) is not None else start
-        if start < 1 or end < 1:
-            raise ToolError("Page numbers start at 1.", code="invalid_option")
-        if end < start:
-            raise ToolError(f"Invalid range {start}-{end}: end is before start.", code="invalid_option")
-        pages.update(range(start, end + 1))
-    out_of_range = [p for p in pages if p > page_count]
-    if out_of_range:
-        raise ToolError(
-            f"Page(s) {sorted(out_of_range)} exceed the document page count ({page_count}).",
-            code="invalid_option",
-        )
-    return sorted(pages)
-
-
 def run(ctx: ToolContext, options: dict) -> Path:
     if not isinstance(options, dict):
         raise ToolError("Options must be an object.", code="invalid_option")
@@ -123,7 +76,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         raise ToolError(f"Option 'vertical' must be one of {_VALID_VERTICAL}.", code="invalid_option")
     if horizontal not in _VALID_HORIZONTAL:
         raise ToolError(f"Option 'horizontal' must be one of {_VALID_HORIZONTAL}.", code="invalid_option")
-    font_size = _coerce_int(get_option(options, SPEC, "font_size"), "font_size", 6, 48)
+    font_size = coerce_int(get_option(options, SPEC, "font_size"), "font_size", 6, 48)
 
     if not ctx.inputs:
         raise ToolError("No input file provided.", code="missing_input")
@@ -132,7 +85,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         data, ctx.inputs[0].filename, encrypted_code="invalid_input"
     )
     page_count = len(reader.pages)
-    pages = _parse_page_ranges(get_option(options, SPEC, "pages"), page_count)
+    pages = resolve_pages(get_option(options, SPEC, "pages"), page_count)
     page_set = set(pages)
 
     writer = PdfWriter()

@@ -8,7 +8,7 @@ from typing import Any
 
 from pypdf import PdfReader
 
-from pdfedi.tools._helpers import read_input_bytes
+from pdfedi.tools._helpers import read_input_bytes, text_or_none
 from pdfedi.tools.base import ToolContext, ToolError, ToolSpec
 
 _METADATA_FIELDS = (
@@ -38,13 +38,6 @@ SPEC = ToolSpec(
     output_mime="application/json",
     category="edit",
 )
-
-
-def _text(value: Any) -> str | None:
-    if value is None:
-        return None
-    text = str(value).strip()
-    return text or None
 
 
 def run(ctx: ToolContext, options: dict) -> Path:
@@ -82,7 +75,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if not encrypted:
         info = reader.metadata or {}
         for name, pdf_key in _METADATA_FIELDS:
-            payload[name] = _text(info.get(pdf_key))
+            payload[name] = text_or_none(info.get(pdf_key))
         try:
             payload["page_count"] = len(reader.pages)
         except Exception:

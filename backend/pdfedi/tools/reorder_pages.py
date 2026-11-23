@@ -5,10 +5,9 @@ a comma-separated string (``"3,1,2"``) is accepted as well.
 """
 from __future__ import annotations
 
-import io
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 
 from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (

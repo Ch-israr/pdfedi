@@ -10,7 +10,7 @@ import re
 import zipfile
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 
 from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (

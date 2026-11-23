@@ -1,14 +1,12 @@
 """Rotate selected pages of a PDF clockwise by 90, 180 or 270 degrees."""
 from __future__ import annotations
 
-import io
 import json
-import re
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 
-from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._helpers import open_pdf_reader, parse_page_ranges
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -63,35 +61,6 @@ SPEC = ToolSpec(
     output_mime="application/pdf",
     category="organize",
 )
-
-_RANGE_TOKEN_RE = re.compile(r"^\s*(\d+)\s*(?:-\s*(\d+)\s*)?$")
-
-
-def _parse_page_ranges(spec: str) -> list[int]:
-    """Parse a 1-based inclusive page-range string like ``"1-3,5"``."""
-    if not isinstance(spec, str) or not spec.strip():
-        raise ToolError(
-            "Page range must be a non-empty string like '1-3,5'.", code="bad_option"
-        )
-    pages: set[int] = set()
-    for token in spec.split(","):
-        match = _RANGE_TOKEN_RE.match(token)
-        if not match:
-            raise ToolError(
-                f"Invalid page range token {token.strip()!r}. "
-                "Use forms like '1-3,5'.",
-                code="bad_option",
-            )
-        start = int(match.group(1))
-        end = int(match.group(2)) if match.group(2) is not None else start
-        if start < 1 or end < 1:
-            raise ToolError("Page numbers start at 1.", code="bad_option")
-        if end < start:
-            raise ToolError(
-                f"Invalid range {start}-{end}: end is before start.", code="bad_option"
-            )
-        pages.update(range(start, end + 1))
-    return sorted(pages)
 
 
 def _parse_rotations(raw, page_count: int) -> dict[int, int]:
@@ -182,7 +151,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
     if pages_spec is None or (isinstance(pages_spec, str) and not pages_spec.strip()):
         pages = list(range(1, page_count + 1))
     else:
-        pages = _parse_page_ranges(pages_spec)
+        pages = parse_page_ranges(pages_spec)
         out_of_range = [p for p in pages if p > page_count]
         if out_of_range:
             raise ToolError(

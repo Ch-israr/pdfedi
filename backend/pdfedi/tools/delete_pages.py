@@ -1,13 +1,11 @@
 """Delete selected pages from a PDF (at least one page must remain)."""
 from __future__ import annotations
 
-import io
-import re
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 
-from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._helpers import open_pdf_reader, parse_page_ranges
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -43,35 +41,6 @@ SPEC = ToolSpec(
     category="organize",
 )
 
-_RANGE_TOKEN_RE = re.compile(r"^\s*(\d+)\s*(?:-\s*(\d+)\s*)?$")
-
-
-def _parse_page_ranges(spec: str) -> list[int]:
-    """Parse a 1-based inclusive page-range string like ``"1,3,5-7"``."""
-    if not isinstance(spec, str) or not spec.strip():
-        raise ToolError(
-            "Page range must be a non-empty string like '1,3,5-7'.", code="bad_option"
-        )
-    pages: set[int] = set()
-    for token in spec.split(","):
-        match = _RANGE_TOKEN_RE.match(token)
-        if not match:
-            raise ToolError(
-                f"Invalid page range token {token.strip()!r}. "
-                "Use forms like '1,3,5-7'.",
-                code="bad_option",
-            )
-        start = int(match.group(1))
-        end = int(match.group(2)) if match.group(2) is not None else start
-        if start < 1 or end < 1:
-            raise ToolError("Page numbers start at 1.", code="bad_option")
-        if end < start:
-            raise ToolError(
-                f"Invalid range {start}-{end}: end is before start.", code="bad_option"
-            )
-        pages.update(range(start, end + 1))
-    return sorted(pages)
-
 
 def run(ctx: ToolContext, options: dict) -> Path:
     """Delete the pages listed in ``pages`` (1-based ranges)."""
@@ -88,7 +57,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
     reader = open_pdf_reader(tool_input.path.read_bytes(), tool_input.filename)
     page_count = len(reader.pages)
 
-    pages = _parse_page_ranges(spec)
+    pages = parse_page_ranges(spec)
     out_of_range = [p for p in pages if p > page_count]
     if out_of_range:
         raise ToolError(

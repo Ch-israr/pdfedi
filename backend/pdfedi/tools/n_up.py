@@ -1,11 +1,9 @@
 """Place multiple PDF pages on each sheet (N-up) for printing handouts."""
 from __future__ import annotations
 
-import io
-from math import ceil
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter, Transformation
+from pypdf import PdfWriter, Transformation
 
 from pdfedi.tools._helpers import PAGE_SIZES_PT, open_pdf_reader
 from pdfedi.tools.base import (

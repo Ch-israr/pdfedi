@@ -14,7 +14,6 @@ because the built-in Helvetica font only covers Latin text.
 """
 from __future__ import annotations
 
-import re
 from html.parser import HTMLParser
 from pathlib import Path
 
@@ -31,6 +30,7 @@ from reportlab.platypus import (
     TableStyle,
 )
 
+from pdfedi.tools._helpers import coerce_int
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -279,20 +279,6 @@ class _HtmlToFlowables(HTMLParser):
         return self.story
 
 
-def _coerce_int(value, name: str, minimum: int, maximum: int) -> int:
-    if isinstance(value, bool):
-        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
-    try:
-        ivalue = int(value)
-    except (TypeError, ValueError):
-        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
-    if isinstance(value, float) and not value.is_integer():
-        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
-    if ivalue < minimum or ivalue > maximum:
-        raise ToolError(f"Option '{name}' must be between {minimum} and {maximum}.", code="invalid_option")
-    return ivalue
-
-
 def run(ctx: ToolContext, options: dict) -> Path:
     if not isinstance(options, dict):
         raise ToolError("Options must be an object.", code="invalid_option")
@@ -302,7 +288,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         raise ToolError(f"Option 'page_size' must be one of {_VALID_PAGE_SIZE}.", code="invalid_option")
     if orientation not in _VALID_ORIENTATION:
         raise ToolError(f"Option 'orientation' must be one of {_VALID_ORIENTATION}.", code="invalid_option")
-    margin_mm = _coerce_int(get_option(options, SPEC, "margin_mm"), "margin_mm", 0, 50)
+    margin_mm = coerce_int(get_option(options, SPEC, "margin_mm"), "margin_mm", 0, 50)
 
     pasted = get_option(options, SPEC, "html")
     html_text: str | None = None
