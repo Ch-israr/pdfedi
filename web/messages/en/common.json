@@ -1,9 +1,9 @@
 {
   "meta": {
     "siteTitle": "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
-    "siteDescription": "Merge, split, convert and protect PDFs free online. 26 PDF tools — no sign-up, no watermarks, private by design.",
+    "siteDescription": "Merge, split, convert and protect PDFs free online. 34 PDF tools — no sign-up, no watermarks, private by design.",
     "homeTitle": "PDFEDI — Free Online PDF Tools: Merge, Split, Compress & Edit",
-    "homeDescription": "Merge, split, convert and protect PDFs free online. 26 PDF tools — no sign-up, no watermarks, private by design.",
+    "homeDescription": "Merge, split, convert and protect PDFs free online. 34 PDF tools — no sign-up, no watermarks, private by design.",
     "lawyersTitle": "PDF Tools for Lawyers — Redact, File & Combine Exhibits | PDFEDI",
     "lawyersDescription": "Free PDF tools for lawyers: true redaction, metadata stripping, court-size compression, exhibit combining with Bates numbers. No sign-up, no watermarks.",
     "lawyersOgDescription": "Redact, strip metadata, compress to your court's filing limit and combine exhibits with Bates numbers — free, no sign-up.",
@@ -17,8 +17,8 @@
     "termsPageDescription": "The terms for using PDFEDI's free online PDF tools: acceptable use, the service as it is, and your files.",
     "termsPageOgDescription": "Acceptable use and no-warranty terms for PDFEDI's free PDF tools.",
     "aboutPageTitle": "About PDFEDI — Free Online PDF Tools",
-    "aboutPageDescription": "PDFEDI is a free online PDF service: 26 tools for working with PDF files, in 10 languages, with no sign-up.",
-    "aboutPageOgDescription": "26 free PDF tools in 10 languages. No sign-up.",
+    "aboutPageDescription": "PDFEDI is a free online PDF service: 34 tools for working with PDF files, in 10 languages, with no sign-up.",
+    "aboutPageOgDescription": "34 free PDF tools in 10 languages. No sign-up.",
     "contactPageTitle": "Contact PDFEDI",
     "contactPageDescription": "How to contact PDFEDI with a question, a suggestion, or a problem with a tool.",
     "contactPageOgDescription": "Contact PDFEDI about a tool, a question, or a suggestion."
@@ -179,6 +179,38 @@
     "strip_metadata": {
       "name": "Strip Metadata",
       "tagline": "Remove hidden metadata, with a report"
+    },
+    "pdf_to_excel": {
+      "name": "PDF to Excel",
+      "tagline": "Extract tables from a PDF into a spreadsheet"
+    },
+    "pdf_to_pptx": {
+      "name": "PDF to PowerPoint",
+      "tagline": "Turn PDF pages into editable slides"
+    },
+    "sign_pdf": {
+      "name": "Sign PDF",
+      "tagline": "Draw a signature and place it on your PDF"
+    },
+    "edit_pdf": {
+      "name": "Edit PDF",
+      "tagline": "Add text and cover areas on your PDF"
+    },
+    "html_to_pdf": {
+      "name": "HTML to PDF",
+      "tagline": "Turn HTML code into a PDF"
+    },
+    "pdf_to_html": {
+      "name": "PDF to HTML",
+      "tagline": "Turn a PDF into a web page"
+    },
+    "header_footer": {
+      "name": "Add Header / Footer",
+      "tagline": "Stamp text on every page"
+    },
+    "pdf_to_epub": {
+      "name": "PDF to EPUB",
+      "tagline": "Turn a PDF into an ebook"
     }
   },
   "runner": {
@@ -220,7 +252,8 @@
     "downloadResult": "Download result",
     "downloading": "Downloading…",
     "downloadingPct": "Downloading… {pct}%",
-    "downloadFailed": "Download failed."
+    "downloadFailed": "Download failed.",
+    "chooseHtml": "Choose an HTML file (optional)"
   },
   "canvas": {
     "startOver": "Start over",
@@ -381,6 +414,51 @@
       "gridAria": "Pages in new order",
       "hint": "Drag thumbnails to reorder (the position badges update live) · Select a page and press Ctrl+← / Ctrl+→ to move it · The order field above stays in sync and accepts a typed permutation.",
       "position": "position {n}"
+    },
+    "sign": {
+      "summary": "Signature on {pages} — {x}% across, {y}% down, {w}% wide",
+      "summaryAll": "Signature on all pages — {x}% across, {y}% down, {w}% wide",
+      "summaryEmpty": "Draw or type your signature, then click a page to place it.",
+      "processLabel": "Sign now",
+      "activity": "Signing",
+      "modeDraw": "Draw",
+      "modeType": "Type",
+      "typePlaceholder": "Type your name",
+      "typeApply": "Use this signature",
+      "clearPad": "Clear",
+      "padLabel": "Signature pad",
+      "padHint": "Draw with your mouse, finger or stylus — or type your name above.",
+      "clickToPlace": "Click the page preview to place the signature; drag the signature to move it.",
+      "widthLabel": "Width",
+      "pagesLabel": "Pages",
+      "pagesPlaceholder": "1-3,5",
+      "pagesAll": "All pages",
+      "noSignature": "Draw or type a signature first.",
+      "invalidPages": "Those pages are beyond this document.",
+      "notDigital": "This adds a visible signature image — not a certified digital signature.",
+      "previewLabel": "Page {n} preview",
+      "selectPageHint": "Choose a page to sign"
+    },
+    "edit": {
+      "summary": "{count, plural, one {# annotation} other {# annotations}} on {pages, plural, one {# page} other {# pages}}",
+      "summaryEmpty": "Add a text note or draw a whiteout rectangle.",
+      "processLabel": "Save edits",
+      "activity": "Saving edits",
+      "modeText": "Add text",
+      "modeWhiteout": "Whiteout",
+      "textPlaceholder": "Text to add",
+      "sizeLabel": "Size",
+      "addTextHint": "Type text above, then click the page where it should go.",
+      "drawHint": "Drag a rectangle over the area you want to cover with white.",
+      "annotationsLabel": "Annotations",
+      "annotationItem": "#{n} · p.{page} · {kind}",
+      "deleteAnnotation": "Delete annotation {n}",
+      "whiteoutLabel": "whiteout",
+      "clearAll": "Clear all",
+      "noAnnotations": "Add at least one annotation first.",
+      "notRealEdit": "New text sits on top of the page — the original text is not changed. Whiteout only covers content; use Redact to remove it for real.",
+      "previewLabel": "Page {n} preview",
+      "selectPageHint": "Choose a page to edit"
     }
   },
   "errors": {
@@ -643,6 +721,75 @@
         "label": "Opacity",
         "help": "0.1 (faint) to 0.5 (strong)."
       }
+    },
+    "pdf_to_excel": {
+      "first_row_header": {
+        "label": "First row is a header",
+        "help": "Bold the first row of each detected table."
+      }
+    },
+    "html_to_pdf": {
+      "html": {
+        "label": "HTML code",
+        "help": "Paste your HTML here. Leave empty to use the uploaded .html file instead."
+      },
+      "page_size": {
+        "label": "Page size",
+        "help": "",
+        "choices": {
+          "A4": "A4",
+          "Letter": "Letter"
+        }
+      },
+      "orientation": {
+        "label": "Orientation",
+        "help": "",
+        "choices": {
+          "portrait": "Portrait",
+          "landscape": "Landscape"
+        }
+      },
+      "margin_mm": {
+        "label": "Margin (mm)",
+        "help": "0 to 50."
+      }
+    },
+    "pdf_to_html": {
+      "include_page_numbers": {
+        "label": "Show page dividers",
+        "help": "Add a visible 'Page N' divider between pages."
+      }
+    },
+    "header_footer": {
+      "text": {
+        "label": "Header / footer text",
+        "help": "Use {page} for the page number and {total} for the page count."
+      },
+      "vertical": {
+        "label": "Position",
+        "help": "'top' stamps a header, 'bottom' stamps a footer.",
+        "choices": {
+          "top": "Top",
+          "bottom": "Bottom"
+        }
+      },
+      "horizontal": {
+        "label": "Alignment",
+        "help": "",
+        "choices": {
+          "left": "Left",
+          "center": "Center",
+          "right": "Right"
+        }
+      },
+      "font_size": {
+        "label": "Font size",
+        "help": "6 to 48."
+      },
+      "pages": {
+        "label": "Pages",
+        "help": "1-based ranges like '1-3,5'. Leave empty for all pages."
+      }
     }
   },
   "lawyers": {
@@ -841,7 +988,7 @@
   },
   "aboutPage": {
     "title": "About PDFEDI",
-    "intro": "PDFEDI is a free online PDF service: 26 tools for working with PDF files, in 10 languages, with no sign-up.",
+    "intro": "PDFEDI is a free online PDF service: 34 tools for working with PDF files, in 10 languages, with no sign-up.",
     "whatTitle": "What you can do",
     "whatPoints": [
       "Merge, split, reorder, rotate, and delete pages.",
@@ -852,7 +999,7 @@
     "howTitle": "How it works",
     "howText": "Choose a tool, upload your PDF, and download the result. Files are uploaded to our server for processing and removed after processing. On the organizer tools, page previews are rendered in your browser before you press the process button.",
     "freeTitle": "Free, no sign-up",
-    "freeText": "All 26 tools are free to use with no account. Some tools have a fair-use hourly limit so the service stays fast for everyone.",
+    "freeText": "All 34 tools are free to use with no account. Some tools have a fair-use hourly limit so the service stays fast for everyone.",
     "backLink": "← Back to all tools"
   },
   "contactPage": {

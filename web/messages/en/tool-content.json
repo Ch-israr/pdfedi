@@ -1156,5 +1156,354 @@
       "images_to_pdf",
       "redact"
     ]
+  },
+  "pdf_to_excel": {
+    "title": "PDF to Excel Online Free — Convert PDF Tables to XLSX | PDFEDI",
+    "description": "Convert PDF tables to Excel online for free. Ruled tables extract cleanly; pages without tables fall back to text lines. No sign-up.",
+    "h1": "PDF to Excel",
+    "intro": "Turn the tables in your PDF into a spreadsheet you can sort, filter and calculate with. Each page with tables becomes a sheet; pages without tables fall back to their text lines in a single column, so nothing is silently lost.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB, 50 pages max).",
+      "Choose whether the first row of each table is a header.",
+      "Click Convert and download the .xlsx file."
+    ],
+    "features": [
+      "Real tables extracted from ruled and borderless layouts",
+      "One sheet per page, with headers bolded",
+      "Text fallback for pages without tables",
+      "Opens in Excel, Google Sheets and LibreOffice Calc"
+    ],
+    "useCases": [
+      "Pull figures out of a PDF report into a spreadsheet",
+      "Reuse invoice line items for bookkeeping",
+      "Turn a PDF price list into a sortable table",
+      "Extract survey results for analysis"
+    ],
+    "faqs": [
+      {
+        "q": "Will every table extract perfectly?",
+        "a": "Ruled tables with clear borders come out clean. Borderless tables are detected from text alignment and are approximate — check the numbers before relying on them. Merged cells, formulas and charts are not preserved."
+      },
+      {
+        "q": "What happens to pages with no tables?",
+        "a": "Their text lines go into a sheet named 'Page N (text)' in a single column, so you still get the content — just not as a table."
+      },
+      {
+        "q": "My PDF is a scan. What happens?",
+        "a": "Scanned PDFs have no tables or text to extract, so you'll get a clear error. Run the OCR tool first to make the scan searchable, then convert."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_pptx",
+      "extract_text",
+      "ocr"
+    ]
+  },
+  "pdf_to_pptx": {
+    "title": "PDF to PowerPoint Online Free — Convert PDF to PPTX | PDFEDI",
+    "description": "Convert PDF pages into PowerPoint slides online for free. One slide per page, with editable text boxes over a rendered page image. No sign-up.",
+    "h1": "PDF to PowerPoint",
+    "intro": "Turn your PDF into a presentation — one slide per page. Each slide shows a rendered image of its page so the layout always looks right, with editable text boxes over the words so you can select and change the text.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB, 50 pages max).",
+      "Click Convert — each page becomes a slide with its text editable.",
+      "Download the .pptx and present or edit it in PowerPoint, Google Slides or Keynote."
+    ],
+    "features": [
+      "One slide per page, 16:9 widescreen",
+      "Editable text boxes positioned on the words",
+      "Page image keeps the visual layout intact",
+      "Opens in PowerPoint, Google Slides and Keynote"
+    ],
+    "useCases": [
+      "Turn a PDF report into a deck for a meeting",
+      "Reuse PDF pages as presentation slides",
+      "Present a document that only exists as a PDF",
+      "Build slides from a PDF handout"
+    ],
+    "faqs": [
+      {
+        "q": "Can I edit the text on the slides?",
+        "a": "Yes — the words are real text boxes you can select, move and retype. The page image underneath keeps the layout looking right, but the text boxes are an overlay and may drift slightly on very complex layouts."
+      },
+      {
+        "q": "Are images and graphics editable?",
+        "a": "No — pictures and vector graphics stay inside the page image. Only the text is rebuilt as editable boxes."
+      },
+      {
+        "q": "My PDF is a scan. What happens?",
+        "a": "Scanned pages become image-only slides with no text boxes. Run the OCR tool first if you need editable text."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_excel",
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "sign_pdf": {
+    "title": "Sign PDF Online Free — Draw Your Signature on a PDF | PDFEDI",
+    "description": "Sign a PDF online for free. Draw or type your signature and place it on the pages you choose. Visible signature image — not a digital certificate. No sign-up.",
+    "h1": "Sign PDF",
+    "intro": "Add your signature to a PDF in seconds. Draw it with your mouse or finger, or type your name in a handwritten style, then click the page to place it and choose which pages get signed. The signature is added as a visible image on the page.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Draw your signature — or type your name and pick a handwriting style.",
+      "Click a page to place the signature, choose the pages, and download the signed PDF."
+    ],
+    "features": [
+      "Draw with mouse, touch or stylus",
+      "Type your name in a handwriting style",
+      "Place on any page, at any size",
+      "Sign one page or every page at once"
+    ],
+    "useCases": [
+      "Sign a contract sent as a PDF",
+      "Add your signature to a permission form",
+      "Sign an invoice before sending it back",
+      "Approve a document without printing it"
+    ],
+    "faqs": [
+      {
+        "q": "Is this a legally binding digital signature?",
+        "a": "No — this adds a visible signature image, not a cryptographic digital signature with a certificate. For many everyday uses (forms, approvals, internal sign-off) that is enough, but for contracts that require a certified signature, use a dedicated signing service."
+      },
+      {
+        "q": "Can I move the signature after placing it?",
+        "a": "Yes — drag it to a new spot or resize it before you click Sign. Once the file is downloaded the signature is baked into the PDF."
+      },
+      {
+        "q": "Does the signature work on every page?",
+        "a": "You choose: the current page only, a range like 1-3,5, or every page. The same signature and position are used on each chosen page."
+      }
+    ],
+    "related": [
+      "edit_pdf",
+      "flatten",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "edit_pdf": {
+    "title": "Edit PDF Online Free — Add Text & Whiteout to a PDF | PDFEDI",
+    "description": "Edit a PDF online for free. Add text annotations and whiteout rectangles on any page. Honest editing: new text sits on top — the original text is not reflowed. No sign-up.",
+    "h1": "Edit PDF",
+    "intro": "Make quick changes to a PDF without a desktop app. Click anywhere to add a line of text, or drag a white box over something you want to cover before writing replacement text. This is the honest slice of editing: new text sits on top of the page, and the original text underneath is not reflowed or removed.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Click a page to add text, or drag to draw a whiteout rectangle.",
+      "Download the edited PDF — your additions are baked into the pages."
+    ],
+    "features": [
+      "Add text anywhere, at sizes 6–72 pt",
+      "Whiteout rectangles cover text before you rewrite it",
+      "Up to 200 annotations per job",
+      "Works on any page of the document"
+    ],
+    "useCases": [
+      "Fix a typo on a PDF you can't regenerate",
+      "Add a note or correction to a shared document",
+      "Cover an old price before writing the new one",
+      "Add a caption or label to a PDF page"
+    ],
+    "faqs": [
+      {
+        "q": "Can I edit the existing text in the PDF?",
+        "a": "No — this tool adds new text on top of the page; it does not change the original words or reflow the layout. To change existing text properly you need the original document. To remove content for real, use the Redact tool."
+      },
+      {
+        "q": "Does whiteout delete the text underneath?",
+        "a": "No — whiteout only covers it visually with a white box. The original text is still in the file and could be revealed by removing the box. Use Redact for real removal."
+      },
+      {
+        "q": "How many changes can I make at once?",
+        "a": "Up to 200 annotations per job — text notes and whiteout rectangles combined."
+      }
+    ],
+    "related": [
+      "sign_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "html_to_pdf": {
+    "title": "HTML to PDF Online Free — Convert HTML Code to PDF | PDFEDI",
+    "description": "Convert HTML code to PDF online for free. Paste your HTML or upload an .html file. Page size, orientation and margins included. No sign-up.",
+    "h1": "HTML to PDF",
+    "intro": "Turn HTML code into a PDF file you can share or print. Paste your HTML into the box, or upload an .html file — then pick the page size, orientation and margins and download the PDF.",
+    "howTo": [
+      "Paste your HTML code, or upload an .html file (up to 50MB).",
+      "Choose the page size (A4 or Letter), orientation and margins.",
+      "Click Convert and download the PDF.",
+      "Check the result — CSS styling, JavaScript and images are not supported."
+    ],
+    "features": [
+      "Paste HTML or upload an .html file",
+      "A4 or Letter page size, portrait or landscape",
+      "Adjustable margins (0–50 mm)",
+      "No sign-up, files deleted automatically"
+    ],
+    "useCases": [
+      "Turn an invoice template into a printable PDF",
+      "Save a web page design as a PDF to share",
+      "Convert documentation pages for offline reading",
+      "Print HTML reports without a browser"
+    ],
+    "faqs": [
+      {
+        "q": "How do I convert HTML to PDF?",
+        "a": "Paste your HTML into the box, or upload an .html file, then click Convert. You will get a PDF file to download."
+      },
+      {
+        "q": "Can I convert a website URL to PDF?",
+        "a": "No — this tool does not fetch web addresses. Paste the page's HTML code, or save the page as an .html file and upload it."
+      },
+      {
+        "q": "Does it run JavaScript?",
+        "a": "No. CSS styling, JavaScript and images are not supported, so styled pages render as plain formatted text."
+      }
+    ],
+    "related": [
+      "pdf_to_html",
+      "pdf_to_word",
+      "extract_text",
+      "compress"
+    ]
+  },
+  "pdf_to_html": {
+    "title": "PDF to HTML Online Free — Convert PDF to Web Page | PDFEDI",
+    "description": "Convert a PDF to a standalone HTML file online for free. Text keeps its on-page position, so the layout looks close to the original. No sign-up.",
+    "h1": "PDF to HTML",
+    "intro": "Turn a PDF into a single .html file you can open in any browser. The text keeps its position on the page, so the result looks close to the original document.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose whether to show page dividers.",
+      "Click Convert and download the .html file.",
+      "Open the file in any browser — no server or extra files needed."
+    ],
+    "features": [
+      "Standalone .html file — no extra files needed",
+      "Text keeps its on-page position",
+      "Optional page dividers",
+      "Works on text-based PDFs up to 500 pages"
+    ],
+    "useCases": [
+      "Publish a PDF report as a web page",
+      "Archive a document in a format browsers can open",
+      "Share a PDF with someone who has no PDF reader",
+      "Extract a PDF's text with its layout intact"
+    ],
+    "faqs": [
+      {
+        "q": "Will the HTML look exactly like the PDF?",
+        "a": "Close, but not exact. Text keeps its position on the page, but images, vector graphics and exact fonts are not reproduced."
+      },
+      {
+        "q": "Does it work on scanned PDFs?",
+        "a": "No — scanned pages have no text layer, so they convert to empty pages. Run OCR first to add a searchable text layer, then convert."
+      },
+      {
+        "q": "How large can the PDF be?",
+        "a": "Up to 500 pages. Larger files are rejected with a clear error."
+      }
+    ],
+    "related": [
+      "html_to_pdf",
+      "extract_text",
+      "pdf_to_word",
+      "ocr"
+    ]
+  },
+  "header_footer": {
+    "title": "Add Header and Footer to PDF Online Free | PDFEDI",
+    "description": "Add a header or footer to PDF pages online for free. Custom text with page numbers, any position, adjustable font size. No sign-up.",
+    "h1": "Add Header / Footer",
+    "intro": "Stamp a header or footer line on your PDF pages. Write your own text, use Page X of Y numbering, and pick the position and font size — ideal for reports, contracts and filings.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Write the header or footer text, with automatic page numbering.",
+      "Choose the position (top or bottom), alignment and font size.",
+      "Pick the pages, then click Add and download."
+    ],
+    "features": [
+      "Custom header or footer text",
+      "Automatic Page X of Y numbering",
+      "Top or bottom position, left, center or right",
+      "Adjustable font size (6–48pt)",
+      "Apply to all pages or selected ranges"
+    ],
+    "useCases": [
+      "Add 'Confidential' to every page of a report",
+      "Number pages in a contract as Page X of Y",
+      "Stamp a filing date on court documents",
+      "Brand proposals with a header on every page"
+    ],
+    "faqs": [
+      {
+        "q": "How do I add 'Page 1 of 10' as a footer?",
+        "a": "Set the text to 'Page {page} of {total}' and the position to bottom. Each page gets its own number."
+      },
+      {
+        "q": "Can I add a header instead of a footer?",
+        "a": "Yes — choose 'top' as the position and the same text is stamped as a header."
+      },
+      {
+        "q": "Can I stamp only some pages?",
+        "a": "Yes — enter page ranges like 1-3,5 and only those pages get the header or footer."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "watermark",
+      "edit_metadata",
+      "crop"
+    ]
+  },
+  "pdf_to_epub": {
+    "title": "PDF to EPUB Online Free — Convert PDF to Ebook | PDFEDI",
+    "description": "Convert a PDF to a reflowable EPUB ebook online for free. Text flows to your reader's font and screen size. No sign-up.",
+    "h1": "PDF to EPUB",
+    "intro": "Turn a PDF into an EPUB ebook you can read on any e-reader, phone or tablet. The text reflows to your screen, so you can change the font size and keep reading comfortably.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Click Convert and download the .epub file.",
+      "Open it in your e-reader app — Apple Books, Kindle, Kobo, or any EPUB reader.",
+      "Adjust the font size in your reader; the text reflows automatically."
+    ],
+    "features": [
+      "Reflowable text for any screen size",
+      "Chapters grouped by page range",
+      "Title and author taken from the PDF when available",
+      "Works on text-based PDFs up to 500 pages"
+    ],
+    "useCases": [
+      "Read a PDF report on an e-reader",
+      "Turn a long PDF guide into an ebook",
+      "Archive documents in an open ebook format",
+      "Share a PDF with someone who reads on a phone"
+    ],
+    "faqs": [
+      {
+        "q": "Will the EPUB look like the PDF?",
+        "a": "No — EPUB reflows the text to fit your screen and font size. The words stay in order, but the original page layout is not preserved."
+      },
+      {
+        "q": "Does it work on scanned PDFs?",
+        "a": "No — scanned pages have no text layer. Run OCR first to add searchable text, then convert."
+      },
+      {
+        "q": "Are images included?",
+        "a": "No — only the text is carried over. Images, tables and vector graphics are not included."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "extract_text",
+      "pdf_to_html",
+      "ocr"
+    ]
   }
 }
