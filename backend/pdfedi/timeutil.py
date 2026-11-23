@@ -11,8 +11,3 @@ from datetime import datetime, timezone
 def utcnow_iso() -> str:
     return datetime.now(timezone.utc).isoformat()
 
-
-def parse_iso(value: str | None) -> datetime | None:
-    if not value:
-        return None
-    return datetime.fromisoformat(value)
