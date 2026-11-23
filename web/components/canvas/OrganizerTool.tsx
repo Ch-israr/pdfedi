@@ -59,8 +59,6 @@ const CANVASES = {
   edit_pdf: EditCanvas,
 } as const;
 
-export const ORGANIZER_TOOLS: readonly string[] = ORGANIZER_TOOL_SLUGS;
-
 export function OrganizerTool({ toolKey }: { toolKey: string }) {
   const tRunner = useTranslations("runner");
   const tErr = useTranslations("errors");
