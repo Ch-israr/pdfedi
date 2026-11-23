@@ -26,8 +26,6 @@ export const LOCALES: Record<string, LocaleInfo> = {
 
 export type LocaleSegment = keyof typeof LOCALES;
 
-export const DEFAULT_LOCALE: LocaleSegment = "en";
-
 /** The 9 prefixed locales (everything except English). */
 export const PREFIXED_LOCALES = (Object.keys(LOCALES) as LocaleSegment[]).filter(
   (l) => l !== "en",
@@ -37,10 +35,6 @@ export const LOCALE_SEGMENTS = Object.keys(LOCALES) as LocaleSegment[];
 
 export function isLocaleSegment(s: string): s is LocaleSegment {
   return s in LOCALES;
-}
-
-export function isRtl(locale: string): boolean {
-  return LOCALES[locale as LocaleSegment]?.dir === "rtl";
 }
 
 /** Prefix a root-relative path with the locale segment (no-op for English). */
