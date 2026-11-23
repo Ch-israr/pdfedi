@@ -26,8 +26,12 @@ export type PdfJsLib = typeof PdfJsTypes;
 export type PdfDocument = PdfJsTypes.PDFDocumentProxy;
 export type PdfPage = PdfJsTypes.PDFPageProxy;
 
-const PDFJS_URL = "/pdf.min.mjs";
-const WORKER_URL = "/pdf.worker.min.mjs";
+// Versioned so the backend can serve these immutable for a year
+// (backend/main.py _frontend_cache_headers): bump ?v= when pdfjs-dist
+// is upgraded — the version is pinned in web/package.json.
+const PDFJS_VERSION = "5.4.296";
+const PDFJS_URL = `/pdf.min.mjs?v=${PDFJS_VERSION}`;
+const WORKER_URL = `/pdf.worker.min.mjs?v=${PDFJS_VERSION}`;
 
 let libPromise: Promise<PdfJsLib> | null = null;
 
