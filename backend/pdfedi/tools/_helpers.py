@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import re
+from typing import Any
 
 from pdfedi.tools.base import ToolError
 
@@ -418,3 +419,28 @@ def _pil_from_xobject(img_obj) -> Image.Image | None:
         return Image.frombytes(mode, (width, height), data)
     except Exception:
         return None
+
+
+def coerce_int(value, name: str, minimum: int, maximum: int | None = None) -> int:
+    """Coerce an option value to an int within bounds, raising ToolError otherwise."""
+    if isinstance(value, bool):
+        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
+    try:
+        ivalue = int(value)
+    except (TypeError, ValueError):
+        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
+    # Reject non-integral floats like 2.5 (int("2.5") raises; int(2.5) silently truncates)
+    if isinstance(value, float) and not value.is_integer():
+        raise ToolError(f"Option '{name}' must be an integer.", code="invalid_option")
+    if ivalue < minimum or (maximum is not None and ivalue > maximum):
+        bound = f"at least {minimum}" if maximum is None else f"between {minimum} and {maximum}"
+        raise ToolError(f"Option '{name}' must be {bound}.", code="invalid_option")
+    return ivalue
+
+
+def text_or_none(value: Any) -> str | None:
+    """Strip a metadata value to text, or None when empty/missing."""
+    if value is None:
+        return None
+    text = str(value).strip()
+    return text or None
