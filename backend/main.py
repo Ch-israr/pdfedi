@@ -23,6 +23,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.concurrency import run_in_threadpool
+from starlette.middleware.gzip import GZipMiddleware
 
 from pdfedi.api import admin as admin_api
 from pdfedi.api import health as health_api
@@ -71,8 +72,51 @@ async def lifespan(app: FastAPI):
         if orphaned:
             db.commit()
             log.info("recovered_orphaned_jobs", count=len(orphaned))
+    # Warm heavy tool imports (python-docx, pdfplumber, python-pptx,
+    # pypdfium2): the registry imports every tool module, and the first
+    # job of a type otherwise pays ~1.7 s of cold import (pdf_to_word
+    # measured 2,218 ms first run vs ~510 ms warm). Trades ~10–20 MB
+    # baseline RSS and ~1 s of boot for predictable first-job latency.
+    from pdfedi.tools import TOOLS as _warmed_tools
+
+    log.info("tools_warmed", count=len(_warmed_tools))
     log.info("startup_complete", db_provider=settings.db_provider)
     yield
+
+
+# Responses that must never be gzipped: file downloads (already-compressed
+# PDFs/ZIPs — gzipping them wastes CPU for ~0 bytes saved) and binary
+# image/font media. Everything else (HTML, JS, CSS, JSON) is gzipped.
+_NEVER_GZIP_PREFIXES = ("/api/v1/downloads", "/api/v1/files")
+_NEVER_GZIP_SUFFIXES = (
+    ".png", ".jpg", ".jpeg", ".webp", ".gif", ".avif", ".ico",
+    ".pdf", ".zip", ".gz", ".br", ".woff", ".woff2", ".mp4", ".mp3",
+)
+
+
+class _ScopedGzipMiddleware:
+    """GZipMiddleware that skips downloads and already-compressed media.
+
+    Starlette's GZipMiddleware has no content-type filter — applied
+    plainly it would gzip 12 MB ZIP/PDF downloads for no benefit.
+    This wrapper delegates to it only for compressible paths.
+    """
+
+    def __init__(self, app, minimum_size: int = 1000):
+        self._gzip = GZipMiddleware(app, minimum_size=minimum_size)
+        self._app = app
+
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self._app(scope, receive, send)
+            return
+        path = scope.get("path", "")
+        if path.startswith(_NEVER_GZIP_PREFIXES) or path.endswith(
+            _NEVER_GZIP_SUFFIXES
+        ):
+            await self._app(scope, receive, send)
+            return
+        await self._gzip(scope, receive, send)
 
 
 def _log_visit_sync(
@@ -133,12 +177,17 @@ def _frontend_cache_headers(path: str) -> dict | None:
     """Cache policy for frontend-served static paths.
 
     - /_next/static/*: content-hashed build output -> immutable for a year.
+    - pdf.min.mjs / pdf.worker.min.mjs: versioned by ?v=<pdfjs-dist
+      version> at the fetch site (web/lib/canvas/pdfjs.ts), so the URL
+      changes on upgrade and immutable caching is safe.
     - HTML pages (and the root/404 fallbacks): no caching — deploys
       replace them and the browser must always revalidate.
     - Other static assets (icons, logo, llms.txt, sitemap.xml): 1 day.
     API routes and download responses are never touched by this.
     """
     if "/_next/static/" in path:
+        return {"Cache-Control": "public, max-age=31536000, immutable"}
+    if path in ("pdf.min.mjs", "pdf.worker.min.mjs"):
         return {"Cache-Control": "public, max-age=31536000, immutable"}
     if path == "" or path.endswith("/") or path.endswith(".html"):
         return None
@@ -185,7 +234,7 @@ def _is_known_frontend_route(norm: str) -> bool:
     """True only for routes the static export actually generates, given a
     normalized path (no leading/trailing slash). `norm` is "" for "/".
     Tool slugs come from the backend tool registry (pdfedi.tools.TOOLS),
-    which is the same 26-tool set the frontend builds pages for — so a
+    which is the same 34-tool set the frontend builds pages for — so a
     removed tool (e.g. thumbnails) 404s here instead of soft-404ing.
     Deliberately no fallback to the English page for a locale URL: a
     locale URL must never return English content with a 200."""
@@ -216,6 +265,11 @@ def create_app() -> FastAPI:
     settings = get_settings()
     app = FastAPI(title="PDFEDI", version="2.0.0", lifespan=lifespan,
                   docs_url=None, redoc_url=None, openapi_url=None)
+
+    # Gzip for HTML/JS/CSS/JSON (scoped: downloads + binary media are
+    # excluded by _ScopedGzipMiddleware). Added first so it ends up
+    # outermost and compresses the fully-built response.
+    app.add_middleware(_ScopedGzipMiddleware, minimum_size=1000)
 
     app.include_router(health_api.router, prefix="/api/v1/health", tags=["health"])
     app.include_router(public_api.router, prefix="/api/v1", tags=["public"])
