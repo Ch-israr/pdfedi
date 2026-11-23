@@ -1159,9 +1159,9 @@
   },
   "pdf_to_excel": {
     "title": "PDF a Excel en línea gratis — Convertir tablas PDF a XLSX | PDFEDI",
-    "description": "Convierte tablas de PDF a Excel en línea gratis. Las tablas con bordes se extraen limpias; las páginas sin tablas usan sus líneas de texto. Sin registro.",
+    "description": "Convierte tablas de PDF a Excel en línea gratis. Las tablas con y sin bordes se extraen limpias; las páginas escaneadas se leen con OCR integrado; los números y las fechas se convierten en valores reales de hoja de cálculo. Sin registro.",
     "h1": "PDF a Excel",
-    "intro": "Convierte las tablas de tu PDF en una hoja de cálculo que puedes ordenar, filtrar y calcular. Cada página con tablas se convierte en una hoja; las páginas sin tablas usan sus líneas de texto en una sola columna, así nada se pierde en silencio.",
+    "intro": "Convierte las tablas de tu PDF en una hoja de cálculo que puedes ordenar, filtrar y calcular. Cada página con tablas se convierte en una hoja; las páginas sin tablas usan sus líneas de texto en una sola columna, así nada se pierde en silencio. Las páginas escaneadas se leen con OCR integrado, y los números, las monedas y las fechas salen como valores reales que puedes sumar.",
     "howTo": [
       "Sube tu archivo PDF (hasta 50 MB, 50 páginas como máximo).",
       "Elige si la primera fila de cada tabla es un encabezado.",
@@ -1182,15 +1182,15 @@
     "faqs": [
       {
         "q": "¿Todas las tablas se extraen perfectamente?",
-        "a": "Las tablas con bordes claros salen limpias. Las tablas sin bordes se detectan por la alineación del texto y son aproximadas — revisa los números antes de confiar en ellos. No se conservan celdas combinadas, fórmulas ni gráficos."
+        "a": "Las tablas con bordes claros salen limpias. Las tablas sin bordes se detectan por la alineación del texto y son aproximadas — revisa los números antes de confiar en ellos. Las celdas combinadas se reconstruyen donde el PDF las marca; no se conservan fórmulas ni gráficos."
       },
       {
         "q": "¿Qué pasa con las páginas sin tablas?",
-        "a": "Sus líneas de texto van a una hoja llamada «Página N (texto)» en una sola columna, así sigues teniendo el contenido, aunque no como tabla."
+        "a": "Sus líneas de texto van a una hoja llamada «Página N (texto)» en una sola columna, así sigues teniendo el contenido, aunque no como tabla. Si no se encuentra ninguna tabla en el documento, una hoja de Notas en el libro lo indica."
       },
       {
         "q": "Mi PDF es un escaneo. ¿Qué pasa?",
-        "a": "Los PDF escaneados no tienen tablas ni texto que extraer, así que verás un error claro. Usa primero la herramienta OCR para que el escaneo sea buscable y luego convierte."
+        "a": "Las páginas escaneadas se leen con OCR integrado, así que su texto y sus tablas llegan a la hoja de cálculo; revisa los valores antes de confiar en ellos, porque el OCR puede leer mal algún carácter. Si un escaneo es ilegible, verás un error claro."
       }
     ],
     "related": [

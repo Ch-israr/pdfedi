@@ -1159,9 +1159,9 @@
   },
   "pdf_to_excel": {
     "title": "PDF vers Excel en ligne gratuit — Convertir des tableaux PDF en XLSX | PDFEDI",
-    "description": "Convertissez des tableaux PDF en Excel en ligne gratuitement. Les tableaux encadrés s'extraient proprement ; les pages sans tableau reprennent leurs lignes de texte. Sans inscription.",
+    "description": "Convertissez des tableaux PDF en Excel en ligne gratuitement. Les tableaux avec ou sans bordures s'extraient proprement ; les pages scannées sont lues par OCR intégré ; les nombres et les dates deviennent de vraies valeurs de feuille de calcul. Sans inscription.",
     "h1": "PDF vers Excel",
-    "intro": "Transformez les tableaux de votre PDF en feuille de calcul que vous pouvez trier, filtrer et calculer. Chaque page contenant des tableaux devient une feuille ; les pages sans tableau reprennent leurs lignes de texte dans une seule colonne, pour que rien ne se perde en silence.",
+    "intro": "Transformez les tableaux de votre PDF en feuille de calcul que vous pouvez trier, filtrer et calculer. Chaque page contenant des tableaux devient une feuille ; les pages sans tableau reprennent leurs lignes de texte dans une seule colonne, pour que rien ne se perde en silence. Les pages scannées sont lues par OCR intégré, et les nombres, montants et dates deviennent de vraies valeurs que vous pouvez additionner.",
     "howTo": [
       "Téléversez votre fichier PDF (jusqu'à 50 Mo, 50 pages maximum).",
       "Choisissez si la première ligne de chaque tableau est un en-tête.",
@@ -1182,15 +1182,15 @@
     "faqs": [
       {
         "q": "Tous les tableaux s'extraient-ils parfaitement ?",
-        "a": "Les tableaux encadrés aux bordures nettes sortent propres. Les tableaux sans bordures sont détectés par l'alignement du texte et sont approximatifs — vérifiez les chiffres avant de vous y fier. Les cellules fusionnées, formules et graphiques ne sont pas conservés."
+        "a": "Les tableaux encadrés aux bordures nettes sortent propres. Les tableaux sans bordures sont détectés par l'alignement du texte et sont approximatifs — vérifiez les chiffres avant de vous y fier. Les cellules fusionnées sont reconstruites là où le PDF les marque ; formules et graphiques ne sont pas conservés."
       },
       {
         "q": "Qu'advient-il des pages sans tableau ?",
-        "a": "Leurs lignes de texte vont dans une feuille nommée « Page N (texte) » en une seule colonne : vous gardez le contenu, mais pas sous forme de tableau."
+        "a": "Leurs lignes de texte vont dans une feuille nommée « Page N (texte) » en une seule colonne : vous gardez le contenu, mais pas sous forme de tableau. Si aucun tableau n'est trouvé dans le document, une feuille Notes dans le classeur l'indique."
       },
       {
         "q": "Mon PDF est un scan. Que se passe-t-il ?",
-        "a": "Les PDF scannés n'ont ni tableau ni texte à extraire, vous verrez donc une erreur claire. Utilisez d'abord l'outil OCR pour rendre le scan consultable, puis convertissez."
+        "a": "Les pages scannées sont lues par OCR intégré, donc leur texte et leurs tableaux arrivent dans la feuille de calcul — vérifiez les valeurs avant de vous y fier, car l'OCR peut mal lire certains caractères. Si un scan est illisible, vous verrez une erreur claire."
       }
     ],
     "related": [

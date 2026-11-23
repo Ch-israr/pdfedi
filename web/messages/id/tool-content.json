@@ -1159,9 +1159,9 @@
   },
   "pdf_to_excel": {
     "title": "PDF ke Excel Online Gratis — Ubah Tabel PDF ke XLSX | PDFEDI",
-    "description": "Ubah tabel PDF ke Excel online gratis. Tabel bergaris terekstrak bersih; halaman tanpa tabel memakai baris teksnya. Tanpa daftar.",
+    "description": "Ubah tabel PDF ke Excel online gratis. Tabel bergaris maupun tanpa garis terekstrak bersih; halaman pindaian dibaca dengan OCR bawaan; angka dan tanggal menjadi nilai spreadsheet sungguhan. Tanpa daftar.",
     "h1": "PDF ke Excel",
-    "intro": "Ubah tabel di PDF Anda menjadi spreadsheet yang bisa diurutkan, difilter, dan dihitung. Setiap halaman bertabel menjadi satu sheet; halaman tanpa tabel memakai baris teksnya dalam satu kolom, jadi tidak ada yang hilang diam-diam.",
+    "intro": "Ubah tabel di PDF Anda menjadi spreadsheet yang bisa diurutkan, difilter, dan dihitung. Setiap halaman bertabel menjadi satu sheet; halaman tanpa tabel memakai baris teksnya dalam satu kolom, jadi tidak ada yang hilang diam-diam. Halaman pindaian dibaca dengan OCR bawaan, dan angka, mata uang, serta tanggal keluar sebagai nilai sungguhan yang bisa dijumlahkan.",
     "howTo": [
       "Unggah file PDF Anda (maksimal 50MB, 50 halaman).",
       "Pilih apakah baris pertama setiap tabel adalah header.",
@@ -1182,15 +1182,15 @@
     "faqs": [
       {
         "q": "Apakah setiap tabel terekstrak sempurna?",
-        "a": "Tabel bergaris dengan batas jelas keluar bersih. Tabel tanpa garis dideteksi dari perataan teks dan bersifat perkiraan — periksa angkanya sebelum mengandalkannya. Sel gabungan, rumus, dan bagan tidak dipertahankan."
+        "a": "Tabel bergaris dengan batas jelas keluar bersih. Tabel tanpa garis dideteksi dari perataan teks dan bersifat perkiraan — periksa angkanya sebelum mengandalkannya. Sel gabungan dibangun kembali di mana PDF menandainya; rumus dan bagan tidak dipertahankan."
       },
       {
         "q": "Bagaimana dengan halaman tanpa tabel?",
-        "a": "Baris teksnya masuk ke sheet bernama 'Page N (text)' dalam satu kolom, jadi Anda tetap mendapat isinya — hanya saja bukan sebagai tabel."
+        "a": "Baris teksnya masuk ke sheet bernama 'Page N (text)' dalam satu kolom, jadi Anda tetap mendapat isinya — hanya saja bukan sebagai tabel. Jika tidak ada tabel yang ditemukan di dokumen, sheet Catatan di workbook akan menyatakannya."
       },
       {
         "q": "PDF saya hasil pindaian. Bagaimana?",
-        "a": "PDF hasil pindaian tidak punya tabel atau teks untuk diekstrak, jadi Anda akan mendapat error yang jelas. Jalankan alat OCR dulu agar pindaian bisa dicari, lalu konversi."
+        "a": "Halaman pindaian dibaca dengan OCR bawaan, jadi teks dan tabelnya masuk ke spreadsheet — periksa nilainya sebelum mengandalkannya, karena OCR bisa salah membaca karakter. Jika pindaian tidak bisa dibaca, Anda akan mendapat error yang jelas."
       }
     ],
     "related": [

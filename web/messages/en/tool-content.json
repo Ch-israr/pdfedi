@@ -1159,9 +1159,9 @@
   },
   "pdf_to_excel": {
     "title": "PDF to Excel Online Free — Convert PDF Tables to XLSX | PDFEDI",
-    "description": "Convert PDF tables to Excel online for free. Ruled tables extract cleanly; pages without tables fall back to text lines. No sign-up.",
+    "description": "Convert PDF tables to Excel online for free. Ruled and borderless tables extract cleanly; scanned pages are read with built-in OCR; numbers and dates become real spreadsheet values. No sign-up.",
     "h1": "PDF to Excel",
-    "intro": "Turn the tables in your PDF into a spreadsheet you can sort, filter and calculate with. Each page with tables becomes a sheet; pages without tables fall back to their text lines in a single column, so nothing is silently lost.",
+    "intro": "Turn the tables in your PDF into a spreadsheet you can sort, filter and calculate with. Each page with tables becomes a sheet; pages without tables fall back to their text lines in a single column, so nothing is silently lost. Scanned pages are read with built-in OCR, and numbers, currency and dates come out as real values you can sum.",
     "howTo": [
       "Upload your PDF file (up to 50MB, 50 pages max).",
       "Choose whether the first row of each table is a header.",
@@ -1182,15 +1182,15 @@
     "faqs": [
       {
         "q": "Will every table extract perfectly?",
-        "a": "Ruled tables with clear borders come out clean. Borderless tables are detected from text alignment and are approximate — check the numbers before relying on them. Merged cells, formulas and charts are not preserved."
+        "a": "Ruled tables with clear borders come out clean. Borderless tables are detected from text alignment and are approximate — check the numbers before relying on them. Merged cells are rebuilt where the PDF marks them; formulas and charts are not preserved."
       },
       {
         "q": "What happens to pages with no tables?",
-        "a": "Their text lines go into a sheet named 'Page N (text)' in a single column, so you still get the content — just not as a table."
+        "a": "Their text lines go into a sheet named 'Page N (text)' in a single column, so you still get the content — just not as a table. If no table is found anywhere in the document, a Notes sheet in the workbook says so."
       },
       {
         "q": "My PDF is a scan. What happens?",
-        "a": "Scanned PDFs have no tables or text to extract, so you'll get a clear error. Run the OCR tool first to make the scan searchable, then convert."
+        "a": "Scanned pages are read with built-in OCR, so their text and tables land in the spreadsheet — check the values before relying on them, as OCR can misread characters. If a scan is unreadable, you get a clear error instead."
       }
     ],
     "related": [

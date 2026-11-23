@@ -1159,9 +1159,9 @@
   },
   "pdf_to_excel": {
     "title": "PDF para Excel online grátis — Converter tabelas PDF em XLSX | PDFEDI",
-    "description": "Converta tabelas de PDF em Excel online grátis. Tabelas com bordas saem limpas; páginas sem tabelas usam suas linhas de texto. Sem cadastro.",
+    "description": "Converta tabelas de PDF em Excel online grátis. Tabelas com ou sem bordas saem limpas; páginas digitalizadas são lidas com OCR integrado; números e datas viram valores reais de planilha. Sem cadastro.",
     "h1": "PDF para Excel",
-    "intro": "Transforme as tabelas do seu PDF numa planilha que você pode ordenar, filtrar e calcular. Cada página com tabelas vira uma aba; páginas sem tabelas usam suas linhas de texto numa só coluna, para que nada se perca em silêncio.",
+    "intro": "Transforme as tabelas do seu PDF numa planilha que você pode ordenar, filtrar e calcular. Cada página com tabelas vira uma aba; páginas sem tabelas usam suas linhas de texto numa só coluna, para que nada se perca em silêncio. Páginas digitalizadas são lidas com OCR integrado, e números, valores e datas saem como valores reais que você pode somar.",
     "howTo": [
       "Envie seu arquivo PDF (até 50 MB, 50 páginas no máximo).",
       "Escolha se a primeira linha de cada tabela é um cabeçalho.",
@@ -1182,15 +1182,15 @@
     "faqs": [
       {
         "q": "Todas as tabelas saem perfeitas?",
-        "a": "Tabelas com bordas claras saem limpas. Tabelas sem bordas são detectadas pelo alinhamento do texto e são aproximadas — confira os números antes de confiar neles. Células mescladas, fórmulas e gráficos não são preservados."
+        "a": "Tabelas com bordas claras saem limpas. Tabelas sem bordas são detectadas pelo alinhamento do texto e são aproximadas — confira os números antes de confiar neles. Células mescladas são reconstruídas onde o PDF as marca; fórmulas e gráficos não são preservados."
       },
       {
         "q": "O que acontece com páginas sem tabelas?",
-        "a": "Suas linhas de texto vão para uma aba chamada «Page N (text)» numa só coluna, então você ainda tem o conteúdo — só não como tabela."
+        "a": "Suas linhas de texto vão para uma aba chamada «Page N (text)» numa só coluna, então você ainda tem o conteúdo — só não como tabela. Se nenhuma tabela for encontrada no documento, uma aba Notas na planilha informa isso."
       },
       {
         "q": "Meu PDF é digitalizado. O que acontece?",
-        "a": "PDFs digitalizados não têm tabelas nem texto para extrair, então você verá um erro claro. Use primeiro a ferramenta OCR para tornar a digitalização pesquisável e depois converta."
+        "a": "Páginas digitalizadas são lidas com OCR integrado, então seu texto e suas tabelas chegam à planilha — confira os valores antes de confiar neles, pois o OCR pode ler algum caractere errado. Se uma digitalização for ilegível, você verá um erro claro."
       }
     ],
     "related": [

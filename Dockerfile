@@ -13,13 +13,16 @@ RUN npm run build
 
 # ---- Stage 2: Python runtime ----
 FROM python:3.12-slim
-# tesseract-ocr powers the OCR tool (pytesseract). The stock Ubuntu
+# tesseract-ocr powers the OCR tool (pytesseract) and the PDF to Excel
+# hybrid engine's OCR path. Ghostscript supports Camelot table
+# extraction (PDF to Excel fallback). The stock Ubuntu
 # eng.traineddata ships LSTM-only, so we fetch the full tessdata build
 # (tesseract-ocr/tessdata) which also contains the legacy engine
 # components needed for --oem 0. Keep the layer small otherwise.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tesseract-ocr \
         tesseract-ocr-eng \
+        ghostscript \
         wget \
         ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
