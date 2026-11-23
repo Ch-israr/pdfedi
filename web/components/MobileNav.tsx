@@ -51,6 +51,7 @@ export function MobileNav({
         >
           <Link
             href={homeHref}
+            prefetch={false}
             onClick={() => setOpen(false)}
             className="block py-2 text-sm font-medium text-slate-700 hover:text-brand-600"
           >
@@ -58,6 +59,7 @@ export function MobileNav({
           </Link>
           <Link
             href={lawyersHref}
+            prefetch={false}
             onClick={() => setOpen(false)}
             className="block py-2 text-sm font-medium text-slate-700 hover:text-brand-600"
           >

@@ -96,7 +96,9 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
   const accept = spec
     ? spec.input_kinds.includes("image")
       ? "image/png,image/jpeg,image/webp"
-      : "application/pdf,.pdf"
+      : spec.input_kinds.includes("html")
+        ? "text/html,.html,.htm"
+        : "application/pdf,.pdf"
     : "";
 
   const activityKey =
@@ -165,7 +167,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       }
     };
     await tick();
-    pollRef.current = setInterval(tick, 800);
+    pollRef.current = setInterval(tick, 400);
   }
 
   async function onPick(list: FileList | null) {
@@ -386,7 +388,9 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
               ? t("uploading")
               : spec.input_kinds.includes("image")
                 ? t("chooseImage")
-                : t("choosePdf")}
+                : spec.input_kinds.includes("html")
+                  ? t("chooseHtml")
+                  : t("choosePdf")}
           </p>
           <p className="mt-1 text-sm text-slate-500">
             {t("fileLimit", { max: spec.max_files, mb: limits?.max_upload_mb ?? 50 })}
@@ -407,7 +411,10 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
         </ul>
       )}
 
-      {phase === "options" && (
+      {/* Tools with min_files 0 (e.g. HTML to PDF, which also accepts
+          pasted code) show their options right away, so the job can
+          start without any file. */}
+      {(phase === "options" || (phase === "pick" && spec.min_files === 0)) && (
         <div className="mt-6 space-y-4 rounded-2xl bg-white p-6 shadow-sm">
           {spec.options.map((o) => (
             <div key={o.name}>
@@ -440,6 +447,16 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
                   type="text"
                   dir="ltr"
                   className="w-full rounded-lg border border-slate-300 px-3 py-2"
+                  placeholder={String(o.default ?? "")}
+                  value={String(options[o.name] ?? "")}
+                  onChange={(e) => setOpt(o.name, e.target.value)}
+                />
+              )}
+              {o.kind === "textarea" && (
+                <textarea
+                  dir="ltr"
+                  rows={10}
+                  className="w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
                   placeholder={String(o.default ?? "")}
                   value={String(options[o.name] ?? "")}
                   onChange={(e) => setOpt(o.name, e.target.value)}

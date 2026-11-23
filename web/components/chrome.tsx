@@ -15,7 +15,7 @@ export async function Header({
   return (
     <header className="relative border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3">
-        <Link href={toLocalePath("/", locale)} className="flex shrink-0 items-center gap-2">
+        <Link href={toLocalePath("/", locale)} prefetch={false} className="flex shrink-0 items-center gap-2">
           <img src="/logo.png" alt="PDFEDI logo" className="h-9 w-9 rounded-lg" />
           <span className="text-xl font-extrabold tracking-tight text-brand-600">
             PDFEDI
@@ -24,10 +24,10 @@ export async function Header({
         {/* Desktop nav — hidden below 480 px, where the hamburger takes over.
             (DISC-03/PERF-01: at 375 px these links overlapped the logo.) */}
         <nav className="hidden min-[480px]:flex items-center gap-4 text-sm text-slate-600">
-          <Link href={toLocalePath("/", locale)} className="hover:text-brand-600">
+          <Link href={toLocalePath("/", locale)} prefetch={false} className="hover:text-brand-600">
             {t("allTools")}
           </Link>
-          <Link href={toLocalePath("/lawyers", locale)} className="hover:text-brand-600">
+          <Link href={toLocalePath("/lawyers", locale)} prefetch={false} className="hover:text-brand-600">
             {t("forLawyers")}
           </Link>
           {showLanguageUI && <LanguageSwitcher locale={locale} />}
@@ -72,6 +72,7 @@ export async function Footer({ locale }: { locale: LocaleSegment }) {
             <Link
               key={l.href}
               href={toLocalePath(l.href, locale)}
+              prefetch={false}
               className="hover:text-brand-600"
             >
               {l.label}
