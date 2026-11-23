@@ -1,6 +1,6 @@
 # PDFEDI
 
-> PDFEDI is a free online PDF toolkit. 26 PDF tools with in-browser page previews.
+> PDFEDI is a free online PDF toolkit. 34 PDF tools with in-browser page previews.
 > No sign-up, no watermarks. Files are processed securely and deleted automatically.
 > Each tool is free up to 5 times per hour; max file size 50MB.
 
@@ -11,6 +11,7 @@
 - [Rotate Pages](https://pdfedi.onrender.com/tools/rotate_pages): Rotate pages 90°, 180° or 270°, all pages or selected ranges.
 - [Delete Pages](https://pdfedi.onrender.com/tools/delete_pages): Remove pages by number or range.
 - [Reorder Pages](https://pdfedi.onrender.com/tools/reorder_pages): Rearrange pages into any order.
+- [N-Up](https://pdfedi.onrender.com/tools/n_up): Print multiple PDF pages per sheet (2, 4, 6 or 9 per page).
 
 ## Convert
 
@@ -18,6 +19,12 @@
 - [PDF to Images](https://pdfedi.onrender.com/tools/pdf_to_images): Convert PDF pages to PNG or JPG (72–300 DPI, ZIP download).
 - [Images to PDF](https://pdfedi.onrender.com/tools/images_to_pdf): Combine JPG, PNG or WebP images into one PDF.
 - [OCR](https://pdfedi.onrender.com/tools/ocr): Make scanned PDFs searchable with an invisible text layer.
+- [PDF to Word](https://pdfedi.onrender.com/tools/pdf_to_word): Convert a PDF into an editable Word (.docx) document with paragraphs and heading styles.
+- [PDF to Excel](https://pdfedi.onrender.com/tools/pdf_to_excel): Extract tables from a PDF into an .xlsx workbook, one sheet per page.
+- [PDF to PowerPoint](https://pdfedi.onrender.com/tools/pdf_to_pptx): Convert PDF pages into editable PowerPoint slides, one slide per page.
+- [HTML to PDF](https://pdfedi.onrender.com/tools/html_to_pdf): Convert pasted HTML code or an uploaded .html file to PDF (A4/Letter, portrait/landscape). CSS styling, JavaScript and images are not supported; URLs are not fetched.
+- [PDF to HTML](https://pdfedi.onrender.com/tools/pdf_to_html): Convert a PDF to a standalone .html file; text keeps its on-page position. Images and vector graphics are not reproduced.
+- [PDF to EPUB](https://pdfedi.onrender.com/tools/pdf_to_epub): Convert a PDF to a reflowable .epub ebook; text only, layout is not preserved.
 
 ## Edit
 
@@ -25,10 +32,16 @@
 - [Edit Metadata](https://pdfedi.onrender.com/tools/edit_metadata): Update PDF title, author, subject and keywords.
 - [Watermark](https://pdfedi.onrender.com/tools/watermark): Stamp diagonal text (e.g. DRAFT, CONFIDENTIAL) with adjustable opacity.
 - [Page Numbers](https://pdfedi.onrender.com/tools/page_numbers): Add page numbers with custom position, start number and font size.
+- [Crop](https://pdfedi.onrender.com/tools/crop): Crop PDF pages to a chosen area by margins or percentage.
+- [Sign PDF](https://pdfedi.onrender.com/tools/sign_pdf): Draw or type a signature and place it on chosen pages (visible signature image, not a digital certificate).
+- [Edit PDF](https://pdfedi.onrender.com/tools/edit_pdf): Add text annotations and whiteout rectangles on any page (new text sits on top; original text is not reflowed).
+- [Add Header / Footer](https://pdfedi.onrender.com/tools/header_footer): Stamp a header or footer line on PDF pages; custom text with {page} and {total} placeholders, any position, adjustable font size.
 
 ## Optimize
 
 - [Compress PDF](https://pdfedi.onrender.com/tools/compress): Shrink a PDF to a target size (2–50 MB), e.g. a court e-filing limit. Batch up to 10 files, ZIP download with a size report.
+- [Grayscale](https://pdfedi.onrender.com/tools/grayscale): Convert a PDF to grayscale to save ink when printing.
+- [Repair PDF](https://pdfedi.onrender.com/tools/repair): Fix a damaged or corrupted PDF file so it opens again.
 
 ## Security
 
