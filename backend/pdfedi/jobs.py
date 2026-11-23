@@ -81,6 +81,11 @@ def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
     kind = (mime or "").lower()
     is_pdf = kind == PDF_MIME or filename.lower().endswith(".pdf")
     is_image = kind in IMAGE_MIMES or filename.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+    # HTML files are only accepted for the HTML to PDF tool, which reads
+    # them as text. They are never treated as PDFs or images elsewhere.
+    is_html = kind in ("text/html", "application/xhtml+xml") or filename.lower().endswith((".html", ".htm"))
+    if is_html:
+        mime = "text/html"
 
     page_count: int | None = None
     if is_pdf:
@@ -101,7 +106,7 @@ def ingest_upload(db: Session, filename: str, data: bytes, mime: str) -> File:
             # does not weaken validation elsewhere.
             page_count = None
         mime = PDF_MIME
-    elif not is_image:
+    elif not is_image and not is_html:
         raise UploadError("Unsupported file type. Upload a PDF or an image.", status_code=422)
 
     sha256 = hashlib.sha256(data).hexdigest()
