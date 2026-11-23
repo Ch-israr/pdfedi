@@ -1,6 +1,5 @@
 {
   "meta": {
-    "siteTitle": "PDFEDI — Outils PDF gratuits en ligne : fusionner, diviser, compresser et modifier",
     "siteDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 34 outils PDF — sans inscription, sans filigrane, privés par conception.",
     "homeTitle": "PDFEDI — Outils PDF gratuits en ligne : fusionner, diviser, compresser et modifier",
     "homeDescription": "Fusionnez, divisez, convertissez et protégez vos PDF gratuitement en ligne. 34 outils PDF — sans inscription, sans filigrane, privés par conception.",
@@ -28,8 +27,6 @@
     "forLawyers": "Pour les avocats",
     "tagline": "PDFEDI — outils PDF gratuits en ligne.",
     "footerNote": "Sans inscription. Les fichiers sont traités puis supprimés automatiquement.",
-    "home": "Accueil",
-    "language": "Langue",
     "privacy": "Confidentialité",
     "terms": "Conditions",
     "about": "À propos",
@@ -216,7 +213,6 @@
   "runner": {
     "loading": "Chargement…",
     "loadFailed": "Échec du chargement de l'outil : {error}",
-    "description": "description",
     "quotaLeft": "{remaining, plural, one {# utilisation gratuite sur {limit} restante cette heure-ci} other {# utilisations gratuites sur {limit} restantes cette heure-ci}}",
     "quotaResets": "· Réinitialisation à {time}",
     "steps": {
@@ -252,7 +248,6 @@
     "downloadResult": "Télécharger le résultat",
     "downloading": "Téléchargement…",
     "downloadingPct": "Téléchargement… {pct} %",
-    "downloadFailed": "Échec du téléchargement.",
     "chooseHtml": "Choisissez un fichier HTML (facultatif)"
   },
   "canvas": {
@@ -287,7 +282,6 @@
     "willBeDeleted": "✕ Sera supprimée",
     "removed": "Supprimée",
     "markedForDeletion": "marquée pour suppression",
-    "previewClose": "Fermer ✕",
     "previewRendering": "Rendu en cours…",
     "pageLabel": "Page {n}",
     "merge": {
@@ -299,15 +293,9 @@
       "activity": "Fusion en cours",
       "moveFileUp": "Déplacer le fichier vers le haut",
       "moveFileDown": "Déplacer le fichier vers le bas",
-      "removeFile": "Retirer le fichier de la fusion",
-      "fileRemoved": "(supprimé)",
       "restore": "Restaurer",
-      "addFiles": "+ Ajouter des fichiers",
       "previewFirstPage": "Aperçu de la première page",
-      "removeSelected": "Supprimer la sélection ({count})",
       "restoreAllRemoved": "Restaurer tous les fichiers supprimés",
-      "gridAria": "Pages à fusionner, dans l'ordre de fusion",
-      "hint": "Faites glisser les pages pour les réorganiser (entre fichiers aussi) · Cliquez pour sélectionner, Maj+clic pour une plage · La touche Suppr retire les pages sélectionnées · Double-cliquez sur une page pour un grand aperçu · Les flèches déplacent la sélection, Ctrl+Z / Ctrl+Y annulent et rétablissent.",
       "filePages": "{count, plural, one {# page} other {# pages}}",
       "moveFileUpAria": "Déplacer {name} vers le haut",
       "moveFileDownAria": "Déplacer {name} vers le bas",
@@ -464,7 +452,6 @@
   "errors": {
     "tool_error": "Une erreur s'est produite. Veuillez réessayer.",
     "internal_error": "Échec du traitement. Veuillez réessayer.",
-    "server_restart": "Le serveur a redémarré pendant le traitement de cette tâche. Veuillez réessayer.",
     "invalid_option": "Un numéro de page ou une option n'est pas valide. Vérifiez les numéros de page et réessayez.",
     "bad_option": "Une valeur d'option n'est pas valide. Vérifiez les valeurs et réessayez.",
     "bad_options": "Une valeur d'option n'est pas valide. Vérifiez les valeurs et réessayez.",
@@ -476,10 +463,8 @@
     "wrong_password": "Le mot de passe est incorrect. Vérifiez-le et réessayez.",
     "quota_exceeded": "Vous avez utilisé toutes les utilisations gratuites de cette heure. Réessayez après {time}.",
     "file_too_large": "Le fichier est trop volumineux. La limite d'envoi est de {mb} Mo.",
-    "lost_contact": "Contact perdu avec le serveur.",
     "download_failed": "Échec du téléchargement.",
     "not_loaded": "Outil pas encore chargé.",
-    "failed_to_load": "Échec du chargement de l'outil.",
     "invalid_page_range": "Plage de pages « {token} » non valide. Utilisez des formes comme « 1-3,5 ».",
     "invalid_range_start": "Plage {range} non valide : les numéros de page commencent à 1.",
     "select_at_least_one_page": "Sélectionnez au moins une page.",
@@ -937,8 +922,6 @@
     "dismiss": "Ignorer"
   },
   "switcher": {
-    "label": "Langue",
-    "current": "Langue actuelle : {language}",
     "choose": "Choisir la langue"
   },
   "seo": {
