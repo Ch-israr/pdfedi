@@ -1,6 +1,5 @@
 {
   "meta": {
-    "siteTitle": "PDFEDI — 免费在线 PDF 工具：合并、拆分、压缩与编辑",
     "siteDescription": "免费在线合并、拆分、转换和保护 PDF。34 个 PDF 工具——无需注册、无水印，注重隐私。",
     "homeTitle": "PDFEDI — 免费在线 PDF 工具：合并、拆分、压缩与编辑",
     "homeDescription": "免费在线合并、拆分、转换和保护 PDF。34 个 PDF 工具——无需注册、无水印，注重隐私。",
@@ -28,8 +27,6 @@
     "forLawyers": "律师专区",
     "tagline": "PDFEDI——免费在线 PDF 工具。",
     "footerNote": "无需注册。文件处理后自动删除。",
-    "home": "首页",
-    "language": "语言",
     "privacy": "隐私",
     "terms": "条款",
     "about": "关于",
@@ -216,7 +213,6 @@
   "runner": {
     "loading": "加载中…",
     "loadFailed": "工具加载失败：{error}",
-    "description": "描述",
     "quotaLeft": "{remaining, plural, other {本小时还剩 # 次免费使用（共 {limit} 次）}}",
     "quotaResets": "· {time} 重置",
     "steps": {
@@ -252,7 +248,6 @@
     "downloadResult": "下载结果",
     "downloading": "下载中…",
     "downloadingPct": "下载中…{pct}%",
-    "downloadFailed": "下载失败。",
     "chooseHtml": "选择一个 HTML 文件（可选）"
   },
   "canvas": {
@@ -287,7 +282,6 @@
     "willBeDeleted": "✕ 将被删除",
     "removed": "已移除",
     "markedForDeletion": "已标记为删除",
-    "previewClose": "关闭 ✕",
     "previewRendering": "渲染中…",
     "pageLabel": "第 {n} 页",
     "merge": {
@@ -299,15 +293,9 @@
       "activity": "合并中",
       "moveFileUp": "将文件上移",
       "moveFileDown": "将文件下移",
-      "removeFile": "从合并中移除文件",
-      "fileRemoved": "（已移除）",
       "restore": "恢复",
-      "addFiles": "+ 添加文件",
       "previewFirstPage": "预览第一页",
-      "removeSelected": "移除所选（{count}）",
       "restoreAllRemoved": "恢复所有已移除的文件",
-      "gridAria": "待合并的页面，按合并顺序排列",
-      "hint": "拖动页面可重新排序（也可跨文件拖动）· 点击选择，Shift+点击选择范围 · Delete 键移除所选页面 · 双击页面可查看大图预览 · 方向键移动选择，Ctrl+Z / Ctrl+Y 撤销和重做。",
       "filePages": "{count, plural, other {# 页}}",
       "moveFileUpAria": "将 {name} 上移",
       "moveFileDownAria": "将 {name} 下移",
@@ -464,7 +452,6 @@
   "errors": {
     "tool_error": "出了点问题。请再试一次。",
     "internal_error": "处理失败。请再试一次。",
-    "server_restart": "处理此任务期间服务器重启了。请再试一次。",
     "invalid_option": "页码或选项无效。请检查页码后重试。",
     "bad_option": "选项值无效。请检查数值后重试。",
     "bad_options": "选项值无效。请检查数值后重试。",
@@ -476,10 +463,8 @@
     "wrong_password": "密码错误。请检查后重试。",
     "quota_exceeded": "本小时的免费使用次数已用完。请于 {time} 后重试。",
     "file_too_large": "文件过大。上传上限为 {mb} MB。",
-    "lost_contact": "与服务器失去连接。",
     "download_failed": "下载失败。",
     "not_loaded": "工具尚未加载。",
-    "failed_to_load": "工具加载失败。",
     "invalid_page_range": "页码范围“{token}”无效。请使用“1-3,5”这样的格式。",
     "invalid_range_start": "范围 {range} 无效：页码从 1 开始。",
     "select_at_least_one_page": "请至少选择一页。",
@@ -937,8 +922,6 @@
     "dismiss": "关闭"
   },
   "switcher": {
-    "label": "语言",
-    "current": "当前语言：{language}",
     "choose": "选择语言"
   },
   "seo": {
