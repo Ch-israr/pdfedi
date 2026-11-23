@@ -1156,5 +1156,354 @@
       "images_to_pdf",
       "redact"
     ]
+  },
+  "pdf_to_excel": {
+    "title": "PDF ke Excel Online Gratis — Ubah Tabel PDF ke XLSX | PDFEDI",
+    "description": "Ubah tabel PDF ke Excel online gratis. Tabel bergaris terekstrak bersih; halaman tanpa tabel memakai baris teksnya. Tanpa daftar.",
+    "h1": "PDF ke Excel",
+    "intro": "Ubah tabel di PDF Anda menjadi spreadsheet yang bisa diurutkan, difilter, dan dihitung. Setiap halaman bertabel menjadi satu sheet; halaman tanpa tabel memakai baris teksnya dalam satu kolom, jadi tidak ada yang hilang diam-diam.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB, 50 halaman).",
+      "Pilih apakah baris pertama setiap tabel adalah header.",
+      "Klik Convert dan unduh file .xlsx."
+    ],
+    "features": [
+      "Tabel asli diekstrak dari tata letak bergaris dan tanpa garis",
+      "Satu sheet per halaman, header ditebalkan",
+      "Teks cadangan untuk halaman tanpa tabel",
+      "Terbuka di Excel, Google Sheets, dan LibreOffice Calc"
+    ],
+    "useCases": [
+      "Menarik angka dari laporan PDF ke spreadsheet",
+      "Memakai ulang item baris faktur untuk pembukuan",
+      "Mengubah daftar harga PDF menjadi tabel yang bisa diurutkan",
+      "Mengekstrak hasil survei untuk dianalisis"
+    ],
+    "faqs": [
+      {
+        "q": "Apakah setiap tabel terekstrak sempurna?",
+        "a": "Tabel bergaris dengan batas jelas keluar bersih. Tabel tanpa garis dideteksi dari perataan teks dan bersifat perkiraan — periksa angkanya sebelum mengandalkannya. Sel gabungan, rumus, dan bagan tidak dipertahankan."
+      },
+      {
+        "q": "Bagaimana dengan halaman tanpa tabel?",
+        "a": "Baris teksnya masuk ke sheet bernama 'Page N (text)' dalam satu kolom, jadi Anda tetap mendapat isinya — hanya saja bukan sebagai tabel."
+      },
+      {
+        "q": "PDF saya hasil pindaian. Bagaimana?",
+        "a": "PDF hasil pindaian tidak punya tabel atau teks untuk diekstrak, jadi Anda akan mendapat error yang jelas. Jalankan alat OCR dulu agar pindaian bisa dicari, lalu konversi."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_pptx",
+      "extract_text",
+      "ocr"
+    ]
+  },
+  "pdf_to_pptx": {
+    "title": "PDF ke PowerPoint Online Gratis — Ubah PDF ke PPTX | PDFEDI",
+    "description": "Ubah halaman PDF menjadi slide PowerPoint online gratis. Satu slide per halaman, dengan kotak teks yang bisa diedit di atas gambar halaman. Tanpa daftar.",
+    "h1": "PDF ke PowerPoint",
+    "intro": "Ubah PDF Anda menjadi presentasi — satu slide per halaman. Setiap slide menampilkan gambar hasil render halamannya sehingga tata letak selalu terlihat benar, dengan kotak teks yang bisa diedit di atas kata-kata agar Anda bisa memilih dan mengubah teks.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB, 50 halaman).",
+      "Klik Convert — setiap halaman menjadi slide dengan teks yang bisa diedit.",
+      "Unduh .pptx dan tampilkan atau edit di PowerPoint, Google Slides, atau Keynote."
+    ],
+    "features": [
+      "Satu slide per halaman, layar lebar 16:9",
+      "Kotak teks yang bisa diedit ditempatkan di atas kata-kata",
+      "Gambar halaman menjaga tata letak visual tetap utuh",
+      "Terbuka di PowerPoint, Google Slides, dan Keynote"
+    ],
+    "useCases": [
+      "Mengubah laporan PDF menjadi deck untuk rapat",
+      "Memakai ulang halaman PDF sebagai slide presentasi",
+      "Mempresentasikan dokumen yang hanya ada sebagai PDF",
+      "Membuat slide dari handout PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Bisakah saya mengedit teks di slide?",
+        "a": "Ya — kata-katanya adalah kotak teks asli yang bisa Anda pilih, pindahkan, dan ketik ulang. Gambar halaman di bawahnya menjaga tata letak tetap benar, tetapi kotak teks adalah lapisan di atasnya dan bisa sedikit bergeser pada tata letak yang sangat kompleks."
+      },
+      {
+        "q": "Apakah gambar dan grafik bisa diedit?",
+        "a": "Tidak — gambar dan grafik vektor tetap berada di dalam gambar halaman. Hanya teks yang dibangun ulang sebagai kotak yang bisa diedit."
+      },
+      {
+        "q": "PDF saya hasil pindaian. Bagaimana?",
+        "a": "Halaman hasil pindaian menjadi slide hanya-gambar tanpa kotak teks. Jalankan alat OCR dulu jika Anda butuh teks yang bisa diedit."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "pdf_to_excel",
+      "pdf_to_images",
+      "ocr"
+    ]
+  },
+  "sign_pdf": {
+    "title": "Tanda Tangan PDF Online Gratis — Gambar Tanda Tangan di PDF | PDFEDI",
+    "description": "Tandatangani PDF online gratis. Gambar atau ketik tanda tangan Anda dan letakkan di halaman yang Anda pilih. Gambar tanda tangan yang terlihat — bukan sertifikat digital. Tanpa daftar.",
+    "h1": "Tanda Tangan PDF",
+    "intro": "Tambahkan tanda tangan Anda ke PDF dalam hitungan detik. Gambar dengan mouse atau jari, atau ketik nama Anda dengan gaya tulisan tangan, lalu klik halaman untuk menempatkannya dan pilih halaman mana yang ditandatangani. Tanda tangan ditambahkan sebagai gambar yang terlihat di halaman.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Gambar tanda tangan Anda — atau ketik nama dan pilih gaya tulisan tangan.",
+      "Klik halaman untuk menempatkan tanda tangan, pilih halamannya, dan unduh PDF yang ditandatangani."
+    ],
+    "features": [
+      "Gambar dengan mouse, sentuhan, atau stylus",
+      "Ketik nama Anda dengan gaya tulisan tangan",
+      "Letakkan di halaman mana pun, ukuran berapa pun",
+      "Tandatangani satu halaman atau semua halaman sekaligus"
+    ],
+    "useCases": [
+      "Menandatangani kontrak yang dikirim sebagai PDF",
+      "Menambahkan tanda tangan ke formulir izin",
+      "Menandatangani faktur sebelum mengirimnya kembali",
+      "Menyetujui dokumen tanpa mencetaknya"
+    ],
+    "faqs": [
+      {
+        "q": "Apakah ini tanda tangan digital yang mengikat secara hukum?",
+        "a": "Tidak — ini menambahkan gambar tanda tangan yang terlihat, bukan tanda tangan digital kriptografis dengan sertifikat. Untuk banyak keperluan sehari-hari (formulir, persetujuan, pengesahan internal) itu sudah cukup, tetapi untuk kontrak yang membutuhkan tanda tangan bersertifikat, gunakan layanan tanda tangan khusus."
+      },
+      {
+        "q": "Bisakah saya memindahkan tanda tangan setelah menempatkannya?",
+        "a": "Ya — seret ke tempat baru atau ubah ukurannya sebelum mengklik Sign. Setelah file diunduh, tanda tangan menyatu ke dalam PDF."
+      },
+      {
+        "q": "Apakah tanda tangan berfungsi di setiap halaman?",
+        "a": "Anda yang memilih: hanya halaman saat ini, rentang seperti 1-3,5, atau semua halaman. Tanda tangan dan posisi yang sama dipakai di setiap halaman yang dipilih."
+      }
+    ],
+    "related": [
+      "edit_pdf",
+      "flatten",
+      "watermark",
+      "page_numbers"
+    ]
+  },
+  "edit_pdf": {
+    "title": "Edit PDF Online Gratis — Tambah Teks & Whiteout ke PDF | PDFEDI",
+    "description": "Edit PDF online gratis. Tambahkan anotasi teks dan persegi whiteout di halaman mana pun. Pengeditan yang jujur: teks baru berada di atas — teks asli tidak ditata ulang. Tanpa daftar.",
+    "h1": "Edit PDF",
+    "intro": "Buat perubahan cepat pada PDF tanpa aplikasi desktop. Klik di mana saja untuk menambahkan baris teks, atau seret kotak putih di atas sesuatu yang ingin Anda tutupi sebelum menulis teks pengganti. Inilah bagian pengeditan yang jujur: teks baru berada di atas halaman, dan teks asli di bawahnya tidak ditata ulang atau dihapus.",
+    "howTo": [
+      "Unggah file PDF Anda (maksimal 50MB).",
+      "Klik halaman untuk menambah teks, atau seret untuk menggambar persegi whiteout.",
+      "Unduh PDF yang diedit — tambahan Anda menyatu ke dalam halaman."
+    ],
+    "features": [
+      "Tambah teks di mana saja, ukuran 6–72 pt",
+      "Persegi whiteout menutupi teks sebelum Anda menulis ulang",
+      "Hingga 200 anotasi per pekerjaan",
+      "Berfungsi di halaman mana pun dalam dokumen"
+    ],
+    "useCases": [
+      "Memperbaiki salah ketik pada PDF yang tidak bisa dibuat ulang",
+      "Menambahkan catatan atau koreksi ke dokumen bersama",
+      "Menutupi harga lama sebelum menulis yang baru",
+      "Menambahkan keterangan atau label ke halaman PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Bisakah saya mengedit teks yang sudah ada di PDF?",
+        "a": "Tidak — alat ini menambahkan teks baru di atas halaman; alat ini tidak mengubah kata-kata asli atau menata ulang tata letak. Untuk mengubah teks yang ada dengan benar, Anda memerlukan dokumen aslinya. Untuk menghapus konten sungguhan, gunakan alat Redact."
+      },
+      {
+        "q": "Apakah whiteout menghapus teks di bawahnya?",
+        "a": "Tidak — whiteout hanya menutupinya secara visual dengan kotak putih. Teks asli masih ada di dalam file dan bisa terungkap jika kotaknya dihapus. Gunakan Redact untuk penghapusan sungguhan."
+      },
+      {
+        "q": "Berapa banyak perubahan yang bisa saya buat sekaligus?",
+        "a": "Hingga 200 anotasi per pekerjaan — catatan teks dan persegi whiteout digabungkan."
+      }
+    ],
+    "related": [
+      "sign_pdf",
+      "redact",
+      "watermark",
+      "flatten"
+    ]
+  },
+  "html_to_pdf": {
+    "title": "HTML ke PDF Online Gratis — Ubah Kode HTML menjadi PDF | PDFEDI",
+    "description": "Ubah kode HTML menjadi PDF online gratis. Tempel HTML Anda atau unggah file .html. Ukuran halaman, orientasi, dan margin tersedia. Tanpa pendaftaran.",
+    "h1": "HTML ke PDF",
+    "intro": "Ubah kode HTML menjadi file PDF yang bisa dibagikan atau dicetak. Tempel HTML Anda ke dalam kotak, atau unggah file .html — lalu pilih ukuran halaman, orientasi, dan margin, lalu unduh PDF-nya.",
+    "howTo": [
+      "Tempel kode HTML Anda, atau unggah file .html (hingga 50 MB).",
+      "Pilih ukuran halaman (A4 atau Letter), orientasi, dan margin.",
+      "Klik Konversi lalu unduh PDF-nya.",
+      "Periksa hasilnya — gaya CSS, JavaScript, dan gambar tidak didukung."
+    ],
+    "features": [
+      "Tempel HTML atau unggah file .html",
+      "Ukuran halaman A4 atau Letter, potret atau lanskap",
+      "Margin yang dapat diatur (0–50 mm)",
+      "Tanpa pendaftaran, file dihapus otomatis"
+    ],
+    "useCases": [
+      "Mengubah templat faktur menjadi PDF yang bisa dicetak",
+      "Menyimpan desain halaman web sebagai PDF untuk dibagikan",
+      "Mengubah halaman dokumentasi untuk dibaca offline",
+      "Mencetak laporan HTML tanpa browser"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara mengubah HTML menjadi PDF?",
+        "a": "Tempel HTML Anda ke dalam kotak, atau unggah file .html, lalu klik Konversi. Anda akan mendapatkan file PDF untuk diunduh."
+      },
+      {
+        "q": "Bisakah saya mengubah alamat situs web menjadi PDF?",
+        "a": "Tidak — alat ini tidak mengambil alamat web. Tempel kode HTML halaman tersebut, atau simpan halaman sebagai file .html lalu unggah."
+      },
+      {
+        "q": "Apakah JavaScript dijalankan?",
+        "a": "Tidak. Gaya CSS, JavaScript, dan gambar tidak didukung, jadi halaman yang diberi gaya tampil sebagai teks berformat sederhana."
+      }
+    ],
+    "related": [
+      "pdf_to_html",
+      "pdf_to_word",
+      "extract_text",
+      "compress"
+    ]
+  },
+  "pdf_to_html": {
+    "title": "PDF ke HTML Online Gratis — Ubah PDF menjadi Halaman Web | PDFEDI",
+    "description": "Ubah PDF menjadi file HTML mandiri online gratis. Teks mempertahankan posisinya di halaman, sehingga tampilannya mirip dengan aslinya. Tanpa pendaftaran.",
+    "h1": "PDF ke HTML",
+    "intro": "Ubah PDF menjadi satu file .html yang bisa dibuka di browser apa pun. Teks mempertahankan posisinya di halaman, sehingga hasilnya mirip dengan dokumen aslinya.",
+    "howTo": [
+      "Unggah file PDF Anda (hingga 50 MB).",
+      "Pilih apakah akan menampilkan pembatas halaman.",
+      "Klik Konversi lalu unduh file .html.",
+      "Buka file di browser apa pun — tidak perlu server atau file tambahan."
+    ],
+    "features": [
+      "File .html mandiri — tanpa file tambahan",
+      "Teks mempertahankan posisinya di halaman",
+      "Pembatas halaman opsional",
+      "Berfungsi untuk PDF berbasis teks hingga 500 halaman"
+    ],
+    "useCases": [
+      "Menerbitkan laporan PDF sebagai halaman web",
+      "Mengarsipkan dokumen dalam format yang bisa dibuka browser",
+      "Membagikan PDF kepada orang yang tidak punya pembaca PDF",
+      "Mengekstrak teks PDF dengan tata letak yang utuh"
+    ],
+    "faqs": [
+      {
+        "q": "Apakah HTML akan terlihat persis seperti PDF?",
+        "a": "Hampir, tetapi tidak persis. Teks mempertahankan posisinya di halaman, tetapi gambar, grafik vektor, dan font yang persis tidak direproduksi."
+      },
+      {
+        "q": "Apakah berfungsi untuk PDF hasil pindaian?",
+        "a": "Tidak — halaman hasil pindaian tidak memiliki lapisan teks, sehingga menjadi halaman kosong. Jalankan OCR dulu untuk menambahkan lapisan teks yang bisa dicari, lalu konversi."
+      },
+      {
+        "q": "Seberapa besar PDF yang bisa diproses?",
+        "a": "Hingga 500 halaman. File yang lebih besar ditolak dengan pesan kesalahan yang jelas."
+      }
+    ],
+    "related": [
+      "html_to_pdf",
+      "extract_text",
+      "pdf_to_word",
+      "ocr"
+    ]
+  },
+  "header_footer": {
+    "title": "Tambah Header dan Footer ke PDF Online Gratis | PDFEDI",
+    "description": "Tambahkan header atau footer ke halaman PDF online gratis. Teks kustom dengan nomor halaman, posisi apa pun, ukuran font yang dapat diatur. Tanpa pendaftaran.",
+    "h1": "Tambah Header / Footer",
+    "intro": "Tambahkan baris header atau footer ke halaman PDF Anda. Tulis teks Anda sendiri, gunakan penomoran Halaman X dari Y, dan pilih posisi serta ukuran font — ideal untuk laporan, kontrak, dan dokumen.",
+    "howTo": [
+      "Unggah file PDF Anda (hingga 50 MB).",
+      "Tulis teks header atau footer, dengan penomoran halaman otomatis.",
+      "Pilih posisi (atas atau bawah), perataan, dan ukuran font.",
+      "Pilih halaman, lalu klik Tambah dan unduh."
+    ],
+    "features": [
+      "Teks header atau footer kustom",
+      "Penomoran otomatis Halaman X dari Y",
+      "Posisi atas atau bawah; kiri, tengah, atau kanan",
+      "Ukuran font yang dapat diatur (6–48 pt)",
+      "Berlaku untuk semua halaman atau rentang yang dipilih"
+    ],
+    "useCases": [
+      "Menambahkan 'Rahasia' ke setiap halaman laporan",
+      "Memberi nomor halaman kontrak sebagai Halaman X dari Y",
+      "Membubuhkan tanggal pengarsipan pada dokumen pengadilan",
+      "Menambahkan header bermerek ke proposal di setiap halaman"
+    ],
+    "faqs": [
+      {
+        "q": "Bagaimana cara menambahkan 'Halaman 1 dari 10' sebagai footer?",
+        "a": "Tulis 'Halaman {page} dari {total}' sebagai teks dan pilih posisi bawah. Setiap halaman mendapat nomornya sendiri."
+      },
+      {
+        "q": "Bisakah saya menambahkan header, bukan footer?",
+        "a": "Ya — pilih 'atas' sebagai posisi dan teks yang sama akan dibubuhkan sebagai header."
+      },
+      {
+        "q": "Bisakah saya hanya membubuhkan beberapa halaman?",
+        "a": "Ya — masukkan rentang halaman seperti 1-3,5 dan hanya halaman itu yang mendapat header atau footer."
+      }
+    ],
+    "related": [
+      "page_numbers",
+      "watermark",
+      "edit_metadata",
+      "crop"
+    ]
+  },
+  "pdf_to_epub": {
+    "title": "PDF ke EPUB Online Gratis — Ubah PDF menjadi Ebook | PDFEDI",
+    "description": "Ubah PDF menjadi ebook EPUB yang dapat mengalir ulang online gratis. Teks menyesuaikan dengan font dan ukuran layar pembaca Anda. Tanpa pendaftaran.",
+    "h1": "PDF ke EPUB",
+    "intro": "Ubah PDF menjadi ebook EPUB yang bisa dibaca di e-reader, ponsel, atau tablet apa pun. Teks menyesuaikan dengan layar Anda, sehingga Anda bisa mengubah ukuran font dan tetap membaca dengan nyaman.",
+    "howTo": [
+      "Unggah file PDF Anda (hingga 50 MB).",
+      "Klik Konversi lalu unduh file .epub.",
+      "Buka di aplikasi pembaca Anda — Apple Books, Kindle, Kobo, atau pembaca EPUB apa pun.",
+      "Sesuaikan ukuran font di pembaca Anda; teks menyesuaikan secara otomatis."
+    ],
+    "features": [
+      "Teks yang mengalir ulang untuk ukuran layar apa pun",
+      "Bab dikelompokkan berdasarkan rentang halaman",
+      "Judul dan penulis diambil dari PDF bila tersedia",
+      "Berfungsi untuk PDF berbasis teks hingga 500 halaman"
+    ],
+    "useCases": [
+      "Membaca laporan PDF di e-reader",
+      "Mengubah panduan PDF yang panjang menjadi ebook",
+      "Mengarsipkan dokumen dalam format ebook terbuka",
+      "Membagikan PDF kepada orang yang membaca di ponsel"
+    ],
+    "faqs": [
+      {
+        "q": "Apakah EPUB akan terlihat seperti PDF?",
+        "a": "Tidak — EPUB menyesuaikan teks dengan layar dan ukuran font Anda. Kata-kata tetap berurutan, tetapi tata letak halaman asli tidak dipertahankan."
+      },
+      {
+        "q": "Apakah berfungsi untuk PDF hasil pindaian?",
+        "a": "Tidak — halaman hasil pindaian tidak memiliki lapisan teks. Jalankan OCR dulu untuk menambahkan teks yang bisa dicari, lalu konversi."
+      },
+      {
+        "q": "Apakah gambar disertakan?",
+        "a": "Tidak — hanya teks yang dibawa. Gambar, tabel, dan grafik vektor tidak disertakan."
+      }
+    ],
+    "related": [
+      "pdf_to_word",
+      "extract_text",
+      "pdf_to_html",
+      "ocr"
+    ]
   }
 }
