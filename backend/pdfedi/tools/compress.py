@@ -20,7 +20,7 @@ import io
 import zipfile
 from pathlib import Path
 
-from pypdf import PdfReader, PdfWriter
+from pypdf import PdfWriter
 from pypdf.generic import DecodedStreamObject, NameObject, NumberObject
 
 from pdfedi.tools._helpers import _pil_from_xobject, open_pdf_reader
