@@ -33,10 +33,3 @@ export function setThumb(key: string, dataUrl: string): void {
   }
 }
 
-export function thumbCacheSize(): number {
-  return cache.size;
-}
-
-export function clearThumbs(): void {
-  cache.clear();
-}

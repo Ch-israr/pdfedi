@@ -24,7 +24,6 @@ import type * as PdfJsTypes from "pdfjs-dist";
 
 export type PdfJsLib = typeof PdfJsTypes;
 export type PdfDocument = PdfJsTypes.PDFDocumentProxy;
-export type PdfPage = PdfJsTypes.PDFPageProxy;
 
 // Versioned so the backend can serve these immutable for a year
 // (backend/main.py _frontend_cache_headers): bump ?v= when pdfjs-dist
