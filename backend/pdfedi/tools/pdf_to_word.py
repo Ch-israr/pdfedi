@@ -4,7 +4,8 @@ Text is rebuilt from pypdfium2 character boxes, font sizes and font weights:
 characters are grouped into lines and paragraphs, the largest type sizes map
 to Heading 1/2 styles, and embedded images are placed in reading order.
 Best for text-based documents — complex tables and multi-column layouts come
-out approximate. Scanned (image-only) PDFs are refused with a pointer to OCR.
+out approximate. Scanned (image-only) pages are read with the shared OCR
+service, so their text converts too (check it afterwards — OCR can misread).
 """
 from __future__ import annotations
 
@@ -16,10 +17,17 @@ from pypdf import PdfReader
 from pypdf.generic import ArrayObject, ContentStream
 
 from pdfedi.tools._helpers import _pil_from_xobject, open_pdf_reader
+from pdfedi.tools._ocr import (
+    ocr_page as _shared_ocr_page,
+    quality_note as _shared_quality_note,
+    validate_language,
+)
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
+    ToolOption,
     ToolSpec,
+    get_option,
 )
 
 SPEC = ToolSpec(
@@ -31,12 +39,21 @@ SPEC = ToolSpec(
         "reconstructed into real paragraphs with heading styles, and embedded "
         "images are placed in reading order. Best for text-based documents — "
         "complex tables and multi-column layouts are approximate. Scanned "
-        "PDFs with no text layer should go through the OCR tool instead."
+        "pages are read with built-in OCR."
     ),
     input_kinds=["pdf"],
     min_files=1,
     max_files=1,
-    options=[],
+    options=[
+        ToolOption(
+            name="language",
+            kind="text",
+            label="Language",
+            required=False,
+            default="eng",
+            help="Tesseract language code, e.g. 'eng' or 'eng+deu'.",
+        ),
+    ],
     output_kind="document",
     output_ext="docx",
     output_mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
@@ -479,12 +496,16 @@ def _image_placements(page, reader) -> list[tuple[float, bytes]]:
 
 
 
-def _extract_page_blocks(data: bytes, page_index: int, page, include_images: bool = True) -> tuple[list, bool]:
+def _extract_page_blocks(data: bytes, page_index: int, page, include_images: bool = True,
+                         lang: str = "eng") -> tuple[list, bool, object | None]:
     """Extract text blocks and images from one page.
 
-    Returns (blocks, has_text) where blocks are dicts:
+    Returns (blocks, has_text, ocr_result) where blocks are dicts:
     {"y": y_top, "kind": "para", "text": str, "runs": [(text, bold)], "size": float}
     or {"y": y_top, "kind": "image", "img": bytes}.
+    ``ocr_result`` is the shared OCR service's result when the page had no
+    text layer and was OCR'd instead (None otherwise) — the caller uses it
+    for the quality note.
     """
     import pypdfium2 as pdfium
     import pypdfium2.raw as raw
@@ -492,6 +513,7 @@ def _extract_page_blocks(data: bytes, page_index: int, page, include_images: boo
     doc = pdfium.PdfDocument(data)
     blocks: list = []
     has_text = False
+    ocr_result = None
     try:
         pdfium_page = doc[page_index]
         tp = pdfium_page.get_textpage()
@@ -605,6 +627,20 @@ def _extract_page_blocks(data: bytes, page_index: int, page, include_images: boo
                     "y": y_top, "kind": "para", "text": text,
                     "runs": runs, "size": med_size,
                 })
+        if not has_text:
+            # Scanned page (no text layer): read it with the shared OCR
+            # service instead of returning nothing. OCR lines slot into
+            # the same block shape (PDF points, bottom origin) as the
+            # native-text paragraphs above.
+            pw, ph = pdfium_page.get_size()
+            ocr_result = _shared_ocr_page(data, page_index, lang=lang)
+            for ln in ocr_result.lines_in_points(pw, ph):
+                blocks.append({
+                    "y": ln["y1"], "kind": "para", "text": ln["text"],
+                    "runs": [(ln["text"], False)], "size": ln["size"],
+                })
+            if blocks:
+                has_text = True
     finally:
         doc.close()
 
@@ -620,7 +656,7 @@ def _extract_page_blocks(data: bytes, page_index: int, page, include_images: boo
         gc.collect()
 
     blocks.sort(key=lambda b: -b["y"])
-    return blocks, has_text
+    return blocks, has_text, ocr_result
 
 
 def run(ctx: ToolContext, options: dict) -> Path:
@@ -659,21 +695,26 @@ def run(ctx: ToolContext, options: dict) -> Path:
             f"PDF to Word supports at most {_PAGE_CAP} pages per job.",
             code="too_many_pages",
         )
+    language = validate_language(get_option(options, SPEC, "language") or "eng")
 
     # First pass (text only, low memory): collect per-line sizes to identify
     # heading sizes. Images are extracted per page in the second pass so at
     # most one page's image bytes are held at a time.
     page_text_blocks: list[list] = []
+    page_ocr_quality: list = []
     any_text = False
     for i, page in enumerate(reader.pages):
-        blocks, has_text = _extract_page_blocks(data, i, page, include_images=False)
+        blocks, has_text, quality = _extract_page_blocks(
+            data, i, page, include_images=False, lang=language,
+        )
         page_text_blocks.append(blocks)
+        page_ocr_quality.append(quality)
         any_text = any_text or has_text
 
     if not any_text:
         raise ToolError(
-            f"'{filename}' has no extractable text — it may be scanned. "
-            "Use the OCR tool first to make it searchable, then convert.",
+            f"'{filename}' has no extractable text — it may be scanned "
+            "and OCR found no readable text.",
             code="no_text",
         )
 
@@ -687,6 +728,19 @@ def run(ctx: ToolContext, options: dict) -> Path:
     heading_sizes = [s for s in sizes if s >= body_size * _HEADING_RATIO]
 
     doc = Document()
+    # Quality signal: document properties carry the OCR notes (the Word
+    # body itself is left untouched — a warning paragraph in the text
+    # would pollute the document).
+    ocr_notes = [
+        _shared_quality_note(pi + 1, q)
+        for pi, q in enumerate(page_ocr_quality)
+        if q is not None
+    ]
+    ocr_notes = [n for n in ocr_notes if n is not None]
+    if ocr_notes:
+        doc.core_properties.comments = (
+            "OCR quality: " + "; ".join(ocr_notes) + ". Please check these pages."
+        )
     for pi, text_blocks in enumerate(page_text_blocks):
         # Second pass, one page at a time: extract that page's images and
         # assemble it into the document, then release everything before

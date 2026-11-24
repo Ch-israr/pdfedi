@@ -711,6 +711,10 @@
       "first_row_header": {
         "label": "La première ligne est un en-tête",
         "help": "Met en gras la première ligne de chaque tableau détecté."
+      },
+      "language": {
+        "label": "Langue",
+        "help": "Code de langue Tesseract, par ex. « eng » ou « eng+deu »."
       }
     },
     "html_to_pdf": {
@@ -743,6 +747,10 @@
       "include_page_numbers": {
         "label": "Afficher les séparateurs de page",
         "help": "Ajouter un séparateur visible « Page N » entre les pages."
+      },
+      "language": {
+        "label": "Langue",
+        "help": "Code de langue Tesseract, par ex. « eng » ou « eng+deu »."
       }
     },
     "header_footer": {
@@ -774,6 +782,24 @@
       "pages": {
         "label": "Pages",
         "help": "Plages à partir de 1 comme « 1-3,5 ». Laissez vide pour toutes les pages."
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "label": "Langue",
+        "help": "Code de langue Tesseract, par ex. « eng » ou « eng+deu »."
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "label": "Langue",
+        "help": "Code de langue Tesseract, par ex. « eng » ou « eng+deu »."
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "label": "Langue",
+        "help": "Code de langue Tesseract, par ex. « eng » ou « eng+deu »."
       }
     }
   },

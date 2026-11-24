@@ -3,12 +3,14 @@
 Each slide carries a rendered image of its page (so the layout always looks
 right) plus editable text boxes rebuilt from the page's text layer, so the
 words can be selected and edited. Text boxes are positioned from the
-character boxes, so they sit where the words are on the page.
+character boxes, so they sit where the words are on the page. Scanned
+pages are read with the shared OCR service, so their text becomes editable
+text boxes too.
 
 Honest limits, stated in the tool copy: the page image is the visual truth
 — text boxes are an editable overlay and may drift slightly on complex
 layouts; vector graphics and embedded images are not rebuilt as editable
-shapes; scanned PDFs get image-only slides (run OCR first for text).
+shapes.
 """
 from __future__ import annotations
 
@@ -17,10 +19,17 @@ import io
 from pathlib import Path
 
 from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._ocr import (
+    ocr_page as _shared_ocr_page,
+    quality_note as _shared_quality_note,
+    validate_language,
+)
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
+    ToolOption,
     ToolSpec,
+    get_option,
 )
 
 SPEC = ToolSpec(
@@ -31,13 +40,22 @@ SPEC = ToolSpec(
         "Convert a PDF into a PowerPoint (.pptx) deck — one slide per page. "
         "Each slide shows a rendered image of its page with editable text "
         "boxes over the words, so the text can be selected and changed. "
-        "Complex layouts may drift slightly; scanned PDFs get image-only "
-        "slides — run the OCR tool first for editable text."
+        "Complex layouts may drift slightly; scanned pages are read with "
+        "built-in OCR, so their text becomes editable too."
     ),
     input_kinds=["pdf"],
     min_files=1,
     max_files=1,
-    options=[],
+    options=[
+        ToolOption(
+            name="language",
+            kind="text",
+            label="Language",
+            required=False,
+            default="eng",
+            help="Tesseract language code, e.g. 'eng' or 'eng+deu'.",
+        ),
+    ],
     output_kind="document",
     output_ext="pptx",
     output_mime="application/vnd.openxmlformats-officedocument.presentationml.presentation",
@@ -51,24 +69,46 @@ _SLIDE_W_IN = 13.333
 _SLIDE_H_IN = 7.5
 
 
-def _lines_for_page(data: bytes, page_index: int) -> list[dict]:
+def _lines_for_page(data: bytes, page_index: int,
+                    lang: str = "eng") -> tuple[list[dict], object | None]:
     """Group a page's characters into text lines with boxes and sizes.
 
     Simple y-proximity grouping (same tolerance idea as pdf_to_word, without
     its column/heading machinery — here the page image carries the layout,
-    so the boxes only need to sit on the right words).
+    so the boxes only need to sit on the right words). Boxes are PDF points
+    in pdfium's bottom-origin convention (x0/y0 = bottom-left, x1/y1 =
+    top-right); the caller converts y1 to a top-origin offset for the slide.
+
+    Returns (lines, ocr_result): ``ocr_result`` is the shared OCR service's
+    result when the page had no text layer and was OCR'd instead (None
+    otherwise) — the caller uses it for the quality note.
     """
     import pypdfium2 as pdfium
     import pypdfium2.raw as raw
 
     doc = pdfium.PdfDocument(data)
     lines: list[dict] = []
+    ocr_result = None
     try:
         page = doc[page_index]
         tp = page.get_textpage()
         n = tp.count_chars()
         if not n:
-            return lines
+            # Scanned page (no text layer): read it with the shared OCR
+            # service instead of leaving an image-only slide.
+            pw, ph = page.get_size()
+            ocr_result = _shared_ocr_page(data, page_index, lang=lang)
+            lines = [
+                {
+                    "text": ln["text"],
+                    "x0": ln["x0"], "y0": ln["y0"],
+                    "x1": ln["x1"], "y1": ln["y1"],
+                    "size": ln["size"],
+                }
+                for ln in ocr_result.lines_in_points(pw, ph)
+            ]
+            lines.sort(key=lambda ln: -ln["y1"])
+            return lines, ocr_result
         full = tp.get_text_range(0, n)
         chars = []
         for i in range(n):
@@ -127,8 +167,9 @@ def _lines_for_page(data: bytes, page_index: int) -> list[dict]:
             })
     finally:
         doc.close()
-    lines.sort(key=lambda ln: ln["y0"])
-    return lines
+    # Top-first (larger y1 = higher on the page, pdfium is bottom-origin).
+    lines.sort(key=lambda ln: -ln["y1"])
+    return lines, ocr_result
 
 
 def run(ctx: ToolContext, options: dict) -> Path:
@@ -167,6 +208,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
             f"PDF to PowerPoint supports at most {_PAGE_CAP} pages per job.",
             code="too_many_pages",
         )
+    language = validate_language(get_option(options, SPEC, "language") or "eng")
 
     prs = Presentation()
     prs.slide_width = Inches(_SLIDE_W_IN)
@@ -191,13 +233,18 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 img_buf, Inches(0), Inches(0),
                 width=Inches(_SLIDE_W_IN), height=Inches(_SLIDE_H_IN),
             )
-            # Editable text boxes over the words.
+            # Editable text boxes over the words. pdfium boxes are
+            # bottom-origin PDF points; the slide is top-origin, so the
+            # box top comes from the TOP edge (y1), not the bottom (y0).
+            # (Using y0 here placed every box vertically flipped — fixed
+            # in the Phase 0 round; see BUILD-REPORT.md.)
             sx = _SLIDE_W_IN * 72.0 / pw if pw else 1.0
             sy = _SLIDE_H_IN * 72.0 / ph if ph else 1.0
             s = min(sx, sy)
-            for ln in _lines_for_page(data, i):
+            lines, ocr_result = _lines_for_page(data, i, lang=language)
+            for ln in lines:
                 left = Inches(ln["x0"] * sx / 72.0)
-                top = Inches(ln["y0"] * sy / 72.0)
+                top = Inches((ph - ln["y1"]) * sy / 72.0)
                 width = Inches(max(0.2, (ln["x1"] - ln["x0"]) * sx / 72.0))
                 height = Inches(max(0.15, (ln["y1"] - ln["y0"]) * sy / 72.0))
                 box = slide.shapes.add_textbox(left, top, width, height)
@@ -207,6 +254,14 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 run_ = p.add_run()
                 run_.text = ln["text"]
                 run_.font.size = Pt(max(6.0, ln["size"] * s))
+            # Quality signal: slide notes carry the OCR warning (invisible
+            # in the slideshow, visible in the notes pane).
+            if ocr_result is not None:
+                note = _shared_quality_note(i + 1, ocr_result)
+                if note is not None:
+                    slide.notes_slide.notes_text_frame.text = (
+                        "OCR quality: " + note + ". Please check this slide."
+                    )
             del img_buf
             gc.collect()
     finally:

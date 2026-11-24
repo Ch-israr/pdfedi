@@ -731,6 +731,10 @@
       "first_row_header": {
         "label": "A primeira linha é um cabeçalho",
         "help": "Deixa em negrito a primeira linha de cada tabela detectada."
+      },
+      "language": {
+        "help": "Código de idioma do Tesseract, ex.: 'eng' ou 'eng+deu'.",
+        "label": "Idioma"
       }
     },
     "html_to_pdf": {
@@ -763,6 +767,10 @@
       "include_page_numbers": {
         "label": "Mostrar divisores de página",
         "help": "Adicione um divisor visível «Página N» entre as páginas."
+      },
+      "language": {
+        "help": "Código de idioma do Tesseract, ex.: 'eng' ou 'eng+deu'.",
+        "label": "Idioma"
       }
     },
     "header_footer": {
@@ -794,6 +802,24 @@
       "pages": {
         "label": "Páginas",
         "help": "Intervalos a partir de 1 como «1-3,5». Deixe vazio para todas as páginas."
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "help": "Código de idioma do Tesseract, ex.: 'eng' ou 'eng+deu'.",
+        "label": "Idioma"
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "help": "Código de idioma do Tesseract, ex.: 'eng' ou 'eng+deu'.",
+        "label": "Idioma"
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "help": "Código de idioma do Tesseract, ex.: 'eng' ou 'eng+deu'.",
+        "label": "Idioma"
       }
     }
   },

@@ -951,7 +951,7 @@
       },
       {
         "q": "Mon PDF est un scan sans texte sélectionnable. Que se passe-t-il ?",
-        "a": "Vous obtiendrez une erreur claire vous orientant vers l'outil OCR. Exécutez d'abord l'OCR pour rendre le scan consultable, puis convertissez le résultat OCR en Word."
+        "a": "Les pages numérisées sont désormais lues avec l'OCR intégré, donc leur texte est converti aussi. Vérifiez-le après coup : l'OCR peut mal lire certains caractères. Si une page est illisible, vous verrez une erreur claire."
       },
       {
         "q": "Quel programme ouvre le fichier téléchargé ?",
@@ -1233,7 +1233,7 @@
       },
       {
         "q": "Mon PDF est un scan. Que se passe-t-il ?",
-        "a": "Les pages scannées deviennent des diapositives uniquement composées d'images, sans zone de texte. Utilisez d'abord l'outil OCR si vous avez besoin de texte modifiable."
+        "a": "Les pages numérisées sont lues avec l'OCR intégré, donc leur texte devient aussi des zones de texte modifiables. Vérifiez-le après coup : l'OCR peut mal lire certains caractères."
       }
     ],
     "related": [
@@ -1403,7 +1403,7 @@
       },
       {
         "q": "Cela fonctionne-t-il avec les PDF numérisés ?",
-        "a": "Non : les pages numérisées n'ont pas de couche de texte, donc elles deviennent des pages vides. Lancez d'abord l'OCR pour ajouter une couche de texte interrogeable, puis convertissez."
+        "a": "Oui : les pages numérisées sont lues avec l'OCR intégré, donc leur texte apparaît dans la page. Vérifiez-le après coup : l'OCR peut mal lire certains caractères."
       },
       {
         "q": "Quelle taille maximale pour le PDF ?",
@@ -1492,7 +1492,7 @@
       },
       {
         "q": "Cela fonctionne-t-il avec les PDF numérisés ?",
-        "a": "Non : les pages numérisées n'ont pas de couche de texte. Lancez d'abord l'OCR pour ajouter du texte interrogeable, puis convertissez."
+        "a": "Oui : les pages numérisées sont lues avec l'OCR intégré, donc leur texte s'intègre au livre numérique. Vérifiez-le après coup : l'OCR peut mal lire certains caractères."
       },
       {
         "q": "Les images sont-elles incluses ?",

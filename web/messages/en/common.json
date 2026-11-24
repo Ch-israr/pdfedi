@@ -711,6 +711,10 @@
       "first_row_header": {
         "label": "First row is a header",
         "help": "Bold the first row of each detected table."
+      },
+      "language": {
+        "label": "Language",
+        "help": "Tesseract language code, e.g. 'eng' or 'eng+deu'."
       }
     },
     "html_to_pdf": {
@@ -743,6 +747,10 @@
       "include_page_numbers": {
         "label": "Show page dividers",
         "help": "Add a visible 'Page N' divider between pages."
+      },
+      "language": {
+        "label": "Language",
+        "help": "Tesseract language code, e.g. 'eng' or 'eng+deu'."
       }
     },
     "header_footer": {
@@ -774,6 +782,24 @@
       "pages": {
         "label": "Pages",
         "help": "1-based ranges like '1-3,5'. Leave empty for all pages."
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "label": "Language",
+        "help": "Tesseract language code, e.g. 'eng' or 'eng+deu'."
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "label": "Language",
+        "help": "Tesseract language code, e.g. 'eng' or 'eng+deu'."
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "label": "Language",
+        "help": "Tesseract language code, e.g. 'eng' or 'eng+deu'."
       }
     }
   },

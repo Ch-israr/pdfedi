@@ -4,9 +4,16 @@ Pipeline (no ocrmypdf needed):
   1. Check each page for native text with pypdf (cheap, no rendering).
      Pages that already have a text layer are copied as-is — no re-OCR.
   2. Render only text-less pages to images with pypdfium2 (200 DPI).
-  3. Recognize words with Tesseract (via pytesseract).
+  3. Recognize words with Tesseract via the shared OCR service
+     (``pdfedi.tools._ocr``): PSM 3 fast path, PSM 11 retry on sparse
+     pages, per-page quality signal.
   4. Rebuild: pypdf interleaves original text pages with reportlab-built
      OCR pages (scanned image as background + invisible text layer).
+
+Quality signal: pages whose OCR came back low-confidence or nearly
+empty are listed in the output PDF's Subject metadata (jobs have no
+warning channel, so the note lives in the file itself) — never silently
+shipped as good output.
 
 Degrades gracefully: if pytesseract or the ``tesseract`` system binary is
 unavailable, raises ToolError with code "ocr_unavailable".
@@ -16,7 +23,6 @@ from __future__ import annotations
 import gc
 import io
 import logging
-import re
 import shutil
 import tempfile
 import time
@@ -24,6 +30,12 @@ from pathlib import Path
 
 log = logging.getLogger(__name__)
 
+from pdfedi.tools._ocr import (
+    ocr_image,
+    page_needs_ocr,
+    quality_note,
+    validate_language,
+)
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -32,35 +44,45 @@ from pdfedi.tools.base import (
     get_option,
 )
 
-_LANGUAGE_RE = re.compile(r"^[A-Za-z]{2,3}(?:\+[A-Za-z]{2,3})*$")
 _OCR_UNAVAILABLE = "OCR is not available on this server."
-# 200 DPI render: Tesseract is accurate at 200+ DPI and this uses 2.25x less
-# memory than 300 DPI. Critical on memory-constrained hosts (Render free tier
-# = 512MB): the old code held the full-res PIL image in memory *while*
-# Tesseract (a subprocess) allocated its own copy, pushing RSS over the limit
-# and getting the container OOM-killed mid-job.
-_DPI = 200
-# Tesseract config: LSTM OCR engine (oem 1), fully automatic page segmentation.
-# The legacy engine (--oem 0) was removed because stock LSTM-only traineddata
-# (tessdata) ships no legacy components, so --oem 0 exits 1 on every page
-# ("Tesseract (legacy) engine requested, but components are not present").
-_TESSERACT_CONFIG = "--oem 1"
 # Per-page recognition timeout (seconds): fail gracefully, never hang forever.
 _PAGE_TIMEOUT = 600
-_MIN_CONFIDENCE = 30
-# Minimum native-text chars for a page to skip OCR. Below this, the page
-# is treated as scanned (safe: we OCR rather than risk missing text).
-_NATIVE_TEXT_MIN_CHARS = 50
+_DPI = 200
 
 
-def _page_needs_ocr(reader_page) -> bool:
-    """True if the page lacks a usable native text layer (i.e. it's a scan)."""
+def _require_ocr():
     try:
-        text = reader_page.extract_text() or ""
-        return len(text.strip()) < _NATIVE_TEXT_MIN_CHARS
-    except Exception:
-        # If text extraction fails, assume it needs OCR (safe default).
-        return True
+        import pytesseract  # noqa: F401
+    except ImportError:
+        raise ToolError(_OCR_UNAVAILABLE, code="ocr_unavailable") from None
+    if shutil.which("tesseract") is None:
+        raise ToolError(_OCR_UNAVAILABLE, code="ocr_unavailable")
+    import pytesseract
+
+    return pytesseract
+
+
+def _attach_quality_notes(pdf_path: Path, notes: list[str]) -> None:
+    """Write the quality notes into the PDF's Subject metadata, in place.
+
+    Jobs carry no warning channel, so the note lives in the output file
+    itself: visible in any reader's document properties, and it changes
+    nothing about how the pages look.
+    """
+    from pypdf import PdfReader, PdfWriter
+
+    reader = PdfReader(str(pdf_path))
+    writer = PdfWriter()
+    for page in reader.pages:
+        writer.add_page(page)
+    meta = dict(reader.metadata or {})
+    subject = "OCR quality: " + "; ".join(notes) + ". Please check these pages."
+    meta["/Subject"] = subject
+    writer.add_metadata(meta)
+    tmp = pdf_path.with_suffix(".noted.pdf")
+    with open(tmp, "wb") as f:
+        writer.write(f)
+    tmp.replace(pdf_path)
 
 
 SPEC = ToolSpec(
@@ -106,12 +128,8 @@ def _require_ocr():
 
 def run(ctx: ToolContext, options: dict) -> Path:
     language = get_option(options, SPEC, "language") or "eng"
-    if not isinstance(language, str) or not _LANGUAGE_RE.match(language):
-        raise ToolError(
-            "Option 'language' must be a Tesseract language code like 'eng' or 'eng+deu'.",
-            code="invalid_option",
-        )
-    pytesseract = _require_ocr()
+    language = validate_language(language)
+    _require_ocr()
 
     if not ctx.inputs:
         raise ToolError("No input file provided.", code="missing_input")
@@ -137,7 +155,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
     # layer are copied as-is; only scanned pages go through Tesseract.
     try:
         reader = PdfReader(io.BytesIO(data))
-        needs_ocr = [_page_needs_ocr(p) for p in reader.pages]
+        needs_ocr = [page_needs_ocr(p) for p in reader.pages]
     except Exception:
         # If pypdf can't parse, fall back to OCR-ing everything.
         needs_ocr = [True] * n_pages
@@ -160,6 +178,8 @@ def run(ctx: ToolContext, options: dict) -> Path:
     # during OCR. Peak Python-side memory per page is ~one small buffer.
     tmpdir = Path(tempfile.mkdtemp(prefix="pdfedi-ocr-"))
     ocr_page_indices: list[int] = []
+    # Per-page quality signal, for the note in the output metadata.
+    quality_notes: list[str] = []
     try:
         for i in range(n_pages):
             if not needs_ocr[i]:
@@ -174,8 +194,9 @@ def run(ctx: ToolContext, options: dict) -> Path:
             page_h_pt = img_h * 72 / _DPI
 
             # Spill the image to disk, then release it BEFORE tesseract runs.
-            # pytesseract accepts a file path; the tesseract subprocess reads
-            # the file itself, so Python holds no image copy during OCR.
+            # The shared service accepts a file path; the tesseract
+            # subprocess reads the file itself, so Python holds no image
+            # copy during OCR.
             img_file = tmpdir / f"page_{i}.png"
             pil_image.save(str(img_file), optimize=True)
             del pil_image
@@ -186,44 +207,36 @@ def run(ctx: ToolContext, options: dict) -> Path:
                         width=page_w_pt, height=page_h_pt)
 
             # Invisible text layer (transparent fill = selectable but unseen).
+            # The shared service runs PSM 3 with a PSM 11 retry on sparse
+            # pages and returns the kept words with their boxes.
             t1 = time.perf_counter()
             try:
-                words = pytesseract.image_to_data(
-                    str(img_file), lang=language,
-                    output_type=pytesseract.Output.DICT,
-                    config=_TESSERACT_CONFIG, timeout=_PAGE_TIMEOUT,
+                result = ocr_image(
+                    img_file, lang=language, timeout=_PAGE_TIMEOUT,
                 )
-            except Exception as e:
+            except ToolError as e:
                 raise ToolError(f"OCR failed on page {i + 1}: {e}", code="ocr_failed") from e
             t_ocr = time.perf_counter() - t1
             log.info(
                 "ocr page timing",
                 extra={"page": i + 1, "render_s": round(t_render, 1),
-                       "ocr_s": round(t_ocr, 1), "px": f"{img_w}x{img_h}"},
+                       "ocr_s": round(t_ocr, 1), "px": f"{img_w}x{img_h}",
+                       "words": result.word_count,
+                       "mean_conf": round(result.mean_confidence, 1),
+                       "retried": result.retried},
             )
+            note = quality_note(i + 1, result)
+            if note is not None:
+                quality_notes.append(note)
             c.saveState()
             c.setFillAlpha(0)
-            texts = words.get("text", [])
-            for idx, text in enumerate(texts):
-                text = (text or "").strip()
-                if not text:
-                    continue
-                try:
-                    conf = float(words["conf"][idx])
-                except (ValueError, TypeError):
-                    continue
-                if conf < 0 or conf < _MIN_CONFIDENCE:
-                    continue
-                x, y, w, h = (words["left"][idx], words["top"][idx],
-                              words["width"][idx], words["height"][idx])
-                if w <= 0 or h <= 0:
-                    continue
-                x_pt = x * 72 / _DPI
+            for word in result.words:
+                x_pt = word.x * 72 / _DPI
                 # Tesseract origin is top-left; PDF origin is bottom-left.
-                y_pt = page_h_pt - (y + h) * 72 / _DPI
-                font_size = max(h * 72 / _DPI, 1)
+                y_pt = page_h_pt - (word.y + word.h) * 72 / _DPI
+                font_size = max(word.h * 72 / _DPI, 1)
                 c.setFont("Helvetica", font_size)
-                c.drawString(x_pt, y_pt, text)
+                c.drawString(x_pt, y_pt, word.text)
             c.restoreState()
             c.showPage()
             # Free the page image file as soon as the page is done.
@@ -239,6 +252,8 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
     if n_ocr == n_pages:
         # Every page was OCR'd: the reportlab output is already complete.
+        if quality_notes:
+            _attach_quality_notes(out_path, quality_notes)
         return out_path
 
     # Mixed: interleave original text pages with OCR'd pages via pypdf.
@@ -260,10 +275,14 @@ def run(ctx: ToolContext, options: dict) -> Path:
         with open(final_path, "wb") as f:
             writer.write(f)
         out_path.unlink(missing_ok=True)
+        if quality_notes:
+            _attach_quality_notes(final_path, quality_notes)
         return final_path
     except Exception as e:
         # If interleaving fails, fall back to the OCR-only output
         # (all scanned pages are in there; text pages would be missing,
         # so this is a last resort — log loudly).
         log.error("ocr interleave failed, returning OCR-only PDF: %s", e)
+        if quality_notes:
+            _attach_quality_notes(out_path, quality_notes)
         return out_path

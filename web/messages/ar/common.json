@@ -711,6 +711,10 @@
       "first_row_header": {
         "label": "الصف الأول رأس",
         "help": "تعريض الصف الأول من كل جدول مكتشف بخط عريض."
+      },
+      "language": {
+        "label": "اللغة",
+        "help": "رمز لغة Tesseract، مثل 'eng' أو 'eng+deu'."
       }
     },
     "html_to_pdf": {
@@ -743,6 +747,10 @@
       "include_page_numbers": {
         "label": "إظهار فواصل الصفحات",
         "help": "إضافة فاصل مرئي «صفحة N» بين الصفحات."
+      },
+      "language": {
+        "label": "اللغة",
+        "help": "رمز لغة Tesseract، مثل 'eng' أو 'eng+deu'."
       }
     },
     "header_footer": {
@@ -774,6 +782,24 @@
       "pages": {
         "label": "الصفحات",
         "help": "نطاقات تبدأ من 1 مثل «1-3,5». اتركه فارغًا لجميع الصفحات."
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "label": "اللغة",
+        "help": "رمز لغة Tesseract، مثل 'eng' أو 'eng+deu'."
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "label": "اللغة",
+        "help": "رمز لغة Tesseract، مثل 'eng' أو 'eng+deu'."
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "label": "اللغة",
+        "help": "رمز لغة Tesseract، مثل 'eng' أو 'eng+deu'."
       }
     }
   },

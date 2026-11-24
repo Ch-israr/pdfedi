@@ -951,7 +951,7 @@
       },
       {
         "q": "PDF saya adalah hasil pindaian tanpa teks yang dapat dipilih. Apa yang terjadi?",
-        "a": "Anda akan mendapatkan pesan kesalahan yang jelas yang mengarahkan Anda ke alat OCR. Jalankan OCR terlebih dahulu untuk membuat hasil pindaian dapat dicari, lalu konversi hasil OCR ke Word."
+        "a": "Halaman hasil pindaian kini dibaca dengan OCR bawaan, jadi teksnya ikut terkonversi. Periksa setelahnya — OCR bisa salah membaca karakter. Jika pindaian tidak terbaca, Anda akan melihat pesan kesalahan yang jelas."
       },
       {
         "q": "Program apa yang membuka file yang diunduh?",
@@ -1233,7 +1233,7 @@
       },
       {
         "q": "PDF saya hasil pindaian. Bagaimana?",
-        "a": "Halaman hasil pindaian menjadi slide hanya-gambar tanpa kotak teks. Jalankan alat OCR dulu jika Anda butuh teks yang bisa diedit."
+        "a": "Halaman hasil pindaian dibaca dengan OCR bawaan, jadi teksnya juga menjadi kotak teks yang bisa diedit. Periksa setelahnya — OCR bisa salah membaca karakter."
       }
     ],
     "related": [
@@ -1403,7 +1403,7 @@
       },
       {
         "q": "Apakah berfungsi untuk PDF hasil pindaian?",
-        "a": "Tidak — halaman hasil pindaian tidak memiliki lapisan teks, sehingga menjadi halaman kosong. Jalankan OCR dulu untuk menambahkan lapisan teks yang bisa dicari, lalu konversi."
+        "a": "Ya — halaman hasil pindaian dibaca dengan OCR bawaan, jadi teksnya muncul di halaman. Periksa setelahnya — OCR bisa salah membaca karakter."
       },
       {
         "q": "Seberapa besar PDF yang bisa diproses?",
@@ -1492,7 +1492,7 @@
       },
       {
         "q": "Apakah berfungsi untuk PDF hasil pindaian?",
-        "a": "Tidak — halaman hasil pindaian tidak memiliki lapisan teks. Jalankan OCR dulu untuk menambahkan teks yang bisa dicari, lalu konversi."
+        "a": "Ya — halaman hasil pindaian dibaca dengan OCR bawaan, jadi teksnya mengalir ke ebook. Periksa setelahnya — OCR bisa salah membaca karakter."
       },
       {
         "q": "Apakah gambar disertakan?",

@@ -951,7 +951,7 @@
       },
       {
         "q": "Mi PDF es un escaneo sin texto seleccionable. ¿Qué pasa?",
-        "a": "Recibirás un error claro que te dirige a la herramienta OCR. Ejecuta primero el OCR para que el escaneo se pueda buscar y luego convierte el resultado con OCR a Word."
+        "a": "Las páginas escaneadas ahora se leen con OCR integrado, así que su texto también se convierte. Revísalo después: el OCR puede confundir caracteres. Si un escaneo es ilegible, verás un error claro."
       },
       {
         "q": "¿Qué programa abre el archivo descargado?",
@@ -1233,7 +1233,7 @@
       },
       {
         "q": "Mi PDF es un escaneo. ¿Qué pasa?",
-        "a": "Las páginas escaneadas se convierten en diapositivas solo de imagen, sin cuadros de texto. Usa primero la herramienta OCR si necesitas texto editable."
+        "a": "Las páginas escaneadas se leen con OCR integrado, así que su texto también se convierte en cuadros de texto editables. Revísalo después: el OCR puede confundir caracteres."
       }
     ],
     "related": [
@@ -1403,7 +1403,7 @@
       },
       {
         "q": "¿Funciona con PDF escaneados?",
-        "a": "No: las páginas escaneadas no tienen capa de texto, así que se convierten en páginas vacías. Usa OCR primero para añadir una capa de texto buscable y luego convierte."
+        "a": "Sí: las páginas escaneadas se leen con OCR integrado, así que su texto aparece en la página. Revísalo después: el OCR puede confundir caracteres."
       },
       {
         "q": "¿Qué tamaño puede tener el PDF?",
@@ -1492,7 +1492,7 @@
       },
       {
         "q": "¿Funciona con PDF escaneados?",
-        "a": "No: las páginas escaneadas no tienen capa de texto. Usa OCR primero para añadir texto buscable y luego convierte."
+        "a": "Sí: las páginas escaneadas se leen con OCR integrado, así que su texto fluye al libro electrónico. Revísalo después: el OCR puede confundir caracteres."
       },
       {
         "q": "¿Se incluyen las imágenes?",

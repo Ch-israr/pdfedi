@@ -16,10 +16,11 @@ Hybrid engine (local, $0 — no paid API):
    kept. Camelot is optional: if it (or Ghostscript) is unavailable
    the pdfplumber result stands.
 3. OCR path for image-only pages. A page with (near-)no text layer
-   but a raster image is rendered at 150 dpi and read with tesseract
-   (same ``--oem 1`` invocation as the OCR tool); the recognised
-   words are clustered into rows/columns by position. Only pages
-   that need it are OCR'd, never the whole document.
+   but a raster image is read with the shared OCR service
+   (``pdfedi.tools._ocr``: 200 DPI, tesseract ``--oem 1``, PSM 3 with a
+   PSM 11 retry on sparse pages); the recognised words are clustered
+   into rows/columns by position. Only pages that need it are OCR'd,
+   never the whole document.
 4. AcroForm sheet. Where ``pypdf.get_fields()`` finds form fields, a
    "Form data" sheet lists label/value pairs and checkbox states.
 5. Post-processing. All-empty rows/columns are dropped; merged
@@ -45,7 +46,6 @@ are not preserved.
 from __future__ import annotations
 
 import datetime
-import gc
 import io
 import logging
 import re
@@ -55,6 +55,11 @@ import tempfile
 from pathlib import Path
 
 from pdfedi.tools._helpers import open_pdf_reader
+from pdfedi.tools._ocr import (
+    ocr_page as _shared_ocr_page,
+    quality_note as _shared_quality_note,
+    validate_language,
+)
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -89,6 +94,14 @@ SPEC = ToolSpec(
             default=True,
             help="Bold the first row of each detected table.",
         ),
+        ToolOption(
+            name="language",
+            kind="text",
+            label="Language",
+            required=False,
+            default="eng",
+            help="Tesseract language code, e.g. 'eng' or 'eng+deu'.",
+        ),
     ],
     output_kind="document",
     output_ext="xlsx",
@@ -100,9 +113,8 @@ SPEC = ToolSpec(
 _PAGE_CAP = 50
 _MAX_CELLS_PER_PAGE = 20_000
 # A page with fewer native-text chars than this is treated as scanned
-# (same threshold as the OCR tool's _NATIVE_TEXT_MIN_CHARS).
+# (same threshold as the OCR tool's page_needs_ocr default).
 _OCR_MIN_TEXT_CHARS = 50
-_OCR_DPI = 150
 _OCR_TIMEOUT = 120
 # Camelot is tried when the best pdfplumber candidate is sparse: no
 # tables at all, or a non-empty-cell ratio below this.
@@ -287,57 +299,29 @@ def _camelot_tables(tmp_pdf: Path, page_no: int) -> list[Grid]:
     return _normalise_tables(out)
 
 
-def _ocr_grid(data: bytes, page_index: int, tmpdir: Path) -> list[Grid]:
-    """Cluster tesseract words on one image-only page into a grid.
+def _ocr_grid(data: bytes, page_index: int, tmpdir: Path,
+              lang: str = "eng"):
+    """Cluster shared-service OCR words on one image-only page into a grid.
 
-    Renders at 150 dpi (same as the research pass) and groups words
-    into rows by their vertical position, then into cells by horizontal
-    gaps. Returns [] when OCR is unavailable or finds (near-)nothing.
+    Groups words into rows by their vertical position, then into cells by
+    horizontal gaps. Returns (grid, result) where result is the shared
+    service's :class:`OcrPageResult` (or None when OCR is unavailable);
+    the caller uses it for the quality notes. Returns ([], None) when
+    OCR finds (near-)nothing.
     """
     try:
-        import pytesseract
-    except ImportError:
-        return []
-    if shutil.which("tesseract") is None:
-        return []
-    try:
-        import pypdfium2 as pdfium
-
-        doc = pdfium.PdfDocument(io.BytesIO(data))
-        pil_image = doc[page_index].render(scale=_OCR_DPI / 72).to_pil()
-    except Exception as exc:  # noqa: BLE001 - OCR is best-effort
-        log.info("ocr render failed on page %d: %s", page_index + 1, exc)
-        return []
-    img_file = tmpdir / f"ocr_page_{page_index}.png"
-    try:
-        pil_image.save(str(img_file), optimize=True)
-        del pil_image
-        gc.collect()
-        import pytesseract as _pt
-
-        result = _pt.image_to_data(
-            str(img_file),
-            output_type=_pt.Output.DICT,
-            config="--oem 1",
-            timeout=_OCR_TIMEOUT,
+        result = _shared_ocr_page(
+            data, page_index, lang=lang, timeout=_OCR_TIMEOUT, tmpdir=tmpdir,
         )
     except Exception as exc:  # noqa: BLE001 - OCR is best-effort
         log.info("ocr failed on page %d: %s", page_index + 1, exc)
-        return []
-    words = []
-    for i, text in enumerate(result.get("text", [])):
-        if text and text.strip():
-            words.append(
-                {
-                    "t": text.strip(),
-                    "x": int(result["left"][i]),
-                    "y": int(result["top"][i]),
-                    "w": int(result["width"][i]),
-                    "h": int(result["height"][i]),
-                }
-            )
+        return [], None
+    words = [
+        {"t": w.text, "x": w.x, "y": w.y, "w": w.w, "h": w.h}
+        for w in result.words
+    ]
     if len(words) < 3:
-        return []
+        return [], result
     med_h = statistics.median(w["h"] for w in words) or 10
     row_tol = max(10.0, med_h * 0.9)
     gap_thresh = max(18.0, med_h * 1.2)
@@ -365,7 +349,20 @@ def _ocr_grid(data: bytes, page_index: int, tmpdir: Path) -> list[Grid]:
     width = max(len(r) for r in grid)
     grid = [r + [""] * (width - len(r)) for r in grid]
     grid = [r for r in grid if any(c.strip() for c in r)]
-    return grid
+    return grid, result
+
+
+def _ocr_quality_note(page_no: int, result) -> str | None:
+    """Quality note for an OCR'd page, or None when the OCR looks good."""
+    if result is None:
+        return None
+    note = _shared_quality_note(page_no, result)
+    if note is None:
+        return None
+    # Excel values come from OCR text: tell the user to check them.
+    if result.word_count == 0:
+        return f"Page {page_no} — OCR found no readable text."
+    return note[0].upper() + note[1:] + "; check values before relying on them."
 
 
 def _form_fields(reader) -> list[tuple[str, str]]:
@@ -542,6 +539,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
             code="bad_input_count",
         )
     first_row_header = bool(get_option(options, SPEC, "first_row_header"))
+    language = validate_language(get_option(options, SPEC, "language") or "eng")
 
     try:
         import pdfplumber
@@ -583,6 +581,10 @@ def run(ctx: ToolContext, options: dict) -> Path:
     # Per-page notes for the "Notes" sheet (only written when the
     # document contains no table at all — see below).
     page_notes: list[tuple[int, str]] = []
+    # OCR quality warnings: unlike page_notes these are ALWAYS written to
+    # a Notes sheet when non-empty — a low-confidence or empty OCR page
+    # must be flagged even when other pages have tables.
+    ocr_notes: list[tuple[int, str]] = []
     # Stitching state: the last table sheet, its header row and width.
     stitch_sheet = None
     stitch_header: tuple | None = None
@@ -698,7 +700,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
                 # --- OCR path for image-only pages -----------------------
                 if text_len < _OCR_MIN_TEXT_CHARS and n_images > 0:
-                    ocr_grid = _ocr_grid(data, i, tmpdir)
+                    ocr_grid, ocr_result = _ocr_grid(data, i, tmpdir, lang=language)
                     if ocr_grid:
                         any_text = True
                         sheet = default_sheet if sheets_used == 0 else wb.create_sheet()
@@ -710,8 +712,14 @@ def run(ctx: ToolContext, options: dict) -> Path:
                         page_notes.append(
                             (i + 1, "Scanned page — text recovered by OCR; check values before relying on them.")
                         )
+                        warning = _ocr_quality_note(i + 1, ocr_result)
+                        if warning is not None:
+                            ocr_notes.append((i + 1, warning))
                         continue
                     page_notes.append(
+                        (i + 1, "Scanned page — OCR found no readable text.")
+                    )
+                    ocr_notes.append(
                         (i + 1, "Scanned page — OCR found no readable text.")
                     )
 
@@ -747,8 +755,8 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
         if not any_text:
             raise ToolError(
-                f"'{filename}' has no extractable tables or text — it may be scanned. "
-                "Use the OCR tool first to make it searchable, then convert.",
+                f"'{filename}' has no extractable tables or text — it may be scanned "
+                "and OCR found no readable text.",
                 code="no_text",
             )
         if sheets_used == 0:  # pragma: no cover - guarded by any_text above
@@ -768,12 +776,17 @@ def run(ctx: ToolContext, options: dict) -> Path:
         # jobs.py has no warning channel (ToolContext carries no
         # warnings field and Job has no warning column), so the warning
         # lives in the workbook itself, where the user will see it.
-        if not any_table and page_notes:
+        # OCR quality warnings are always written (even when other pages
+        # have tables); the informational page notes only when no table
+        # was found anywhere.
+        if (not any_table and page_notes) or ocr_notes:
             sheet = wb.create_sheet()
             sheet.title = "Notes"
             sheet.cell(row=1, column=1, value="Page").font = bold
             sheet.cell(row=1, column=2, value="Note").font = bold
-            for r_idx, (page_no, note) in enumerate(page_notes, start=2):
+            note_rows = list(page_notes) if not any_table else []
+            note_rows.extend(ocr_notes)
+            for r_idx, (page_no, note) in enumerate(note_rows, start=2):
                 sheet.cell(row=r_idx, column=1, value=f"Page {page_no}")
                 sheet.cell(row=r_idx, column=2, value=note)
 

@@ -4,8 +4,9 @@ Text is extracted page by page and flowed into chapters (up to 10
 pages per chapter). The ebook keeps the reading order, but the
 original page layout is NOT preserved — text reflows to the reader's
 font and screen size, which is the point of EPUB. Images, tables and
-vector graphics are not carried over. Scanned image-only pages have
-no text layer and produce empty chapters; run OCR first for those.
+vector graphics are not carried over. Scanned image-only pages are
+read with the shared OCR service, so their text flows into the ebook
+too (check it afterwards — OCR can misread).
 """
 from __future__ import annotations
 
@@ -15,10 +16,17 @@ import zipfile
 from pathlib import Path
 
 from pdfedi.tools._helpers import page_count_of_pdf, read_input_bytes
+from pdfedi.tools._ocr import (
+    ocr_page as _shared_ocr_page,
+    quality_note as _shared_quality_note,
+    validate_language,
+)
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
+    ToolOption,
     ToolSpec,
+    get_option,
 )
 
 PAGES_PER_CHAPTER = 10
@@ -31,12 +39,21 @@ SPEC = ToolSpec(
     description=(
         "Convert a PDF into a reflowable .epub ebook for e-readers. Text "
         "flows to your reader's font and screen size; the original page "
-        "layout is not preserved."
+        "layout is not preserved. Scanned pages are read with built-in OCR."
     ),
     input_kinds=["pdf"],
     min_files=1,
     max_files=1,
-    options=[],
+    options=[
+        ToolOption(
+            name="language",
+            kind="text",
+            label="Language",
+            required=False,
+            default="eng",
+            help="Tesseract language code, e.g. 'eng' or 'eng+deu'.",
+        ),
+    ],
     output_kind="text",
     output_ext="epub",
     output_mime="application/epub+zip",
@@ -82,6 +99,7 @@ def run(ctx: ToolContext, options: dict) -> Path:
         )
     if not isinstance(options, dict):
         raise ToolError("Options must be an object.", code="invalid_option")
+    language = validate_language(get_option(options, SPEC, "language") or "eng")
 
     data = read_input_bytes(ctx.inputs[0].path)
     page_count = page_count_of_pdf(data)
@@ -123,14 +141,26 @@ def run(ctx: ToolContext, options: dict) -> Path:
     pdf = pdfium.PdfDocument(data)
     try:
         page_texts: list[str] = []
+        ocr_notes: list[str] = []
         for page_no in range(1, page_count + 1):
             page = pdf[page_no - 1]
             try:
                 textpage = page.get_textpage()
                 try:
-                    page_texts.append(textpage.get_text_range().strip())
+                    text = textpage.get_text_range().strip()
                 finally:
                     textpage.close()
+                if not text:
+                    # Scanned page (no text layer): read it with the
+                    # shared OCR service instead of an empty chapter.
+                    ocr_result = _shared_ocr_page(
+                        data, page_no - 1, lang=language,
+                    )
+                    text = ocr_result.text()
+                    note = _shared_quality_note(page_no, ocr_result)
+                    if note is not None:
+                        ocr_notes.append(note)
+                page_texts.append(text)
             finally:
                 page.close()
     finally:
@@ -171,7 +201,13 @@ def run(ctx: ToolContext, options: dict) -> Path:
         f"<dc:creator>{html_lib.escape(author)}</dc:creator>\n"
         "<dc:language>en</dc:language>\n"
         f"<dc:identifier id=\"bookid\">{book_id}</dc:identifier>\n"
-        "</metadata>\n"
+        + (
+            "<dc:description>OCR quality: "
+            + html_lib.escape("; ".join(ocr_notes))
+            + ". Please check these pages.</dc:description>\n"
+            if ocr_notes else ""
+        )
+        + "</metadata>\n"
         "<manifest>\n" + "\n".join(manifest_items) + "\n</manifest>\n"
         "<spine toc=\"ncx\">\n" + "\n".join(spine_items) + "\n</spine>\n"
         "</package>\n"

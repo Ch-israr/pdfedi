@@ -711,6 +711,10 @@
       "first_row_header": {
         "label": "Baris pertama adalah header",
         "help": "Tebalkan baris pertama setiap tabel yang terdeteksi."
+      },
+      "language": {
+        "label": "Bahasa",
+        "help": "Kode bahasa Tesseract, contoh 'eng' atau 'eng+deu'."
       }
     },
     "html_to_pdf": {
@@ -743,6 +747,10 @@
       "include_page_numbers": {
         "label": "Tampilkan pembatas halaman",
         "help": "Tambahkan pembatas 'Halaman N' yang terlihat di antara halaman."
+      },
+      "language": {
+        "label": "Bahasa",
+        "help": "Kode bahasa Tesseract, contoh 'eng' atau 'eng+deu'."
       }
     },
     "header_footer": {
@@ -774,6 +782,24 @@
       "pages": {
         "label": "Halaman",
         "help": "Rentang berbasis 1 seperti '1-3,5'. Biarkan kosong untuk semua halaman."
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "label": "Bahasa",
+        "help": "Kode bahasa Tesseract, contoh 'eng' atau 'eng+deu'."
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "label": "Bahasa",
+        "help": "Kode bahasa Tesseract, contoh 'eng' atau 'eng+deu'."
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "label": "Bahasa",
+        "help": "Kode bahasa Tesseract, contoh 'eng' atau 'eng+deu'."
       }
     }
   },

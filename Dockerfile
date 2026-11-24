@@ -13,12 +13,15 @@ RUN npm run build
 
 # ---- Stage 2: Python runtime ----
 FROM python:3.12-slim
-# tesseract-ocr powers the OCR tool (pytesseract) and the PDF to Excel
-# hybrid engine's OCR path. Ghostscript supports Camelot table
-# extraction (PDF to Excel fallback). The stock Ubuntu
-# eng.traineddata ships LSTM-only, so we fetch the full tessdata build
-# (tesseract-ocr/tessdata) which also contains the legacy engine
-# components needed for --oem 0. Keep the layer small otherwise.
+# tesseract-ocr powers the OCR tool (pytesseract) and the shared OCR
+# service used by PDF to Excel / Word / PowerPoint / HTML / EPUB.
+# Ghostscript supports Camelot table extraction (PDF to Excel fallback).
+# The stock Ubuntu eng.traineddata ships LSTM-only, so we fetch the full
+# tessdata build (tesseract-ocr/tessdata) which also contains the legacy
+# engine components needed for --oem 0. Keep the layer small otherwise.
+# The other 9 locale packs come from tessdata_fast (LSTM-only, ~2-4 MB
+# each — all Phase 0 needs, since OCR runs --oem 1); without them a
+# non-English scan fails outright in production.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         tesseract-ocr \
         tesseract-ocr-eng \
@@ -29,7 +32,15 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && TESSDATA_DIR="$(dirname "$(find /usr/share/tesseract-ocr -name 'eng.traineddata' | head -1)")" \
     && wget -q -O "$TESSDATA_DIR/eng.traineddata" \
         https://github.com/tesseract-ocr/tessdata/raw/main/eng.traineddata \
-    && test "$(stat -c%s "$TESSDATA_DIR/eng.traineddata")" -gt 10000000
+    && test "$(stat -c%s "$TESSDATA_DIR/eng.traineddata")" -gt 10000000 \
+    && for lang in ara ben chi_sim fra hin ind por spa urd; do \
+        wget -q -O "$TESSDATA_DIR/$lang.traineddata" \
+            "https://github.com/tesseract-ocr/tessdata_fast/raw/main/$lang.traineddata" || exit 1; \
+       done \
+    && for lang in ara ben chi_sim fra hin ind por spa urd; do \
+        test "$(stat -c%s "$TESSDATA_DIR/$lang.traineddata")" -gt 500000 || exit 1; \
+       done \
+    && echo "tesseract langs installed:" && ls "$TESSDATA_DIR"/*.traineddata
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONUNBUFFERED=1 \

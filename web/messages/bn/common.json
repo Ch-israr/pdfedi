@@ -711,6 +711,10 @@
       "first_row_header": {
         "label": "প্রথম সারি হেডার",
         "help": "প্রতিটি শনাক্ত টেবিলের প্রথম সারি বোল্ড করুন।"
+      },
+      "language": {
+        "label": "ভাষা",
+        "help": "Tesseract ভাষার কোড, যেমন 'eng' বা 'eng+deu'।"
       }
     },
     "html_to_pdf": {
@@ -743,6 +747,10 @@
       "include_page_numbers": {
         "label": "পৃষ্ঠা বিভাজক দেখান",
         "help": "পৃষ্ঠাগুলোর মধ্যে একটি দৃশ্যমান 'পৃষ্ঠা N' বিভাজক যোগ করুন।"
+      },
+      "language": {
+        "label": "ভাষা",
+        "help": "Tesseract ভাষার কোড, যেমন 'eng' বা 'eng+deu'।"
       }
     },
     "header_footer": {
@@ -774,6 +782,24 @@
       "pages": {
         "label": "পৃষ্ঠা",
         "help": "'1-3,5'-এর মতো 1-ভিত্তিক রেঞ্জ। সব পৃষ্ঠার জন্য খালি রাখুন।"
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "label": "ভাষা",
+        "help": "Tesseract ভাষার কোড, যেমন 'eng' বা 'eng+deu'।"
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "label": "ভাষা",
+        "help": "Tesseract ভাষার কোড, যেমন 'eng' বা 'eng+deu'।"
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "label": "ভাষা",
+        "help": "Tesseract ভাষার কোড, যেমন 'eng' বা 'eng+deu'।"
       }
     }
   },

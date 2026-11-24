@@ -711,6 +711,10 @@
       "first_row_header": {
         "label": "पहली पंक्ति हेडर है",
         "help": "हर पहचानी गई टेबल की पहली पंक्ति बोल्ड करें।"
+      },
+      "language": {
+        "label": "भाषा",
+        "help": "Tesseract भाषा कोड, जैसे 'eng' या 'eng+deu'।"
       }
     },
     "html_to_pdf": {
@@ -743,6 +747,10 @@
       "include_page_numbers": {
         "label": "पेज डिवाइडर दिखाएँ",
         "help": "पेजों के बीच एक दृश्यमान 'पेज N' डिवाइडर जोड़ें।"
+      },
+      "language": {
+        "label": "भाषा",
+        "help": "Tesseract भाषा कोड, जैसे 'eng' या 'eng+deu'।"
       }
     },
     "header_footer": {
@@ -774,6 +782,24 @@
       "pages": {
         "label": "पेज",
         "help": "'1-3,5' जैसी 1-आधारित श्रेणियाँ। सभी पेजों के लिए खाली छोड़ें।"
+      }
+    },
+    "pdf_to_word": {
+      "language": {
+        "label": "भाषा",
+        "help": "Tesseract भाषा कोड, जैसे 'eng' या 'eng+deu'।"
+      }
+    },
+    "pdf_to_pptx": {
+      "language": {
+        "label": "भाषा",
+        "help": "Tesseract भाषा कोड, जैसे 'eng' या 'eng+deu'।"
+      }
+    },
+    "pdf_to_epub": {
+      "language": {
+        "label": "भाषा",
+        "help": "Tesseract भाषा कोड, जैसे 'eng' या 'eng+deu'।"
       }
     }
   },

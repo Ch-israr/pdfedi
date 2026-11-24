@@ -951,7 +951,7 @@
       },
       {
         "q": "My PDF is a scan with no selectable text. What happens?",
-        "a": "You'll get a clear error pointing you to the OCR tool. Run OCR first to make the scan searchable, then convert the OCR'd result to Word."
+        "a": "Scanned pages are now read with built-in OCR, so their text converts too. Check it afterwards — OCR can misread characters. If a scan is unreadable, you get a clear error instead."
       },
       {
         "q": "What program opens the downloaded file?",
@@ -1233,7 +1233,7 @@
       },
       {
         "q": "My PDF is a scan. What happens?",
-        "a": "Scanned pages become image-only slides with no text boxes. Run the OCR tool first if you need editable text."
+        "a": "Scanned pages are read with built-in OCR, so their text becomes editable text boxes too. Check it afterwards — OCR can misread characters."
       }
     ],
     "related": [
@@ -1403,7 +1403,7 @@
       },
       {
         "q": "Does it work on scanned PDFs?",
-        "a": "No — scanned pages have no text layer, so they convert to empty pages. Run OCR first to add a searchable text layer, then convert."
+        "a": "Yes — scanned pages are read with built-in OCR, so their text appears in the page. Check it afterwards — OCR can misread characters."
       },
       {
         "q": "How large can the PDF be?",
@@ -1492,7 +1492,7 @@
       },
       {
         "q": "Does it work on scanned PDFs?",
-        "a": "No — scanned pages have no text layer. Run OCR first to add searchable text, then convert."
+        "a": "Yes — scanned pages are read with built-in OCR, so their text flows into the ebook. Check it afterwards — OCR can misread characters."
       },
       {
         "q": "Are images included?",

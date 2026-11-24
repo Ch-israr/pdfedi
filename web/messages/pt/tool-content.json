@@ -951,7 +951,7 @@
       },
       {
         "q": "Meu PDF é uma digitalização sem texto selecionável. O que acontece?",
-        "a": "Você receberá um erro claro apontando para a ferramenta OCR. Execute primeiro o OCR para tornar a digitalização pesquisável e depois converta o resultado com OCR para Word."
+        "a": "As páginas digitalizadas agora são lidas com OCR integrado, então o texto delas também é convertido. Confira depois — o OCR pode ler caracteres incorretamente. Se uma digitalização for ilegível, você verá um erro claro."
       },
       {
         "q": "Qual programa abre o arquivo baixado?",
@@ -1233,7 +1233,7 @@
       },
       {
         "q": "Meu PDF é digitalizado. O que acontece?",
-        "a": "Páginas digitalizadas viram slides só de imagem, sem caixas de texto. Use primeiro a ferramenta OCR se precisar de texto editável."
+        "a": "As páginas digitalizadas são lidas com OCR integrado, então o texto delas também vira caixas de texto editáveis. Confira depois — o OCR pode ler caracteres incorretamente."
       }
     ],
     "related": [
@@ -1403,7 +1403,7 @@
       },
       {
         "q": "Funciona com PDFs digitalizados?",
-        "a": "Não — páginas digitalizadas não têm camada de texto, então viram páginas vazias. Use o OCR primeiro para adicionar uma camada de texto pesquisável e depois converta."
+        "a": "Sim — as páginas digitalizadas são lidas com OCR integrado, então o texto aparece na página. Confira depois — o OCR pode ler caracteres incorretamente."
       },
       {
         "q": "Qual o tamanho máximo do PDF?",
@@ -1492,7 +1492,7 @@
       },
       {
         "q": "Funciona com PDFs digitalizados?",
-        "a": "Não — páginas digitalizadas não têm camada de texto. Use o OCR primeiro para adicionar texto pesquisável e depois converta."
+        "a": "Sim — as páginas digitalizadas são lidas com OCR integrado, então o texto flui para o ebook. Confira depois — o OCR pode ler caracteres incorretamente."
       },
       {
         "q": "As imagens são incluídas?",
