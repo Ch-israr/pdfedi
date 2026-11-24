@@ -41,6 +41,28 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         test "$(stat -c%s "$TESSDATA_DIR/$lang.traineddata")" -gt 500000 || exit 1; \
        done \
     && echo "tesseract langs installed:" && ls "$TESSDATA_DIR"/*.traineddata
+# Invisible OCR text-layer fonts (reportlab TTFont): Helvetica is
+# WinAnsi/Latin-only, so Arabic/Devanagari/Bengali/CJK words drawn with
+# it collapse to the letter "n" (verified live 2026-11-24). These OFL
+# Noto fonts give the text layer real codepoints (TTFont embeds a
+# ToUnicode CMap). Downloaded at build time, never committed to the repo.
+# NOTE: reportlab TTFont only supports TrueType outlines — the CFF
+# OTF build of Noto Sans CJK SC is unusable, so CJK uses the variable
+# TTF (default instance = Regular) from google/fonts.
+RUN mkdir -p /srv/fonts \
+    && wget -q -O /srv/fonts/NotoNaskhArabic-Regular.ttf \
+        https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf \
+    && test "$(stat -c%s /srv/fonts/NotoNaskhArabic-Regular.ttf)" -gt 100000 \
+    && wget -q -O /srv/fonts/NotoSansDevanagari-Regular.ttf \
+        https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansDevanagari/NotoSansDevanagari-Regular.ttf \
+    && test "$(stat -c%s /srv/fonts/NotoSansDevanagari-Regular.ttf)" -gt 100000 \
+    && wget -q -O /srv/fonts/NotoSansBengali-Regular.ttf \
+        https://github.com/googlefonts/noto-fonts/raw/main/hinted/ttf/NotoSansBengali/NotoSansBengali-Regular.ttf \
+    && test "$(stat -c%s /srv/fonts/NotoSansBengali-Regular.ttf)" -gt 100000 \
+    && wget -q -O /srv/fonts/NotoSansSC-Regular.ttf \
+        "https://github.com/google/fonts/raw/main/ofl/notosanssc/NotoSansSC%5Bwght%5D.ttf" \
+    && test "$(stat -c%s /srv/fonts/NotoSansSC-Regular.ttf)" -gt 10000000 \
+    && echo "OCR text-layer fonts:" && ls -l /srv/fonts
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PYTHONUNBUFFERED=1 \

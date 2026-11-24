@@ -36,6 +36,7 @@ from pdfedi.tools._ocr import (
     quality_note,
     validate_language,
 )
+from pdfedi.tools._textlayer import ensure_textlayer_fonts, font_for_word
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
@@ -174,6 +175,11 @@ def run(ctx: ToolContext, options: dict) -> Path:
 
     # Build OCR'd pages with reportlab (only for pages that need it).
     c = Canvas(str(out_path))
+    # Unicode text-layer fonts: Helvetica is WinAnsi/Latin-only, so
+    # non-Latin words drawn with it collapse to "n" (live 2026-11-24).
+    # _textlayer registers embedded Noto TTFs and picks the font per
+    # word by script; Latin words still use Helvetica, unchanged.
+    ensure_textlayer_fonts()
     # Rendered page images go to temp files on disk, never held in memory
     # during OCR. Peak Python-side memory per page is ~one small buffer.
     tmpdir = Path(tempfile.mkdtemp(prefix="pdfedi-ocr-"))
@@ -235,8 +241,12 @@ def run(ctx: ToolContext, options: dict) -> Path:
                 # Tesseract origin is top-left; PDF origin is bottom-left.
                 y_pt = page_h_pt - (word.y + word.h) * 72 / _DPI
                 font_size = max(word.h * 72 / _DPI, 1)
-                c.setFont("Helvetica", font_size)
-                c.drawString(x_pt, y_pt, word.text)
+                # Per-word Unicode font (RTL words come back in visual
+                # order — see _textlayer); Latin words still use
+                # Helvetica, exactly as before.
+                font_name, visual_text = font_for_word(word.text)
+                c.setFont(font_name, font_size)
+                c.drawString(x_pt, y_pt, visual_text)
             c.restoreState()
             c.showPage()
             # Free the page image file as soon as the page is done.
