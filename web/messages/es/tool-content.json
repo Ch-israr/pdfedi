@@ -712,38 +712,39 @@
     ]
   },
   "flatten": {
-    "title": "Aplanar PDF en línea gratis — Integrar anotaciones en las páginas | PDFEDI",
-    "description": "Aplana un PDF en línea y gratis. Integra anotaciones, comentarios y campos de formulario rellenados de forma permanente en las páginas para que la apariencia quede fija. Sin registro.",
+    "title": "Aplanar PDF gratis — Convierte cada página en una imagen | PDFEDI",
+    "description": "Aplana un PDF gratis. Cada página se convierte en una imagen para que nada siga siendo editable, seleccionable o buscable. Los valores de los formularios rellenados se mantienen visibles.",
     "h1": "Aplanar PDF",
-    "intro": "Integra anotaciones y campos de formulario de forma permanente en las páginas de tu PDF. Al aplanar, las marcas, los comentarios y los formularios rellenados se fusionan con el contenido de la página, así el documento se ve igual en todas partes y ya no se puede seguir editando.",
+    "intro": "Aplana un PDF de verdad: cada página se convierte en una imagen a página completa, para que nada del documento se pueda editar, seleccionar o buscar. Los valores de los formularios rellenados se fijan primero, así que se mantienen visibles. Elige 300 DPI para calidad de impresión o 150 DPI para un archivo más pequeño.",
     "howTo": [
       "Sube tu archivo PDF (hasta 50 MB).",
-      "Haz clic en Aplanar.",
-      "Descarga el PDF aplanado."
+      "Elige 300 DPI para calidad de impresión o 150 DPI para un archivo más pequeño.",
+      "Haz clic en Aplanar y descarga el PDF."
     ],
     "features": [
-      "Fusiona las anotaciones con el contenido de la página",
-      "Integra los valores de los campos de formulario en las páginas",
-      "Fija la apariencia final del documento"
+      "Cada página se convierte en una imagen a página completa",
+      "Nada queda editable, seleccionable o buscable",
+      "Los valores de los formularios se mantienen visibles en la imagen",
+      "Mismo número de páginas y tamaño que el original"
     ],
     "useCases": [
       "Finalizar un formulario rellenado para que los valores no se puedan cambiar",
-      "Integrar comentarios de revisión en un documento",
-      "Garantizar una apariencia consistente en todos los lectores de PDF",
+      "Compartir un documento que no se pueda copiar ni editar",
+      "Garantizar la misma apariencia en todos los lectores de PDF",
       "Preparar documentos para imprimir o archivar"
     ],
     "faqs": [
       {
         "q": "¿Qué hace aplanar un PDF?",
-        "a": "Aplanar fusiona las anotaciones, los comentarios y los valores de los campos de formulario directamente en los gráficos de la página. Después de aplanar, forman parte de la página y ya no se pueden editar ni mover."
+        "a": "Aplanar convierte cada página en una imagen a página completa. Las anotaciones, los comentarios y los valores de los formularios se fijan primero en la imagen, así que se mantienen visibles, pero nada del resultado se puede editar, seleccionar o buscar."
       },
       {
         "q": "¿Por qué debería aplanar un formulario rellenado?",
-        "a": "Los valores de un formulario sin aplanar aún pueden editarse con cualquier editor de PDF. Aplanar fija los valores rellenados en su lugar."
+        "a": "Los valores de un formulario sin aplanar todavía se pueden editar con cualquier editor de PDF. Al aplanarlo, los valores rellenados quedan fijados en una imagen."
       },
       {
         "q": "¿Aplanar cambiará el aspecto de mi PDF?",
-        "a": "No: la apariencia visual se mantiene igual. Solo cambia la capacidad de editar las anotaciones y los campos de formulario."
+        "a": "Las páginas se ven igual, pero ahora son imágenes: el texto ya no se puede seleccionar ni buscar, y los PDF con mucho texto pueden pesar más. Elige 150 DPI si el tamaño del archivo importa más que la nitidez de impresión."
       }
     ],
     "related": [
@@ -1504,6 +1505,55 @@
       "extract_text",
       "pdf_to_html",
       "ocr"
+    ]
+  },
+  "pdf_to_300dpi": {
+    "title": "Convertir PDF a 300 DPI gratis — Aumenta la resolución para imprimir | PDFEDI",
+    "description": "Convierte un PDF a 300 DPI gratis. Aumenta la resolución efectiva de las imágenes para que tu archivo pase los controles de imprenta. Las imágenes que ya están a 300 DPI no se tocan; nada se amplía más de 2x.",
+    "h1": "Convertir PDF a 300 DPI",
+    "intro": "Aumenta la resolución efectiva de las imágenes de tu PDF a 300 DPI (o 600 para impresión de alta calidad) para que pase los controles de imprenta y de los portales de subida. Las imágenes que ya alcanzan el objetivo no se tocan, y ninguna se amplía más de 2x. Subir la resolución no añade detalle que no esté en la imagen original: solo corrige el número que leen los controles. El texto y los gráficos vectoriales no tienen DPI y nunca se tocan.",
+    "howTo": [
+      "Sube tu archivo PDF (hasta 50 MB).",
+      "Elige 300 DPI para imprimir o 600 DPI para impresión de alta calidad.",
+      "Haz clic en Convertir y descarga el PDF.",
+      "Consulta las Propiedades del documento del PDF resultante: la línea Asunto indica la resolución antes y después."
+    ],
+    "features": [
+      "Sube las imágenes a 300 o 600 DPI",
+      "Deja intactas las imágenes que ya cumplen el objetivo",
+      "Nunca amplía ninguna imagen más de 2x",
+      "Informe de DPI antes y después en el archivo resultante",
+      "Texto y gráficos vectoriales intactos"
+    ],
+    "useCases": [
+      "Corregir un archivo que la imprenta rechazó por baja resolución",
+      "Cumplir el requisito de 300 DPI para un tribunal o un portal",
+      "Preparar documentos escaneados para impresión comercial",
+      "Comprobar la resolución real de las imágenes de tu PDF"
+    ],
+    "faqs": [
+      {
+        "q": "¿Convertir a 300 DPI hará mis imágenes más nítidas?",
+        "a": "No: subir la resolución no puede añadir detalle que no esté en la imagen original. Aumenta la cantidad de píxeles para que la resolución efectiva del archivo pase los controles de imprenta que rechazan todo lo que esté por debajo de 300 DPI."
+      },
+      {
+        "q": "¿Qué pasa con las imágenes que ya están a 300 DPI?",
+        "a": "Nada: se dejan exactamente como están. Solo se amplían las imágenes por debajo del objetivo, y ninguna más de 2x."
+      },
+      {
+        "q": "¿Cambia mi texto?",
+        "a": "No. El texto y los gráficos vectoriales no tienen DPI: se dibujan a partir de contornos matemáticos y se mantienen nítidos a cualquier tamaño. Solo se remuestrean las imágenes de trama incrustadas."
+      },
+      {
+        "q": "¿Cómo sé qué cambió?",
+        "a": "Abre las Propiedades del documento del PDF resultante (normalmente Ctrl+D o Cmd+D) y lee la línea Asunto: indica cuántas imágenes se ampliaron, cuántas ya estaban bien, cuántas se omitieron y la resolución efectiva mínima antes y después."
+      }
+    ],
+    "related": [
+      "compress",
+      "pdf_to_images",
+      "grayscale",
+      "repair"
     ]
   }
 }

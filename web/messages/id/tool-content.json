@@ -712,38 +712,39 @@
     ]
   },
   "flatten": {
-    "title": "Ratakan PDF Online Gratis — Satukan Anotasi ke Halaman | PDFEDI",
-    "description": "Ratakan PDF online gratis. Satukan anotasi, komentar, dan kolom formulir yang terisi secara permanen ke halaman sehingga tampilannya terkunci. Tanpa mendaftar.",
+    "title": "Ratakan PDF Gratis — Ubah Setiap Halaman Menjadi Gambar | PDFEDI",
+    "description": "Ratakan PDF secara gratis. Setiap halaman dirender menjadi gambar sehingga tidak ada lagi yang bisa diedit, dipilih, atau dicari. Nilai formulir yang terisi tetap terlihat.",
     "h1": "Ratakan PDF",
-    "intro": "Satukan anotasi dan kolom formulir secara permanen ke halaman PDF Anda. Perataan menggabungkan markup, komentar, dan formulir yang terisi ke dalam konten halaman sehingga dokumen tampak sama di mana saja dan tidak dapat diedit lagi.",
+    "intro": "Ratakan PDF dengan sungguh-sungguh: setiap halaman dirender menjadi gambar seukuran halaman penuh, sehingga tidak ada lagi di dalam dokumen yang bisa diedit, dipilih, atau dicari. Nilai formulir yang terisi disematkan dulu, jadi tetap terlihat. Pilih 300 DPI untuk kualitas cetak atau 150 DPI untuk file yang lebih kecil.",
     "howTo": [
-      "Unggah file PDF Anda (maksimal 50MB).",
-      "Klik Ratakan.",
-      "Unduh PDF yang sudah diratakan."
+      "Unggah file PDF Anda (hingga 50 MB).",
+      "Pilih 300 DPI untuk kualitas cetak atau 150 DPI untuk file yang lebih kecil.",
+      "Klik Ratakan dan unduh PDF."
     ],
     "features": [
-      "Menggabungkan anotasi ke dalam konten halaman",
-      "Menyatukan nilai kolom formulir ke halaman",
-      "Mengunci tampilan akhir dokumen"
+      "Setiap halaman menjadi gambar seukuran halaman penuh",
+      "Tidak ada lagi yang bisa diedit, dipilih, atau dicari",
+      "Nilai formulir yang terisi tetap terlihat pada gambar",
+      "Jumlah halaman dan ukuran halaman sama seperti aslinya"
     ],
     "useCases": [
-      "Finalisasi formulir yang terisi agar nilainya tidak dapat diubah",
-      "Satukan komentar tinjauan ke dalam dokumen",
-      "Pastikan tampilan konsisten di semua pembaca PDF",
-      "Siapkan dokumen untuk dicetak atau diarsipkan"
+      "Menyelesaikan formulir terisi agar nilainya tidak bisa diubah",
+      "Membagikan dokumen yang tidak bisa disalin atau diedit",
+      "Menjamin tampilan yang sama di semua pembaca PDF",
+      "Menyiapkan dokumen untuk dicetak atau diarsipkan"
     ],
     "faqs": [
       {
         "q": "Apa yang dilakukan perataan PDF?",
-        "a": "Perataan menggabungkan anotasi, komentar, dan nilai kolom formulir langsung ke dalam grafik halaman. Setelah diratakan, semuanya menjadi bagian halaman dan tidak dapat lagi diedit atau dipindahkan."
+        "a": "Meratakan berarti setiap halaman dirender menjadi gambar seukuran halaman penuh. Anotasi, komentar, dan nilai formulir disematkan dulu ke dalam gambar, jadi tetap terlihat — tetapi tidak ada lagi dalam hasil yang bisa diedit, dipilih, atau dicari."
       },
       {
         "q": "Mengapa saya harus meratakan formulir yang terisi?",
-        "a": "Nilai formulir yang belum diratakan masih dapat diedit oleh siapa pun yang memiliki editor PDF. Perataan mengunci nilai yang terisi di tempatnya."
+        "a": "Nilai formulir yang belum diratakan masih bisa diedit oleh siapa pun yang memiliki editor PDF. Meratakan mengunci nilai yang terisi ke dalam gambar."
       },
       {
-        "q": "Apakah perataan akan mengubah tampilan PDF saya?",
-        "a": "Tidak — tampilan visual tetap sama. Hanya kemampuan edit anotasi dan kolom formulir yang berubah."
+        "q": "Apakah meratakan akan mengubah tampilan PDF saya?",
+        "a": "Halaman-halaman terlihat sama, tetapi sekarang berupa gambar: teks tidak lagi bisa dipilih atau dicari, dan PDF yang banyak teksnya bisa menjadi lebih besar. Pilih 150 DPI jika ukuran file lebih penting daripada ketajaman cetak."
       }
     ],
     "related": [
@@ -1504,6 +1505,55 @@
       "extract_text",
       "pdf_to_html",
       "ocr"
+    ]
+  },
+  "pdf_to_300dpi": {
+    "title": "Ubah PDF ke 300 DPI Gratis — Naikkan Resolusi Gambar untuk Cetak | PDFEDI",
+    "description": "Ubah PDF ke 300 DPI secara gratis. Naikkan DPI efektif gambar yang tertanam agar file Anda lolos pemeriksaan percetakan. Gambar yang sudah 300 DPI dibiarkan apa adanya; tidak ada yang diperbesar lebih dari 2x.",
+    "h1": "Ubah PDF ke 300 DPI",
+    "intro": "Naikkan DPI efektif gambar dalam PDF Anda ke 300 DPI (atau 600 untuk cetak berkualitas tinggi) agar lolos pemeriksaan percetakan dan portal unggah. Gambar yang sudah mencapai target dibiarkan utuh, dan tidak ada gambar yang diperbesar lebih dari 2x. Menaikkan DPI tidak dapat menambah detail yang tidak ada pada gambar asli — ini hanya memperbaiki angka yang dibaca pemeriksa. Teks dan grafik vektor tidak memiliki DPI dan tidak pernah disentuh.",
+    "howTo": [
+      "Unggah file PDF Anda (hingga 50 MB).",
+      "Pilih 300 DPI untuk cetak atau 600 DPI untuk cetak berkualitas tinggi.",
+      "Klik Konversi dan unduh PDF.",
+      "Periksa Properti Dokumen pada PDF hasil — baris Subjek melaporkan DPI sebelum dan sesudah untuk file Anda."
+    ],
+    "features": [
+      "Menaikkan gambar tertanam ke 300 atau 600 DPI",
+      "Membiarkan gambar yang sudah mencapai target tetap utuh",
+      "Tidak pernah memperbesar gambar lebih dari 2x",
+      "Laporan DPI sebelum/sesudah di dalam file hasil",
+      "Teks dan grafik vektor tidak disentuh"
+    ],
+    "useCases": [
+      "Memperbaiki file yang ditolak percetakan karena resolusi rendah",
+      "Memenuhi syarat unggah 300 DPI untuk pengadilan atau portal",
+      "Menyiapkan dokumen hasil pindaian untuk cetak komersial",
+      "Memeriksa DPI sebenarnya dari gambar dalam PDF Anda"
+    ],
+    "faqs": [
+      {
+        "q": "Apakah mengubah ke 300 DPI membuat gambar saya lebih tajam?",
+        "a": "Tidak — menaikkan DPI tidak dapat menambah detail yang tidak ada pada gambar asli. Ini menambah jumlah piksel agar DPI efektif file lolos pemeriksaan percetakan yang menolak apa pun di bawah 300 DPI."
+      },
+      {
+        "q": "Apa yang terjadi pada gambar yang sudah 300 DPI?",
+        "a": "Tidak ada — gambar dibiarkan persis apa adanya. Hanya gambar di bawah target yang diperbesar, dan tidak lebih dari 2x."
+      },
+      {
+        "q": "Apakah ini mengubah teks saya?",
+        "a": "Tidak. Teks dan grafik vektor tidak memiliki DPI — digambar dari garis matematis dan tetap tajam pada ukuran apa pun. Hanya gambar raster tertanam yang diolah ulang."
+      },
+      {
+        "q": "Bagaimana saya tahu apa yang berubah?",
+        "a": "Buka Properti Dokumen pada PDF hasil (biasanya Ctrl+D atau Cmd+D) dan baca baris Subjek — baris itu melaporkan berapa gambar yang dinaikkan, berapa yang sudah baik, berapa yang dilewati, dan DPI efektif minimum sebelum dan sesudah."
+      }
+    ],
+    "related": [
+      "compress",
+      "pdf_to_images",
+      "grayscale",
+      "repair"
     ]
   }
 }

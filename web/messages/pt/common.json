@@ -850,7 +850,7 @@
     },
     "flatten": {
       "name": "Achatar PDF",
-      "tagline": "Incorpore anotações às páginas"
+      "tagline": "Transforme cada página numa imagem"
     },
     "grayscale": {
       "name": "PDF em Escala de Cinza",
@@ -959,6 +959,10 @@
     "pdf_to_epub": {
       "name": "PDF para EPUB",
       "tagline": "Converta um PDF em ebook"
+    },
+    "pdf_to_300dpi": {
+      "name": "Converter PDF para 300 DPI",
+      "tagline": "Aumente a resolução para impressão"
     }
   },
   "privacyPage": {

@@ -49,6 +49,7 @@ export const TOOL_CARDS: ToolCard[] = [
   { key: "edit_pdf", icon: "📝", category: "edit" },
   { key: "grayscale", icon: "🩶", category: "optimize" },
   { key: "compress", icon: "🗜️", category: "optimize" },
+  { key: "pdf_to_300dpi", icon: "🖨️", category: "optimize" },
   { key: "repair", icon: "🛠️", category: "optimize" },
   { key: "password_protect", icon: "🔒", category: "security" },
   { key: "unlock_pdf", icon: "🔓", category: "security" },

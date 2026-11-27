@@ -1,33 +1,43 @@
-"""Flatten a PDF: bake annotations and form fields into static page content.
+"""Flatten a PDF: render every page to an image so nothing stays editable.
 
-After flattening, annotations/widgets are part of the static page — they can
-no longer be edited or removed as separate objects, and form fields are no
-longer interactive.
+Flattening here means a TRUE flatten: after the form/annotation baking
+step below, each page is rendered to a full-page raster image with
+pypdfium2 and the PDF is rebuilt with one image per page, at the original
+page size. The output has no text layer, no annotations, no AcroForm and
+no vector content — nothing is selectable, searchable or editable
+anymore. That is what users mean when they say the old flatten "returned
+the same file": the old tool only baked annotations into the page content
+while text stayed selectable text and vectors stayed vectors.
 
-How the baking works (pypdf only, no PyMuPDF):
+How it works:
 
-* Every annotation on every page is examined before it is removed.
-* If the annotation has an appearance stream (``/AP /N``), that stream is
-  copied into the page's ``/Resources /XObject`` as a Form XObject and a
-  ``q <matrix> cm /Fm Do Q`` operation is appended to the page content,
-  drawing the appearance at the annotation's ``/Rect``. The appearance
-  stream's own ``/Matrix`` is honoured automatically by the ``Do``
-  operator, so the visual is preserved exactly as the viewer showed it.
-* A widget (form field) with a filled value (``/V``) but no appearance
-  stream gets a minimal appearance generated from the value and the
-  field's default appearance (``/DA``) — plain text drawing — which is
-  then baked the same way. A field type whose value cannot be rendered
-  as text (button, signature, multi-select choice, ...) is rejected
-  with a clear ``ToolError`` instead of silently destroying the data.
-* Annotations with no appearance and no field value (sticky notes,
-  highlights without an appearance, links, popups, ...) have no baked
-  visual to preserve — their visual is viewer-generated — so they are
-  simply removed.
-* No live annotation is ever left in the output, and ``/AcroForm`` is
-  dropped from the document root.
+1. Bake first (pypdf only, no PyMuPDF): every annotation on every page
+   is examined before it is removed. If the annotation has an appearance
+   stream (``/AP /N``), that stream is copied into the page's
+   ``/Resources /XObject`` as a Form XObject and drawn at the
+   annotation's ``/Rect``. A widget (form field) with a filled value
+   (``/V``) but no appearance stream gets a minimal appearance generated
+   from the value and the field's default appearance (``/DA``). This
+   step is what makes filled form values survive: pypdfium2 only renders
+   widget values that have appearance streams, so baking first is what
+   keeps "Alice Example" visible in the rendered output. A field type
+   whose value cannot be rendered as text is rejected with a clear
+   ``ToolError`` instead of silently destroying the data. Annotations
+   with no appearance and no field value are simply removed, and
+   ``/AcroForm`` is dropped from the document root.
+2. Render each baked page to a JPEG image at the chosen quality
+   (150 DPI standard / 300 DPI print, default 300) and rebuild the PDF
+   with reportlab: one full-page image per page, same page count and
+   same page size (rotation-aware).
+
+Honest limits, stated on the tool page: the output is image-only, so
+text is no longer selectable or searchable, and the file may get bigger
+for text-heavy PDFs. Quality is a render resolution, not a magic
+enhancer: a blurry scan stays blurry.
 """
 from __future__ import annotations
 
+import io
 import re
 from pathlib import Path
 
@@ -45,21 +55,37 @@ from pdfedi.tools._helpers import open_pdf_reader
 from pdfedi.tools.base import (
     ToolContext,
     ToolError,
+    ToolOption,
     ToolSpec,
+    get_option,
 )
 
 SPEC = ToolSpec(
     key="flatten",
     name="Flatten PDF",
-    tagline="Bake annotations and forms into the page",
+    tagline="Turn every page into an image",
     description=(
-        "Merge annotations and interactive form fields into static page content. "
-        "The output PDF is no longer editable or interactive."
+        "Flatten a PDF for real: every page is rendered to a full-page "
+        "image, so nothing in the document is editable, selectable or "
+        "searchable anymore. Filled form values are baked in first, so "
+        "they stay visible. Choose 300 DPI for print quality or 150 DPI "
+        "for a smaller file. The output is image-only — text is no longer "
+        "selectable, and text-heavy PDFs may get bigger."
     ),
     input_kinds=["pdf"],
     min_files=1,
     max_files=1,
-    options=[],
+    options=[
+        ToolOption(
+            name="quality",
+            kind="select",
+            label="Output quality",
+            required=False,
+            default="300",
+            choices=["150", "300"],
+            help="Render resolution. 300 DPI is print quality; 150 DPI makes a smaller file. Either way the output is image-only: text is no longer selectable or searchable.",
+        ),
+    ],
     output_kind="pdf",
     output_ext="pdf",
     output_mime="application/pdf",
@@ -417,6 +443,19 @@ def _flatten_page_annotations(writer, page, counter: list[int]) -> None:
 
 
 def run(ctx: ToolContext, options: dict) -> Path:
+    if not isinstance(options, dict):
+        raise ToolError("Options must be an object.", code="bad_options")
+    raw_quality = get_option(options, SPEC, "quality")
+    try:
+        quality_dpi = int(raw_quality)
+    except (TypeError, ValueError):
+        raise ToolError(
+            "Option 'quality' must be 150 or 300 DPI.", code="invalid_option"
+        )
+    if str(quality_dpi) not in ("150", "300"):
+        raise ToolError(
+            "Option 'quality' must be 150 or 300 DPI.", code="invalid_option"
+        )
     if not ctx.inputs:
         raise ToolError("No input file provided.", code="missing_input")
     data = ctx.inputs[0].path.read_bytes()
@@ -424,22 +463,83 @@ def run(ctx: ToolContext, options: dict) -> Path:
         data, ctx.inputs[0].filename, encrypted_code="invalid_input"
     )
 
+    # Step 1 — bake appearances first. pypdfium2 only renders widget
+    # values that have appearance streams, so without this step filled
+    # form values would vanish from the rendered pages. This also raises
+    # ToolError for values that cannot be baked instead of destroying
+    # them silently.
     writer = PdfWriter()
     for page in reader.pages:
         writer.add_page(page)
-
-    # Bake every annotation into its page content before removing it,
-    # so filled values and annotation visuals survive as static content.
     counter = [0]
     for page in writer.pages:
         _flatten_page_annotations(writer, page, counter)
-
-    # Drop the interactive form dictionary: fields are no longer fillable.
     root = writer._root_object
     if "/AcroForm" in root:
         del root[NameObject("/AcroForm")]
+    baked_buf = io.BytesIO()
+    writer.write(baked_buf)
+    baked_bytes = baked_buf.getvalue()
 
+    # Page sizes (rotation-aware) come from the baked document.
+    baked_reader = open_pdf_reader(
+        baked_bytes, ctx.inputs[0].filename, encrypted_code="invalid_input"
+    )
+
+    try:
+        import pypdfium2 as pdfium
+    except ImportError as exc:
+        raise ToolError(
+            "Image rendering is unavailable on this deployment.",
+            code="dependency_unavailable",
+        ) from exc
+    from reportlab.lib.utils import ImageReader
+    from reportlab.pdfgen import canvas as rl_canvas
+
+    scale = quality_dpi / 72.0
+    jpeg_quality = 90 if quality_dpi >= 300 else 85
     out_path = ctx.new_output_path("flattened.pdf")
-    with open(out_path, "wb") as f:
-        writer.write(f)
+
+    pdf = pdfium.PdfDocument(baked_bytes)
+    try:
+        canvas = None
+        for i in range(len(pdf)):
+            page = pdf[i]
+            try:
+                pil_image = page.render(scale=scale).to_pil()
+            finally:
+                page.close()
+            src = baked_reader.pages[i]
+            try:
+                w_pt = float(src.mediabox.width)
+                h_pt = float(src.mediabox.height)
+                rotation = int(src.get("/Rotate") or 0) % 360
+            except Exception:
+                w_pt, h_pt, rotation = 612.0, 792.0, 0
+            if w_pt <= 0 or h_pt <= 0:
+                raise ToolError(
+                    f"Page {i + 1} has an invalid page size.",
+                    code="invalid_input",
+                )
+            if rotation in (90, 270):
+                w_pt, h_pt = h_pt, w_pt
+            if pil_image.mode in ("RGBA", "LA", "PA"):
+                pil_image = pil_image.convert("RGB")
+            img_buf = io.BytesIO()
+            pil_image.save(img_buf, format="JPEG", quality=jpeg_quality, optimize=True)
+            pil_image.close()
+            if canvas is None:
+                canvas = rl_canvas.Canvas(str(out_path), pagesize=(w_pt, h_pt))
+            else:
+                canvas.setPageSize((w_pt, h_pt))
+            canvas.drawImage(
+                ImageReader(io.BytesIO(img_buf.getvalue())),
+                0, 0, width=w_pt, height=h_pt,
+            )
+            canvas.showPage()
+        if canvas is None:
+            raise ToolError("No pages were rendered.", code="invalid_input")
+        canvas.save()
+    finally:
+        pdf.close()
     return out_path

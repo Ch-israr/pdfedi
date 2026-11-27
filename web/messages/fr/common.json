@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "Aplatir un PDF",
-      "tagline": "Intégrer les annotations dans les pages"
+      "tagline": "Transformez chaque page en image"
     },
     "strip_image_metadata": {
       "name": "Supprimer les métadonnées des images",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF vers EPUB",
       "tagline": "Convertir un PDF en livre numérique"
+    },
+    "pdf_to_300dpi": {
+      "name": "Convertir un PDF en 300 DPI",
+      "tagline": "Augmentez la résolution pour l'impression"
     }
   },
   "runner": {

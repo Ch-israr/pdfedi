@@ -40,6 +40,7 @@
 ## Optimize
 
 - [Compress PDF](https://pdfedi.onrender.com/tools/compress): Shrink a PDF to a target size (2–50 MB), e.g. a court e-filing limit. Batch up to 10 files, ZIP download with a size report.
+- [Convert PDF to 300 DPI](https://pdfedi.onrender.com/tools/pdf_to_300dpi): Raise the effective DPI of embedded images to 300 or 600 DPI for print; images already at the target are left alone, and no image is upscaled more than 2x.
 - [Grayscale](https://pdfedi.onrender.com/tools/grayscale): Convert a PDF to grayscale to save ink when printing.
 - [Repair PDF](https://pdfedi.onrender.com/tools/repair): Fix a damaged or corrupted PDF file so it opens again.
 

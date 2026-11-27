@@ -712,38 +712,39 @@
     ]
   },
   "flatten": {
-    "title": "Aplatir un PDF en ligne gratuitement — Intégrer les annotations dans les pages | PDFEDI",
-    "description": "Aplatissez un PDF en ligne gratuitement. Intégrez définitivement les annotations, commentaires et champs de formulaire remplis dans les pages pour figer l'apparence. Sans inscription.",
+    "title": "Aplatir un PDF gratuitement — Transformez chaque page en image | PDFEDI",
+    "description": "Aplatissez un PDF gratuitement. Chaque page devient une image, donc plus rien n'est modifiable, sélectionnable ou recherchable. Les valeurs des formulaires remplis restent visibles.",
     "h1": "Aplatir un PDF",
-    "intro": "Intégrez définitivement les annotations et les champs de formulaire dans les pages de votre PDF. L'aplatissement fusionne les marques, les commentaires et les formulaires remplis dans le contenu de la page, pour que le document ait la même apparence partout et ne puisse plus être modifié.",
+    "intro": "Aplatissez un PDF pour de vrai : chaque page devient une image pleine page, donc plus rien dans le document ne peut être modifié, sélectionné ou recherché. Les valeurs des formulaires remplis sont d'abord figées, elles restent donc visibles. Choisissez 300 DPI pour la qualité d'impression ou 150 DPI pour un fichier plus petit.",
     "howTo": [
-      "Envoyez votre fichier PDF (jusqu'à 50 Mo).",
-      "Cliquez sur Aplatir.",
-      "Téléchargez le PDF aplati."
+      "Téléversez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez 300 DPI pour la qualité d'impression ou 150 DPI pour un fichier plus petit.",
+      "Cliquez sur Aplatir et téléchargez le PDF."
     ],
     "features": [
-      "Fusionne les annotations dans le contenu de la page",
-      "Intègre les valeurs des champs de formulaire dans les pages",
-      "Fige l'apparence finale du document"
+      "Chaque page devient une image pleine page",
+      "Plus rien n'est modifiable, sélectionnable ou recherchable",
+      "Les valeurs des formulaires restent visibles dans l'image",
+      "Même nombre de pages et même taille que l'original"
     ],
     "useCases": [
-      "Finaliser un formulaire rempli pour que les valeurs ne puissent plus être modifiées",
-      "Intégrer les commentaires de relecture dans un document",
-      "Garantir une apparence cohérente dans tous les lecteurs PDF",
+      "Finaliser un formulaire rempli pour que les valeurs ne puissent plus changer",
+      "Partager un document qui ne peut être ni copié ni modifié",
+      "Garantir la même apparence dans tous les lecteurs PDF",
       "Préparer des documents pour l'impression ou l'archivage"
     ],
     "faqs": [
       {
         "q": "Que fait l'aplatissement d'un PDF ?",
-        "a": "L'aplatissement fusionne les annotations, les commentaires et les valeurs des champs de formulaire directement dans les graphiques de la page. Après l'aplatissement, ils font partie de la page et ne peuvent plus être modifiés ni déplacés."
+        "a": "L'aplatissement transforme chaque page en une image pleine page. Les annotations, commentaires et valeurs de formulaire sont d'abord figés dans l'image, donc ils restent visibles — mais plus rien dans le résultat ne peut être modifié, sélectionné ou recherché."
       },
       {
         "q": "Pourquoi aplatir un formulaire rempli ?",
-        "a": "Les valeurs d'un formulaire non aplati peuvent encore être modifiées par quiconque dispose d'un éditeur PDF. L'aplatissement fige les valeurs saisies."
+        "a": "Les valeurs d'un formulaire non aplati peuvent toujours être modifiées avec n'importe quel éditeur PDF. L'aplatissement fige les valeurs saisies dans une image."
       },
       {
-        "q": "L'aplatissement modifiera-t-il l'apparence de mon PDF ?",
-        "a": "Non — l'apparence visuelle reste la même. Seule la possibilité de modifier les annotations et les champs de formulaire change."
+        "q": "L'aplatissement changera-t-il l'apparence de mon PDF ?",
+        "a": "Les pages ont la même apparence, mais ce sont désormais des images : le texte ne peut plus être sélectionné ni recherché, et les PDF riches en texte peuvent devenir plus lourds. Choisissez 150 DPI si la taille du fichier compte plus que la netteté d'impression."
       }
     ],
     "related": [
@@ -1504,6 +1505,55 @@
       "extract_text",
       "pdf_to_html",
       "ocr"
+    ]
+  },
+  "pdf_to_300dpi": {
+    "title": "Convertir un PDF en 300 DPI gratuitement — Augmentez la résolution pour l'impression | PDFEDI",
+    "description": "Convertissez un PDF en 300 DPI gratuitement. Augmentez la résolution effective des images intégrées pour que votre fichier passe les contrôles d'imprimerie. Les images déjà à 300 DPI sont laissées intactes ; rien n'est agrandi de plus de 2x.",
+    "h1": "Convertir un PDF en 300 DPI",
+    "intro": "Augmentez la résolution effective des images de votre PDF à 300 DPI (ou 600 pour l'impression haute qualité) afin qu'il passe les contrôles d'imprimerie et des portails de dépôt. Les images déjà à l'objectif sont laissées intactes, et aucune image n'est agrandie de plus de 2x. Augmenter la résolution ne peut pas ajouter de détails absents de l'image d'origine — cela corrige simplement le chiffre lu par les contrôles. Le texte et les graphiques vectoriels n'ont pas de DPI et ne sont jamais touchés.",
+    "howTo": [
+      "Téléversez votre fichier PDF (jusqu'à 50 Mo).",
+      "Choisissez 300 DPI pour l'impression ou 600 DPI pour l'impression haute qualité.",
+      "Cliquez sur Convertir et téléchargez le PDF.",
+      "Consultez les Propriétés du document du PDF obtenu : la ligne Sujet indique la résolution avant et après."
+    ],
+    "features": [
+      "Monte les images intégrées à 300 ou 600 DPI",
+      "Laisse intactes les images déjà à l'objectif",
+      "N'agrandit jamais une image de plus de 2x",
+      "Rapport de résolution avant/après dans le fichier obtenu",
+      "Texte et graphiques vectoriels intacts"
+    ],
+    "useCases": [
+      "Corriger un fichier refusé par l'imprimerie pour basse résolution",
+      "Respecter l'exigence de 300 DPI d'un tribunal ou d'un portail",
+      "Préparer des pièces scannées pour l'impression commerciale",
+      "Vérifier la résolution réelle des images de votre PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Convertir en 300 DPI rendra-t-il mes images plus nettes ?",
+        "a": "Non : augmenter la résolution ne peut pas ajouter de détails absents de l'image d'origine. Cela augmente le nombre de pixels pour que la résolution effective du fichier passe les contrôles d'imprimerie qui refusent tout ce qui est sous 300 DPI."
+      },
+      {
+        "q": "Qu'advient-il des images déjà à 300 DPI ?",
+        "a": "Rien : elles sont laissées exactement telles quelles. Seules les images sous l'objectif sont agrandies, et jamais de plus de 2x."
+      },
+      {
+        "q": "Cela change-t-il mon texte ?",
+        "a": "Non. Le texte et les graphiques vectoriels n'ont pas de DPI : ils sont dessinés à partir de contours mathématiques et restent nets à toute taille. Seules les images matricielles intégrées sont rééchantillonnées."
+      },
+      {
+        "q": "Comment savoir ce qui a changé ?",
+        "a": "Ouvrez les Propriétés du document du PDF obtenu (généralement Ctrl+D ou Cmd+D) et lisez la ligne Sujet : elle indique combien d'images ont été agrandies, combien étaient déjà bonnes, combien ont été ignorées, et la résolution effective minimale avant et après."
+      }
+    ],
+    "related": [
+      "compress",
+      "pdf_to_images",
+      "grayscale",
+      "repair"
     ]
   }
 }

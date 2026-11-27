@@ -21,6 +21,7 @@ from . import (
     n_up,
     ocr,
     pdf_to_epub,
+    pdf_to_300dpi,
     pdf_to_excel,
     pdf_to_html,
     pdf_to_pptx,
@@ -51,6 +52,7 @@ _MODULES = [
     compress, strip_metadata, exhibit_combine, strip_image_metadata,
     pdf_to_excel, pdf_to_pptx, sign_pdf, edit_pdf,
     html_to_pdf, pdf_to_html, header_footer, pdf_to_epub,
+    pdf_to_300dpi,
 ]
 
 TOOLS: dict[str, Any] = {}

@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "Flatten PDF",
-      "tagline": "Bake annotations into pages"
+      "tagline": "Turn every page into an image"
     },
     "strip_image_metadata": {
       "name": "Strip Image Metadata",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF to EPUB",
       "tagline": "Turn a PDF into an ebook"
+    },
+    "pdf_to_300dpi": {
+      "name": "Convert PDF to 300 DPI",
+      "tagline": "Raise image DPI for print"
     }
   },
   "runner": {

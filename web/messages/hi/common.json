@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "PDF फ़्लैटन करें",
-      "tagline": "एनोटेशन को पेजों में स्थायी रूप से मिलाएँ"
+      "tagline": "हर पृष्ठ को छवि में बदलें"
     },
     "strip_image_metadata": {
       "name": "इमेज मेटाडेटा हटाएँ",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF से EPUB",
       "tagline": "PDF को ईबुक में बदलें"
+    },
+    "pdf_to_300dpi": {
+      "name": "PDF को 300 DPI में बदलें",
+      "tagline": "प्रिंट के लिए छवियों का DPI बढ़ाएँ"
     }
   },
   "runner": {

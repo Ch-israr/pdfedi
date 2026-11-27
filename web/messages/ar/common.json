@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "تسطيح PDF",
-      "tagline": "دمج التعليقات التوضيحية في الصفحات"
+      "tagline": "حوّل كل صفحة إلى صورة"
     },
     "strip_image_metadata": {
       "name": "إزالة البيانات الوصفية للصور",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF إلى EPUB",
       "tagline": "تحويل PDF إلى كتاب إلكتروني"
+    },
+    "pdf_to_300dpi": {
+      "name": "تحويل PDF إلى 300 DPI",
+      "tagline": "ارفع دقة الصور للطباعة"
     }
   },
   "runner": {

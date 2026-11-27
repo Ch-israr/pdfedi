@@ -712,38 +712,39 @@
     ]
   },
   "flatten": {
-    "title": "Achatar PDF Online Grátis — Incorporar Anotações às Páginas | PDFEDI",
-    "description": "Achate um PDF online grátis. Incorpore anotações, comentários e campos de formulário preenchidos permanentemente às páginas para travar a aparência. Sem cadastro.",
+    "title": "Achatar PDF grátis — Transforme cada página numa imagem | PDFEDI",
+    "description": "Achate um PDF grátis. Cada página passa a ser uma imagem, por isso nada fica editável, selecionável ou pesquisável. Os valores dos formulários preenchidos mantêm-se visíveis.",
     "h1": "Achatar PDF",
-    "intro": "Incorpore anotações e campos de formulário permanentemente às páginas do seu PDF. Achatar mescla marcações, comentários e formulários preenchidos ao conteúdo da página, para que o documento fique igual em qualquer lugar e não possa mais ser editado.",
+    "intro": "Achate um PDF a sério: cada página passa a ser uma imagem de página inteira, por isso nada no documento pode ser editado, selecionado ou pesquisado. Os valores dos formulários preenchidos são fixados primeiro, por isso mantêm-se visíveis. Escolha 300 DPI para qualidade de impressão ou 150 DPI para um ficheiro mais pequeno.",
     "howTo": [
-      "Envie seu arquivo PDF (até 50 MB).",
-      "Clique em Achatar.",
-      "Baixe o PDF achatado."
+      "Envie o seu ficheiro PDF (até 50 MB).",
+      "Escolha 300 DPI para qualidade de impressão ou 150 DPI para um ficheiro mais pequeno.",
+      "Clique em Achatar e transfira o PDF."
     ],
     "features": [
-      "Mescla anotações ao conteúdo da página",
-      "Incorpora os valores dos campos de formulário às páginas",
-      "Trava a aparência final do documento"
+      "Cada página passa a ser uma imagem de página inteira",
+      "Nada fica editável, selecionável ou pesquisável",
+      "Os valores dos formulários mantêm-se visíveis na imagem",
+      "Mesmo número de páginas e tamanho do original"
     ],
     "useCases": [
-      "Finalizar um formulário preenchido para que os valores não possam ser alterados",
-      "Incorporar comentários de revisão a um documento",
-      "Garantir aparência consistente em todos os leitores de PDF",
-      "Preparar documentos para impressão ou arquivamento"
+      "Finalizar um formulário preenchido para que os valores não possam mudar",
+      "Partilhar um documento que não possa ser copiado nem editado",
+      "Garantir a mesma aparência em todos os leitores de PDF",
+      "Preparar documentos para impressão ou arquivo"
     ],
     "faqs": [
       {
-        "q": "O que achatar um PDF faz?",
-        "a": "Achatar mescla anotações, comentários e valores de campos de formulário diretamente nos gráficos da página. Depois de achatar, eles passam a fazer parte da página e não podem mais ser editados ou movidos."
+        "q": "O que faz achatar um PDF?",
+        "a": "Achatar transforma cada página numa imagem de página inteira. As anotações, os comentários e os valores dos formulários são primeiro fixados na imagem, por isso mantêm-se visíveis — mas nada no resultado pode ser editado, selecionado ou pesquisado."
       },
       {
-        "q": "Por que devo achatar um formulário preenchido?",
-        "a": "Os valores de um formulário não achatado ainda podem ser editados por qualquer pessoa com um editor de PDF. Achatar trava os valores preenchidos no lugar."
+        "q": "Porque devo achatar um formulário preenchido?",
+        "a": "Os valores de um formulário não achatado ainda podem ser editados por qualquer pessoa com um editor de PDF. Ao achatar, os valores preenchidos ficam fixados numa imagem."
       },
       {
-        "q": "Achatar muda a aparência do meu PDF?",
-        "a": "Não — a aparência visual permanece a mesma. Apenas a editabilidade das anotações e dos campos de formulário muda."
+        "q": "Achatar vai mudar o aspeto do meu PDF?",
+        "a": "As páginas têm o mesmo aspeto, mas agora são imagens: o texto já não pode ser selecionado nem pesquisado, e os PDF com muito texto podem ficar maiores. Escolha 150 DPI se o tamanho do ficheiro importar mais do que a nitidez de impressão."
       }
     ],
     "related": [
@@ -1504,6 +1505,55 @@
       "extract_text",
       "pdf_to_html",
       "ocr"
+    ]
+  },
+  "pdf_to_300dpi": {
+    "title": "Converter PDF para 300 DPI grátis — Aumente a resolução para impressão | PDFEDI",
+    "description": "Converta um PDF para 300 DPI grátis. Aumente a resolução efetiva das imagens incorporadas para que o ficheiro passe nas verificações das gráficas. As imagens que já estão a 300 DPI ficam intactas; nada é ampliado mais de 2x.",
+    "h1": "Converter PDF para 300 DPI",
+    "intro": "Aumente a resolução efetiva das imagens do seu PDF para 300 DPI (ou 600 para impressão de alta qualidade) para que passe nas verificações das gráficas e dos portais de envio. As imagens que já atingem o objetivo ficam intactas, e nenhuma imagem é ampliada mais de 2x. Aumentar a resolução não pode acrescentar detalhe que não esteja na imagem original — apenas corrige o número que as verificações leem. O texto e os gráficos vetoriais não têm DPI e nunca são tocados.",
+    "howTo": [
+      "Envie o seu ficheiro PDF (até 50 MB).",
+      "Escolha 300 DPI para impressão ou 600 DPI para impressão de alta qualidade.",
+      "Clique em Converter e transfira o PDF.",
+      "Consulte as Propriedades do documento do PDF resultante: a linha Assunto indica a resolução antes e depois."
+    ],
+    "features": [
+      "Aumenta as imagens incorporadas para 300 ou 600 DPI",
+      "Deixa intactas as imagens que já cumprem o objetivo",
+      "Nunca amplia nenhuma imagem mais de 2x",
+      "Relatório de DPI antes/depois no ficheiro resultante",
+      "Texto e gráficos vetoriais intactos"
+    ],
+    "useCases": [
+      "Corrigir um ficheiro rejeitado pela gráfica por baixa resolução",
+      "Cumprir o requisito de 300 DPI de um tribunal ou portal",
+      "Preparar documentos digitalizados para impressão comercial",
+      "Verificar a resolução real das imagens do seu PDF"
+    ],
+    "faqs": [
+      {
+        "q": "Converter para 300 DPI vai tornar as minhas imagens mais nítidas?",
+        "a": "Não: aumentar a resolução não pode acrescentar detalhe que não esteja na imagem original. Aumenta o número de píxeis para que a resolução efetiva do ficheiro passe nas verificações das gráficas que rejeitam tudo abaixo de 300 DPI."
+      },
+      {
+        "q": "O que acontece às imagens que já estão a 300 DPI?",
+        "a": "Nada: ficam exatamente como estão. Só as imagens abaixo do objetivo são ampliadas, e nunca mais de 2x."
+      },
+      {
+        "q": "Isto muda o meu texto?",
+        "a": "Não. O texto e os gráficos vetoriais não têm DPI: são desenhados a partir de contornos matemáticos e mantêm-se nítidos em qualquer tamanho. Só as imagens raster incorporadas são reamostradas."
+      },
+      {
+        "q": "Como sei o que mudou?",
+        "a": "Abra as Propriedades do documento do PDF resultante (normalmente Ctrl+D ou Cmd+D) e leia a linha Assunto: indica quantas imagens foram ampliadas, quantas já estavam bem, quantas foram ignoradas e a resolução efetiva mínima antes e depois."
+      }
+    ],
+    "related": [
+      "compress",
+      "pdf_to_images",
+      "grayscale",
+      "repair"
     ]
   }
 }

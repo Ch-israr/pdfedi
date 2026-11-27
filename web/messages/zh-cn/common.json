@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "展平 PDF",
-      "tagline": "将注释合并到页面中"
+      "tagline": "将每一页变成图片"
     },
     "strip_image_metadata": {
       "name": "清除图片元数据",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF 转 EPUB",
       "tagline": "将 PDF 转换为电子书"
+    },
+    "pdf_to_300dpi": {
+      "name": "将 PDF 转换为 300 DPI",
+      "tagline": "提高图片分辨率以便打印"
     }
   },
   "runner": {

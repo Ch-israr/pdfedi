@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "Ratakan PDF",
-      "tagline": "Satukan anotasi ke dalam halaman"
+      "tagline": "Ubah setiap halaman menjadi gambar"
     },
     "strip_image_metadata": {
       "name": "Hapus Metadata Gambar",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF ke EPUB",
       "tagline": "Ubah PDF menjadi ebook"
+    },
+    "pdf_to_300dpi": {
+      "name": "Ubah PDF ke 300 DPI",
+      "tagline": "Naikkan resolusi gambar untuk cetak"
     }
   },
   "runner": {

@@ -163,7 +163,7 @@
     },
     "flatten": {
       "name": "PDF فلیٹ کریں",
-      "tagline": "تشریحات کو صفحات میں ضم کریں"
+      "tagline": "ہر صفحے کو تصویر میں بدلیں"
     },
     "strip_image_metadata": {
       "name": "تصاویر کا میٹا ڈیٹا ہٹائیں",
@@ -208,6 +208,10 @@
     "pdf_to_epub": {
       "name": "PDF سے EPUB",
       "tagline": "PDF کو ای بک میں تبدیل کریں"
+    },
+    "pdf_to_300dpi": {
+      "name": "PDF کو 300 DPI میں تبدیل کریں",
+      "tagline": "پرنٹ کے لیے تصاویر کا DPI بڑھائیں"
     }
   },
   "runner": {

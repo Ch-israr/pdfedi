@@ -712,38 +712,39 @@
     ]
   },
   "flatten": {
-    "title": "Flatten PDF Online Free — Bake Annotations into Pages | PDFEDI",
-    "description": "Flatten a PDF online for free. Bake annotations, comments and filled form fields permanently into pages so appearance is locked. No sign-up.",
+    "title": "Flatten PDF Online Free — Turn Every Page into an Image | PDFEDI",
+    "description": "Flatten a PDF online for free. Every page is rendered to an image so nothing stays editable, selectable or searchable. Filled form values stay visible.",
     "h1": "Flatten PDF",
-    "intro": "Bake annotations and form fields permanently into your PDF's pages. Flattening merges markups, comments, and filled forms into the page content so the document looks the same everywhere and can't be edited further.",
+    "intro": "Flatten a PDF for real: every page is rendered to a full-page image, so nothing in the document is editable, selectable or searchable anymore. Filled form values are baked in first, so they stay visible. Choose 300 DPI for print quality or 150 DPI for a smaller file.",
     "howTo": [
       "Upload your PDF file (up to 50MB).",
-      "Click Flatten.",
-      "Download the flattened PDF."
+      "Choose 300 DPI for print quality or 150 DPI for a smaller file.",
+      "Click Flatten and download the PDF."
     ],
     "features": [
-      "Merges annotations into page content",
-      "Bakes form field values into pages",
-      "Locks final document appearance"
+      "Every page becomes a full-page image",
+      "Nothing stays editable, selectable or searchable",
+      "Filled form values stay visible in the image",
+      "Same page count and page size as the original"
     ],
     "useCases": [
       "Finalize a filled form so values can't be changed",
-      "Bake review comments into a document",
-      "Ensure consistent appearance across PDF readers",
+      "Share a document that can't be copied or edited",
+      "Ensure identical appearance across PDF readers",
       "Prepare documents for printing or archiving"
     ],
     "faqs": [
       {
         "q": "What does flattening a PDF do?",
-        "a": "Flattening merges annotations, comments, and form field values directly into the page graphics. After flattening, they become part of the page and can no longer be edited or moved."
+        "a": "Flattening renders every page to a full-page image. Annotations, comments and filled form values are baked into the image first, so they stay visible — but nothing in the output can be edited, selected or searched anymore."
       },
       {
         "q": "Why should I flatten a filled form?",
-        "a": "An unflattened form's values can still be edited by anyone with a PDF editor. Flattening locks the filled-in values in place."
+        "a": "An unflattened form's values can still be edited by anyone with a PDF editor. Flattening locks the filled-in values into an image."
       },
       {
         "q": "Will flattening change how my PDF looks?",
-        "a": "No — the visual appearance stays the same. Only the editability of annotations and form fields changes."
+        "a": "The pages look the same, but they are now images: text can no longer be selected or searched, and text-heavy PDFs may get bigger. Choose 150 DPI if file size matters more than print sharpness."
       }
     ],
     "related": [
@@ -1504,6 +1505,55 @@
       "extract_text",
       "pdf_to_html",
       "ocr"
+    ]
+  },
+  "pdf_to_300dpi": {
+    "title": "Convert PDF to 300 DPI Online Free — Raise Image DPI for Print | PDFEDI",
+    "description": "Convert a PDF to 300 DPI online for free. Raise the effective DPI of embedded images so your file passes print-shop checks. Images already at 300 DPI are left alone; nothing is upscaled more than 2x.",
+    "h1": "Convert PDF to 300 DPI",
+    "intro": "Raise the effective DPI of the images in your PDF to 300 DPI (or 600 for high-quality print) so it passes print-shop and upload-portal checks. Images already at the target are left untouched, and no image is upscaled more than 2x. Raising DPI cannot add detail that isn't in the original — it fixes the number checkers read. Text and vector graphics have no DPI and are never touched.",
+    "howTo": [
+      "Upload your PDF file (up to 50MB).",
+      "Choose 300 DPI for print or 600 DPI for high-quality print.",
+      "Click Convert and download the PDF.",
+      "Check the output PDF's Document Properties — the Subject line reports the DPI before and after for your file."
+    ],
+    "features": [
+      "Raises embedded images to 300 or 600 DPI",
+      "Leaves images already at target untouched",
+      "Never upscales any image more than 2x",
+      "Before/after DPI report in the output file",
+      "Text and vector graphics untouched"
+    ],
+    "useCases": [
+      "Fix a file a print shop rejected for low resolution",
+      "Meet a 300 DPI upload requirement for a court or portal",
+      "Prepare scanned exhibits for commercial printing",
+      "Check what DPI your PDF's images actually are"
+    ],
+    "faqs": [
+      {
+        "q": "Will converting to 300 DPI make my images sharper?",
+        "a": "No — raising DPI cannot add detail that isn't in the original image. It increases the pixel count so the file's effective DPI passes print-shop and preflight checks that reject anything under 300 DPI."
+      },
+      {
+        "q": "What happens to images already at 300 DPI?",
+        "a": "Nothing — they are left exactly as they are. Only images below the target are upscaled, and no image is upscaled more than 2x."
+      },
+      {
+        "q": "Does it change my text?",
+        "a": "No. Text and vector graphics have no DPI — they are drawn from mathematical outlines and stay sharp at any size. Only embedded raster images are resampled."
+      },
+      {
+        "q": "How do I know what changed?",
+        "a": "Open the output PDF's Document Properties (usually Ctrl+D or Cmd+D) and read the Subject line — it reports how many images were raised, how many were already fine, how many were skipped, and the minimum effective DPI before and after."
+      }
+    ],
+    "related": [
+      "compress",
+      "pdf_to_images",
+      "grayscale",
+      "repair"
     ]
   }
 }
