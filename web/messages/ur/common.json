@@ -252,7 +252,9 @@
     "downloadResult": "نتیجہ ڈاؤن لوڈ کریں",
     "downloading": "ڈاؤن لوڈ ہو رہا ہے…",
     "downloadingPct": "ڈاؤن لوڈ ہو رہا ہے… {pct}%",
-    "chooseHtml": "ایک HTML فائل منتخب کریں (اختیاری)"
+    "chooseHtml": "ایک HTML فائل منتخب کریں (اختیاری)",
+    "stillChecking": "عارضی رکاوٹ — آپ کی فائل ابھی بھی چیک ہو رہی ہے…",
+    "waitingInQueue": "خالی سلاٹ کا انتظار — اب تک {elapsed}۔"
   },
   "canvas": {
     "startOver": "نئے سرے سے شروع کریں",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "ترتیب دینے کے لیے کچھ نہیں ہے۔",
     "output_too_large": "نتیجہ ڈاؤن لوڈ کے لیے بہت بڑا ہے۔",
     "pdf_unreadable": "یہ فائل PDF کے طور پر پڑھی نہیں جا سکی۔",
-    "pdf_unreadable_one": "ایک فائل PDF کے طور پر پڑھی نہیں جا سکی۔"
+    "pdf_unreadable_one": "ایک فائل PDF کے طور پر پڑھی نہیں جا سکی۔",
+    "temporary_error": "ایک لمحے کے لیے کچھ غلط ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔",
+    "connection_lost": "آپ کی فائل چیک کرتے ہوئے کنکشن منقطع ہو گیا۔ براہ کرم دوبارہ کوشش کریں۔"
   },
   "toolOptions": {
     "compress": {

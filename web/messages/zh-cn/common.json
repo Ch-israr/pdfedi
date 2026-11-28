@@ -252,7 +252,9 @@
     "downloadResult": "下载结果",
     "downloading": "下载中…",
     "downloadingPct": "下载中…{pct}%",
-    "chooseHtml": "选择一个 HTML 文件（可选）"
+    "chooseHtml": "选择一个 HTML 文件（可选）",
+    "stillChecking": "遇到临时问题——仍在检查您的文件…",
+    "waitingInQueue": "正在等待空闲位置——目前已等待 {elapsed}。"
   },
   "canvas": {
     "startOver": "重新开始",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "没有可重新排序的内容。",
     "output_too_large": "结果过大，无法下载。",
     "pdf_unreadable": "此文件无法作为 PDF 读取。",
-    "pdf_unreadable_one": "其中一个文件无法作为 PDF 读取。"
+    "pdf_unreadable_one": "其中一个文件无法作为 PDF 读取。",
+    "temporary_error": "刚才出了一点问题。请重试。",
+    "connection_lost": "检查文件时连接中断。请重试。"
   },
   "toolOptions": {
     "compress": {

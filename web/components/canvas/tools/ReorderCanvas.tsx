@@ -147,6 +147,9 @@ export function ReorderCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps
       locale={locale}
       activityLabel={t("reorder.activity")}
       error={job.error}
+      transientNotice={job.transientNotice}
+      queueWaitMs={job.queueWaitMs}
+      jobStatus={job.job?.status ?? null}
     >
       <div className="mt-4">
         <div className="mb-3 flex flex-wrap items-center gap-2">

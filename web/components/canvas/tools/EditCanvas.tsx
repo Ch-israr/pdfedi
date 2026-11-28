@@ -157,6 +157,9 @@ export function EditCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) {
       locale={locale}
       activityLabel={t("edit.activity")}
       error={job.error}
+      transientNotice={job.transientNotice}
+      queueWaitMs={job.queueWaitMs}
+      jobStatus={job.job?.status ?? null}
     >
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div>

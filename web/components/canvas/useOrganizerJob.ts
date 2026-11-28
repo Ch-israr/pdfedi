@@ -8,6 +8,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { ApiError, api, type Job, type ToolSpec, type UploadedFile } from "../../lib/api";
+import {
+  POLL_BASE_MS,
+  POLL_FAIL_WINDOW_MS,
+  isQuotaError,
+  nextPollDelayMs,
+} from "../../lib/polling";
 
 export type CanvasPhase =
   | "pick"
@@ -32,10 +38,15 @@ export function useOrganizerJob(toolKey: string) {
 
   // Translate an API failure by stable code; fall back to the English
   // message only when no code is available (e.g. a network failure).
+  // Only a 429 carrying the backend's `quota_exceeded` code is a real
+  // quota error — a bare 429 (proxy / upstream rate limit, no code)
+  // is transient, so it gets the temporary-error message instead of
+  // the quota message. See web/lib/polling.ts.
   function resolveError(e: unknown): string {
     if (e instanceof ApiError) {
-      if (e.status === 429) return tErr("quota_exceeded", { time: quotaResetTime() });
+      if (isQuotaError(e)) return tErr("quota_exceeded", { time: quotaResetTime() });
       if (e.code && tErr.has(e.code)) return tErr(e.code);
+      if (e.status === 429) return tErr("temporary_error");
       return e.message;
     }
     return e instanceof Error ? e.message : String(e);
@@ -56,22 +67,36 @@ export function useOrganizerJob(toolKey: string) {
   const [downloadPct, setDownloadPct] = useState<number | null>(null);
   const [quota, setQuota] = useState<{ used: number; limit: number; remaining: number } | null>(null);
   const [limits, setLimits] = useState<{ max_upload_mb: number; max_download_mb: number } | null>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Transient poll note ("still checking…") shown while the poller
+  // rides out a blip; cleared on the next successful poll. Distinct
+  // from `error`, which is a terminal failure.
+  const [transientNotice, setTransientNotice] = useState<string | null>(null);
+  // Milliseconds the current job has spent queued (from job.created_at),
+  // shown as a waiting line while the job waits for a free slot.
+  const [queueWaitMs, setQueueWaitMs] = useState<number | null>(null);
+  // setTimeout chain (not setInterval): the next poll is scheduled
+  // after each tick, so the gap can back off after failures.
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Consecutive failed polls + when the current failure streak began.
+  const pollFailuresRef = useRef(0);
+  const firstFailureAtRef = useRef<number | null>(null);
 
   useEffect(() => {
     api.tool(toolKey).then(setSpec).catch((e) => setSpecError(String(e.message || e)));
     api.quota(toolKey).then(setQuota).catch(() => {});
     api.limits().then(setLimits).catch(() => {});
     return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
+      if (pollRef.current) clearTimeout(pollRef.current);
     };
   }, [toolKey]);
 
   function stopPolling() {
     if (pollRef.current) {
-      clearInterval(pollRef.current);
+      clearTimeout(pollRef.current);
       pollRef.current = null;
     }
+    pollFailuresRef.current = 0;
+    firstFailureAtRef.current = null;
   }
 
   // Mirror of `files` for async upload callbacks. `uploadFiles` must not
@@ -109,7 +134,7 @@ export function useOrganizerJob(toolKey: string) {
         // never renders an empty grid.
         return all;
       } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
+        setError(resolveError(e));
         setPhase("pick");
         throw e;
       } finally {
@@ -128,11 +153,34 @@ export function useOrganizerJob(toolKey: string) {
         const j = await api.createJob(spec.key, orderedFiles.map((f) => f.id), config);
         setJob(j);
         setPhase("processing");
+        // Poll with backoff: a failed poll never stops the poller
+        // outright. Transient failures (e.g. a bare 429 from the
+        // proxy) show a temporary note and retry with exponential
+        // backoff; only a sustained failure window
+        // (POLL_FAIL_WINDOW_MS) ends the job with a hard error.
+        // A coded quota error is terminal — but quota is charged at
+        // job creation, so it should not occur while polling.
+        stopPolling();
+        setTransientNotice(null);
+        setQueueWaitMs(null);
+        const schedule = (delay: number) => {
+          pollRef.current = setTimeout(tick, delay);
+        };
         const tick = async () => {
           try {
             const cur = await api.job(j.id);
+            // Success resets the failure streak and clears the note.
+            pollFailuresRef.current = 0;
+            firstFailureAtRef.current = null;
+            setTransientNotice(null);
             setJob(cur);
-            if (cur.status === "succeeded") {
+            if (cur.status === "queued") {
+              setQueueWaitMs(Date.now() - Date.parse(cur.created_at));
+              schedule(POLL_BASE_MS);
+            } else if (cur.status === "running") {
+              setQueueWaitMs(null);
+              schedule(POLL_BASE_MS);
+            } else if (cur.status === "succeeded") {
               stopPolling();
               api.quota(toolKey).then(setQuota).catch(() => {});
               setPhase("completed");
@@ -142,13 +190,27 @@ export function useOrganizerJob(toolKey: string) {
               setPhase("failed");
             }
           } catch (e) {
-            stopPolling();
-            setError(resolveError(e));
-            setPhase("failed");
+            if (isQuotaError(e)) {
+              stopPolling();
+              setError(resolveError(e));
+              setPhase("failed");
+              return;
+            }
+            pollFailuresRef.current += 1;
+            const now = Date.now();
+            if (firstFailureAtRef.current === null) firstFailureAtRef.current = now;
+            if (now - firstFailureAtRef.current >= POLL_FAIL_WINDOW_MS) {
+              stopPolling();
+              setTransientNotice(null);
+              setError(tErr("connection_lost"));
+              setPhase("failed");
+              return;
+            }
+            setTransientNotice(tRunner("stillChecking"));
+            schedule(nextPollDelayMs(pollFailuresRef.current));
           }
         };
         await tick();
-        pollRef.current = setInterval(tick, 400);
       } catch (e) {
         setError(resolveError(e));
         api.quota(toolKey).then(setQuota).catch(() => {});
@@ -200,6 +262,8 @@ export function useOrganizerJob(toolKey: string) {
     setFiles([]);
     setJob(null);
     setError(null);
+    setTransientNotice(null);
+    setQueueWaitMs(null);
     setPhase("pick");
   }, []);
 
@@ -218,6 +282,8 @@ export function useOrganizerJob(toolKey: string) {
     job,
     error,
     setError,
+    transientNotice,
+    queueWaitMs,
     busy,
     downloadPct,
     quota,

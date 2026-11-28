@@ -175,6 +175,9 @@ export function MergeCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) 
       locale={locale}
       activityLabel={t("merge.activity")}
       error={job.error}
+      transientNotice={job.transientNotice}
+      queueWaitMs={job.queueWaitMs}
+      jobStatus={job.job?.status ?? null}
     >
       <div className="mt-4 flex flex-col gap-4 lg:flex-row">
         {/* File rail */}

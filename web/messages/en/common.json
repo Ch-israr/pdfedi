@@ -252,7 +252,9 @@
     "downloadResult": "Download result",
     "downloading": "Downloading…",
     "downloadingPct": "Downloading… {pct}%",
-    "chooseHtml": "Choose an HTML file (optional)"
+    "chooseHtml": "Choose an HTML file (optional)",
+    "stillChecking": "Temporary hiccup — still checking on your file…",
+    "waitingInQueue": "Waiting for a free slot — {elapsed} so far."
   },
   "canvas": {
     "startOver": "Start over",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "Nothing to reorder.",
     "output_too_large": "The result is too large to download.",
     "pdf_unreadable": "This file could not be read as a PDF.",
-    "pdf_unreadable_one": "One of the files could not be read as a PDF."
+    "pdf_unreadable_one": "One of the files could not be read as a PDF.",
+    "temporary_error": "Something went wrong for a moment. Please try again.",
+    "connection_lost": "We lost connection while checking your file. Please try again."
   },
   "toolOptions": {
     "compress": {

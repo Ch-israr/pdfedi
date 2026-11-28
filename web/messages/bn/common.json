@@ -252,7 +252,9 @@
     "downloadResult": "ফলাফল ডাউনলোড করুন",
     "downloading": "ডাউনলোড হচ্ছে…",
     "downloadingPct": "ডাউনলোড হচ্ছে… {pct}%",
-    "chooseHtml": "একটি HTML ফাইল বেছে নিন (ঐচ্ছিক)"
+    "chooseHtml": "একটি HTML ফাইল বেছে নিন (ঐচ্ছিক)",
+    "stillChecking": "সাময়িক সমস্যা — আপনার ফাইলটি এখনও যাচাই করা হচ্ছে…",
+    "waitingInQueue": "খালি স্লটের জন্য অপেক্ষা করা হচ্ছে — এখন পর্যন্ত {elapsed}।"
   },
   "canvas": {
     "startOver": "আবার শুরু করুন",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "পুনর্বিন্যাস করার কিছু নেই।",
     "output_too_large": "ফলাফল ডাউনলোডের জন্য অনেক বড়।",
     "pdf_unreadable": "এই ফাইলটি PDF হিসেবে পড়া যায়নি।",
-    "pdf_unreadable_one": "একটি ফাইল PDF হিসেবে পড়া যায়নি।"
+    "pdf_unreadable_one": "একটি ফাইল PDF হিসেবে পড়া যায়নি।",
+    "temporary_error": "এক মুহূর্তের জন্য কিছু ভুল হয়েছে। আবার চেষ্টা করুন।",
+    "connection_lost": "আপনার ফাইলটি যাচাই করার সময় সংযোগ বিচ্ছিন্ন হয়ে গেছে। আবার চেষ্টা করুন।"
   },
   "toolOptions": {
     "compress": {

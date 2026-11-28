@@ -261,7 +261,9 @@
     "rotate_at_least_one_page": "Gire pelo menos uma página.",
     "select_at_least_one_page": "Selecione pelo menos uma página.",
     "tool_error": "Algo deu errado. Tente novamente.",
-    "wrong_password": "A senha está errada. Verifique-a e tente novamente."
+    "wrong_password": "A senha está errada. Verifique-a e tente novamente.",
+    "temporary_error": "Algo correu mal por um momento. Tente novamente.",
+    "connection_lost": "Perdemos a ligação enquanto verificávamos o seu ficheiro. Tente novamente."
   },
   "home": {
     "heroAccent": "Grátis.",
@@ -472,7 +474,9 @@
     "tooBig": "\"{name}\" excede o limite de envio de {mb} MB.",
     "tryAgain": "Tentar novamente",
     "uploading": "Enviando…",
-    "chooseHtml": "Escolha um arquivo HTML (opcional)"
+    "chooseHtml": "Escolha um arquivo HTML (opcional)",
+    "stillChecking": "Contratempo temporário — ainda estamos a verificar o seu ficheiro…",
+    "waitingInQueue": "À espera de uma vaga livre — {elapsed} até agora."
   },
   "seo": {
     "breadcrumbHome": "Início",

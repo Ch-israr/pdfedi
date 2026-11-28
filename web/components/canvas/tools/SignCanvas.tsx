@@ -222,6 +222,9 @@ export function SignCanvas({ job, pdfs, localFiles, onPick }: ToolCanvasProps) {
       locale={locale}
       activityLabel={t("sign.activity")}
       error={job.error}
+      transientNotice={job.transientNotice}
+      queueWaitMs={job.queueWaitMs}
+      jobStatus={job.job?.status ?? null}
     >
       <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         {/* Left: signature pad + placement controls */}

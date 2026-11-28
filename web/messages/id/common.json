@@ -252,7 +252,9 @@
     "downloadResult": "Unduh hasil",
     "downloading": "Mengunduh…",
     "downloadingPct": "Mengunduh… {pct}%",
-    "chooseHtml": "Pilih file HTML (opsional)"
+    "chooseHtml": "Pilih file HTML (opsional)",
+    "stillChecking": "Gangguan sementara — masih memeriksa file Anda…",
+    "waitingInQueue": "Menunggu slot kosong — sejauh ini {elapsed}."
   },
   "canvas": {
     "startOver": "Mulai dari awal",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "Tidak ada yang perlu disusun ulang.",
     "output_too_large": "Hasilnya terlalu besar untuk diunduh.",
     "pdf_unreadable": "File ini tidak dapat dibaca sebagai PDF.",
-    "pdf_unreadable_one": "Salah satu file tidak dapat dibaca sebagai PDF."
+    "pdf_unreadable_one": "Salah satu file tidak dapat dibaca sebagai PDF.",
+    "temporary_error": "Terjadi kesalahan sesaat. Silakan coba lagi.",
+    "connection_lost": "Koneksi terputus saat memeriksa file Anda. Silakan coba lagi."
   },
   "toolOptions": {
     "compress": {

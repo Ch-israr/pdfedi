@@ -252,7 +252,9 @@
     "downloadResult": "परिणाम डाउनलोड करें",
     "downloading": "डाउनलोड हो रहा है…",
     "downloadingPct": "डाउनलोड हो रहा है… {pct}%",
-    "chooseHtml": "एक HTML फ़ाइल चुनें (वैकल्पिक)"
+    "chooseHtml": "एक HTML फ़ाइल चुनें (वैकल्पिक)",
+    "stillChecking": "अस्थायी रुकावट — आपकी फ़ाइल अभी भी जाँची जा रही है…",
+    "waitingInQueue": "खाली स्लॉट की प्रतीक्षा — अब तक {elapsed}।"
   },
   "canvas": {
     "startOver": "फिर से शुरू करें",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "क्रम बदलने के लिए कुछ नहीं है।",
     "output_too_large": "परिणाम डाउनलोड करने के लिए बहुत बड़ा है।",
     "pdf_unreadable": "यह फ़ाइल PDF के रूप में पढ़ी नहीं जा सकी।",
-    "pdf_unreadable_one": "एक फ़ाइल PDF के रूप में पढ़ी नहीं जा सकी।"
+    "pdf_unreadable_one": "एक फ़ाइल PDF के रूप में पढ़ी नहीं जा सकी।",
+    "temporary_error": "एक पल के लिए कुछ गड़बड़ हो गई। कृपया पुनः प्रयास करें।",
+    "connection_lost": "आपकी फ़ाइल जाँचते समय कनेक्शन टूट गया। कृपया पुनः प्रयास करें।"
   },
   "toolOptions": {
     "compress": {

@@ -252,7 +252,9 @@
     "downloadResult": "Descargar resultado",
     "downloading": "Descargando…",
     "downloadingPct": "Descargando… {pct}%",
-    "chooseHtml": "Elige un archivo HTML (opcional)"
+    "chooseHtml": "Elige un archivo HTML (opcional)",
+    "stillChecking": "Contratiempo temporal — seguimos revisando tu archivo…",
+    "waitingInQueue": "Esperando un hueco libre — {elapsed} hasta ahora."
   },
   "canvas": {
     "startOver": "Empezar de nuevo",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "No hay nada que reordenar.",
     "output_too_large": "El resultado es demasiado grande para descargarlo.",
     "pdf_unreadable": "No se pudo leer este archivo como PDF.",
-    "pdf_unreadable_one": "No se pudo leer uno de los archivos como PDF."
+    "pdf_unreadable_one": "No se pudo leer uno de los archivos como PDF.",
+    "temporary_error": "Algo salió mal por un momento. Inténtalo de nuevo.",
+    "connection_lost": "Perdimos la conexión mientras revisábamos tu archivo. Inténtalo de nuevo."
   },
   "toolOptions": {
     "compress": {

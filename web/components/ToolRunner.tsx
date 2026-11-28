@@ -10,6 +10,13 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import { ApiError, api, ToolSpec, UploadedFile, Job } from "../lib/api";
+import {
+  POLL_BASE_MS,
+  POLL_FAIL_WINDOW_MS,
+  formatWait,
+  isQuotaError,
+  nextPollDelayMs,
+} from "../lib/polling";
 import { toLocalePath } from "../i18n/routing";
 
 type Phase =
@@ -48,15 +55,33 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
   const [quota, setQuota] = useState<{ used: number; limit: number; remaining: number } | null>(null);
   const [limits, setLimits] = useState<{ max_upload_mb: number; max_download_mb: number } | null>(null);
   const [downloadPct, setDownloadPct] = useState<number | null>(null);
+  // Transient poll note ("still checking…") shown while the poller
+  // rides out a blip; cleared on the next successful poll. Distinct
+  // from `error`, which is a terminal failure.
+  const [transientNotice, setTransientNotice] = useState<string | null>(null);
+  // Milliseconds the current job has spent queued (from job.created_at),
+  // shown as a waiting line while the job waits for a free slot.
+  const [queueWaitMs, setQueueWaitMs] = useState<number | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // setTimeout chain (not setInterval): the next poll is scheduled
+  // after each tick, so the gap can back off after failures.
+  const pollRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Consecutive failed polls + when the current failure streak began.
+  // Refs, not state: ticks read/write them without re-rendering.
+  const pollFailuresRef = useRef(0);
+  const firstFailureAtRef = useRef<number | null>(null);
 
   // Translate an error by stable code. Falls back to the English
   // message only when no code is available (e.g. a network failure).
+  // Only a 429 carrying the backend's `quota_exceeded` code is a real
+  // quota error — a bare 429 (proxy / upstream rate limit, no code)
+  // is transient, so it gets the temporary-error message instead of
+  // the quota message. See web/lib/polling.ts.
   function resolveError(e: unknown): string {
     if (e instanceof ApiError) {
-      if (e.status === 429) return tErr("quota_exceeded", { time: quotaResetTime() });
+      if (isQuotaError(e)) return tErr("quota_exceeded", { time: quotaResetTime() });
       if (e.code && tErr.has(e.code)) return tErr(e.code);
+      if (e.status === 429) return tErr("temporary_error");
       return e.message;
     }
     return e instanceof Error ? e.message : String(e);
@@ -88,7 +113,7 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
     api.quota(toolKey).then(setQuota).catch(() => {});
     api.limits().then(setLimits).catch(() => {});
     return () => {
-      if (pollRef.current) clearInterval(pollRef.current);
+      if (pollRef.current) clearTimeout(pollRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [toolKey]);
@@ -133,21 +158,42 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
 
   function stopPolling() {
     if (pollRef.current) {
-      clearInterval(pollRef.current);
+      clearTimeout(pollRef.current);
       pollRef.current = null;
     }
+    pollFailuresRef.current = 0;
+    firstFailureAtRef.current = null;
   }
 
+  // Poll with backoff: a failed poll never stops the poller outright.
+  // Transient failures (e.g. a bare 429 from the proxy) show a
+  // temporary note and retry with exponential backoff; only a
+  // sustained failure window (POLL_FAIL_WINDOW_MS) ends the job with
+  // a hard error. A coded quota error is terminal — but quota is
+  // charged at job creation, so it should not occur while polling.
   async function pollJob(jobId: string) {
     stopPolling();
+    setTransientNotice(null);
+    setQueueWaitMs(null);
+    const schedule = (delay: number) => {
+      pollRef.current = setTimeout(tick, delay);
+    };
     const tick = async () => {
       try {
         const j = await api.job(jobId);
+        // Success resets the failure streak and clears the note.
+        pollFailuresRef.current = 0;
+        firstFailureAtRef.current = null;
+        setTransientNotice(null);
         setJob(j);
         if (j.status === "queued") {
           setPhase("preparing");
+          setQueueWaitMs(Date.now() - Date.parse(j.created_at));
+          schedule(POLL_BASE_MS);
         } else if (j.status === "running") {
           setPhase("active");
+          setQueueWaitMs(null);
+          schedule(POLL_BASE_MS);
         } else if (j.status === "succeeded") {
           stopPolling();
           setPhase("finalizing");
@@ -161,13 +207,27 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
           setPhase("failed");
         }
       } catch (e: unknown) {
-        stopPolling();
-        setError(resolveError(e));
-        setPhase("failed");
+        if (isQuotaError(e)) {
+          stopPolling();
+          setError(resolveError(e));
+          setPhase("failed");
+          return;
+        }
+        pollFailuresRef.current += 1;
+        const now = Date.now();
+        if (firstFailureAtRef.current === null) firstFailureAtRef.current = now;
+        if (now - firstFailureAtRef.current >= POLL_FAIL_WINDOW_MS) {
+          stopPolling();
+          setTransientNotice(null);
+          setError(tErr("connection_lost"));
+          setPhase("failed");
+          return;
+        }
+        setTransientNotice(t("stillChecking"));
+        schedule(nextPollDelayMs(pollFailuresRef.current));
       }
     };
     await tick();
-    pollRef.current = setInterval(tick, 400);
   }
 
   async function onPick(list: FileList | null) {
@@ -226,8 +286,10 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       await pollJob(j.id);
     } catch (e: unknown) {
       setError(resolveError(e));
-      // A 429 here means the quota is spent — refresh so the reset-time
-      // display and the disabled run state show up immediately.
+      // A real quota error refreshes the quota display so the
+      // reset-time and the disabled run state show up immediately.
+      // (resolveError only maps a coded quota_exceeded to the quota
+      // message; a bare 429 gets the temporary-error message.)
       api.quota(toolKey).then(setQuota).catch(() => {});
       setPhase("options");
     } finally {
@@ -282,6 +344,8 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
     setOptions({});
     setJob(null);
     setError(null);
+    setTransientNotice(null);
+    setQueueWaitMs(null);
     setPhase("pick");
   }
 
@@ -363,6 +427,12 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
       {error && phase !== "failed" && (
         <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
           {error}
+        </div>
+      )}
+
+      {transientNotice && (phase === "preparing" || phase === "active" || phase === "finalizing") && (
+        <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          {transientNotice}
         </div>
       )}
 
@@ -497,6 +567,11 @@ export function ToolRunner({ toolKey }: { toolKey: string }) {
             {phase === "active" && t("activeSub")}
             {phase === "finalizing" && t("finalizingSub")}
           </p>
+          {phase === "preparing" && job?.status === "queued" && queueWaitMs !== null && (
+            <p className="mt-1 text-sm text-amber-700">
+              {t("waitingInQueue", { elapsed: formatWait(queueWaitMs) })}
+            </p>
+          )}
         </div>
       )}
 

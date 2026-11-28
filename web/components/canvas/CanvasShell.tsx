@@ -7,6 +7,7 @@ import { useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { toLocalePath } from "../../i18n/routing";
+import { formatWait } from "../../lib/polling";
 import type { CanvasPhase } from "./useOrganizerJob";
 
 interface CanvasShellProps {
@@ -33,6 +34,15 @@ interface CanvasShellProps {
   downloadPct: number | null;
   activityLabel: string;
   error: string | null;
+  // Transient poll note ("still checking…") while the poller rides
+  // out a blip; null when polls are healthy.
+  transientNotice?: string | null;
+  // Milliseconds the current job has spent queued; shown as a
+  // waiting line while the job waits for a free slot.
+  queueWaitMs?: number | null;
+  // Current job status ("queued" | "running" | ...), or null when no
+  // job is running yet.
+  jobStatus?: string | null;
   locale: string;
   children: ReactNode;
 }
@@ -61,6 +71,9 @@ export function CanvasShell({
   downloadPct,
   activityLabel,
   error,
+  transientNotice,
+  queueWaitMs,
+  jobStatus,
   locale,
   children,
 }: CanvasShellProps) {
@@ -101,6 +114,12 @@ export function CanvasShell({
         {error && phase !== "failed" && (
           <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
+          </div>
+        )}
+
+        {transientNotice && phase === "processing" && (
+          <div className="mt-4 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+            {transientNotice}
           </div>
         )}
 
@@ -214,6 +233,11 @@ export function CanvasShell({
             <div className="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-brand-600" />
             <p className="mt-4 font-semibold">{activityLabel}…</p>
             <p className="mt-1 text-sm text-slate-500">{t("processingSub")}</p>
+            {jobStatus === "queued" && queueWaitMs !== null && queueWaitMs !== undefined && (
+              <p className="mt-1 text-sm text-amber-700">
+                {tRunner("waitingInQueue", { elapsed: formatWait(queueWaitMs) })}
+              </p>
+            )}
           </div>
         </div>
       )}

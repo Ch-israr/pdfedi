@@ -252,7 +252,9 @@
     "downloadResult": "تنزيل النتيجة",
     "downloading": "جارٍ التنزيل…",
     "downloadingPct": "جارٍ التنزيل… {pct} %",
-    "chooseHtml": "اختر ملف HTML (اختياري)"
+    "chooseHtml": "اختر ملف HTML (اختياري)",
+    "stillChecking": "عطل مؤقت — ما زلنا نتحقق من ملفك…",
+    "waitingInQueue": "بنتظار خانة شاغرة — {elapsed} حتى الآن."
   },
   "canvas": {
     "startOver": "ابدأ من جديد",
@@ -477,7 +479,9 @@
     "nothing_to_reorder": "لا يوجد شيء لإعادة طلبه.",
     "output_too_large": "النتيجة كبيرة جدًا بحيث لا يمكن تنزيلها.",
     "pdf_unreadable": "تعذّر قراءة هذا الملف كتنسيق PDF.",
-    "pdf_unreadable_one": "تعذّر قراءة أحد الملفات بتنسيق PDF."
+    "pdf_unreadable_one": "تعذّر قراءة أحد الملفات بتنسيق PDF.",
+    "temporary_error": "حدث خطأ مؤقت. يرجى المحاولة مرة أخرى.",
+    "connection_lost": "انقطع الاتصال أثناء التحقق من ملفك. يرجى المحاولة مرة أخرى."
   },
   "toolOptions": {
     "compress": {
